@@ -2544,15 +2544,6 @@ enough (H :
       do 2 rewrite (rngl_mul_opp_r Hop).
       rewrite (rngl_mul_opp_l Hop).
       rewrite (rngl_opp_involutive Hop).
-...
-Theorem rngl_sin_mul_sin :
-  ∀ a b,
-  (rngl_sin a * rngl_sin b = (rngl_cos (a - b) - rngl_cos (a + b)) / 2)%L.
-...
-rewrite <- rngl_mul_assoc.
-rewrite rngl_sin_mul_sin.
-(* ne fait que revenir en arrière *)
-...
       rewrite (rngl_div_opp_l Hop Hiv).
       rewrite (rngl_add_opp_l Hop).
       rewrite <- (rngl_add_opp_r Hop).
@@ -2572,7 +2563,6 @@ rewrite rngl_sin_mul_sin.
       rewrite (rngl_mul_opp_r Hop).
       rewrite (rngl_div_opp_l Hop Hiv).
       rewrite (rngl_add_opp_r Hop).
-...
       rewrite angle_div_2_add.
       rewrite Hov.
       rewrite rngl_sin_add_straight_r.
@@ -2585,7 +2575,41 @@ rewrite rngl_sin_mul_sin.
       rewrite (rngl_div_opp_l Hop Hiv).
       rewrite (rngl_sub_opp_r Hop).
       rewrite angle_add_comm.
+      rewrite <- rngl_mul_assoc.
       rewrite rngl_sin_add, rngl_sin_sub.
+      remember (rngl_sin (θ₀ /₂)) as a.
+      remember (rngl_cos (θ₀ /₂)) as b.
+      remember (rngl_sin (θ /₂)) as c.
+      remember (rngl_cos (θ /₂)) as d.
+      rewrite (rngl_mul_comm Hic (_ + _)).
+      rewrite (rngl_squ_sub_squ' Hop).
+      rewrite (rngl_mul_comm Hic (b * c)).
+      rewrite (rngl_add_sub Hos).
+      subst a b c d.
+      cbn.
+      do 4 rewrite (rngl_squ_mul Hic).
+      rewrite (rngl_squ_sqrt Hon); [ | apply rngl_1_sub_cos_div_2_nonneg ].
+      rewrite (rngl_squ_sqrt Hon); [ | apply rngl_1_add_cos_div_2_nonneg ].
+      rewrite (rngl_squ_sqrt Hon); [ | apply rngl_1_add_cos_div_2_nonneg ].
+      rewrite (rngl_squ_sqrt Hon); [ | apply rngl_1_sub_cos_div_2_nonneg ].
+      replace (if _ ≤? _ then _ else _)²%L with 1%L. 2: {
+        destruct (0 ≤? rngl_sin θ)%L; symmetry; [ apply (rngl_squ_1 Hon) | ].
+        apply (rngl_squ_opp_1 Hon Hop).
+      }
+      replace (if _ ≤? _ then _ else _)²%L with 1%L. 2: {
+        destruct (0 ≤? rngl_sin θ₀)%L; symmetry; [ apply (rngl_squ_1 Hon) | ].
+        apply (rngl_squ_opp_1 Hon Hop).
+      }
+      do 2 rewrite (rngl_mul_1_l Hon).
+      rewrite (rngl_mul_sub_distr_r Hop).
+      do 2 rewrite <- rngl_mul_assoc.
+      rewrite (rngl_div_mul Hon Hiv). 2: {
+        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+      }
+      rewrite (rngl_div_mul Hon Hiv). 2: {
+        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+      }
+      do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
 ...
       remember ((θ + q) /₂)%A as a.
   remember ((p - q) /₂)%A as b.
