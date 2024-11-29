@@ -2546,6 +2546,35 @@ enough (H :
       rewrite (rngl_opp_involutive Hop).
       rewrite (rngl_div_opp_l Hop Hiv).
       rewrite (rngl_add_opp_l Hop).
+      rewrite <- (rngl_add_opp_r Hop).
+      rewrite <- (rngl_div_opp_l Hop Hiv).
+      rewrite <- (rngl_mul_opp_r Hop).
+      rewrite <- rngl_sin_opp.
+      rewrite angle_opp_div_2.
+      rewrite angle_opp_sub_distr.
+      remember (θ - θ₀ =? 0)%A as ttz eqn:Httz.
+      symmetry in Httz.
+      destruct ttz. {
+        apply angle_eqb_eq in Httz.
+        apply -> angle_sub_move_0_r in Httz; subst θ.
+        now apply angle_lt_irrefl in Htt.
+      }
+      rewrite rngl_sin_add_straight_r.
+      rewrite (rngl_mul_opp_r Hop).
+      rewrite (rngl_div_opp_l Hop Hiv).
+      rewrite (rngl_add_opp_r Hop).
+      rewrite angle_div_2_add.
+      rewrite Hov.
+      rewrite rngl_sin_add_straight_r.
+      rewrite angle_div_2_sub.
+      generalize Htt; intros H1.
+      apply angle_lt_le_incl in H1.
+      rewrite H1; clear H1.
+      rewrite (rngl_mul_opp_r Hop).
+      rewrite (rngl_mul_opp_l Hop).
+      rewrite (rngl_div_opp_l Hop Hiv).
+      rewrite (rngl_sub_opp_r Hop).
+      rewrite angle_add_comm.
 ...
 enough (H :
   ∃ η : T,
