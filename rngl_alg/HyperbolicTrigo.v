@@ -2484,8 +2484,8 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
 }
 Qed.
 
-Theorem fold_old_angle_add_overflow :
-  ∀ θ1 θ2, (θ1 + θ2 <? θ1)%A = old_angle_add_overflow θ1 θ2.
+Theorem fold_angle_add_overflow2 :
+  ∀ θ1 θ2, (θ1 + θ2 <? θ1)%A = angle_add_overflow2 θ1 θ2.
 Proof. easy. Qed.
 
 (* to be completed
@@ -2729,7 +2729,7 @@ enough (H :
   rewrite <- angle_mul_2_l.
   rewrite angle_div_2_add.
 (**)
-  rewrite fold_old_angle_add_overflow.
+  rewrite fold_angle_add_overflow2.
   rewrite angle_add_overflow_equiv3.
   remember (angle_add_overflow θ dθ) as ov1 eqn:Hov1.
   remember (angle_add_overflow (θ + dθ) θ) as ov2 eqn:Hov2.
@@ -2807,7 +2807,7 @@ destruct pqs. {
 ...
     (* lemma *)
     rewrite <- angle_add_overflow_equiv3.
-    progress unfold old_angle_add_overflow.
+    progress unfold angle_add_overflow2.
     (* lemma *)
     apply Bool.not_true_iff_false.
     intros H.

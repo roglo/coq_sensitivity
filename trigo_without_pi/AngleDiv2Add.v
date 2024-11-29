@@ -55,8 +55,8 @@ assert (Hs2z : (√2 ≠ 0)%L). {
 }
 intros * Haov.
 generalize Haov; intros Haov_v.
-rewrite <- angle_add_overflow_equiv3 in Haov.
-progress unfold old_angle_add_overflow in Haov.
+rewrite <- angle_add_overflow_equiv2 in Haov.
+progress unfold angle_add_overflow2 in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 cbn.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
@@ -316,8 +316,8 @@ assert (Hs2z : (√2 ≠ 0)%L). {
   now rewrite (rngl_squ_0 Hos) in H.
 }
 generalize Haov; intros Haov_v.
-rewrite <- angle_add_overflow_equiv3 in Haov.
-progress unfold old_angle_add_overflow in Haov.
+rewrite <- angle_add_overflow_equiv2 in Haov.
+progress unfold angle_add_overflow2 in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 cbn.
 move Haov at bottom.
@@ -578,8 +578,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Haov.
 rewrite rngl_cos_add_straight_r.
 cbn - [ angle_add ].
-rewrite <- angle_add_overflow_equiv3 in Haov.
-progress unfold old_angle_add_overflow in Haov.
+rewrite <- angle_add_overflow_equiv2 in Haov.
+progress unfold angle_add_overflow2 in Haov.
 progress unfold angle_ltb in Haov.
 cbn.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
@@ -782,8 +782,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Haov.
 rewrite rngl_sin_add_straight_r.
 cbn - [ angle_add ].
-rewrite <- angle_add_overflow_equiv3 in Haov.
-progress unfold old_angle_add_overflow in Haov.
+rewrite <- angle_add_overflow_equiv2 in Haov.
+progress unfold angle_add_overflow2 in Haov.
 progress unfold angle_ltb in Haov.
 cbn.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.

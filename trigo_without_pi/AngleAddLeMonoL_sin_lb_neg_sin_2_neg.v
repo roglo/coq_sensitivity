@@ -83,8 +83,8 @@ destruct zs13. {
   }
   (* perhaps a lemma; faut réfléchir *)
   clear - ac Hzs13 Hor θ2 H23 Hzs12 Hzs2 Heo Hop Hzs3 Hon Hs13 Hc1 Hii Hos.
-  rewrite <- angle_add_overflow_equiv3.
-  progress unfold old_angle_add_overflow.
+  rewrite <- angle_add_overflow_equiv2.
+  progress unfold angle_add_overflow2.
   progress unfold angle_ltb.
   generalize Hzs13; intros H.
   apply rngl_leb_le in H.
@@ -343,11 +343,11 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ1)) as [Hzs1'| Hs1z']. {
 }
 apply (rngl_nlt_ge_iff Hor) in Hs1z'.
 (**)
-rewrite <- angle_add_overflow_equiv3 in Haov13.
-progress unfold old_angle_add_overflow in Haov13.
+rewrite <- angle_add_overflow_equiv2 in Haov13.
+progress unfold angle_add_overflow2 in Haov13.
 progress unfold angle_ltb in Haov13.
-rewrite <- angle_add_overflow_equiv3.
-progress unfold old_angle_add_overflow.
+rewrite <- angle_add_overflow_equiv2.
+progress unfold angle_add_overflow2.
 progress unfold angle_ltb.
 progress sin_cos_add_sub_straight_hyp T Haov13.
 generalize Hzs13; intros H.
@@ -410,8 +410,8 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzs1| Hc1z]. {
     apply Haov12; clear Haov12.
     (* perhaps a lemma *)
     clear - ac Hop Hzs12 Hs1z Hor Hzs1 Hzs2 Hzc2.
-    rewrite <- angle_add_overflow_equiv3.
-    progress unfold old_angle_add_overflow.
+    rewrite <- angle_add_overflow_equiv2.
+    progress unfold angle_add_overflow2.
     rewrite angle_add_sub_assoc.
     rewrite <- angle_add_sub_swap.
     progress unfold angle_ltb.
@@ -447,8 +447,8 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzs1| Hc1z]. {
   rewrite <- angle_sub_sub_distr.
   rewrite angle_straight_sub_right.
   (* perhaps a lemma *)
-  rewrite <- angle_add_overflow_equiv3.
-  progress unfold old_angle_add_overflow.
+  rewrite <- angle_add_overflow_equiv2.
+  progress unfold angle_add_overflow2.
   rewrite angle_add_sub_assoc.
   rewrite <- angle_add_sub_swap.
   rewrite <- angle_sub_add_distr.
@@ -531,8 +531,8 @@ rewrite angle_straight_sub_right in Haov12.
 apply Bool.not_true_iff_false in Haov12.
 apply Haov12; clear Haov12.
 (* perhaps a lemma *)
-rewrite <- angle_add_overflow_equiv3.
-progress unfold old_angle_add_overflow.
+rewrite <- angle_add_overflow_equiv2.
+progress unfold angle_add_overflow2.
 rewrite angle_add_sub_assoc.
 rewrite <- angle_add_sub_swap.
 rewrite angle_sub_sub_swap.

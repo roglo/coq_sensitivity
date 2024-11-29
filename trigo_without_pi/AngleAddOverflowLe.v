@@ -674,8 +674,8 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * H32 H12.
-  rewrite <- angle_add_overflow_equiv3.
-  progress unfold old_angle_add_overflow.
+  rewrite <- angle_add_overflow_equiv2.
+  progress unfold angle_add_overflow2.
   progress unfold angle_ltb.
   rewrite (H1 (rngl_sin θ1)).
   rewrite (rngl_leb_refl Hor).
@@ -688,9 +688,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * H32 H12.
 generalize H12; intros Haov.
-rewrite <- angle_add_overflow_equiv3 in H12 |-*.
-progress unfold old_angle_add_overflow in H12.
-progress unfold old_angle_add_overflow.
+rewrite <- angle_add_overflow_equiv2 in H12 |-*.
+progress unfold angle_add_overflow2 in H12.
+progress unfold angle_add_overflow2.
 progress unfold angle_leb in H32.
 progress unfold angle_ltb in H12.
 progress unfold angle_ltb.

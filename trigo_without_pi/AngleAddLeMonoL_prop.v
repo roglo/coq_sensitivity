@@ -83,8 +83,8 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
   progress sin_cos_add_sub_right_hyp T Hzs12.
   progress sin_cos_add_sub_right_hyp T Hs1z.
   clear - Haov12 ac Hop Hs1z Hor Hzc1 Hzs2 Hc2z Hzs12 Hon Hc1.
-  rewrite <- angle_add_overflow_equiv3 in Haov12.
-  progress unfold old_angle_add_overflow in Haov12.
+  rewrite <- angle_add_overflow_equiv2 in Haov12.
+  progress unfold angle_add_overflow2 in Haov12.
   apply Bool.not_true_iff_false in Haov12.
   apply Haov12; clear Haov12.
   rewrite angle_add_sub_assoc.
@@ -147,8 +147,8 @@ destruct (rngl_lt_dec Hor (rngl_sin θ1) 0)%L as [Hs1z| Hzs1]. 2: {
   progress sin_cos_add_sub_right_hyp T Hzs12.
   progress sin_cos_add_sub_right_hyp T Hzs1.
   progress sin_cos_add_sub_right_hyp T Hc1z.
-  rewrite <- angle_add_overflow_equiv3.
-  progress unfold old_angle_add_overflow.
+  rewrite <- angle_add_overflow_equiv2.
+  progress unfold angle_add_overflow2.
   rewrite angle_add_sub_assoc.
   rewrite angle_add_add_swap.
   rewrite angle_add_sub_swap.
@@ -184,8 +184,8 @@ progress sin_cos_add_sub_straight_hyp T Hs1z.
 progress sin_cos_add_sub_straight_hyp T Hc1z.
 apply Bool.not_true_iff_false in Haov12.
 apply Haov12; clear Haov12.
-rewrite <- angle_add_overflow_equiv3.
-progress unfold old_angle_add_overflow.
+rewrite <- angle_add_overflow_equiv2.
+progress unfold angle_add_overflow2.
 rewrite angle_add_sub_assoc.
 rewrite <- angle_add_sub_swap.
 rewrite <- angle_sub_add_distr.

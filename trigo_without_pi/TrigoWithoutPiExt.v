@@ -17,9 +17,8 @@ Context {ac : angle_ctx T}.
 
 Definition angle_add_overflow θ1 θ2 := ((θ1 ≠? 0)%A && (- θ1 ≤? θ2)%A)%bool.
 
-(**)
-Definition old_angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
-(**)
+(* equivalent definition *)
+Definition angle_add_overflow2 θ1 θ2 := (θ1 + θ2 <? θ1)%A.
 
 Theorem angle_lt_iff : ∀ θ1 θ2, (θ1 < θ2 ↔ θ1 ≤ θ2 ∧ θ1 ≠ θ2)%A.
 Proof.
@@ -442,9 +441,9 @@ apply (rngl_lt_add_r Hos Hor).
 now apply (rngl_mul_pos_pos Hos Hor Hii).
 Qed.
 
-Theorem angle_add_overflow_equiv3 :
+Theorem angle_add_overflow_equiv2 :
   ∀ θ1 θ2,
-  old_angle_add_overflow θ1 θ2 = angle_add_overflow θ1 θ2.
+  angle_add_overflow2 θ1 θ2 = angle_add_overflow θ1 θ2.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -454,13 +453,13 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
   rewrite (H1 θ1), (H1 θ2).
   rewrite angle_add_overflow_0_l.
-  progress unfold old_angle_add_overflow.
+  progress unfold angle_add_overflow2.
   rewrite angle_add_0_l.
   apply Bool.not_true_iff_false.
   apply angle_lt_irrefl.
 }
 intros.
-progress unfold old_angle_add_overflow.
+progress unfold angle_add_overflow2.
 progress unfold angle_add_overflow.
 remember (θ1 =? 0)%A as z1 eqn:Hz1.
 symmetry in Hz1.
@@ -1012,8 +1011,8 @@ apply Bool.not_true_iff_false.
 intros Haov.
 apply rngl_nle_gt in Hzs2.
 apply Hzs2; clear Hzs2.
-rewrite <- angle_add_overflow_equiv3 in Haov.
-progress unfold old_angle_add_overflow in Haov.
+rewrite <- angle_add_overflow_equiv2 in Haov.
+progress unfold angle_add_overflow2 in Haov.
 apply angle_leb_gt in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 apply (rngl_nlt_ge_iff Hor).
@@ -1046,8 +1045,8 @@ Theorem rngl_sin_add_nonneg_angle_add_not_overflow_sin_nonneg :
 Proof.
 destruct_ac.
 intros * Hzs1 Hzs3 Haov.
-rewrite <- angle_add_overflow_equiv3 in Haov.
-progress unfold old_angle_add_overflow in Haov.
+rewrite <- angle_add_overflow_equiv2 in Haov.
+progress unfold angle_add_overflow2 in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 apply (rngl_nlt_ge_iff Hor).
 intros Hzs2.
@@ -2137,9 +2136,9 @@ Theorem angle_add_not_overflow_move_add :
 Proof.
 destruct_ac.
 intros * H13 H132.
-rewrite <- angle_add_overflow_equiv3 in H132 |-*.
-progress unfold old_angle_add_overflow in H132.
-progress unfold old_angle_add_overflow.
+rewrite <- angle_add_overflow_equiv2 in H132 |-*.
+progress unfold angle_add_overflow2 in H132.
+progress unfold angle_add_overflow2.
 apply Bool.not_true_iff_false in H132.
 apply angle_nlt_ge in H132.
 apply Bool.not_true_iff_false.
@@ -2147,8 +2146,8 @@ apply angle_nlt_ge.
 rewrite angle_add_add_swap in H132.
 rewrite <- angle_add_assoc in H132.
 apply (angle_le_trans _ (θ1 + θ3))%A; [ | apply H132 ].
-rewrite <- angle_add_overflow_equiv3 in H13.
-progress unfold old_angle_add_overflow in H13.
+rewrite <- angle_add_overflow_equiv2 in H13.
+progress unfold angle_add_overflow2 in H13.
 apply Bool.not_true_iff_false in H13.
 now apply angle_nlt_ge in H13.
 Qed.
