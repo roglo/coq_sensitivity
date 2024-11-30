@@ -2524,6 +2524,7 @@ enough (H :
   rewrite (rngl_sub_opp_r Hop).
   now apply H.
 }
+Check exists_nat_such_that_rngl_cos_close_to_1.
 ...
 enough (H :
   ∃ η : T,
