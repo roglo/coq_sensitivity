@@ -668,6 +668,13 @@ Check rngl_cos_lt_angle_eucl_dist_lt.
    ouais, bon, faut voir...
 *)
 rewrite angle_eucl_dist_is_sqrt.
+progress unfold angle_div_2 at 2.
+cbn - [ angle_div_2 angle_sub ].
+rewrite rngl_cos_sub_comm.
+remember (1 - _)%L as a.
+...
+Search (rngl_sin (_ /₂)).
+rewrite rngl_sin_angle_div_2.
 ...
 progress unfold angle_eucl_dist.
 ...
