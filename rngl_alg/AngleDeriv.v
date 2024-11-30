@@ -628,7 +628,6 @@ rewrite <- (rngl_mul_div_assoc Hiv).
    which could make the lhs of this inequality as small
    as we want.
  *)
-(* TODO: many repeated proofs below; do some asserts before *)
 rewrite angle_eucl_dist_is_sqrt.
 progress unfold angle_div_2 at 2.
 cbn - [ angle_div_2 angle_sub ].
@@ -648,17 +647,9 @@ assert (Hsnz : √2 ≠ 0%L). {
   now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
 }
 remember (1 - _)%L as a.
-rewrite (rl_sqrt_div Hon Hop Hiv Hor _ _ Hz1c Hz2).
-rewrite (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
-(*
-  √(2 * a) ≠ 0%L
-*)
+assert (Hsanz : √a ≠ 0%L). {
   intros H1.
-  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
-    now apply (rngl_mul_nonneg_nonneg Hos Hor).
-  }
-(* ... *)
-  apply (rngl_eq_mul_0_r Hos Hii) in H1; [ | easy ].
+  apply (eq_rl_sqrt_0 Hon Hos) in H1; [ | easy ].
   subst a.
   apply -> (rngl_sub_move_0_r Hop) in H1.
   symmetry in H1.
@@ -666,33 +657,24 @@ rewrite (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
   apply -> angle_sub_move_0_r in H1.
   subst θ.
   now apply angle_lt_irrefl in Htt.
+}
+rewrite (rl_sqrt_div Hon Hop Hiv Hor _ _ Hz1c Hz2).
+rewrite (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
+  intros H1.
+  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+    now apply (rngl_mul_nonneg_nonneg Hos Hor).
+  }
+  apply (rngl_eq_mul_0_r Hos Hii) in H1; [ | easy ].
+  move H1 at top.
+  subst a.
+  now rewrite (rl_sqrt_0 Hon Hop Hor Hii) in Hsanz.
 }
 rewrite rl_sqrt_mul; [ | easy | easy ].
 rewrite <- (rngl_mul_mul_swap Hic √_).
 rewrite fold_rngl_squ.
 rewrite (rngl_squ_sqrt Hon); [ | easy ].
-rewrite <- (rngl_div_div Hos Hon Hiv); [ | | easy ]. 2: {
-  intros H1.
-  apply (eq_rl_sqrt_0 Hon Hos) in H1; [ | easy ].
-  subst a.
-  apply -> (rngl_sub_move_0_r Hop) in H1.
-  symmetry in H1.
-  apply eq_rngl_cos_1 in H1.
-  apply -> angle_sub_move_0_r in H1.
-  subst θ.
-  now apply angle_lt_irrefl in Htt.
-}
-rewrite (rngl_div_diag Hon Hiq). 2: {
-  intros H1.
-  apply (eq_rl_sqrt_0 Hon Hos) in H1; [ | easy ].
-  subst a.
-  apply -> (rngl_sub_move_0_r Hop) in H1.
-  symmetry in H1.
-  apply eq_rngl_cos_1 in H1.
-  apply -> angle_sub_move_0_r in H1.
-  subst θ.
-  now apply angle_lt_irrefl in Htt.
-}
+rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+rewrite (rngl_div_diag Hon Hiq); [ | easy ].
 rewrite (rngl_mul_comm Hic).
 rewrite rngl_mul_assoc.
 rewrite (rngl_div_mul Hon Hiv); [ | easy ].
