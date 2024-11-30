@@ -597,6 +597,7 @@ Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -667,20 +668,97 @@ Check rngl_cos_lt_angle_eucl_dist_lt.
    d(θ,θ₀) = √((cos θ₀ - cos θ)²+(sin θ₀ - sin θ)²)
    ouais, bon, faut voir...
 *)
-rewrite angle_eucl_dist_is_sqrt.
-progress unfold angle_div_2 at 2.
-cbn - [ angle_div_2 angle_sub ].
-rewrite rngl_cos_sub_comm.
-remember (1 - _)%L as a.
-...
-Search (rngl_sin (_ /₂)).
-rewrite rngl_sin_angle_div_2.
-...
-progress unfold angle_eucl_dist.
-...
+      (* many repeated proofs; do some asserts before *)
+      rewrite angle_eucl_dist_is_sqrt.
+      progress unfold angle_div_2 at 2.
+      cbn - [ angle_div_2 angle_sub ].
+      rewrite rngl_cos_sub_comm.
+      remember (1 - _)%L as a.
+      rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
+        subst a.
+        apply (rngl_le_0_sub Hop Hor).
+        apply rngl_cos_bound.
+      } {
+        apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      }
+      rewrite (rngl_div_div Hos Hon Hiv); cycle 1. {
+        intros H1.
+        apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+          apply (rngl_0_le_2 Hon Hos Hor).
+        }
+        now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
+      } {
+        intros H1.
+        apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+          apply (rngl_mul_nonneg_nonneg Hos Hor).
+          apply (rngl_0_le_2 Hon Hos Hor).
+          subst a.
+          apply (rngl_le_0_sub Hop Hor).
+          apply rngl_cos_bound.
+        }
+        apply (rngl_eq_mul_0_r Hos Hii) in H1. 2: {
+          now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+        }
+        subst a.
+        apply -> (rngl_sub_move_0_r Hop) in H1.
+        symmetry in H1.
+        apply eq_rngl_cos_1 in H1.
+        apply -> angle_sub_move_0_r in H1.
+        subst θ.
+        now apply angle_lt_irrefl in Htt.
+      }
+      rewrite rl_sqrt_mul; cycle 1. {
+        apply (rngl_0_le_2 Hon Hos Hor).
+      } {
+        subst a.
+        apply (rngl_le_0_sub Hop Hor).
+        apply rngl_cos_bound.
+      }
+      rewrite <- (rngl_mul_mul_swap Hic √_).
+      rewrite fold_rngl_squ.
+      rewrite (rngl_squ_sqrt Hon). 2: {
+        apply (rngl_0_le_2 Hon Hos Hor).
+      }
+      rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+        intros H1.
+        apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+          subst a.
+          apply (rngl_le_0_sub Hop Hor).
+          apply rngl_cos_bound.
+        }
+        subst a.
+        apply -> (rngl_sub_move_0_r Hop) in H1.
+        symmetry in H1.
+        apply eq_rngl_cos_1 in H1.
+        apply -> angle_sub_move_0_r in H1.
+        subst θ.
+        now apply angle_lt_irrefl in Htt.
+      } {
+        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+      }
+      rewrite (rngl_div_diag Hon Hiq). 2: {
+        intros H1.
+        apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+          subst a.
+          apply (rngl_le_0_sub Hop Hor).
+          apply rngl_cos_bound.
+        }
+        subst a.
+        apply -> (rngl_sub_move_0_r Hop) in H1.
+        symmetry in H1.
+        apply eq_rngl_cos_1 in H1.
+        apply -> angle_sub_move_0_r in H1.
+        subst θ.
+        now apply angle_lt_irrefl in Htt.
+      }
+      rewrite (rngl_mul_comm Hic).
+      rewrite rngl_mul_assoc.
+      rewrite (rngl_div_mul Hon Hiv). 2: {
+        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+      }
+      rewrite (rngl_mul_1_l Hon).
+(* bien. Bon, faut voir... *)
 Check exists_nat_such_that_rngl_cos_close_to_1.
-...
-  rewrite angle_eucl_dist_is_sqrt.
 ...
 enough (H :
   ∃ η, (0 < η)%L ∧
