@@ -2494,6 +2494,7 @@ Theorem rngl_cos_derivative :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros θ ε Hε.
@@ -2523,106 +2524,6 @@ enough (H :
   rewrite (rngl_sub_opp_r Hop).
   now apply H.
 }
-enough (H :
-  ∃ η, (0 < η)%L ∧
-  ∀ θ, (angle_eucl_dist θ θ₀ < η)%L →
-  (rngl_abs
-     ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀ + rngl_sin θ₀) <
-     ε)%L). {
-  destruct H as (η & Hη & H).
-  exists η.
-  move η before ε.
-  split; [ easy | ].
-  intros θ Hθ.
-  rewrite rngl_cos_sub_cos.
-  remember (angle_add_overflow θ θ₀) as ov eqn:Hov.
-  remember (θ <? θ₀)%A as tt eqn:Htt.
-  symmetry in Hov, Htt.
-  destruct ov. {
-    destruct tt. {
-      do 2 rewrite rngl_sin_add_straight_r.
-      do 2 rewrite (rngl_mul_opp_r Hop).
-      rewrite (rngl_mul_opp_l Hop).
-      rewrite (rngl_opp_involutive Hop).
-      rewrite (rngl_div_opp_l Hop Hiv).
-      rewrite (rngl_add_opp_l Hop).
-      rewrite <- (rngl_add_opp_r Hop).
-      rewrite <- (rngl_div_opp_l Hop Hiv).
-      rewrite <- (rngl_mul_opp_r Hop).
-      rewrite <- rngl_sin_opp.
-      rewrite angle_opp_div_2.
-      rewrite angle_opp_sub_distr.
-      remember (θ - θ₀ =? 0)%A as ttz eqn:Httz.
-      symmetry in Httz.
-      destruct ttz. {
-        apply angle_eqb_eq in Httz.
-        apply -> angle_sub_move_0_r in Httz; subst θ.
-        now apply angle_lt_irrefl in Htt.
-      }
-      rewrite rngl_sin_add_straight_r.
-      rewrite (rngl_mul_opp_r Hop).
-      rewrite (rngl_div_opp_l Hop Hiv).
-      rewrite (rngl_add_opp_r Hop).
-      rewrite angle_div_2_add.
-      rewrite Hov.
-      rewrite rngl_sin_add_straight_r.
-      rewrite angle_div_2_sub.
-      generalize Htt; intros H1.
-      apply angle_lt_le_incl in H1.
-      rewrite H1; clear H1.
-      rewrite (rngl_mul_opp_r Hop).
-      rewrite (rngl_mul_opp_l Hop).
-      rewrite (rngl_div_opp_l Hop Hiv).
-      rewrite (rngl_sub_opp_r Hop).
-      rewrite angle_add_comm.
-      rewrite <- rngl_mul_assoc.
-      rewrite rngl_sin_add, rngl_sin_sub.
-      remember (rngl_sin (θ₀ /₂)) as a.
-      remember (rngl_cos (θ₀ /₂)) as b.
-      remember (rngl_sin (θ /₂)) as c.
-      remember (rngl_cos (θ /₂)) as d.
-      rewrite (rngl_mul_comm Hic (_ + _)).
-      rewrite (rngl_squ_sub_squ' Hop).
-      rewrite (rngl_mul_comm Hic (b * c)).
-      rewrite (rngl_add_sub Hos).
-      subst a b c d.
-      cbn.
-      do 4 rewrite (rngl_squ_mul Hic).
-      rewrite (rngl_squ_sqrt Hon); [ | apply rngl_1_sub_cos_div_2_nonneg ].
-      rewrite (rngl_squ_sqrt Hon); [ | apply rngl_1_add_cos_div_2_nonneg ].
-      rewrite (rngl_squ_sqrt Hon); [ | apply rngl_1_add_cos_div_2_nonneg ].
-      rewrite (rngl_squ_sqrt Hon); [ | apply rngl_1_sub_cos_div_2_nonneg ].
-      replace (if _ ≤? _ then _ else _)²%L with 1%L. 2: {
-        destruct (0 ≤? rngl_sin θ)%L; symmetry; [ apply (rngl_squ_1 Hon) | ].
-        apply (rngl_squ_opp_1 Hon Hop).
-      }
-      replace (if _ ≤? _ then _ else _)²%L with 1%L. 2: {
-        destruct (0 ≤? rngl_sin θ₀)%L; symmetry; [ apply (rngl_squ_1 Hon) | ].
-        apply (rngl_squ_opp_1 Hon Hop).
-      }
-      do 2 rewrite (rngl_mul_1_l Hon).
-      rewrite (rngl_mul_sub_distr_r Hop).
-      do 2 rewrite <- rngl_mul_assoc.
-      rewrite (rngl_div_mul Hon Hiv). 2: {
-        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-      }
-      rewrite (rngl_div_mul Hon Hiv). 2: {
-        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-      }
-      do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
-...
-      remember ((θ + q) /₂)%A as a.
-  remember ((p - q) /₂)%A as b.
-  move b before a.
-  rewrite (rngl_sub_opp_r Hop).
-  rewrite (rngl_opp_add_distr Hop).
-  rewrite (rngl_add_sub_assoc Hop).
-  rewrite (rngl_sub_add Hop).
-  rewrite <- (rngl_opp_add_distr Hop).
-  rewrite <- (rngl_mul_2_l Hon).
-  rewrite <- rngl_mul_assoc.
-  rewrite <- (rngl_mul_opp_r Hop).
-  f_equal.
 ...
 enough (H :
   ∃ η : T,
