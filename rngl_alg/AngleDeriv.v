@@ -1,5 +1,6 @@
 (* derivation of trigonometric functions *)
 
+Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import Trigo.RealLike.
@@ -592,6 +593,132 @@ Theorem fold_angle_add_overflow2 :
   ∀ θ1 θ2, (θ1 + θ2 <? θ1)%A = angle_add_overflow2 θ1 θ2.
 Proof. easy. Qed.
 
+Theorem angle_add_overflow_angle_lt_abs_lt :
+  ∀ ε θ θ₀,
+  angle_add_overflow θ θ₀ = true
+  → (θ < θ₀)%A
+  → (rngl_abs (rngl_sin θ₀ - rngl_sin ((θ + θ₀) /₂)) < ε)%L
+  → (rngl_abs
+       ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀ + rngl_sin θ₀) <
+     ε)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hov Htt Hε.
+  rewrite (H1 (rngl_abs _)), (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros * Hov Htt Hε.
+rewrite rngl_cos_sub_cos.
+rewrite Hov, Htt.
+do 2 rewrite rngl_sin_add_straight_r.
+do 2 rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_opp_involutive Hop).
+rewrite (rngl_div_opp_l Hop Hiv).
+rewrite (rngl_add_opp_l Hop).
+rewrite <- (rngl_mul_div_assoc Hiv).
+(* when θ tends to θ₀,
+     sin ((θ+θ₀)/2) is supposed to tend to sin(θ₀)
+   and
+     sin ((θ-θ₀)/2) / d(θ,θ₀) is supposed to tend to 1/2
+   which could make the lhs of this inequality as small
+   as we want.
+ *)
+(* TODO: many repeated proofs below; do some asserts before *)
+rewrite angle_eucl_dist_is_sqrt.
+progress unfold angle_div_2 at 2.
+cbn - [ angle_div_2 angle_sub ].
+rewrite rngl_cos_sub_comm.
+remember (1 - _)%L as a.
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
+  subst a.
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+rewrite (rngl_div_div Hos Hon Hiv); cycle 1. {
+  intros H1.
+  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
+} {
+  intros H1.
+  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    subst a.
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  apply (rngl_eq_mul_0_r Hos Hii) in H1. 2: {
+    now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  subst a.
+  apply -> (rngl_sub_move_0_r Hop) in H1.
+  symmetry in H1.
+  apply eq_rngl_cos_1 in H1.
+  apply -> angle_sub_move_0_r in H1.
+  subst θ.
+  now apply angle_lt_irrefl in Htt.
+}
+rewrite rl_sqrt_mul; cycle 1. {
+  apply (rngl_0_le_2 Hon Hos Hor).
+} {
+  subst a.
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite <- (rngl_mul_mul_swap Hic √_).
+rewrite fold_rngl_squ.
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_0_le_2 Hon Hos Hor).
+}
+rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+  intros H1.
+  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+    subst a.
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  subst a.
+  apply -> (rngl_sub_move_0_r Hop) in H1.
+  symmetry in H1.
+  apply eq_rngl_cos_1 in H1.
+  apply -> angle_sub_move_0_r in H1.
+  subst θ.
+  now apply angle_lt_irrefl in Htt.
+} {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+rewrite (rngl_div_diag Hon Hiq). 2: {
+  intros H1.
+  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+    subst a.
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  subst a.
+  apply -> (rngl_sub_move_0_r Hop) in H1.
+  symmetry in H1.
+  apply eq_rngl_cos_1 in H1.
+  apply -> angle_sub_move_0_r in H1.
+  subst θ.
+  now apply angle_lt_irrefl in Htt.
+}
+rewrite (rngl_mul_comm Hic).
+rewrite rngl_mul_assoc.
+rewrite (rngl_div_mul Hon Hiv). 2: {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+now rewrite (rngl_mul_1_l Hon).
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
@@ -632,6 +759,9 @@ enough (H :
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (angle_eucl_dist θ θ₀ < η)%L →
+  if (angle_add_overflow θ θ₀ && (θ <? θ₀)%A)%bool then
+    (rngl_abs (rngl_sin θ₀ - rngl_sin ((θ + θ₀) /₂)) < ε)%L
+  else
   (rngl_abs
      ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀ + rngl_sin θ₀) <
      ε)%L). {
@@ -640,115 +770,18 @@ enough (H :
   split; [ easy | ].
   intros θ Hθ.
   specialize (H θ Hθ).
-  rewrite rngl_cos_sub_cos.
   remember (angle_add_overflow θ θ₀) as ov eqn:Hov.
   remember (θ <? θ₀)%A as tt eqn:Htt.
   symmetry in Hov, Htt.
   destruct ov. {
     destruct tt. {
-      do 2 rewrite rngl_sin_add_straight_r.
-      do 2 rewrite (rngl_mul_opp_r Hop).
-      rewrite (rngl_mul_opp_l Hop).
-      rewrite (rngl_opp_involutive Hop).
-      rewrite (rngl_div_opp_l Hop Hiv).
-      rewrite (rngl_add_opp_l Hop).
-      rewrite <- (rngl_mul_div_assoc Hiv).
-      (* when θ tends to θ₀,
-           sin ((θ+θ₀)/2) is supposed to tend to sin(θ₀)
-         and
-           sin ((θ-θ₀)/2) / d(θ,θ₀) is supposed to tend to 1/2
-         which could make the lhs of this inequality as small
-         as we want.
-       *)
-      (* TODO: many repeated proofs below; do some asserts before *)
-      rewrite angle_eucl_dist_is_sqrt.
-      progress unfold angle_div_2 at 2.
-      cbn - [ angle_div_2 angle_sub ].
-      rewrite rngl_cos_sub_comm.
-      remember (1 - _)%L as a.
-      rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
-        subst a.
-        apply (rngl_le_0_sub Hop Hor).
-        apply rngl_cos_bound.
-      } {
-        apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-      }
-      rewrite (rngl_div_div Hos Hon Hiv); cycle 1. {
-        intros H1.
-        apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
-          apply (rngl_0_le_2 Hon Hos Hor).
-        }
-        now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
-      } {
-        intros H1.
-        apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
-          apply (rngl_mul_nonneg_nonneg Hos Hor).
-          apply (rngl_0_le_2 Hon Hos Hor).
-          subst a.
-          apply (rngl_le_0_sub Hop Hor).
-          apply rngl_cos_bound.
-        }
-        apply (rngl_eq_mul_0_r Hos Hii) in H1. 2: {
-          now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-        }
-        subst a.
-        apply -> (rngl_sub_move_0_r Hop) in H1.
-        symmetry in H1.
-        apply eq_rngl_cos_1 in H1.
-        apply -> angle_sub_move_0_r in H1.
-        subst θ.
-        now apply angle_lt_irrefl in Htt.
-      }
-      rewrite rl_sqrt_mul; cycle 1. {
-        apply (rngl_0_le_2 Hon Hos Hor).
-      } {
-        subst a.
-        apply (rngl_le_0_sub Hop Hor).
-        apply rngl_cos_bound.
-      }
-      rewrite <- (rngl_mul_mul_swap Hic √_).
-      rewrite fold_rngl_squ.
-      rewrite (rngl_squ_sqrt Hon). 2: {
-        apply (rngl_0_le_2 Hon Hos Hor).
-      }
-      rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
-        intros H1.
-        apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
-          subst a.
-          apply (rngl_le_0_sub Hop Hor).
-          apply rngl_cos_bound.
-        }
-        subst a.
-        apply -> (rngl_sub_move_0_r Hop) in H1.
-        symmetry in H1.
-        apply eq_rngl_cos_1 in H1.
-        apply -> angle_sub_move_0_r in H1.
-        subst θ.
-        now apply angle_lt_irrefl in Htt.
-      } {
-        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-      }
-      rewrite (rngl_div_diag Hon Hiq). 2: {
-        intros H1.
-        apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
-          subst a.
-          apply (rngl_le_0_sub Hop Hor).
-          apply rngl_cos_bound.
-        }
-        subst a.
-        apply -> (rngl_sub_move_0_r Hop) in H1.
-        symmetry in H1.
-        apply eq_rngl_cos_1 in H1.
-        apply -> angle_sub_move_0_r in H1.
-        subst θ.
-        now apply angle_lt_irrefl in Htt.
-      }
-      rewrite (rngl_mul_comm Hic).
-      rewrite rngl_mul_assoc.
-      rewrite (rngl_div_mul Hon Hiv). 2: {
-        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-      }
-      rewrite (rngl_mul_1_l Hon).
+      now apply angle_add_overflow_angle_lt_abs_lt.
+    }
+    easy.
+  }
+  easy.
+}
+...
 (* bien. Bon, faut voir... *)
 Check rngl_cos_lt_angle_eucl_dist_lt.
 Check exists_nat_such_that_rngl_cos_close_to_1.
