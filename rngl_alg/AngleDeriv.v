@@ -653,22 +653,14 @@ enough (H :
       rewrite (rngl_div_opp_l Hop Hiv).
       rewrite (rngl_add_opp_l Hop).
       rewrite <- (rngl_mul_div_assoc Hiv).
-Check rngl_cos_lt_angle_eucl_dist_lt.
-(* when θ tends to θ₀,
-     sin ((θ+θ₀)/2) is supposed to tend to sin(θ₀)
-   and
-     sin ((θ-θ₀)/2) / d(θ,θ₀) is supposed to tend to 1/2
-   which would make the lhs of this inequality as small
-   as we want.
-
-     But is it mathematically true? It should but I have
-   to verify it.
-
-   sin θ = θ - θ²/2 + o(θ²)
-   d(θ,θ₀) = √((cos θ₀ - cos θ)²+(sin θ₀ - sin θ)²)
-   ouais, bon, faut voir...
-*)
-      (* many repeated proofs; do some asserts before *)
+      (* when θ tends to θ₀,
+           sin ((θ+θ₀)/2) is supposed to tend to sin(θ₀)
+         and
+           sin ((θ-θ₀)/2) / d(θ,θ₀) is supposed to tend to 1/2
+         which could make the lhs of this inequality as small
+         as we want.
+       *)
+      (* TODO: many repeated proofs below; do some asserts before *)
       rewrite angle_eucl_dist_is_sqrt.
       progress unfold angle_div_2 at 2.
       cbn - [ angle_div_2 angle_sub ].
@@ -758,6 +750,7 @@ Check rngl_cos_lt_angle_eucl_dist_lt.
       }
       rewrite (rngl_mul_1_l Hon).
 (* bien. Bon, faut voir... *)
+Check rngl_cos_lt_angle_eucl_dist_lt.
 Check exists_nat_such_that_rngl_cos_close_to_1.
 ...
 enough (H :
