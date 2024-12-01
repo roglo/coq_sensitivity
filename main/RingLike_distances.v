@@ -61,14 +61,14 @@ Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
   ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (dist (u p) (u q) < ε)%L.
 
 Definition is_limit_when_tending_to {A B} da db
-    (f : A → B) (a : A) (L : B) :=
+    (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
-   ∀ x : A, da x a < η → db (f x) L < ε)%L.
+   ∀ x : A, da x x₀ < η → db (f x) L < ε)%L.
 
 Definition is_limit_when_tending_to_neighbourhood {A B} da db
-     (f : A → B) (a : A) (L : B) :=
+     (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
-   ∀ x : A, 0 < da x a < η → db (f x) L < ε)%L.
+   ∀ x : A, 0 < da x x₀ < η → db (f x) L < ε)%L.
 
 Definition is_limit_when_tending_to_inf {A} dist (f : nat → A) (L : A) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) L < ε)%L.
@@ -77,10 +77,12 @@ Definition is_complete A (dist : A → A → T) :=
   ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
 
-Definition is_derivative {A} (da : A → A → T) (db : T → T → T) f f' :=
-  ∀ a,
+Definition derivative_at {A} (da : A → A → T) (db : T → T → T) f f' a :=
   let g x := ((f x - f a) / da x a)%L in
   is_limit_when_tending_to_neighbourhood da db g a (f' a).
+
+Definition is_derivative {A} (da : A → A → T) (db : T → T → T) f f' :=
+  ∀ a, derivative_at da db f f' a.
 
 Definition continuous_at {A B} da db (f : A → B) a :=
   is_limit_when_tending_to da db f a (f a).
