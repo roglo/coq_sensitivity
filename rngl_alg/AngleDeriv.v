@@ -803,9 +803,12 @@ enough (H :
     else
       (rngl_abs (rngl_sin θ₀ + rngl_sin ((θ + θ₀) /₂)) < ε)%L
   else
-  (rngl_abs
-     (rngl_sin θ₀ + (rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀) <
-     ε)%L). {
+    if (θ <? θ₀)%A then
+      (rngl_abs (rngl_sin θ₀ + rngl_sin ((θ + θ₀) /₂)) < ε)%L
+    else
+      (rngl_abs
+         (rngl_sin θ₀ + (rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀) <
+         ε)%L). {
   destruct H as (η & Hzη & H).
   exists η.
   split; [ easy | ].
@@ -824,8 +827,69 @@ enough (H :
       now apply angle_add_overflow_angle_ge_abs_lt.
     }
   }
-  easy.
+  destruct tt. {
+destruct Hθ as (Hθ, _).
+rewrite rngl_cos_sub_cos.
+rewrite Hov, Htt.
+rewrite rngl_sin_add_straight_r.
+rewrite angle_add_0_r.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_opp_involutive Hop).
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite angle_eucl_dist_is_sqrt.
+progress unfold angle_div_2 at 2.
+cbn - [ angle_div_2 angle_sub ].
+rewrite rngl_cos_sub_comm.
+assert (Hz1c : (0 ≤ 1 - rngl_cos (θ₀ - θ))%L). {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
 }
+assert (Hz2 : (0 < 2)%L) by apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+assert (Hze2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hor).
+assert (H2nz : 2%L ≠ 0%L) by apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+assert (Hsnz : √2 ≠ 0%L). {
+  intros H1.
+  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
+}
+remember (1 - _)%L as a.
+assert (Hsanz : √a ≠ 0%L). {
+  intros H1.
+  apply (eq_rl_sqrt_0 Hon Hos) in H1; [ | easy ].
+  subst a.
+  apply -> (rngl_sub_move_0_r Hop) in H1.
+  symmetry in H1.
+  apply eq_rngl_cos_1 in H1.
+  apply -> angle_sub_move_0_r in H1.
+  subst θ.
+  now apply angle_lt_irrefl in Htt.
+}
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | easy | easy ].
+specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
+rewrite (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
+  intros H1.
+  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+    now apply (rngl_mul_nonneg_nonneg Hos Hor).
+  }
+  apply (rngl_eq_mul_0_r Hos Hii) in H1; [ | easy ].
+  rewrite H1 in Hsanz.
+  now rewrite (rl_sqrt_0 Hon Hop Hor Hii) in Hsanz.
+}
+rewrite rl_sqrt_mul; [ | easy | easy ].
+rewrite <- (rngl_mul_mul_swap Hic √_).
+rewrite fold_rngl_squ.
+rewrite (rngl_squ_sqrt Hon); [ | easy ].
+rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+rewrite (rngl_mul_comm Hic).
+rewrite rngl_mul_assoc.
+rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+now rewrite (rngl_mul_1_l Hon).
+...
+}
+easy.
 ...
 (* bien. Bon, faut voir... *)
 Check rngl_cos_lt_angle_eucl_dist_lt.
