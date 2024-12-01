@@ -62,7 +62,7 @@ Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
 
 Definition is_limit_when_tending_to {A B} da db (f : A → B) (a : A) (l : B) :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
-   ∀ x : A, da x a < η → 0 < db (f x) l < ε)%L.
+   ∀ x : A, da x a < η → db (f x) l < ε)%L.
 
 Definition is_limit_when_tending_to_inf {A} dist (f : nat → A) (l : A) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) l < ε)%L.
