@@ -691,11 +691,12 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros θ ε Hε.
+  intros θ g ε Hε.
   rewrite H1 in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-intros θ₀ ε Hε.
+intros θ₀ g ε Hε.
+subst g.
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L →

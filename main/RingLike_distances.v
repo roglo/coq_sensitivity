@@ -60,31 +60,27 @@ Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
   ∀ ε : T, (0 < ε)%L →
   ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (dist (u p) (u q) < ε)%L.
 
-Definition is_limit_when_tending_to {A B} da db (f : A → B) (a : A) (l : B) :=
+Definition is_limit_when_tending_to {A B} da db
+    (f : A → B) (a : A) (L : B) :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
-   ∀ x : A, da x a < η → db (f x) l < ε)%L.
+   ∀ x : A, da x a < η → db (f x) L < ε)%L.
 
-Definition is_limit_when_tending_to_inf {A} dist (f : nat → A) (l : A) :=
-  ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) l < ε)%L.
+Definition is_limit_when_tending_to_neighbourhood {A B} da db
+     (f : A → B) (a : A) (L : B) :=
+  (∀ ε, 0 < ε → ∃ η, 0 < η ∧
+   ∀ x : A, 0 < da x a < η → db (f x) L < ε)%L.
+
+Definition is_limit_when_tending_to_inf {A} dist (f : nat → A) (L : A) :=
+  ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) L < ε)%L.
 
 Definition is_complete A (dist : A → A → T) :=
   ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
 
-Definition is_derivative {A} (da : A → A → T) (dist : T → T → T) f f' :=
+Definition is_derivative {A} (da : A → A → T) (db : T → T → T) f f' :=
   ∀ a,
-  ∀ ε : T, (0 < ε)%L → ∃ η : T, (0 < η)%L ∧
-  ∀ b : A, (0 < da b a < η)%L → (dist ((f b - f a) / da b a) (f' a) < ε)%L.
-(*
-  The below definition is different from the definition above because
-  there is an extra "0 < da b a" in the definition above; if I add
-  this extra condition in "is_limit_when_tending_to", I have a problem
-  in my theorem of intermediate value ../rngl_alg/IntermVal.v
-    I don't know what happens, actually
-
-  ∀ a, is_limit_when_tending_to da dist (λ b, (f b - f a) / da b a)%L
-  a (f' a).
-*)
+  let g x := ((f x - f a) / da x a)%L in
+  is_limit_when_tending_to_neighbourhood da db g a (f' a).
 
 Definition continuous_at {A B} da db (f : A → B) a :=
   is_limit_when_tending_to da db f a (f a).
