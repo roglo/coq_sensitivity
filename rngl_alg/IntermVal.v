@@ -1132,7 +1132,8 @@ assert (Hfu : ∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
      apply (rngl_le_0_sub Hop Hor).
      now apply (rngl_lt_le_incl Hor).
   }
-  now apply (rngl_sub_lt_mono_r Hop Hor) in H2.
+  destruct H2 as (H2, H3).
+  now apply (rngl_sub_lt_mono_r Hop Hor) in H3.
 }
 intros H; subst c.
 assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
@@ -1220,7 +1221,8 @@ assert (Hfu : ∀ x, (rngl_max a (b - η) < x ≤ b → u < f x)%L). {
       now apply (rngl_le_sub_0 Hop Hor).
     }
     rewrite (rngl_opp_sub_distr Hop) in H2.
-    now apply (rngl_sub_lt_mono_l Hop Hor) in H2.
+    destruct H2 as (H2, H3).
+    now apply (rngl_sub_lt_mono_l Hop Hor) in H3.
   }
   apply (rngl_nle_gt_iff Hor) in Hfxb.
   now apply (rngl_lt_trans Hor _ (f b)).

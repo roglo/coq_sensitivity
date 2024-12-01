@@ -597,9 +597,10 @@ Theorem angle_add_overflow_angle_lt_abs_lt :
   ∀ ε θ θ₀,
   angle_add_overflow θ θ₀ = true
   → (θ < θ₀)%A
-  → (rngl_abs (rngl_sin θ₀ - rngl_sin ((θ + θ₀) /₂)) < ε)%L
-  → (rngl_abs
-       ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀ + rngl_sin θ₀) <
+  → (0 < rngl_abs (rngl_sin θ₀ - rngl_sin ((θ + θ₀) /₂)) < ε)%L
+  → (0 <
+        rngl_abs
+          ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀ + rngl_sin θ₀) <
      ε)%L.
 Proof.
 destruct_ac.
@@ -609,6 +610,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hov Htt Hε.
   rewrite (H1 (rngl_abs _)), (H1 ε) in Hε.
+  destruct Hε as (_, Hε).
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * Hov Htt Hε.
@@ -629,7 +631,7 @@ rewrite <- (rngl_mul_div_assoc Hiv).
    as we want.
  *)
 rewrite angle_eucl_dist_is_sqrt.
-progress unfold angle_div_2 at 2.
+progress unfold angle_div_2 at 2 4.
 cbn - [ angle_div_2 angle_sub ].
 rewrite rngl_cos_sub_comm.
 assert (Hz1c : (0 ≤ 1 - rngl_cos (θ₀ - θ))%L). {
@@ -699,7 +701,7 @@ intros θ₀ ε Hε.
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (angle_eucl_dist θ θ₀ < η)%L →
-  (rngl_dist
+  (0 < rngl_dist
      ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀)
      (- rngl_sin θ₀) < ε)%L). {
   easy.
@@ -707,7 +709,7 @@ enough (H :
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (angle_eucl_dist θ θ₀ < η)%L →
-  (rngl_abs
+  (0 < rngl_abs
      ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀ + rngl_sin θ₀) <
      ε)%L). {
   destruct H as (η & Hzη & H).
@@ -722,9 +724,9 @@ enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (angle_eucl_dist θ θ₀ < η)%L →
   if (angle_add_overflow θ θ₀ && (θ <? θ₀)%A)%bool then
-    (rngl_abs (rngl_sin θ₀ - rngl_sin ((θ + θ₀) /₂)) < ε)%L
+    (0 < rngl_abs (rngl_sin θ₀ - rngl_sin ((θ + θ₀) /₂)) < ε)%L
   else
-  (rngl_abs
+  (0 < rngl_abs
      ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀ + rngl_sin θ₀) <
      ε)%L). {
   destruct H as (η & Hzη & H).
@@ -748,7 +750,7 @@ enough (H :
     rewrite (rngl_opp_involutive Hop).
     rewrite <- (rngl_mul_div_assoc Hiv).
     rewrite angle_eucl_dist_is_sqrt.
-    progress unfold angle_div_2 at 2.
+    progress unfold angle_div_2 at 2 4.
     cbn - [ angle_div_2 angle_sub ].
     rewrite rngl_cos_sub_comm.
     assert (Hz1c : (0 ≤ 1 - rngl_cos (θ₀ - θ))%L). {
@@ -766,7 +768,7 @@ enough (H :
       now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
     }
     remember (1 - _)%L as a.
-(*
+(**)
     assert (Hsanz : √a ≠ 0%L). {
       intros H1.
       apply (eq_rl_sqrt_0 Hon Hos) in H1; [ | easy ].
@@ -776,9 +778,14 @@ enough (H :
       apply eq_rngl_cos_1 in H1.
       apply -> angle_sub_move_0_r in H1.
       subst θ.
+      cbn in H.
+      rewrite (rngl_sub_diag Hos) in H.
+...
+      rewrite (rngl_div_0_l Hos Hi1) in H.
+...
       now apply angle_lt_irrefl in Htt.
     }
-*)
+(**)
     rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | easy | easy ].
 specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 destruct (rngl_eq_dec Heo a 0) as [Haz| Haz]. {
