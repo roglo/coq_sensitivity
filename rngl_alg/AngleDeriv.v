@@ -957,7 +957,7 @@ enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L →
   let s :=
-    if Bool.bool_dec (angle_add_overflow θ θ₀) (θ <? θ₀)%A then (-1)%L
+    if Bool.eqb (angle_add_overflow θ θ₀) (θ <? θ₀)%A then (-1)%L
     else 1%L
   in
   (rngl_abs (rngl_sin θ₀ + s * rngl_sin ((θ + θ₀) /₂)) < ε)%L). {
