@@ -956,22 +956,30 @@ enough (H :
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L →
-  if Bool.bool_dec (angle_add_overflow θ θ₀) (θ <? θ₀)%A then
-    (rngl_abs (rngl_sin θ₀ - rngl_sin ((θ + θ₀) /₂)) < ε)%L
-  else
-    (rngl_abs (rngl_sin θ₀ + rngl_sin ((θ + θ₀) /₂)) < ε)%L). {
+  let s :=
+    if Bool.bool_dec (angle_add_overflow θ θ₀) (θ <? θ₀)%A then (-1)%L
+    else 1%L
+  in
+  (rngl_abs (rngl_sin θ₀ + s * rngl_sin ((θ + θ₀) /₂)) < ε)%L). {
+clear - H Hor Hop Hon.
   destruct H as (η & Hzη & H).
   exists η.
   split; [ easy | ].
   intros θ Hθ.
   specialize (H θ Hθ).
+  cbn - [ angle_div_2 ] in H.
   remember (angle_add_overflow θ θ₀) as ov eqn:Hov.
   remember (θ <? θ₀)%A as tt eqn:Htt.
   symmetry in Hov, Htt.
   destruct ov. {
     destruct tt. {
+      cbn - [ angle_div_2 ] in H.
+      rewrite (rngl_mul_opp_l Hop) in H.
+      rewrite (rngl_add_opp_r Hop) in H.
+      rewrite (rngl_mul_1_l Hon) in H.
       now apply angle_add_overflow_angle_lt_abs_lt.
     } {
+      rewrite (rngl_mul_1_l Hon) in H.
       apply angle_ltb_ge in Htt.
       destruct Hθ as (Hθ, _).
       apply (rngl_lt_iff Hor) in Hθ.
@@ -979,9 +987,14 @@ enough (H :
     }
   } {
     destruct tt. {
+      rewrite (rngl_mul_1_l Hon) in H.
       destruct Hθ as (Hθ, _).
       now apply angle_add_not_overflow_angle_lt_abs_lt.
     } {
+      cbn - [ angle_div_2 ] in H.
+      rewrite (rngl_mul_opp_l Hop) in H.
+      rewrite (rngl_add_opp_r Hop) in H.
+      rewrite (rngl_mul_1_l Hon) in H.
       destruct Hθ as (Hθ, _).
       apply (rngl_lt_iff Hor) in Hθ.
       destruct Hθ as (_, Hθ).
