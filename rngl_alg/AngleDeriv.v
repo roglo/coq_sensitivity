@@ -887,6 +887,7 @@ rewrite (rngl_mul_comm Hic).
 rewrite rngl_mul_assoc.
 rewrite (rngl_div_mul Hon Hiv); [ | easy ].
 now rewrite (rngl_mul_1_l Hon).
+(* faire un lemme *)
 ...
 }
 easy.
