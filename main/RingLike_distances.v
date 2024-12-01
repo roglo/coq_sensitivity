@@ -71,10 +71,20 @@ Definition is_complete A (dist : A → A → T) :=
   ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
 
-Definition is_derivative {A} (da : A → A → T) dist f f' :=
+Definition is_derivative {A} (da : A → A → T) (dist : T → T → T) f f' :=
   ∀ a,
-  is_limit_when_tending_to da dist (λ x, (f x - f a) / da x a)%L
-    a (f' a).
+  ∀ ε : T, (0 < ε)%L → ∃ η : T, (0 < η)%L ∧
+  ∀ b : A, (0 < da b a < η)%L → (dist ((f b - f a) / da b a) (f' a) < ε)%L.
+(*
+  The below definition is different from the definition above because
+  there is an extra "0 < da b a" in the definition above; if I add
+  this extra condition in "is_limit_when_tending_to", I have a problem
+  in my theorem of intermediate value ../rngl_alg/IntermVal.v
+    I don't know what happens, actually
+
+  ∀ a, is_limit_when_tending_to da dist (λ b, (f b - f a) / da b a)%L
+  a (f' a).
+*)
 
 Definition continuous_at {A B} da db (f : A → B) a :=
   is_limit_when_tending_to da db f a (f a).
