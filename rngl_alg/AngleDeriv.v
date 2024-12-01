@@ -956,16 +956,10 @@ enough (H :
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L →
-  if angle_add_overflow θ θ₀ then
-    if (θ <? θ₀)%A then
-      (rngl_abs (rngl_sin θ₀ - rngl_sin ((θ + θ₀) /₂)) < ε)%L
-    else
-      (rngl_abs (rngl_sin θ₀ + rngl_sin ((θ + θ₀) /₂)) < ε)%L
+  if Bool.bool_dec (angle_add_overflow θ θ₀) (θ <? θ₀)%A then
+    (rngl_abs (rngl_sin θ₀ - rngl_sin ((θ + θ₀) /₂)) < ε)%L
   else
-    if (θ <? θ₀)%A then
-      (rngl_abs (rngl_sin θ₀ + rngl_sin ((θ + θ₀) /₂)) < ε)%L
-    else
-      (rngl_abs (rngl_sin θ₀ - rngl_sin ((θ + θ₀) /₂)) < ε)%L). {
+    (rngl_abs (rngl_sin θ₀ + rngl_sin ((θ + θ₀) /₂)) < ε)%L). {
   destruct H as (η & Hzη & H).
   exists η.
   split; [ easy | ].
