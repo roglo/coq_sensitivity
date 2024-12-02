@@ -610,7 +610,18 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 intros * Hov Htt.
+assert (Hz2 : (0 < 2)%L) by apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+assert (Hze2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hor).
+assert (H2nz : 2%L ≠ 0%L) by apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+assert (Hsnz : √2 ≠ 0%L). {
+  intros H1.
+  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
+}
 rewrite rngl_cos_sub_cos.
+(**)
 rewrite Hov, Htt.
 do 2 rewrite rngl_sin_add_straight_r.
 do 2 rewrite (rngl_mul_opp_r Hop).
@@ -623,16 +634,6 @@ rewrite angle_eucl_dist_is_sqrt.
 progress unfold angle_div_2 at 2.
 cbn - [ angle_div_2 angle_sub ].
 rewrite rngl_cos_sub_comm.
-assert (Hz2 : (0 < 2)%L) by apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-assert (Hze2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hor).
-assert (H2nz : 2%L ≠ 0%L) by apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-assert (Hsnz : √2 ≠ 0%L). {
-  intros H1.
-  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
-    apply (rngl_0_le_2 Hon Hos Hor).
-  }
-  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
-}
 remember (1 - _)%L as a.
 assert (Hz1c : (0 ≤ a)%L). {
   subst a.
@@ -691,7 +692,18 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 intros * Hov Htt Hθ.
+assert (Hz2 : (0 < 2)%L) by apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+assert (Hze2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hor).
+assert (H2nz : 2%L ≠ 0%L) by apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+assert (Hsnz : √2 ≠ 0%L). {
+  intros H1.
+  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
+}
 rewrite rngl_cos_sub_cos.
+(**)
 apply angle_ltb_ge in Htt.
 rewrite Hov, Htt.
 rewrite rngl_sin_add_straight_r.
@@ -704,16 +716,6 @@ rewrite angle_eucl_dist_is_sqrt.
 progress unfold angle_div_2 at 2.
 cbn - [ angle_div_2 angle_sub ].
 rewrite rngl_cos_sub_comm.
-assert (Hz2 : (0 < 2)%L) by apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-assert (Hze2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hor).
-assert (H2nz : 2%L ≠ 0%L) by apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-assert (Hsnz : √2 ≠ 0%L). {
-  intros H1.
-  apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
-    apply (rngl_0_le_2 Hon Hos Hor).
-  }
-  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
-}
 remember (1 - _)%L as a.
 assert (Hz1c : (0 ≤ a)%L). {
   subst a.
@@ -771,17 +773,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 intros * Hov Htt.
-rewrite rngl_cos_sub_cos.
-rewrite Hov, Htt.
-rewrite rngl_sin_add_straight_r.
-rewrite angle_add_0_r.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_opp_involutive Hop).
-rewrite <- (rngl_mul_div_assoc Hiv).
-rewrite angle_eucl_dist_is_sqrt.
-progress unfold angle_div_2 at 2.
-cbn - [ angle_div_2 angle_sub ].
-rewrite rngl_cos_sub_comm.
 assert (Hz2 : (0 < 2)%L) by apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 assert (Hze2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hor).
 assert (H2nz : 2%L ≠ 0%L) by apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
@@ -792,6 +783,18 @@ assert (Hsnz : √2 ≠ 0%L). {
   }
   now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
 }
+rewrite rngl_cos_sub_cos.
+(**)
+rewrite Hov, Htt.
+rewrite rngl_sin_add_straight_r.
+rewrite angle_add_0_r.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_opp_involutive Hop).
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite angle_eucl_dist_is_sqrt.
+progress unfold angle_div_2 at 2.
+cbn - [ angle_div_2 angle_sub ].
+rewrite rngl_cos_sub_comm.
 remember (1 - _)%L as a.
 assert (Hz1c : (0 ≤ a)%L). {
   subst a.
@@ -850,17 +853,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 intros * Hov Htt Hθ.
-rewrite rngl_cos_sub_cos.
-apply angle_ltb_ge in Htt.
-rewrite Hov, Htt.
-do 2 rewrite angle_add_0_r.
-rewrite (rngl_div_opp_l Hop Hiv).
-f_equal.
-rewrite <- (rngl_mul_div_assoc Hiv).
-rewrite angle_eucl_dist_is_sqrt.
-progress unfold angle_div_2 at 2.
-cbn - [ angle_div_2 angle_sub ].
-rewrite rngl_cos_sub_comm.
 assert (Hz2 : (0 < 2)%L) by apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 assert (Hze2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hor).
 assert (H2nz : 2%L ≠ 0%L) by apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
@@ -871,6 +863,18 @@ assert (Hsnz : √2 ≠ 0%L). {
   }
   now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
 }
+rewrite rngl_cos_sub_cos.
+(**)
+apply angle_ltb_ge in Htt.
+rewrite Hov, Htt.
+do 2 rewrite angle_add_0_r.
+rewrite (rngl_div_opp_l Hop Hiv).
+f_equal.
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite angle_eucl_dist_is_sqrt.
+progress unfold angle_div_2 at 2.
+cbn - [ angle_div_2 angle_sub ].
+rewrite rngl_cos_sub_comm.
 remember (1 - _)%L as a.
 assert (Hz1c : (0 ≤ a)%L). {
   subst a.
