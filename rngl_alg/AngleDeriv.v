@@ -911,6 +911,36 @@ rewrite (rngl_div_mul Hon Hiv); [ | easy ].
 now rewrite (rngl_mul_1_l Hon).
 Qed.
 
+Theorem angle_cos_sub_cos_div_dist :
+  ∀ θ1 θ2,
+  angle_eucl_dist θ1 θ2 ≠ 0%L
+  → ((rngl_cos θ1 - rngl_cos θ2) / angle_eucl_dist θ1 θ2 =
+       if Bool.eqb (angle_add_overflow θ1 θ2) (θ1 <? θ2)%A then
+         - rngl_sin ((θ1 + θ2) /₂)
+       else
+         rngl_sin ((θ1 + θ2) /₂))%L.
+Proof.
+intros * Hθ.
+remember (angle_add_overflow θ1 θ2) as ov eqn:Hov.
+remember (θ1 <? θ2)%A as tt eqn:Htt.
+symmetry in Hov, Htt.
+destruct ov. {
+  destruct tt. {
+    now apply angle_add_overflow_angle_lt_cos_cos_div_dist.
+  } {
+    apply angle_ltb_ge in Htt.
+    now apply angle_add_overflow_angle_ge_cos_cos_div_dist.
+  }
+} {
+  destruct tt. {
+    now apply angle_add_not_overflow_angle_lt_cos_cos_div_dist.
+  } {
+    apply angle_ltb_ge in Htt.
+    now apply angle_add_not_overflow_angle_ge_cos_cos_div_dist.
+  }
+}
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
@@ -957,51 +987,23 @@ enough (H :
     else 1%L
   in
   (rngl_abs (rngl_sin θ₀ + s * rngl_sin ((θ + θ₀) /₂)) < ε)%L). {
-clear - H Hor Hop Hon.
+  clear - H Hor Hop Hon.
   destruct H as (η & Hzη & H).
   exists η.
   split; [ easy | ].
   intros θ Hθ.
   specialize (H θ Hθ).
   cbn - [ angle_div_2 ] in H.
-  remember (angle_add_overflow θ θ₀) as ov eqn:Hov.
-  remember (θ <? θ₀)%A as tt eqn:Htt.
-  symmetry in Hov, Htt.
-  destruct ov. {
-    destruct tt. {
-      cbn - [ angle_div_2 ] in H.
-      rewrite (rngl_mul_opp_l Hop) in H.
-      rewrite (rngl_add_opp_r Hop) in H.
-      rewrite (rngl_mul_1_l Hon) in H.
-      rewrite <- (rngl_add_opp_r Hop) in H.
-      now rewrite angle_add_overflow_angle_lt_cos_cos_div_dist.
-    } {
-      rewrite (rngl_mul_1_l Hon) in H.
-      apply angle_ltb_ge in Htt.
-      destruct Hθ as (Hθ, _).
-      apply (rngl_lt_iff Hor) in Hθ.
-      destruct Hθ as (_, Hθ).
-      apply not_eq_sym in Hθ.
-      now rewrite angle_add_overflow_angle_ge_cos_cos_div_dist.
-    }
+  destruct Hθ as (Hθ, _).
+  apply (rngl_lt_iff Hor) in Hθ.
+  destruct Hθ as (_, Hθ).
+  apply not_eq_sym in Hθ.
+  rewrite angle_cos_sub_cos_div_dist; [ | easy ].
+  destruct (Bool.eqb _ _). {
+    rewrite (rngl_mul_opp_l Hop) in H.
+    now rewrite (rngl_mul_1_l Hon) in H.
   } {
-    destruct tt. {
-      rewrite (rngl_mul_1_l Hon) in H.
-      destruct Hθ as (Hθ, _).
-      now rewrite angle_add_not_overflow_angle_lt_cos_cos_div_dist.
-    } {
-      cbn - [ angle_div_2 ] in H.
-      rewrite (rngl_mul_opp_l Hop) in H.
-      rewrite (rngl_add_opp_r Hop) in H.
-      rewrite (rngl_mul_1_l Hon) in H.
-      destruct Hθ as (Hθ, _).
-      apply (rngl_lt_iff Hor) in Hθ.
-      destruct Hθ as (_, Hθ).
-      apply not_eq_sym in Hθ.
-      apply angle_ltb_ge in Htt.
-      rewrite <- (rngl_add_opp_r Hop) in H.
-      now rewrite angle_add_not_overflow_angle_ge_cos_cos_div_dist.
-    }
+    now rewrite (rngl_mul_1_l Hon) in H.
   }
 }
 Inspect 4.
