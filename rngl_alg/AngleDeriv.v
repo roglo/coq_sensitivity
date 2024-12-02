@@ -673,26 +673,24 @@ rewrite (rngl_div_mul Hon Hiv); [ | easy ].
 now rewrite (rngl_mul_1_l Hon).
 Qed.
 
-Theorem angle_add_overflow_angle_ge_abs_lt :
-  ∀ ε θ θ₀,
-  angle_add_overflow θ θ₀ = true
-  → (θ₀ ≤ θ)%A
-  → angle_eucl_dist θ θ₀ ≠ 0%L
-  → (rngl_abs (rngl_sin θ₀ + rngl_sin ((θ + θ₀) /₂)) < ε)%L
-  → (rngl_abs
-        (rngl_sin θ₀ + (rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀) <
-     ε)%L.
+Theorem angle_add_overflow_angle_ge_cos_cos_div_dist :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = true
+  → (θ2 ≤ θ1)%A
+  → angle_eucl_dist θ1 θ2 ≠ 0%L
+  → ((rngl_cos θ1 - rngl_cos θ2) / angle_eucl_dist θ1 θ2 =
+       rngl_sin ((θ1 + θ2) /₂))%L.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hov Htt Hθ Hε.
-  rewrite (H1 (rngl_abs _)), (H1 ε) in Hε.
-  now apply (rngl_lt_irrefl Hor) in Hε.
+  intros * Hov Htt Hθ.
+  rewrite (H1 (rngl_sin _)).
+  apply H1.
 }
-intros * Hov Htt Hθ Hε.
+intros * Hov Htt Hθ.
 rewrite rngl_cos_sub_cos.
 apply angle_ltb_ge in Htt.
 rewrite Hov, Htt.
@@ -706,10 +704,6 @@ rewrite angle_eucl_dist_is_sqrt.
 progress unfold angle_div_2 at 2.
 cbn - [ angle_div_2 angle_sub ].
 rewrite rngl_cos_sub_comm.
-assert (Hz1c : (0 ≤ 1 - rngl_cos (θ₀ - θ))%L). {
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
 assert (Hz2 : (0 < 2)%L) by apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 assert (Hze2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hor).
 assert (H2nz : 2%L ≠ 0%L) by apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
@@ -721,6 +715,11 @@ assert (Hsnz : √2 ≠ 0%L). {
   now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
 }
 remember (1 - _)%L as a.
+assert (Hz1c : (0 ≤ a)%L). {
+  subst a.
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
 assert (Hsanz : √a ≠ 0%L). {
   intros H1.
   apply (eq_rl_sqrt_0 Hon Hos) in H1; [ | easy ].
@@ -729,7 +728,7 @@ assert (Hsanz : √a ≠ 0%L). {
   symmetry in H1.
   apply eq_rngl_cos_1 in H1.
   apply -> angle_sub_move_0_r in H1.
-  subst θ.
+  subst θ1.
   now rewrite angle_eucl_dist_diag in Hθ.
 }
 rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | easy | easy ].
@@ -976,14 +975,16 @@ clear - H Hor Hop Hon.
       rewrite (rngl_mul_opp_l Hop) in H.
       rewrite (rngl_add_opp_r Hop) in H.
       rewrite (rngl_mul_1_l Hon) in H.
-      rewrite angle_add_overflow_angle_lt_cos_cos_div_dist; [ | easy | easy ].
-      now rewrite (rngl_add_opp_r Hop).
+      rewrite <- (rngl_add_opp_r Hop) in H.
+      now rewrite angle_add_overflow_angle_lt_cos_cos_div_dist.
     } {
       rewrite (rngl_mul_1_l Hon) in H.
       apply angle_ltb_ge in Htt.
       destruct Hθ as (Hθ, _).
       apply (rngl_lt_iff Hor) in Hθ.
-      now apply angle_add_overflow_angle_ge_abs_lt.
+      destruct Hθ as (_, Hθ).
+      apply not_eq_sym in Hθ.
+      now rewrite angle_add_overflow_angle_ge_cos_cos_div_dist.
     }
   } {
     destruct tt. {
