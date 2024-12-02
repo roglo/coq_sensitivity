@@ -862,23 +862,20 @@ intros * Hθ.
 remember (angle_add_overflow θ1 θ2) as ov eqn:Hov.
 remember (θ1 <? θ2)%A as tt eqn:Htt.
 symmetry in Hov, Htt.
+rewrite (rngl_mul_comm Hic).
 destruct ov. {
   destruct tt. {
-    rewrite angle_add_overflow_angle_lt_cos_sub_cos; [ | easy | easy ].
-    now rewrite (rngl_mul_comm Hic).
+    apply (angle_add_overflow_angle_lt_cos_sub_cos _ _ Hov Htt).
   } {
     apply angle_ltb_ge in Htt.
-    rewrite angle_add_overflow_angle_ge_cos_sub_cos; [ | easy | easy ].
-    now rewrite (rngl_mul_comm Hic).
+    apply (angle_add_overflow_angle_ge_cos_sub_cos _ _ Hov Htt).
   }
 } {
   destruct tt. {
-    rewrite angle_add_not_overflow_angle_lt_cos_sub_cos; [ | easy | easy ].
-    now rewrite (rngl_mul_comm Hic).
+    apply (angle_add_not_overflow_angle_lt_cos_sub_cos _ _ Hov Htt).
   } {
     apply angle_ltb_ge in Htt.
-    rewrite angle_add_not_overflow_angle_ge_cos_sub_cos; [ | easy | easy ].
-    now rewrite (rngl_mul_comm Hic).
+    apply (angle_add_not_overflow_angle_ge_cos_sub_cos _ _ Hov Htt).
   }
 }
 Qed.
