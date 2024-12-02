@@ -840,25 +840,32 @@ Qed.
 
 Theorem angle_cos_sub_cos_angle_eucl_dist_mul :
   ∀ θ1 θ2,
-  angle_eucl_dist θ1 θ2 ≠ 0%L
-  → (rngl_cos θ1 - rngl_cos θ2 =
-       angle_eucl_dist θ1 θ2 *
-       if Bool.eqb (angle_add_overflow θ1 θ2) (θ1 <? θ2)%A then
-         - rngl_sin ((θ1 + θ2) /₂)
-       else
-         rngl_sin ((θ1 + θ2) /₂))%L.
+  (rngl_cos θ1 - rngl_cos θ2 =
+     angle_eucl_dist θ1 θ2 *
+     if Bool.eqb (angle_add_overflow θ1 θ2) (θ1 <? θ2)%A then
+       - rngl_sin ((θ1 + θ2) /₂)
+     else
+       rngl_sin ((θ1 + θ2) /₂))%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hθ.
+  intros.
   rewrite (H1 (_ * _))%L.
   apply H1.
 }
-intros * Hθ.
+intros.
+destruct (rngl_eq_dec Heo (angle_eucl_dist θ1 θ2) 0) as [H12| H12]. {
+  rewrite H12.
+  apply angle_eucl_dist_separation in H12.
+  rewrite H12, (rngl_sub_diag Hos).
+  symmetry.
+  apply (rngl_mul_0_l Hos).
+}
 remember (angle_add_overflow θ1 θ2) as ov eqn:Hov.
 remember (θ1 <? θ2)%A as tt eqn:Htt.
 symmetry in Hov, Htt.
@@ -937,7 +944,7 @@ enough (H :
   apply (rngl_lt_iff Hor) in Hθ.
   destruct Hθ as (_, Hθ).
   apply not_eq_sym in Hθ.
-  rewrite angle_cos_sub_cos_angle_eucl_dist_mul; [ | easy ].
+  rewrite angle_cos_sub_cos_angle_eucl_dist_mul.
   rewrite (rngl_mul_comm Hic).
   rewrite (rngl_mul_div Hi1); [ | easy ].
   destruct (Bool.eqb _ _). {
