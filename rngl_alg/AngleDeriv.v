@@ -838,10 +838,11 @@ rewrite (rl_sqrt_inv Hon Hic Hos Hiv Hor); [ | easy ].
 now apply (rngl_div_mul Hon Hiv).
 Qed.
 
-Theorem angle_cos_sub_cos_div_dist :
+Theorem angle_cos_sub_cos_angle_eucl_dist_mul :
   ∀ θ1 θ2,
   angle_eucl_dist θ1 θ2 ≠ 0%L
-  → ((rngl_cos θ1 - rngl_cos θ2) / angle_eucl_dist θ1 θ2 =
+  → (rngl_cos θ1 - rngl_cos θ2 =
+       angle_eucl_dist θ1 θ2 *
        if Bool.eqb (angle_add_overflow θ1 θ2) (θ1 <? θ2)%A then
          - rngl_sin ((θ1 + θ2) /₂)
        else
@@ -854,7 +855,7 @@ specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hθ.
-  rewrite (H1 (if Bool.eqb _ _ then _ else _)).
+  rewrite (H1 (_ * _))%L.
   apply H1.
 }
 intros * Hθ.
@@ -864,20 +865,20 @@ symmetry in Hov, Htt.
 destruct ov. {
   destruct tt. {
     rewrite angle_add_overflow_angle_lt_cos_sub_cos; [ | easy | easy ].
-    now rewrite (rngl_mul_div Hi1).
+    now rewrite (rngl_mul_comm Hic).
   } {
     apply angle_ltb_ge in Htt.
     rewrite angle_add_overflow_angle_ge_cos_sub_cos; [ | easy | easy ].
-    now rewrite (rngl_mul_div Hi1).
+    now rewrite (rngl_mul_comm Hic).
   }
 } {
   destruct tt. {
     rewrite angle_add_not_overflow_angle_lt_cos_sub_cos; [ | easy | easy ].
-    now rewrite (rngl_mul_div Hi1).
+    now rewrite (rngl_mul_comm Hic).
   } {
     apply angle_ltb_ge in Htt.
     rewrite angle_add_not_overflow_angle_ge_cos_sub_cos; [ | easy | easy ].
-    now rewrite (rngl_mul_div Hi1).
+    now rewrite (rngl_mul_comm Hic).
   }
 }
 Qed.
@@ -928,7 +929,7 @@ enough (H :
     else 1%L
   in
   (rngl_abs (rngl_sin θ₀ + s * rngl_sin ((θ + θ₀) /₂)) < ε)%L). {
-  clear - H Hor Hop Hon.
+  clear - H Hor Hop Hon Hic Hi1.
   destruct H as (η & Hzη & H).
   exists η.
   split; [ easy | ].
@@ -939,7 +940,9 @@ enough (H :
   apply (rngl_lt_iff Hor) in Hθ.
   destruct Hθ as (_, Hθ).
   apply not_eq_sym in Hθ.
-  rewrite angle_cos_sub_cos_div_dist; [ | easy ].
+  rewrite angle_cos_sub_cos_angle_eucl_dist_mul; [ | easy ].
+  rewrite (rngl_mul_comm Hic).
+  rewrite (rngl_mul_div Hi1); [ | easy ].
   destruct (Bool.eqb _ _). {
     rewrite (rngl_mul_opp_l Hop) in H.
     now rewrite (rngl_mul_1_l Hon) in H.
