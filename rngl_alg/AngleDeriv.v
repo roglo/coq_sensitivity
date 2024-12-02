@@ -620,21 +620,7 @@ assert (Hsnz : √2 ≠ 0%L). {
   }
   now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
 }
-rewrite rngl_cos_sub_cos.
-(**)
-rewrite Hov, Htt.
-do 2 rewrite rngl_sin_add_straight_r.
-do 2 rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_opp_involutive Hop).
-rewrite (rngl_div_opp_l Hop Hiv).
-f_equal.
-rewrite <- (rngl_mul_div_assoc Hiv).
-rewrite angle_eucl_dist_is_sqrt.
-progress unfold angle_div_2 at 2.
-cbn - [ angle_div_2 angle_sub ].
-rewrite rngl_cos_sub_comm.
-remember (1 - _)%L as a.
+remember (1 - rngl_cos (θ2 - θ1))%L as a.
 assert (Hz1c : (0 ≤ a)%L). {
   subst a.
   apply (rngl_le_0_sub Hop Hor).
@@ -651,6 +637,21 @@ assert (Hsanz : √a ≠ 0%L). {
   subst θ2.
   now apply angle_lt_irrefl in Htt.
 }
+rewrite rngl_cos_sub_cos.
+(**)
+rewrite Hov, Htt.
+do 2 rewrite rngl_sin_add_straight_r.
+do 2 rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_opp_involutive Hop).
+rewrite (rngl_div_opp_l Hop Hiv).
+f_equal.
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite angle_eucl_dist_is_sqrt.
+progress unfold angle_div_2 at 2.
+cbn - [ angle_div_2 angle_sub ].
+rewrite rngl_cos_sub_comm.
+rewrite <- Heqa.
 rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | easy | easy ].
 rewrite (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
   intros H1.
@@ -702,21 +703,7 @@ assert (Hsnz : √2 ≠ 0%L). {
   }
   now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
 }
-rewrite rngl_cos_sub_cos.
-(**)
-apply angle_ltb_ge in Htt.
-rewrite Hov, Htt.
-rewrite rngl_sin_add_straight_r.
-rewrite angle_add_0_r.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_opp_involutive Hop).
-rewrite <- (rngl_mul_div_assoc Hiv).
-rewrite angle_eucl_dist_is_sqrt.
-progress unfold angle_div_2 at 2.
-cbn - [ angle_div_2 angle_sub ].
-rewrite rngl_cos_sub_comm.
-remember (1 - _)%L as a.
+remember (1 - rngl_cos (θ2 - θ1))%L as a.
 assert (Hz1c : (0 ≤ a)%L). {
   subst a.
   apply (rngl_le_0_sub Hop Hor).
@@ -733,6 +720,21 @@ assert (Hsanz : √a ≠ 0%L). {
   subst θ1.
   now rewrite angle_eucl_dist_diag in Hθ.
 }
+rewrite rngl_cos_sub_cos.
+(**)
+apply angle_ltb_ge in Htt.
+rewrite Hov, Htt.
+rewrite rngl_sin_add_straight_r.
+rewrite angle_add_0_r.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_opp_involutive Hop).
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite angle_eucl_dist_is_sqrt.
+progress unfold angle_div_2 at 2.
+cbn - [ angle_div_2 angle_sub ].
+rewrite rngl_cos_sub_comm.
+rewrite <- Heqa.
 rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | easy | easy ].
 specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 rewrite (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
@@ -783,19 +785,7 @@ assert (Hsnz : √2 ≠ 0%L). {
   }
   now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
 }
-rewrite rngl_cos_sub_cos.
-(**)
-rewrite Hov, Htt.
-rewrite rngl_sin_add_straight_r.
-rewrite angle_add_0_r.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_opp_involutive Hop).
-rewrite <- (rngl_mul_div_assoc Hiv).
-rewrite angle_eucl_dist_is_sqrt.
-progress unfold angle_div_2 at 2.
-cbn - [ angle_div_2 angle_sub ].
-rewrite rngl_cos_sub_comm.
-remember (1 - _)%L as a.
+remember (1 - rngl_cos (θ2 - θ1))%L as a.
 assert (Hz1c : (0 ≤ a)%L). {
   subst a.
   apply (rngl_le_0_sub Hop Hor).
@@ -812,6 +802,19 @@ assert (Hsanz : √a ≠ 0%L). {
   subst θ1.
   now apply angle_lt_irrefl in Htt.
 }
+rewrite rngl_cos_sub_cos.
+(**)
+rewrite Hov, Htt.
+rewrite rngl_sin_add_straight_r.
+rewrite angle_add_0_r.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_opp_involutive Hop).
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite angle_eucl_dist_is_sqrt.
+progress unfold angle_div_2 at 2.
+cbn - [ angle_div_2 angle_sub ].
+rewrite rngl_cos_sub_comm.
+rewrite <- Heqa.
 rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | easy | easy ].
 specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 rewrite (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
@@ -863,19 +866,7 @@ assert (Hsnz : √2 ≠ 0%L). {
   }
   now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
 }
-rewrite rngl_cos_sub_cos.
-(**)
-apply angle_ltb_ge in Htt.
-rewrite Hov, Htt.
-do 2 rewrite angle_add_0_r.
-rewrite (rngl_div_opp_l Hop Hiv).
-f_equal.
-rewrite <- (rngl_mul_div_assoc Hiv).
-rewrite angle_eucl_dist_is_sqrt.
-progress unfold angle_div_2 at 2.
-cbn - [ angle_div_2 angle_sub ].
-rewrite rngl_cos_sub_comm.
-remember (1 - _)%L as a.
+remember (1 - rngl_cos (θ2 - θ1))%L as a.
 assert (Hz1c : (0 ≤ a)%L). {
   subst a.
   apply (rngl_le_0_sub Hop Hor).
@@ -892,7 +883,20 @@ assert (Hsanz : √a ≠ 0%L). {
   subst θ1.
   now rewrite angle_eucl_dist_diag in Hθ.
 }
-rewrite (rl_sqrt_div Hon Hop Hiv Hor _ _ Hz1c Hz2).
+rewrite rngl_cos_sub_cos.
+(**)
+apply angle_ltb_ge in Htt.
+rewrite Hov, Htt.
+do 2 rewrite angle_add_0_r.
+rewrite (rngl_div_opp_l Hop Hiv).
+f_equal.
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite angle_eucl_dist_is_sqrt.
+progress unfold angle_div_2 at 2.
+cbn - [ angle_div_2 angle_sub ].
+rewrite rngl_cos_sub_comm.
+rewrite <- Heqa.
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | easy | easy ].
 rewrite (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
   intros H1.
   apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
