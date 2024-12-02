@@ -947,6 +947,17 @@ enough (H :
   rewrite angle_cos_sub_cos_angle_eucl_dist_mul.
   rewrite (rngl_mul_comm Hic).
   rewrite (rngl_mul_div Hi1); [ | easy ].
+(*
+rewrite angle_div_2_add.
+remember (angle_add_overflow θ θ₀) as ov eqn:Hov.
+symmetry in Hov.
+destruct ov. {
+  rewrite rngl_sin_add_straight_r.
+  rewrite (rngl_opp_involutive Hop).
+  replace (Bool.eqb _ _) with (θ <? θ₀)%A. 2: {
+    now destruct (θ <? θ₀)%A.
+  }
+*)
   destruct (Bool.eqb _ _). {
     rewrite (rngl_mul_opp_l Hop) in H.
     now rewrite (rngl_mul_1_l Hon) in H.
@@ -954,6 +965,7 @@ enough (H :
     now rewrite (rngl_mul_1_l Hon) in H.
   }
 }
+...
 Inspect 4.
 ...
 (* bien. Bon, faut voir... *)
