@@ -858,78 +858,13 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 intros * Hθ.
-assert (Hz2 : (0 < 2)%L) by apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-assert (Hze2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hor).
-assert (H2nz : 2%L ≠ 0%L) by apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-assert (Hs2na : √2%L ≠ 0%L). {
-  intros H.
-  now apply (eq_rl_sqrt_0 Hon Hos) in H.
-}
-remember (1 - rngl_cos (θ2 - θ1))%L as a.
-assert (Hz1c : (0 ≤ a)%L). {
-  subst a.
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
 remember (angle_add_overflow θ1 θ2) as ov eqn:Hov.
 remember (θ1 <? θ2)%A as tt eqn:Htt.
 symmetry in Hov, Htt.
 destruct ov. {
   destruct tt. {
-    rewrite rngl_cos_sub_cos.
-    cbn - [ angle_add angle_div_2 ].
-    rewrite Hov, Htt.
-    do 2 rewrite rngl_sin_add_straight_r.
-    do 2 rewrite (rngl_mul_opp_r Hop).
-    rewrite (rngl_mul_opp_l Hop).
-    rewrite (rngl_opp_involutive Hop).
-    rewrite (rngl_div_opp_l Hop Hiv).
-    progress f_equal.
-    rewrite (rngl_mul_comm Hic 2).
-    rewrite <- rngl_mul_assoc.
-    rewrite <- (rngl_mul_div_assoc Hiv).
-    rewrite <- (rngl_mul_1_r Hon (rngl_sin _)) at 2.
-    progress f_equal.
-    rewrite angle_eucl_dist_is_sqrt.
-    cbn - [ angle_sub ].
-    rewrite rngl_cos_sub_comm.
-    rewrite (rngl_mul_comm Hic).
-    rewrite <- Heqa.
-    rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | easy | easy ].
-    rewrite (rngl_mul_comm Hic).
-    rewrite <- (rngl_mul_div_assoc Hiv).
-    rewrite (rngl_div_div_swap Hic Hiv).
-    rewrite rl_sqrt_mul; [ | easy | easy ].
-    rewrite (rngl_mul_comm Hic √_).
-    rewrite (rngl_div_div Hos Hon Hiv); [ | | easy ]. 2: {
-      intros H.
-      apply (rngl_eq_mul_0_l Hos Hii) in H; [ | easy ].
-      apply (eq_rl_sqrt_0 Hon Hos) in H; [ | easy ].
-      subst a.
-      apply -> (rngl_sub_move_0_r Hop) in H.
-      symmetry in H.
-      apply eq_rngl_cos_1 in H.
-      apply -> angle_sub_move_0_r in H.
-      subst θ2.
-      now rewrite angle_eucl_dist_diag in Hθ.
-    }
-    rewrite (rngl_mul_comm Hic √2).
-    rewrite <- rngl_mul_assoc.
-    rewrite fold_rngl_squ.
-    rewrite (rngl_squ_sqrt Hon); [ | easy ].
-    rewrite (rngl_mul_div_assoc Hiv).
-    rewrite (rngl_mul_comm Hic).
-    apply (rngl_div_diag Hon Hiq).
-    intros H.
-    apply (rngl_eq_mul_0_l Hos Hii) in H; [ | easy ].
-    apply (eq_rl_sqrt_0 Hon Hos) in H; [ | easy ].
-    subst a.
-    apply -> (rngl_sub_move_0_r Hop) in H.
-    symmetry in H.
-    apply eq_rngl_cos_1 in H.
-    apply -> angle_sub_move_0_r in H.
-    subst θ2.
-    now rewrite angle_eucl_dist_diag in Hθ.
+    rewrite angle_add_overflow_angle_lt_cos_sub_cos; [ | easy | easy ].
+    now rewrite (rngl_mul_div Hi1).
   } {
     apply angle_ltb_ge in Htt.
     rewrite angle_add_overflow_angle_ge_cos_sub_cos; [ | easy | easy ].
