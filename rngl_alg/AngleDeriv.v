@@ -956,12 +956,12 @@ enough (H :
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ dθ, (0 < angle_eucl_dist dθ 0 < η)%L →
-  (rngl_dist
-     (if Bool.eqb (angle_add_overflow θ₀ (θ₀ + dθ)) (θ₀ + dθ <? θ₀)%A then
-        - rngl_sin ((2 * θ₀ + dθ) /₂)
-      else
-        rngl_sin ((2 * θ₀ + dθ) /₂))
-     (- rngl_sin θ₀) < ε)%L). {
+  (rngl_abs
+     (rngl_sin θ₀ +
+      (if Bool.eqb (angle_add_overflow θ₀ (θ₀ + dθ)) (θ₀ + dθ <? θ₀)%A then
+         - rngl_sin ((2 * θ₀ + dθ) /₂)
+       else
+         rngl_sin ((2 * θ₀ + dθ) /₂))) < ε)%L). {
   destruct H as (η & Hzη & H).
   exists η.
   move η before ε.
@@ -970,8 +970,12 @@ enough (H :
   rewrite angle_eucl_dist_move_0_l in Hθ.
   rewrite angle_add_comm in Hθ.
   rewrite angle_add_sub in Hθ.
+  progress unfold rngl_dist.
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite rngl_add_comm.
   now apply H.
 }
+Search ((2 * _ + _)/₂)%A.
 ...
 enough (H :
   ∃ η, (0 < η)%L ∧
