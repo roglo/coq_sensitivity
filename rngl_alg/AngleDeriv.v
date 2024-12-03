@@ -984,6 +984,10 @@ enough (H :
       rewrite rngl_sin_angle_div_2_add_overflow; [ | easy ].
       rewrite rngl_sin_add_straight_r.
       rewrite (rngl_sub_opp_r Hop).
+      destruct Hθ as (Hzd, Hde).
+      apply rngl_cos_lt_angle_eucl_dist_lt in Hde. 2: {
+        now apply (rngl_lt_le_incl Hor) in Hzη.
+      }
 ...
 Inspect 4.
 ...

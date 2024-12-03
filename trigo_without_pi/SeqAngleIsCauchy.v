@@ -163,17 +163,18 @@ Theorem rngl_cos_lt_angle_eucl_dist_lt :
   ∀ a θ1 θ2,
   (0 ≤ a)%L
   → (1 - a² / 2 < rngl_cos (θ2 - θ1))%L
-  → (angle_eucl_dist θ1 θ2 < a)%L.
+  ↔ (angle_eucl_dist θ1 θ2 < a)%L.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * ε Hε.
-  rewrite (H1 (_ - _))%L, (H1 (rngl_cos _)) in Hε.
-  now apply (rngl_lt_irrefl Hor) in Hε.
+  intros * Ha.
+  rewrite (H1 (_ - _))%L, (H1 (rngl_cos _)).
+  rewrite (H1 (angle_eucl_dist _ _)), (H1 a).
+  easy.
 }
-intros * Hza Hc.
+intros * Hza.
 rewrite angle_eucl_dist_is_sqrt.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor √_). 2: {
   apply rl_sqrt_nonneg.
@@ -183,21 +184,42 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor √_). 2: {
   apply (rngl_le_0_sub Hop Hor).
   apply rngl_cos_bound.
 }
-rewrite <- (rngl_abs_nonneg_eq Hop Hor a); [ | easy ].
-apply (rngl_squ_lt_abs_lt Hop Hor Hii).
-rewrite (rngl_squ_sqrt Hon). 2: {
-  apply (rngl_mul_nonneg_nonneg Hos Hor). {
-    apply (rngl_0_le_2 Hon Hos Hor).
+rewrite <- (rngl_abs_nonneg_eq Hop Hor a) at 2; [ | easy ].
+split. {
+  intros Hc.
+  apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+  rewrite (rngl_squ_sqrt Hon). 2: {
+    apply (rngl_mul_nonneg_nonneg Hos Hor). {
+      apply (rngl_0_le_2 Hon Hos Hor).
+    }
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
   }
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  now apply (rngl_lt_sub_lt_add_r Hop Hor).
+} {
+  intros Ha.
+  apply (rngl_abs_lt_squ_lt Hop Hor Hii) in Ha. 2: {
+    apply (rngl_mul_comm Hic).
+  }
+  rewrite (rngl_squ_sqrt Hon) in Ha. 2: {
+    apply (rngl_mul_nonneg_nonneg Hos Hor). {
+      apply (rngl_0_le_2 Hon Hos Hor).
+    }
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rngl_mul_comm Hic) in Ha.
+  apply (rngl_lt_div_r Hon Hop Hiv Hor) in Ha. 2: {
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_lt_sub_lt_add_l Hop Hor) in Ha.
+  now apply (rngl_lt_sub_lt_add_r Hop Hor) in Ha.
 }
-rewrite (rngl_mul_comm Hic).
-apply (rngl_lt_div_r Hon Hop Hiv Hor). {
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-}
-apply (rngl_lt_sub_lt_add_l Hop Hor).
-now apply (rngl_lt_sub_lt_add_r Hop Hor).
 Qed.
 
 Theorem seq_angle_to_div_nat_sub :
