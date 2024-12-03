@@ -918,6 +918,7 @@ enough (H :
      ε)%L). {
   destruct H as (η & Hzη & H).
   exists η.
+  move η before ε.
   split; [ easy | ].
   intros θ Hθ.
   progress unfold rngl_dist.
@@ -988,6 +989,9 @@ enough (H :
       apply rngl_cos_lt_angle_eucl_dist_lt in Hde. 2: {
         now apply (rngl_lt_le_incl Hor) in Hzη.
       }
+Search (rngl_cos _ + rngl_cos _ = _)%L.
+...
+Search (rngl_sin _ + rngl_sin _)%L.
 ...
 Inspect 4.
 ...
