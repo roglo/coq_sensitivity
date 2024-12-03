@@ -926,6 +926,52 @@ enough (H :
   }
   now apply H.
 }
+enough (H :
+  ∃ η, (0 < η)%L ∧
+  ∀ dθ, (0 < angle_eucl_dist θ₀ (θ₀ + dθ) < η)%L →
+  (rngl_dist
+     (if Bool.eqb (angle_add_overflow θ₀ (θ₀ + dθ)) (θ₀ + dθ <? θ₀)%A then
+        - rngl_sin ((2 * θ₀ + dθ) /₂)
+      else
+        rngl_sin ((2 * θ₀ + dθ) /₂))
+     (- rngl_sin θ₀) < ε)%L). {
+  destruct H as (η & Hzη & H).
+  exists η.
+  move η before ε.
+  split; [ easy | ].
+  intros θ Hθ.
+  specialize (H (θ - θ₀))%A.
+  rewrite angle_add_sub_assoc in H.
+  rewrite angle_add_comm in H.
+  rewrite angle_add_sub in H.
+  rewrite angle_eucl_dist_symmetry in H.
+  specialize (H Hθ).
+  rewrite angle_add_overflow_comm in H.
+  rewrite angle_mul_2_l in H.
+  rewrite angle_add_sub_assoc in H.
+  rewrite (angle_add_comm _ θ) in H.
+  rewrite angle_add_assoc in H.
+  now rewrite angle_add_sub in H.
+}
+enough (H :
+  ∃ η, (0 < η)%L ∧
+  ∀ dθ, (0 < angle_eucl_dist dθ 0 < η)%L →
+  (rngl_dist
+     (if Bool.eqb (angle_add_overflow θ₀ (θ₀ + dθ)) (θ₀ + dθ <? θ₀)%A then
+        - rngl_sin ((2 * θ₀ + dθ) /₂)
+      else
+        rngl_sin ((2 * θ₀ + dθ) /₂))
+     (- rngl_sin θ₀) < ε)%L). {
+  destruct H as (η & Hzη & H).
+  exists η.
+  move η before ε.
+  split; [ easy | ].
+  intros dθ Hθ.
+  rewrite angle_eucl_dist_move_0_l in Hθ.
+  rewrite angle_add_comm in Hθ.
+  rewrite angle_add_sub in Hθ.
+  now apply H.
+}
 ...
 enough (H :
   ∃ η, (0 < η)%L ∧
