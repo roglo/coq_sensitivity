@@ -906,10 +906,27 @@ enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L →
   (rngl_dist
-     ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀)
+     (if Bool.eqb (angle_add_overflow θ θ₀) (θ <? θ₀)%A then
+        - rngl_sin ((θ + θ₀) /₂)
+      else
+        rngl_sin ((θ + θ₀) /₂))
      (- rngl_sin θ₀) < ε)%L). {
-  easy.
+  destruct H as (η & Hzη & H).
+  exists η.
+  move η before ε.
+  split; [ easy | ].
+  intros θ Hθ.
+  rewrite angle_cos_sub_cos_angle_eucl_dist_mul.
+  rewrite (rngl_mul_comm Hic).
+  rewrite (rngl_mul_div Hi1). 2: {
+    destruct Hθ as (Hθ, _).
+    apply (rngl_lt_iff Hor) in Hθ.
+    destruct Hθ as (_, Hθ).
+    now apply not_eq_sym in Hθ.
+  }
+  now apply H.
 }
+...
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L →
