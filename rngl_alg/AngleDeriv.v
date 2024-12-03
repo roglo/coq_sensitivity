@@ -947,17 +947,6 @@ enough (H :
   rewrite angle_cos_sub_cos_angle_eucl_dist_mul.
   rewrite (rngl_mul_comm Hic).
   rewrite (rngl_mul_div Hi1); [ | easy ].
-(*
-rewrite angle_div_2_add.
-remember (angle_add_overflow θ θ₀) as ov eqn:Hov.
-symmetry in Hov.
-destruct ov. {
-  rewrite rngl_sin_add_straight_r.
-  rewrite (rngl_opp_involutive Hop).
-  replace (Bool.eqb _ _) with (θ <? θ₀)%A. 2: {
-    now destruct (θ <? θ₀)%A.
-  }
-*)
   destruct (Bool.eqb _ _). {
     rewrite (rngl_mul_opp_l Hop) in H.
     now rewrite (rngl_mul_1_l Hon) in H.
@@ -965,6 +954,36 @@ destruct ov. {
     now rewrite (rngl_mul_1_l Hon) in H.
   }
 }
+enough (H :
+  ∃ η, (0 < η)%L ∧
+  ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L →
+  let s :=
+    if Bool.eqb (angle_add_overflow θ θ₀) (θ <? θ₀)%A then (-1)%L
+    else 1%L
+  in
+  (rngl_abs (rngl_sin θ₀ + s * rngl_sin ((θ + θ₀) /₂)) < ε)%L). {
+  destruct H as (η & Hzη & H1).
+  exists η.
+  move η before ε.
+  split; [ easy | ].
+  intros θ Hθ.
+  specialize (H1 θ Hθ).
+  cbn - [ angle_div_2 ] in H1.
+  remember (angle_add_overflow θ θ₀) as ov eqn:Hov.
+  remember (θ <? θ₀)%A as tt eqn:Htt.
+  symmetry in Hov, Htt.
+  destruct ov. {
+    progress replace (Bool.eqb true tt) with tt in H1 |-*. 2: {
+      now destruct tt.
+    }
+    destruct tt. {
+      cbn - [ angle_div_2 ].
+      rewrite (rngl_mul_opp_l Hop).
+      rewrite (rngl_mul_1_l Hon).
+      rewrite (rngl_add_opp_r Hop).
+      rewrite rngl_sin_angle_div_2_add_overflow; [ | easy ].
+      rewrite rngl_sin_add_straight_r.
+      rewrite (rngl_sub_opp_r Hop).
 ...
 Inspect 4.
 ...
