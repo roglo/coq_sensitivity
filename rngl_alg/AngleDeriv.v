@@ -927,6 +927,21 @@ enough (H :
       now apply angle_lt_irrefl in Htzs.
     }
     intros θ Hθ.
+    rewrite angle_cos_sub_cos_angle_eucl_dist_mul.
+    rewrite (rngl_mul_comm Hic).
+    rewrite (rngl_mul_div Hi1). 2: {
+      destruct Hθ as (Hθ, _).
+      apply (rngl_lt_iff Hor) in Hθ.
+      destruct Hθ as (_, Hθ).
+      now apply not_eq_sym in Hθ.
+    }
+    assert (Hov : angle_add_overflow θ θ₀ = false). {
+      progress unfold angle_add_overflow.
+      apply Bool.andb_false_iff.
+      destruct Hθ as (H1, H2).
+      do 2 rewrite angle_eucl_dist_is_sqrt in H2.
+      rewrite rngl_cos_sub_straight_l in H2.
+      rewrite (rngl_sub_opp_r Hop) in H2.
 ...
 enough (H :
   ∃ η, (0 < η)%L ∧
