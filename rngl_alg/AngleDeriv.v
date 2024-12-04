@@ -931,6 +931,49 @@ rewrite rngl_cos_sub_comm in Hdd.
 now rewrite (rngl_cos_sub_comm θ2 θ1) in Hdd.
 Qed.
 
+Theorem angle_add_not_overflow_iff :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = false
+  ↔ (θ1 = 0%A ∨ (θ2 < - θ1)%A).
+Proof.
+intros.
+split; intros Hov. {
+  apply Bool.andb_false_iff in Hov.
+  destruct Hov as [Hov| Hov]; [ left | right ]. {
+    apply Bool.negb_false_iff in Hov.
+    now apply angle_eqb_eq in Hov.
+  } {
+    now apply angle_leb_gt in Hov.
+  }
+} {
+  apply Bool.andb_false_iff.
+  destruct Hov as [Hov| Hov]; [ left | right ]. {
+    apply Bool.negb_false_iff.
+    now apply angle_eqb_eq.
+  } {
+    now apply angle_leb_gt.
+  }
+}
+Qed.
+
+Theorem angle_eucl_dist_pos_angle_neq :
+  ∀ θ1 θ2, (0 < angle_eucl_dist θ1 θ2)%L ↔ θ1 ≠ θ2.
+Proof.
+destruct_ac.
+intros.
+split; intros Hd. {
+  apply (rngl_lt_iff Hor) in Hd.
+  destruct Hd as (_, Hd).
+  intros H1; apply Hd; symmetry.
+  now apply angle_eucl_dist_separation.
+} {
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  intros H1; apply Hd.
+  now apply angle_eucl_dist_separation.
+}
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
@@ -980,11 +1023,11 @@ enough (H :
       now apply not_eq_sym in Hθ.
     }
     assert (Hov : angle_add_overflow θ θ₀ = false). {
-      progress unfold angle_add_overflow.
-      apply Bool.andb_false_iff.
+      apply angle_add_not_overflow_iff.
       destruct Hθ as (H1, H2).
       apply angle_eucl_dist_lt_angle_eucl_dist in H2.
       rewrite rngl_cos_sub_straight_r in H2.
+      apply angle_eucl_dist_pos_angle_neq in H1.
 ...
 enough (H :
   ∃ η, (0 < η)%L ∧
