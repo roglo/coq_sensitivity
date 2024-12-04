@@ -903,6 +903,32 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros θ₀ ε Hε.
 enough (H :
+  if (θ₀ <? angle_straight)%A then
+    ∃ η : T, (0 < η)%L ∧
+    ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L
+    → (rngl_dist
+           ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀)
+           (- rngl_sin θ₀) < ε)%L
+  else
+    ∃ η : T, (0 < η)%L ∧
+    ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L
+    → (rngl_dist
+           ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀)
+           (- rngl_sin θ₀) < ε)%L). {
+  remember (θ₀ <? angle_straight)%A as tzs eqn:Htzs.
+  symmetry in Htzs.
+  destruct tzs. {
+    exists (angle_eucl_dist θ₀ angle_straight).
+    split. {
+      apply (rngl_lt_iff Hor).
+      split; [ apply angle_eucl_dist_nonneg | ].
+      intros H1; symmetry in H1.
+      rewrite angle_eucl_dist_separation in H1; subst θ₀.
+      now apply angle_lt_irrefl in Htzs.
+    }
+    intros θ Hθ.
+...
+enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L →
   (rngl_dist
