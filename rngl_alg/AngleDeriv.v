@@ -1030,7 +1030,28 @@ apply angle_eucl_dist_lt_angle_eucl_dist in H2.
 rewrite rngl_cos_sub_straight_r in H2.
 apply angle_eucl_dist_pos_angle_neq in H1.
 apply (rngl_lt_opp_l Hop Hor) in H2.
-Search (_ → angle_add_overflow _ _ = false).
+progress unfold angle_leb.
+cbn.
+rewrite (rngl_leb_refl Hor).
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs; [ apply rngl_leb_le, rngl_cos_bound | ].
+exfalso.
+apply rngl_leb_nle in Hzs.
+apply Hzs; clear Hzs.
+move Htzs at bottom.
+progress unfold angle_ltb in Htzs.
+cbn in Htzs.
+rewrite (rngl_leb_refl Hor) in Htzs.
+remember (0 ≤? rngl_sin θ₀)%L as zz eqn:Hzz.
+symmetry in Hzz.
+destruct zz; [ | easy ].
+apply rngl_leb_le in Hzz.
+apply rngl_ltb_lt in Htzs.
+apply (rngl_lt_iff Hor) in Htzs.
+destruct Htzs as (_, Hc).
+apply not_eq_sym in Hc.
+Search (rngl_cos _ ≠ _).
 ...
       apply angle_add_not_overflow_iff.
       destruct Hθ as (H1, H2).
