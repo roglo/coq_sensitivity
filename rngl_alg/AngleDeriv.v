@@ -887,6 +887,50 @@ destruct ov. {
 }
 Qed.
 
+Theorem angle_eucl_dist_lt_angle_eucl_dist :
+  ∀ θ1 θ2 θ3 θ4,
+  (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ3 θ4)%L
+  → (rngl_cos (θ3 - θ4) < rngl_cos (θ1 - θ2))%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hdd.
+  do 2 rewrite (H1 (angle_eucl_dist _ _)) in Hdd.
+  now apply (rngl_lt_irrefl Hor) in Hdd.
+}
+intros * Hdd.
+do 2 rewrite angle_eucl_dist_is_sqrt in Hdd.
+apply (rngl_lt_lt_squ Hop Hor Hii) in Hdd; cycle 1. {
+  apply (rngl_mul_comm Hic).
+} {
+  apply rl_sqrt_nonneg.
+  apply (rngl_mul_nonneg_nonneg Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_squ_sqrt Hon) in Hdd. 2: {
+  apply (rngl_mul_nonneg_nonneg Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_squ_sqrt Hon) in Hdd. 2: {
+  apply (rngl_mul_nonneg_nonneg Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in Hdd. 2: {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+apply (rngl_sub_lt_mono_l Hop Hor) in Hdd.
+rewrite rngl_cos_sub_comm in Hdd.
+now rewrite (rngl_cos_sub_comm θ2 θ1) in Hdd.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
@@ -939,9 +983,8 @@ enough (H :
       progress unfold angle_add_overflow.
       apply Bool.andb_false_iff.
       destruct Hθ as (H1, H2).
-      do 2 rewrite angle_eucl_dist_is_sqrt in H2.
-      rewrite rngl_cos_sub_straight_l in H2.
-      rewrite (rngl_sub_opp_r Hop) in H2.
+      apply angle_eucl_dist_lt_angle_eucl_dist in H2.
+      rewrite rngl_cos_sub_straight_r in H2.
 ...
 enough (H :
   ∃ η, (0 < η)%L ∧
@@ -1016,8 +1059,6 @@ enough (H :
   rewrite rngl_add_comm.
   now apply H.
 }
-Search ((2 * _ + _)/₂)%A.
-...
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (0 < angle_eucl_dist θ θ₀ < η)%L →
