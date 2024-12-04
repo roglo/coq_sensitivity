@@ -1028,6 +1028,23 @@ enough (H :
       apply angle_eucl_dist_lt_angle_eucl_dist in H2.
       rewrite rngl_cos_sub_straight_r in H2.
       apply angle_eucl_dist_pos_angle_neq in H1.
+      destruct (angle_eq_dec θ 0) as [Htz| Htz]; [ now left | right ].
+(*
+apply (rngl_lt_opp_l Hop Hor) in H2.
+rewrite rngl_cos_sub in H2.
+rewrite rngl_add_assoc in H2.
+rewrite (rngl_add_mul_r_diag_r Hon) in H2.
+*)
+      progress unfold angle_ltb.
+      cbn.
+      rewrite (rngl_leb_0_opp Hop).
+      remember (0 ≤? rngl_sin θ₀)%L as zs eqn:Hzs.
+      remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+      symmetry in Hzs, Hsz.
+      destruct zs. {
+        destruct sz; [ | easy ].
+        apply rngl_ltb_lt.
+        apply rngl_leb_le in Hzs, Hsz.
 ...
 enough (H :
   ∃ η, (0 < η)%L ∧
