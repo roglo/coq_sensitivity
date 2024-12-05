@@ -11,6 +11,7 @@ Require Import Trigo.AngleDiv2.
 Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.SeqAngleIsCauchy.
 Require Import Trigo.TrigoWithoutPiExt.
+Require Import Trigo.AngleDivNat.
 Require Import Trigo.Angle_order.
 Require Import Trigo.TacChangeAngle.
 
@@ -1044,6 +1045,10 @@ enough (H :
       now apply not_eq_sym in Hθ.
     }
     assert (Hov : angle_add_overflow θ θ₀ = false). {
+Search angle_ltb.
+Check angle_le_angle_eucl_dist_le.
+(* θ-θ₀ ≤ π-θ₀ *)
+...
 rewrite angle_add_overflow_comm.
 apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
 destruct Hθ as (H1, H2).
