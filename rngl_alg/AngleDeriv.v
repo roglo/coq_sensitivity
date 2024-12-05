@@ -1048,6 +1048,40 @@ enough (H :
 Search angle_ltb.
 Check angle_le_angle_eucl_dist_le.
 (* θ-θ₀ ≤ π-θ₀ *)
+Theorem chatgpt_glop :
+  ∀ θ1 θ2,
+  angle_eucl_dist θ1 θ2 = (2 * rngl_abs (rngl_sin ((θ1 - θ2) /₂)))%L.
+Proof.
+destruct_ac.
+intros.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite rl_sqrt_mul; cycle 1. {
+  apply (rngl_0_le_2 Hon Hos Hor).
+} {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+Arguments rngl_squ_sqrt {T ro rp rl} Hon a%_L.
+rewrite <- (rngl_squ_sqrt Hon 2) at 2. 2: {
+  apply (rngl_0_le_2 Hon Hos Hor).
+}
+progress unfold rngl_squ.
+rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite <- (rl_sqrt_squ Hon Hop Hor).
+rewrite <- rl_sqrt_mul; cycle 1. {
+  apply (rngl_0_le_2 Hon Hos Hor).
+} {
+  apply (rngl_squ_nonneg Hos Hor).
+}
+f_equal.
+specialize (cos2_sin2_1 ((θ1 - θ2) /₂)) as H1.
+apply (rngl_add_move_l Hop) in H1.
+rewrite H1.
+rewrite angle_div_2_sub.
+remember (θ2 ≤? θ1)%A as t21 eqn:Ht21.
+symmetry in Ht21.
+destruct t21. {
 ...
 rewrite angle_add_overflow_comm.
 apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
