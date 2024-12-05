@@ -1006,12 +1006,30 @@ enough (H :
   remember (θ₀ <? angle_straight)%A as tzs eqn:Htzs.
   symmetry in Htzs.
   destruct tzs. {
-    exists (angle_eucl_dist θ₀ angle_straight).
+    exists (angle_eucl_dist θ₀ angle_straight / 2)%L.
     split. {
       apply (rngl_lt_iff Hor).
+(*
       split; [ apply angle_eucl_dist_nonneg | ].
+*)
+      split. {
+        apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+          apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+        }
+        apply angle_eucl_dist_nonneg.
+      }
+(**)
       intros H1; symmetry in H1.
+(*
       rewrite angle_eucl_dist_separation in H1; subst θ₀.
+*)
+      (* lemma *)
+      progress unfold rngl_div in H1.
+      rewrite Hiv in H1.
+Search (_ * _ = 0)%L.
+      apply (rngl_eq_mul_0_l Hos Hii) in
+...
+(**)
       now apply angle_lt_irrefl in Htzs.
     }
     intros θ Hθ.
@@ -1027,9 +1045,9 @@ enough (H :
 rewrite angle_add_overflow_comm.
 apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
 destruct Hθ as (H1, H2).
-...
 apply angle_eucl_dist_lt_angle_eucl_dist in H2.
 rewrite rngl_cos_sub_straight_r in H2.
+...
 apply angle_eucl_dist_pos_angle_neq in H1.
 apply (rngl_lt_opp_l Hop Hor) in H2.
 progress unfold angle_leb.
