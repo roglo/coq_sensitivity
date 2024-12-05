@@ -356,7 +356,9 @@ subst x y.
 subst θ3.
 rewrite <- (rngl_squ_opp Hop).
 rewrite (rngl_opp_sub_distr Hop).
-now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
+apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
+apply rngl_leb_le in Hzs1, Hzs2.
+congruence.
 Qed.
 
 Theorem rngl_sin_nonneg_angle_le_straight :

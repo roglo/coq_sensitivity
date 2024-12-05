@@ -1317,14 +1317,13 @@ Qed.
 
 Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub :
   ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
+  (0 ≤? rngl_sin θ1)%L = (0 ≤? rngl_sin θ2)%L
   → ((1 + rngl_cos (θ1 + θ2)) * 2)%L =
       (√((1 + rngl_cos θ1) * (1 + rngl_cos θ2)) -
        √((1 - rngl_cos θ1) * (1 - rngl_cos θ2)))²%L.
 Proof.
 destruct_ac.
-intros * Hzs1 Hzs2.
+intros * Hzs12.
 assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cos θ1) * (1 + rngl_cos θ2))%L). {
   intros.
   apply (rngl_mul_nonneg_nonneg Hos Hor). {
@@ -1414,9 +1413,23 @@ f_equal.
 rewrite <- (rngl_add_sub_assoc Hop).
 f_equal; cbn.
 f_equal.
-rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-easy.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs2.
+destruct zs2. {
+  apply rngl_leb_le in Hzs2, Hzs12.
+  rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+  rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+  easy.
+} {
+  apply (rngl_leb_gt Hor) in Hzs2, Hzs12.
+  apply (rngl_lt_le_incl Hor) in Hzs2, Hzs12.
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_opp_r Hop).
+  symmetry.
+  apply (rngl_opp_involutive Hop).
+}
 Qed.
 
 Theorem angle_right_add_right :
@@ -1645,7 +1658,9 @@ progress unfold rngl_squ at 1.
 rewrite rngl_mul_assoc.
 rewrite (rngl_div_mul Hon Hiv); [ | easy ].
 subst x y.
-now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
+apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
+apply rngl_leb_le in Hzs1, Hzs2.
+congruence.
 Qed.
 
 Theorem rngl_sin_sub_anticomm :
@@ -1902,13 +1917,12 @@ Qed.
 
 Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add :
   ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
+  (0 ≤? rngl_sin θ1)%L = (0 ≤? rngl_sin θ2)%L
   → ((1 + rngl_cos (θ1 - θ2)) * 2)%L =
       (√((1 + rngl_cos θ1) * (1 + rngl_cos θ2)) +
        √((1 - rngl_cos θ1) * (1 - rngl_cos θ2)))²%L.
 Proof.
-intros * Hzs1 Hzs2.
+intros * Hzs12.
 (* proof borrowed from rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub
    and it works: perhaps there is a way to unify these two theorems *)
 destruct_ac.
@@ -2000,9 +2014,23 @@ f_equal; cbn.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_sub_opp_r Hop).
 f_equal.
-rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-easy.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs2.
+destruct zs2. {
+  apply rngl_leb_le in Hzs2, Hzs12.
+  rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+  rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+  easy.
+} {
+  apply (rngl_leb_gt Hor) in Hzs2, Hzs12.
+  apply (rngl_lt_le_incl Hor) in Hzs2, Hzs12.
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_opp_r Hop).
+  symmetry.
+  apply (rngl_opp_involutive Hop).
+}
 Qed.
 
 Theorem rngl_sin_nonneg_sin_neg_sin_add_neg :
@@ -2126,7 +2154,9 @@ rewrite <- (rngl_opp_0 Hop) in Hzs2.
 apply (rngl_opp_le_compat Hop Hor) in Hzs2.
 rewrite angle_add_opp_r.
 rewrite rngl_cos_opp.
-now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add.
+apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add.
+apply rngl_leb_le in Hzs1, Hzs2.
+congruence.
 Qed.
 
 Theorem angle_add_add_swap :
