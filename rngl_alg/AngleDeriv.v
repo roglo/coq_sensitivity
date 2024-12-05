@@ -12,6 +12,7 @@ Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.SeqAngleIsCauchy.
 Require Import Trigo.TrigoWithoutPiExt.
 Require Import Trigo.Angle_order.
+Require Import Trigo.TacChangeAngle.
 
 Section a.
 
@@ -1026,6 +1027,7 @@ enough (H :
 rewrite angle_add_overflow_comm.
 apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
 destruct Hθ as (H1, H2).
+...
 apply angle_eucl_dist_lt_angle_eucl_dist in H2.
 rewrite rngl_cos_sub_straight_r in H2.
 apply angle_eucl_dist_pos_angle_neq in H1.
@@ -1051,7 +1053,20 @@ apply rngl_ltb_lt in Htzs.
 apply (rngl_lt_iff Hor) in Htzs.
 destruct Htzs as (_, Hc).
 apply not_eq_sym in Hc.
-Search (rngl_cos _ ≠ _).
+destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hcz| Hcz]. {
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hct| Hct]. {
+    apply (rngl_nlt_ge_iff Hor).
+    intros Hsz.
+    rewrite rngl_cos_sub in H2.
+    change_angle_opp θ.
+    progress sin_cos_opp_hyp T H2.
+    progress sin_cos_opp_hyp T Hsz.
+    progress sin_cos_opp_hyp T Hct.
+...
+    change_angle_add_r θ angle_right.
+    progress sin_cos_add_sub_right_hyp T H2.
+    progress sin_cos_add_sub_right_hyp T Hsz.
+    progress sin_cos_add_sub_right_hyp T Hct.
 ...
       apply angle_add_not_overflow_iff.
       destruct Hθ as (H1, H2).
