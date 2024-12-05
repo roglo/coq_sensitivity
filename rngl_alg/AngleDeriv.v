@@ -1026,9 +1026,11 @@ enough (H :
       (* lemma *)
       progress unfold rngl_div in H1.
       rewrite Hiv in H1.
-Search (_ * _ = 0)%L.
-      apply (rngl_eq_mul_0_l Hos Hii) in
-...
+      apply (rngl_eq_mul_0_l Hos Hii) in H1. 2: {
+        apply (rngl_inv_neq_0 Hon Hos Hiv).
+        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+      }
+      rewrite angle_eucl_dist_separation in H1; subst θ₀.
 (**)
       now apply angle_lt_irrefl in Htzs.
     }
@@ -1045,6 +1047,20 @@ Search (_ * _ = 0)%L.
 rewrite angle_add_overflow_comm.
 apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
 destruct Hθ as (H1, H2).
+apply angle_nlt_ge.
+intros Hst.
+apply (rngl_nle_gt_iff Hor) in H2.
+apply H2; clear H2.
+apply (rngl_le_div_l Hon Hop Hiv Hor). {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+rewrite (rngl_mul_2_r Hon).
+eapply (rngl_le_trans Hor). {
+  apply angle_eucl_dist_triangular with (θ2 := θ).
+}
+rewrite angle_eucl_dist_symmetry.
+apply (rngl_add_le_mono_l Hop Hor).
+...
 apply angle_eucl_dist_lt_angle_eucl_dist in H2.
 rewrite rngl_cos_sub_straight_r in H2.
 ...
