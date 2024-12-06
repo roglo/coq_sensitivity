@@ -1042,6 +1042,56 @@ enough (H :
       now apply not_eq_sym in Hθ.
     }
     assert (Hov : angle_add_overflow θ θ₀ = false). {
+      rewrite angle_add_overflow_comm.
+      apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
+      progress unfold angle_leb.
+      cbn.
+      rewrite (rngl_leb_refl Hor).
+      remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+      symmetry in Hzs.
+      destruct zs; [ apply rngl_leb_le, rngl_cos_bound | exfalso ].
+      apply (rngl_leb_gt Hor) in Hzs.
+      destruct Hθ as (H1, H2).
+do 2 rewrite angle_eucl_dist_is_sqrt in H2.
+...
+      do 2 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2 in H2.
+      rewrite <- (rngl_mul_div_assoc Hiv) in H2.
+      apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in H2. 2: {
+        apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      }
+      do 2 rewrite angle_div_2_sub in H2.
+      generalize Htzs; intros H3.
+      apply angle_nle_gt in H3.
+      apply Bool.not_true_iff_false in H3.
+      rewrite H3 in H2; clear H3.
+      rewrite angle_straight_div_2 in H2.
+      rewrite <- (angle_add_sub_swap (θ₀ /₂))in H2.
+      rewrite <- angle_add_sub_assoc in H2.
+      rewrite angle_straight_sub_right in H2.
+      rewrite rngl_sin_add_right_r in H2.
+      remember (θ₀ ≤? θ)%A as tt eqn:Htt.
+      symmetry in Htt.
+      destruct tt. {
+        rewrite rngl_sin_sub in H2.
+        cbn in H2.
+        generalize Hzs; intros H3.
+        apply (rngl_leb_gt Hor) in H3.
+        rewrite H3 in H2; clear H3.
+        rewrite (rngl_mul_opp_l Hop) in H2.
+        rewrite (rngl_mul_1_l Hon) in H2.
+        remember (0 ≤? rngl_sin θ₀)%L as zz eqn:Hzz.
+        symmetry in Hzz.
+        destruct zz. 2: {
+          progress unfold angle_ltb in Htzs.
+          cbn in Htzs.
+          rewrite (rngl_leb_refl Hor) in Htzs.
+          now rewrite Hzz in Htzs.
+        }
+        rewrite (rngl_mul_1_l Hon) in H2.
+        rewrite (rngl_mul_opp_l Hop) in H2.
+        rewrite (rngl_sub_opp_r Hop) in H2.
+Search (√_ * √_ + _)%L.
+...
 Check angle_eucl_dist_is_2_mul_sin_sub_div_2.
 Check angle_eucl_dist_is_sqrt.
 ...
