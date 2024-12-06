@@ -1042,6 +1042,7 @@ enough (H :
       now apply not_eq_sym in Hθ.
     }
     assert (Hov : angle_add_overflow θ θ₀ = false). {
+...
       rewrite angle_add_overflow_comm.
       apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
       progress unfold angle_leb.
