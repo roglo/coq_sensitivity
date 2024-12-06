@@ -1301,7 +1301,8 @@ destruct zs1. {
 }
 Qed.
 
-Theorem angle_eucl_dist_eq_2_mul_sin_sub_div_2 :
+(* should be moved to Angle.v close to angle_eucl_dist_is_sqrt *)
+Theorem angle_eucl_dist_is_2_mul_sin_sub_div_2 :
   ∀ θ1 θ2,
   angle_eucl_dist θ1 θ2 = (2 * rngl_sin ((θ1 - θ2) /₂))%L.
 Proof.
