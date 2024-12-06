@@ -1110,6 +1110,121 @@ apply (rngl_mul_le_compat_nonneg Hor). {
 }
 Qed.
 
+Theorem angle_eucl_dist_2_mul_sqrt_add_sqrt :
+  ∀ θ1 θ2,
+  (rngl_sin θ1 < 0)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → angle_eucl_dist θ1 θ2 =
+    (2 *
+     (√((1 - rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) +
+      √((1 + rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2)))%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _))%L.
+  apply H1.
+}
+intros * Hs1z Hzs2.
+apply (rngl_leb_gt Hor) in Hs1z.
+apply rngl_leb_le in Hzs2.
+assert (H2r : √2 ≠ 0%L). {
+  intros H.
+  apply (f_equal rngl_squ) in H.
+  rewrite (rngl_squ_sqrt Hon) in H. 2: {
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  rewrite (rngl_squ_0 Hos) in H.
+  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H.
+}
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
+  apply (rngl_le_opp_l Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
+  apply (rngl_le_opp_l Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
+do 2 rewrite (rngl_mul_div_assoc Hiv).
+rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+rewrite fold_rngl_squ.
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_0_le_2 Hon Hos Hor).
+}
+rewrite rngl_mul_add_distr_l.
+do 2 rewrite (rngl_mul_comm Hic 2).
+rewrite (rngl_div_mul Hon Hiv). 2: {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+rewrite (rngl_div_mul Hon Hiv). 2: {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+rewrite <- rl_sqrt_mul; cycle 1. {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_le_opp_l Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite <- rl_sqrt_mul; cycle 1. {
+  apply (rngl_le_opp_l Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+change_angle_add_r θ1 angle_straight.
+rewrite rngl_cos_sub_straight_r.
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
+rewrite angle_eucl_dist_is_sqrt.
+rewrite angle_sub_sub_distr.
+rewrite rngl_cos_add_straight_r.
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_mul_comm Hic).
+rewrite rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add. 2: {
+  rewrite rngl_sin_sub_straight_r in Hs1z.
+  rewrite (rngl_leb_0_opp Hop Hor) in Hs1z.
+  apply (rngl_leb_gt Hor) in Hs1z.
+  apply (rngl_lt_le_incl Hor) in Hs1z.
+  apply rngl_leb_le in Hs1z.
+  congruence.
+}
+rewrite (rl_sqrt_squ Hon Hop Hor).
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_mul_comm Hic (_ - _)).
+apply (rngl_abs_nonneg_eq Hop Hor).
+apply (rngl_add_nonneg_nonneg Hor).
+apply rl_sqrt_nonneg.
+apply (rngl_mul_nonneg_nonneg Hos Hor).
+apply (rngl_le_opp_l Hop Hor), rngl_cos_bound.
+apply (rngl_le_opp_l Hop Hor), rngl_cos_bound.
+apply rl_sqrt_nonneg.
+apply (rngl_mul_nonneg_nonneg Hos Hor).
+apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
+apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
@@ -1234,7 +1349,34 @@ destruct t21. {
       do 2 rewrite (rngl_mul_opp_l Hop).
       do 2 rewrite (rngl_mul_1_l Hon).
       rewrite (rngl_sub_opp_r Hop).
+      apply (rngl_leb_gt Hor) in Hzs1.
+      apply rngl_leb_le in Hzs2.
+      now apply angle_eucl_dist_2_mul_sqrt_add_sqrt.
+    }
+...
+apply (rngl_leb_gt Hor) in Hzs1.
+apply rngl_leb_le in Hzs2.
 Check angle_eucl_dist_2_mul_sqrt_sub_sqrt.
+...
+      change_angle_add_r θ1 angle_straight.
+      rewrite rngl_sin_sub_straight_r in Hzs1.
+      apply (rngl_leb_gt Hor) in Hzs1.
+      apply (rngl_opp_neg_pos Hop Hor) in Hzs1.
+      rewrite rngl_cos_sub_straight_r.
+      rewrite (rngl_sub_opp_r Hop).
+      rewrite (rngl_add_opp_r Hop).
+Search (angle_eucl_dist (_ - _)).
+rewrite angle_eucl_dist_move_0_r.
+rewrite angle_sub_sub_swap.
+rewrite <- angle_eucl_dist_move_0_r.
+Search (angle_eucl_dist angle_straight _).
+Check angle_eucl_dist_2_mul_sqrt_sub_sqrt.
+...
+Search (- _ < 0)%L.
+
+Search (_ ≤? - _)%L.
+rewrite rngl_leb_0_opp in Hzs1.
+...
 ...
 Search (√ _ + √ _)%L.
 About rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add.
