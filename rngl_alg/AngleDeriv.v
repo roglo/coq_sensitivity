@@ -1004,23 +1004,25 @@ enough (H :
   remember (θ₀ <? angle_straight)%A as tzs eqn:Htzs.
   symmetry in Htzs.
   destruct tzs. {
+(**)
+    exists (angle_eucl_dist θ₀ angle_straight)%L.
+(*
     exists (angle_eucl_dist θ₀ angle_straight / 2)%L.
+*)
     split. {
       apply (rngl_lt_iff Hor).
-(*
+(**)
       split; [ apply angle_eucl_dist_nonneg | ].
-*)
+(*
       split. {
         apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
           apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
         }
         apply angle_eucl_dist_nonneg.
       }
-(**)
+*)
       intros H1; symmetry in H1.
 (*
-      rewrite angle_eucl_dist_separation in H1; subst θ₀.
-*)
       (* lemma *)
       progress unfold rngl_div in H1.
       rewrite Hiv in H1.
@@ -1028,6 +1030,7 @@ enough (H :
         apply (rngl_inv_neq_0 Hon Hos Hiv).
         apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
       }
+*)
       rewrite angle_eucl_dist_separation in H1; subst θ₀.
 (**)
       now apply angle_lt_irrefl in Htzs.
@@ -1042,9 +1045,60 @@ enough (H :
       now apply not_eq_sym in Hθ.
     }
     assert (Hov : angle_add_overflow θ θ₀ = false). {
-...
+rename θ₀ into θ1.
+rename θ into θ2.
       rewrite angle_add_overflow_comm.
       apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
+      apply angle_nlt_ge.
+      intros Hst.
+      assert (H1 : (angle_straight - θ1 < θ2 - θ1)%A). {
+        destruct Hθ as (H1, H2).
+        move Htzs before Hst.
+        (* lemma *)
+        progress unfold angle_ltb in Htzs.
+        progress unfold angle_ltb in Hst.
+        progress unfold angle_ltb.
+        cbn in Htzs.
+        rewrite (rngl_leb_refl Hor) in Htzs.
+        cbn in Hst.
+        rewrite (rngl_leb_refl Hor) in Hst.
+        rewrite rngl_sin_sub_straight_l.
+        rewrite rngl_cos_sub_straight_l.
+        remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+        symmetry in Hzs1.
+        destruct zs1; [ | easy ].
+        apply rngl_leb_le in Hzs1.
+        apply rngl_ltb_lt in Htzs.
+        apply (rngl_lt_iff Hor) in Htzs.
+        destruct Htzs as (_, Hco1).
+        apply not_eq_sym in Hco1.
+        Search (rngl_cos _ ≠ - 1)%L.
+        remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+        symmetry in Hzs2.
+        destruct zs2; [ | clear Hst ]. {
+          exfalso.
+          apply rngl_ltb_lt in Hst.
+          apply rngl_nle_gt in Hst.
+          apply Hst, rngl_cos_bound.
+        }
+        apply (rngl_leb_gt Hor) in Hzs2.
+        remember (0 ≤? rngl_sin (θ2 - θ1))%L as zs21 eqn:Hzs21.
+        symmetry in Hzs21.
+        destruct zs21; [ | easy ].
+        apply rngl_leb_le in Hzs21.
+        apply rngl_ltb_lt.
+Search (rngl_cos _ + rngl_cos _ < 0)%L.
+rewrite rngl_cos_sub.
+...
+Search (_ + _ < _ + _)%A.
+Search (_ - _ < _ - _)%A.
+Search (_ - _ < _)%A.
+Search (_ < _ - _)%A.
+Search (_ < _ + _)%A.
+...
+      rewrite (angle_eucl_dist_symmetry θ₀) in Hθ.
+      do 2 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2 in Hθ.
+...
       progress unfold angle_leb.
       cbn.
       rewrite (rngl_leb_refl Hor).
