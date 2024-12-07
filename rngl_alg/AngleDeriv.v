@@ -1051,6 +1051,7 @@ rename θ into θ2.
       apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
       apply angle_nlt_ge.
       intros Hst.
+...
       assert (H1 : (angle_straight - θ1 < θ2 - θ1)%A). {
 ...
         destruct Hθ as (H1, H2).
