@@ -1052,6 +1052,7 @@ rename θ into θ2.
       apply angle_nlt_ge.
       intros Hst.
       assert (H1 : (angle_straight - θ1 < θ2 - θ1)%A). {
+...
         destruct Hθ as (H1, H2).
         move Htzs before Hst.
         (* lemma *)
@@ -1072,7 +1073,6 @@ rename θ into θ2.
         apply (rngl_lt_iff Hor) in Htzs.
         destruct Htzs as (_, Hco1).
         apply not_eq_sym in Hco1.
-        Search (rngl_cos _ ≠ - 1)%L.
         remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
         symmetry in Hzs2.
         destruct zs2; [ | clear Hst ]. {
@@ -1082,6 +1082,21 @@ rename θ into θ2.
           apply Hst, rngl_cos_bound.
         }
         apply (rngl_leb_gt Hor) in Hzs2.
+        progress unfold angle_eucl_dist in H2.
+        rewrite rngl_cos_straight in H2.
+        rewrite rngl_sin_straight in H2.
+        rewrite (rngl_sub_0_l Hop) in H2.
+        progress unfold rl_modl in H2.
+        rewrite <- (rngl_opp_add_distr Hop) in H2.
+        do 2 rewrite (rngl_squ_opp Hop) in H2.
+        rewrite (rngl_add_comm _ 1) in H2.
+        rewrite (rngl_squ_add Hic Hon) in H2.
+        rewrite (rngl_squ_1 Hon) in H2.
+        rewrite (rngl_mul_1_r Hon) in H2.
+        rewrite <- rngl_add_assoc in H2.
+        rewrite cos2_sin2_1 in H2.
+        rewrite rngl_add_add_swap in H2.
+...
         remember (0 ≤? rngl_sin (θ2 - θ1))%L as zs21 eqn:Hzs21.
         symmetry in Hzs21.
         destruct zs21; [ | easy ].
