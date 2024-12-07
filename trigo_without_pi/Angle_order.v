@@ -108,8 +108,7 @@ now apply rngl_ltb_lt.
 Qed.
 
 Theorem angle_straight_pos :
-  rngl_characteristic T ≠ 1 →
-  (0 < angle_straight)%A.
+  rngl_characteristic T ≠ 1 → (0 < angle_straight)%A.
 Proof.
 destruct_ac.
 intros Hc1.
@@ -179,8 +178,7 @@ destruct zs. {
 }
 Qed.
 
-Theorem angle_le_refl :
-  ∀ θ, (θ ≤? θ)%A = true.
+Theorem angle_le_refl : ∀ θ, (θ ≤? θ)%A = true.
 Proof.
 intros.
 destruct_ac.
