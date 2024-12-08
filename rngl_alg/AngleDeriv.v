@@ -1071,7 +1071,6 @@ destruct Hθ as (_, Hθ).
 clear ε Hε H.
 move θ2 before θ1.
 rewrite angle_eucl_dist_symmetry in Hθ.
-...
       apply angle_nlt_ge.
       intros Hst.
 ...
