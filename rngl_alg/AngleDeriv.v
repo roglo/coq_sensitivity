@@ -1044,7 +1044,21 @@ enough (H :
       destruct Hθ as (_, Hθ).
       now apply not_eq_sym in Hθ.
     }
-...
+(*1*)
+    remember (Bool.eqb _ _) as b eqn:Hb.
+    symmetry in Hb.
+    destruct b. {
+      progress unfold rngl_dist.
+      rewrite (rngl_sub_opp_r Hop).
+      rewrite (rngl_add_opp_l Hop).
+      specialize (angle_eucl_dist_is_2_mul_sin_sub_div_2 θ₀ (-θ)) as H1.
+      rewrite angle_sub_opp_r in H1.
+      rewrite angle_add_comm in H1.
+      apply (f_equal (λ x, (x / 2)%L)) in H1.
+      rewrite (rngl_mul_comm Hic) in H1.
+      rewrite (rngl_mul_div Hi1) in H1.
+      rewrite <- H1; clear H1.
+...1
     assert (Hov : angle_add_overflow θ θ₀ = false). {
 rename θ₀ into θ1.
 rename θ into θ2.
