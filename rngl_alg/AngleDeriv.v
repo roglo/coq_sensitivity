@@ -1044,7 +1044,7 @@ enough (H :
       destruct Hθ as (_, Hθ).
       now apply not_eq_sym in Hθ.
     }
-(*1*)
+(*1
     remember (Bool.eqb _ _) as b eqn:Hb.
     symmetry in Hb.
     destruct b. {
@@ -1056,14 +1056,22 @@ enough (H :
       rewrite angle_add_comm in H1.
       apply (f_equal (λ x, (x / 2)%L)) in H1.
       rewrite (rngl_mul_comm Hic) in H1.
-      rewrite (rngl_mul_div Hi1) in H1.
+      rewrite (rngl_mul_div Hi1) in H1. 2: {
+        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+      }
       rewrite <- H1; clear H1.
 ...1
+*)
     assert (Hov : angle_add_overflow θ θ₀ = false). {
 rename θ₀ into θ1.
 rename θ into θ2.
       rewrite angle_add_overflow_comm.
       apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
+destruct Hθ as (_, Hθ).
+clear ε Hε H.
+move θ2 before θ1.
+rewrite angle_eucl_dist_symmetry in Hθ.
+...
       apply angle_nlt_ge.
       intros Hst.
 ...
