@@ -1044,6 +1044,7 @@ enough (H :
       destruct Hθ as (_, Hθ).
       now apply not_eq_sym in Hθ.
     }
+...
     assert (Hov : angle_add_overflow θ θ₀ = false). {
 rename θ₀ into θ1.
 rename θ into θ2.
