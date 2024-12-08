@@ -889,45 +889,63 @@ Qed.
 Theorem angle_eucl_dist_lt_angle_eucl_dist :
   ∀ θ1 θ2 θ3 θ4,
   (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ3 θ4)%L
-  → (rngl_cos (θ3 - θ4) < rngl_cos (θ1 - θ2))%L.
+  ↔ (rngl_cos (θ3 - θ4) < rngl_cos (θ1 - θ2))%L.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hdd.
-  do 2 rewrite (H1 (angle_eucl_dist _ _)) in Hdd.
-  now apply (rngl_lt_irrefl Hor) in Hdd.
+  intros.
+  do 2 rewrite (H1 (angle_eucl_dist _ _)).
+  do 2 rewrite (H1 (rngl_cos _)).
+  easy.
 }
-intros * Hdd.
-do 2 rewrite angle_eucl_dist_is_sqrt in Hdd.
-apply (rngl_lt_lt_squ Hop Hor Hii) in Hdd; cycle 1. {
-  apply (rngl_mul_comm Hic).
+intros.
+do 2 rewrite angle_eucl_dist_is_sqrt.
+split. {
+  intros Hdd.
+  apply (rngl_lt_lt_squ Hop Hor Hii) in Hdd; cycle 1. {
+    apply (rngl_mul_comm Hic).
+  } {
+    apply rl_sqrt_nonneg.
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rngl_squ_sqrt Hon) in Hdd. 2: {
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rngl_squ_sqrt Hon) in Hdd. 2: {
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in Hdd. 2: {
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_sub_lt_mono_l Hop Hor) in Hdd.
+  rewrite rngl_cos_sub_comm in Hdd.
+  now rewrite (rngl_cos_sub_comm θ2 θ1) in Hdd.
 } {
-  apply rl_sqrt_nonneg.
-  apply (rngl_mul_nonneg_nonneg Hos Hor).
-  apply (rngl_0_le_2 Hon Hos Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-rewrite (rngl_squ_sqrt Hon) in Hdd. 2: {
-  apply (rngl_mul_nonneg_nonneg Hos Hor).
-  apply (rngl_0_le_2 Hon Hos Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-rewrite (rngl_squ_sqrt Hon) in Hdd. 2: {
-  apply (rngl_mul_nonneg_nonneg Hos Hor).
-  apply (rngl_0_le_2 Hon Hos Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in Hdd. 2: {
+  intros Hcc.
+  apply (rl_sqrt_lt_rl_sqrt Hon Hor). {
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii).
   apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_sub_lt_mono_l Hop Hor).
+  rewrite (rngl_cos_sub_comm θ4).
+  rewrite (rngl_cos_sub_comm θ2).
+  easy.
 }
-apply (rngl_sub_lt_mono_l Hop Hor) in Hdd.
-rewrite rngl_cos_sub_comm in Hdd.
-now rewrite (rngl_cos_sub_comm θ2 θ1) in Hdd.
 Qed.
 
 Theorem angle_add_not_overflow_iff :
@@ -1073,6 +1091,36 @@ move θ2 before θ1.
 rewrite angle_eucl_dist_symmetry in Hθ.
       apply angle_nlt_ge.
       intros Hst.
+Theorem glop :
+  ∀ θ1 θ2 θ3,
+  (θ1 < θ2 < θ3)%A
+  → (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ1 θ3)%L.
+Proof.
+intros * (H12, H23).
+progress unfold angle_ltb in H12.
+progress unfold angle_ltb in H23.
+apply angle_eucl_dist_lt_angle_eucl_dist.
+do 2 rewrite rngl_cos_sub.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+symmetry in Hzs1, Hzs2, Hzs3.
+destruct zs2. {
+  destruct zs1; [ | easy ].
+  apply rngl_leb_le in Hzs1, Hzs2.
+  apply rngl_ltb_lt in H12.
+...
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+...
+      apply rngl_nle_gt in Hθ.
+      apply Hθ; clear Hθ.
+      apply (rngl_lt_le_incl Hor).
+      now apply glop.
+...
+specialize (angle_eucl_dist_triangular θ1 angle_straight θ2) as H1.
+apply (rngl_nle_gt_iff Hor) in Hθ.
+apply Hθ; clear Hθ.
+eapply (rngl_le_trans Hor).
 ...
       assert (H1 : (angle_straight - θ1 < θ2 - θ1)%A). {
 ...
