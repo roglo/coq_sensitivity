@@ -1086,34 +1086,71 @@ rename θ into θ2.
       rewrite angle_add_overflow_comm.
       apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
 destruct Hθ as (_, Hθ).
+(*
 clear ε Hε H.
+*)
 move θ2 before θ1.
+move Htzs at bottom.
 rewrite angle_eucl_dist_symmetry in Hθ.
       apply angle_nlt_ge.
       intros Hst.
+      apply rngl_nle_gt in Hθ.
+      apply Hθ; clear Hθ.
+...
 Theorem glop :
   ∀ θ1 θ2 θ3,
   (θ1 < θ2 < θ3)%A
+  → (θ3 < θ1 + angle_straight)%A
   → (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ1 θ3)%L.
 Proof.
-intros * (H12, H23).
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * (H12, H23) H31.
+...
 progress unfold angle_ltb in H12.
 progress unfold angle_ltb in H23.
+progress unfold angle_ltb in H31.
+rewrite rngl_sin_add_straight_r in H31.
+rewrite rngl_cos_add_straight_r in H31.
+rewrite (rngl_leb_0_opp Hop Hor) in H31.
 apply angle_eucl_dist_lt_angle_eucl_dist.
-do 2 rewrite rngl_cos_sub.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
 remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
 symmetry in Hzs1, Hzs2, Hzs3.
 destruct zs2. {
   destruct zs1; [ | easy ].
-  apply rngl_leb_le in Hzs1, Hzs2.
-  apply rngl_ltb_lt in H12.
+  destruct zs3. {
+    apply rngl_ltb_lt in H12, H23.
+    apply rngl_leb_le in Hzs1, Hzs2, Hzs3.
+    remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
+    symmetry in Hs1z.
+    destruct s1z. {
+      apply rngl_leb_le in Hs1z.
+      apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
+      clear Hs1z.
+      apply eq_rngl_sin_0 in Hzs1.
+      destruct Hzs1; subst θ1; [ now do 2 rewrite angle_sub_0_l | ].
+      exfalso.
+      apply rngl_ltb_lt in H31.
+      apply rngl_nle_gt in H31.
+      apply H31; clear H31; cbn.
+      rewrite (rngl_opp_involutive Hop).
+      apply rngl_cos_bound.
+    }
+    clear H31.
 ...
-Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+    apply (rngl_leb_gt Hor) in Hs1z.
+    destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+      do 2 rewrite rngl_cos_sub.
+      apply (rngl_add_lt_compat Hop Hor). {
+        now apply (rngl_mul_lt_mono_pos_l Hop Hor Hii).
+      }
+      apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
 ...
-      apply rngl_nle_gt in Hθ.
-      apply Hθ; clear Hθ.
+      apply (rngl_lt_trans Hor _ (rngl_sin θ2)). {
+        apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
+...
       apply (rngl_lt_le_incl Hor).
       now apply glop.
 ...
