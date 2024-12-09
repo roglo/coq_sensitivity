@@ -1097,6 +1097,45 @@ rewrite angle_eucl_dist_symmetry in Hθ.
       apply rngl_nle_gt in Hθ.
       apply Hθ; clear Hθ.
 Theorem glop :
+  ∀ θ1 θ2,
+  (θ1 < angle_straight < θ2)%A
+  → (θ2 < θ1 + angle_straight)%A
+  → (angle_eucl_dist θ1 angle_straight < angle_eucl_dist θ1 θ2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * (H1s, Hs2) H21.
+progress unfold angle_ltb in H1s.
+progress unfold angle_ltb in Hs2.
+progress unfold angle_ltb in H21.
+rewrite rngl_sin_add_straight_r in H21.
+rewrite rngl_cos_add_straight_r in H21.
+rewrite (rngl_leb_0_opp Hop Hor) in H21.
+cbn in H1s, Hs2, H21.
+rewrite (rngl_leb_refl Hor) in H1s, Hs2.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
+symmetry in Hzs1, Hzs2, Hs1z.
+destruct zs1; [ | easy ].
+destruct zs2. {
+  exfalso.
+  apply rngl_ltb_lt in Hs2.
+  apply rngl_nle_gt in Hs2.
+  apply Hs2, rngl_cos_bound.
+}
+clear Hs2.
+destruct s1z; [ easy | ].
+apply rngl_leb_le in Hzs1.
+apply rngl_ltb_lt in H1s, H21.
+apply (rngl_leb_gt Hor) in Hzs2, Hs1z.
+apply (rngl_lt_opp_r Hop Hor) in H21.
+apply angle_eucl_dist_lt_angle_eucl_dist.
+rewrite rngl_cos_sub_straight_r.
+apply (rngl_lt_opp_r Hop Hor).
+(* est-ce vrai ? va savoir... *)
+...
+Theorem glop :
   ∀ θ1 θ2 θ3,
   (θ1 < θ2 < θ3)%A
   → (θ3 < θ1 + angle_straight)%A
