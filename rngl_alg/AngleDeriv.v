@@ -1096,7 +1096,6 @@ rewrite angle_eucl_dist_symmetry in Hθ.
       intros Hst.
       apply rngl_nle_gt in Hθ.
       apply Hθ; clear Hθ.
-...
 Theorem glop :
   ∀ θ1 θ2 θ3,
   (θ1 < θ2 < θ3)%A
@@ -1106,13 +1105,13 @@ Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * (H12, H23) H31.
-...
 progress unfold angle_ltb in H12.
 progress unfold angle_ltb in H23.
 progress unfold angle_ltb in H31.
 rewrite rngl_sin_add_straight_r in H31.
 rewrite rngl_cos_add_straight_r in H31.
 rewrite (rngl_leb_0_opp Hop Hor) in H31.
+(*2*)
 apply angle_eucl_dist_lt_angle_eucl_dist.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
@@ -1139,9 +1138,21 @@ destruct zs2. {
       apply rngl_cos_bound.
     }
     clear H31.
-...
     apply (rngl_leb_gt Hor) in Hs1z.
-    destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hzc3]. {
+          apply (rngl_lt_iff Hor).
+          split. {
+            do 2 rewrite rngl_cos_sub.
+            apply (rngl_le_sub_le_add_r Hop Hor).
+            rewrite <- (rngl_add_sub_assoc Hop).
+            rewrite <- (rngl_mul_sub_distr_l Hop).
+            apply (rngl_le_add_le_sub_l Hop Hor).
+            rewrite <- (rngl_mul_sub_distr_l Hop).
+            destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3))
+                as [Hs23| Hs23]. {
+...
       do 2 rewrite rngl_cos_sub.
       apply (rngl_add_lt_compat Hop Hor). {
         now apply (rngl_mul_lt_mono_pos_l Hop Hor Hii).
