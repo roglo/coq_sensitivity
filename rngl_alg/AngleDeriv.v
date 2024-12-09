@@ -1102,6 +1102,8 @@ Theorem glop :
   → (θ3 < θ1 + angle_straight)%A
   → (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ1 θ3)%L.
 Proof.
+(* en fait c'est faux : par exemple si θ1, θ2 et θ3 sont
+   dans le premier quadrant *)
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * (H12, H23) H31.
@@ -1144,14 +1146,18 @@ destruct zs2. {
         destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hzc3]. {
           apply (rngl_lt_iff Hor).
           split. {
+(*
             do 2 rewrite rngl_cos_sub.
             apply (rngl_le_sub_le_add_r Hop Hor).
             rewrite <- (rngl_add_sub_assoc Hop).
             rewrite <- (rngl_mul_sub_distr_l Hop).
             apply (rngl_le_add_le_sub_l Hop Hor).
             rewrite <- (rngl_mul_sub_distr_l Hop).
-            destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3))
-                as [Hs23| Hs23]. {
+            destruct (rngl_le_dec Hor (rngl_cos θ1) (rngl_cos θ2))
+                as [Hc12| Hc12]. {
+            apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+*)
+rngl_cos _ ≤ rngl_cos _)%L.
 ...
       do 2 rewrite rngl_cos_sub.
       apply (rngl_add_lt_compat Hop Hor). {
