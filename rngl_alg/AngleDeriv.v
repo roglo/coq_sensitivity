@@ -10,6 +10,7 @@ Require Import Trigo.AngleDiv2.
 Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.TrigoWithoutPiExt.
 Require Import Trigo.Angle_order.
+Require Import Trigo.TacChangeAngle.
 Require Import AngleEuclDist_sin.
 
 Require Import Trigo.AngleAddOverflowLe.
@@ -1090,38 +1091,47 @@ enough (H :
   remember (θ₀ <? angle_straight)%A as tzs eqn:Htzs.
   symmetry in Htzs.
   destruct tzs. {
-(**)
     exists (angle_eucl_dist θ₀ angle_straight)%L.
-(*
-    exists (angle_eucl_dist θ₀ angle_straight / 2)%L.
-*)
     split. {
       apply (rngl_lt_iff Hor).
-(**)
       split; [ apply angle_eucl_dist_nonneg | ].
-(*
-      split. {
-        apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
-          apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-        }
-        apply angle_eucl_dist_nonneg.
-      }
-*)
       intros H1; symmetry in H1.
-(*
-      (* lemma *)
-      progress unfold rngl_div in H1.
-      rewrite Hiv in H1.
-      apply (rngl_eq_mul_0_l Hos Hii) in H1. 2: {
-        apply (rngl_inv_neq_0 Hon Hos Hiv).
-        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-      }
-*)
       rewrite angle_eucl_dist_separation in H1; subst θ₀.
-(**)
       now apply angle_lt_irrefl in Htzs.
     }
     intros θ Hθ.
+    move θ before θ₀.
+    (* todo: define angle_dec? *)
+    remember (angle_ltb (θ + angle_right) θ₀) as tr eqn:Htr.
+    symmetry in Htr.
+    destruct tr. {
+      exfalso.
+      apply angle_nle_gt in Htr.
+      apply Htr; clear Htr.
+      progress unfold angle_leb.
+      rewrite rngl_sin_add_right_r.
+      rewrite rngl_cos_add_right_r.
+      generalize Htzs; intros H1.
+      apply angle_lt_le_incl in H1.
+      apply rngl_sin_nonneg_angle_le_straight in H1.
+      apply rngl_leb_le in H1.
+      rewrite H1; clear H1.
+      remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
+      symmetry in Hzc.
+      destruct zc; [ | easy ].
+      apply rngl_leb_le in Hzc.
+      apply rngl_leb_le.
+      destruct Hθ as (Hzt, Ht).
+      apply angle_eucl_dist_lt_angle_eucl_dist in Ht.
+      rewrite rngl_cos_sub_straight_r in Ht.
+...
+      change_angle_add_r θ angle_right.
+      rewrite angle_sub_sub_swap in Ht.
+      progress sin_cos_add_sub_right_hyp T Hzc.
+      progress sin_cos_add_sub_right_hyp T Ht.
+      progress sin_cos_add_sub_right_goal T.
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
+...
     rewrite angle_cos_sub_cos_angle_eucl_dist_mul.
     rewrite (rngl_mul_comm Hic).
     rewrite (rngl_mul_div Hi1). 2: {
@@ -1149,23 +1159,27 @@ enough (H :
 ...1
 *)
     assert (Hov : angle_add_overflow θ θ₀ = false). {
+(*
 rename θ₀ into θ1.
 rename θ into θ2.
+*)
       rewrite angle_add_overflow_comm.
       apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
-destruct Hθ as (_, Hθ).
+      destruct Hθ as (_, Hθ).
 (*
 clear ε Hε H.
+     move θ2 before θ1.
 *)
-move θ2 before θ1.
-move Htzs at bottom.
-rewrite angle_eucl_dist_symmetry in Hθ.
+      move θ before θ₀.
+      move Htzs at bottom.
+      rewrite angle_eucl_dist_symmetry in Hθ.
       apply angle_nlt_ge.
       intros Hst.
       apply rngl_nle_gt in Hθ.
       apply Hθ; clear Hθ.
-  destruct H as (η & Hzη & H).
-  move η before ε.
+      destruct H as (η & Hzη & H).
+      move η before ε.
+...
 specialize (H θ2).
 Inspect 1.
 apply (rngl_lt_le_incl Hor).
