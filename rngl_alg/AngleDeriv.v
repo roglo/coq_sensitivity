@@ -1063,16 +1063,19 @@ Qed.
 (* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
 Definition circ_trigo_param θ :=
   if (θ =? 0)%A then 0%L
-  else if (θ =? angle_straight)%A then (-1)%L
   else ((1 - rngl_cos θ) / rngl_sin θ)%L.
 
 Definition other_cos θ :=
-  let t := circ_trigo_param θ in
-  ((1 - t²) / (1 + t²))%L.
+  if (θ =? angle_straight)%A then (-1)%L
+  else
+    let t := circ_trigo_param θ in
+    ((1 - t²) / (1 + t²))%L.
 
 Definition other_sin θ :=
-  let t := circ_trigo_param θ in
-  (2 * t / (1 + t²))%L.
+  if (θ =? angle_straight)%A then 0%L
+  else
+    let t := circ_trigo_param θ in
+    (2 * t / (1 + t²))%L.
 
 (* faut montrer que rngl_cos θ = other_cos θ et rngl_sin θ = other_sin θ,
    avec les conditions qu'il faut (en particulier pour l'angle plat π,
@@ -1086,33 +1089,87 @@ Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (other_cos _)).
+  apply H1.
+}
 intros.
 progress unfold other_cos.
 progress unfold circ_trigo_param.
 remember (θ =? 0)%A as tz eqn:Htz.
 remember (θ =? angle_straight)%A as ts eqn:Hts.
 symmetry in Htz, Hts.
+destruct ts. {
+  now apply angle_eqb_eq in Hts; subst θ.
+}
 destruct tz. {
   apply angle_eqb_eq in Htz; subst θ.
   rewrite (rngl_squ_0 Hos).
   rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
   now rewrite (rngl_div_1_r' Hon Hos Hiq).
 }
-destruct ts. {
-  apply angle_eqb_eq in Hts; subst θ.
-  rewrite (rngl_squ_opp Hop).
-  rewrite (rngl_squ_1 Hon).
-  rewrite (rngl_sub_diag Hos).
-  rewrite (rngl_div_0_l Hos Hi1); [ | ].
-(* ah bin non c'est pas bon... *)
-...
-  rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
-  now rewrite (rngl_div_1_r' Hon Hos Hiq).
-...
-  apply angle_eqb_eq in Hts; subst θ.
-...
-Search (_ / _ = 1)%L.
-  rewrite rngl_mul_div.
+(* lemma *)
+apply angle_eqb_neq in Htz, Hts.
+rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
+  intros H.
+  apply eq_rngl_sin_0 in H.
+  now destruct H.
+}
+rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_1 Hon).
+rewrite (rngl_mul_1_r Hon).
+specialize (cos2_sin2_1 θ) as H1.
+apply (rngl_add_move_r Hop) in H1.
+rewrite H1; clear H1.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+rewrite (rngl_div_sub_distr_r Hop Hiv (2 * _))%L.
+rewrite (rngl_div_diag Hon Hiq). 2: {
+  intros H.
+  apply (eq_rngl_squ_0 Hos Hio) in H.
+  apply eq_rngl_sin_0 in H.
+  now destruct H.
+}
+rewrite (rngl_sub_sub_distr Hop).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_add_sub_swap Hop _ (_ / _))%L.
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+rewrite (rngl_div_sub_distr_r Hop Hiv).
+rewrite (rngl_div_diag Hon Hiq). 2: {
+  intros H.
+  apply (f_equal (λ a, (a * (rngl_sin θ)²)))%L in H.
+  rewrite (rngl_div_mul Hon Hiv) in H. 2: {
+    intros H1.
+    apply (eq_rngl_squ_0 Hos Hio) in H1.
+    apply eq_rngl_sin_0 in H1.
+    now destruct H1.
+  }
+  rewrite (rngl_mul_0_l Hos) in H.
+  apply (rngl_eq_mul_0_r Hos) in H; cycle 1. {
+    now rewrite Hi1, Bool.orb_true_r.
+  } {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_sub_move_l Hop) in H.
+  rewrite (rngl_sub_0_r Hos) in H.
+  now apply eq_rngl_cos_1 in H.
+}
+specialize (cos2_sin2_1 θ) as H1.
+apply (rngl_add_move_l Hop) in H1.
+rewrite H1; clear H1.
 ...
 
 Theorem rngl_cos_derivative :
