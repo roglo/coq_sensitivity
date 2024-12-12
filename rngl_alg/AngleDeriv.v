@@ -1060,6 +1060,26 @@ apply (rngl_lt_le_incl Hor) in Hzs2.
 now apply (rngl_mul_nonneg_nonpos Hop Hor).
 Qed.
 
+(* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
+Definition circ_trigo_param θ :=
+  if (θ =? 0)%A then 0%L
+  else if (θ =? angle_straight)%A then (-1)%L
+  else ((1 - rngl_cos θ) / rngl_sin θ)%L.
+
+Definition other_cos θ :=
+  let t := circ_trigo_param θ in
+  ((1 - t²) / (1 + t²))%L.
+
+Definition other_sin θ :=
+  let t := circ_trigo_param θ in
+  (2 * t / (1 + t²))%L.
+
+(* faut montrer que rngl_cos θ = other_cos θ et rngl_sin θ = other_sin θ,
+   avec les conditions qu'il faut (en particulier pour l'angle plat π,
+   et alors, avec de l'espoir, je peux arriver, normalement facilement à
+   montrer que la dérivée de other_cos θ est égale à "- other_sin θ",
+   c'est-à-dire, si Dieu le veut, que la dérivée du cos, c'est "- sin" *)
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
