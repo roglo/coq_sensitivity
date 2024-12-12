@@ -1083,8 +1083,7 @@ Definition other_sin θ :=
    montrer que la dérivée de other_cos θ est égale à "- other_sin θ",
    c'est-à-dire, si Dieu le veut, que la dérivée du cos, c'est "- sin" *)
 
-(* to be completed
-Theorem glop : ∀ θ, rngl_cos θ = other_cos θ.
+Theorem rngl_other_cos : ∀ θ, rngl_cos θ = other_cos θ.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1170,8 +1169,46 @@ rewrite (rngl_div_diag Hon Hiq). 2: {
 specialize (cos2_sin2_1 θ) as H1.
 apply (rngl_add_move_l Hop) in H1.
 rewrite H1; clear H1.
-...
+rewrite <- (rngl_squ_1 Hon) at 6.
+rewrite (rngl_squ_sub_squ Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_add_sub Hos).
+rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+  intros H.
+  apply -> (rngl_sub_move_0_r Hop) in H.
+  symmetry in H.
+  now apply eq_rngl_cos_1 in H.
+} {
+  intros H.
+  rewrite rngl_add_comm in H.
+  apply -> (rngl_add_move_0_r Hop) in H.
+  now apply eq_rngl_cos_opp_1 in H.
+}
+rewrite (rngl_mul_div Hi1). 2: {
+  intros H.
+  apply -> (rngl_sub_move_0_r Hop) in H.
+  symmetry in H.
+  now apply eq_rngl_cos_1 in H.
+}
+rewrite (rngl_div_div_r Hon Hos Hiv); cycle 1. {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+} {
+  intros H.
+  rewrite rngl_add_comm in H.
+  apply -> (rngl_add_move_0_r Hop) in H.
+  now apply eq_rngl_cos_opp_1 in H.
+}
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_mul_div Hi1). 2: {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+rewrite rngl_add_comm.
+symmetry.
+apply (rngl_add_sub Hos).
+Qed.
 
+(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
 Proof.
