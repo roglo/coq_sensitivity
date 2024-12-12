@@ -1130,11 +1130,11 @@ enough (H :
       remember (θ - θ₀)%A as dθ eqn:Hd.
       apply angle_add_move_r in Hd.
       subst θ.
-      cbn.
-      rewrite rngl_add_add_swap.
-      rewrite (rngl_add_mul_l_diag_r Hon).
       destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
         destruct (rngl_le_dec Hor 0 (rngl_cos dθ)) as [Hzcd| Hzcd]. {
+          cbn.
+          rewrite rngl_add_add_swap.
+          rewrite (rngl_add_mul_l_diag_r Hon).
           apply (rngl_add_nonneg_nonneg Hor). {
             apply (rngl_mul_nonneg_nonneg Hos Hor); [ | easy ].
             rewrite rngl_add_comm.
@@ -1146,10 +1146,10 @@ enough (H :
           now apply rngl_sin_nonneg_angle_le_straight in Htzs.
         }
         apply (rngl_nle_gt_iff Hor) in Hzcd.
-        rewrite rngl_cos_add in Hzc.
-        apply -> (rngl_le_0_sub Hop Hor) in Hzc.
         destruct (rngl_le_dec Hor 0 (rngl_sin dθ)) as [Hzsd| Hzsd]. {
           exfalso.
+          rewrite rngl_cos_add in Hzc.
+          apply -> (rngl_le_0_sub Hop Hor) in Hzc.
           apply rngl_nlt_ge in Hzc.
           apply Hzc; clear Hzc.
           eapply (rngl_lt_le_trans Hor _ 0). {
@@ -1179,6 +1179,8 @@ enough (H :
           now apply rngl_sin_nonneg_angle_le_straight.
         }
         apply (rngl_nle_gt_iff Hor) in Hzsd.
+        change_angle_sub_l dθ angle_straight.
+        progress sin_cos_add_sub_straight_hyp T Hzc.
 ...
             apply (rngl_lt_le_incl Hor) in Hzcd.
             now apply (rngl_mul_nonpos_nonneg Hop Hor).
