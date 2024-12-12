@@ -414,6 +414,30 @@ rewrite (rngl_mul_1_r Hon) in H1.
 now apply H1, rngl_1_neq_0_iff.
 Qed.
 
+Theorem rngl_div_1_r' :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_has_inv_or_quot T = true →
+  ∀ a, (a / 1 = a)%L.
+Proof.
+intros Hon Hos Hiq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 a).
+  apply H1.
+}
+intros.
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_or_quot_iff in Hiq.
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now destruct Hiq; [ left | right ].
+}
+specialize (rngl_mul_div Hi1 a 1%L) as H1.
+rewrite (rngl_mul_1_r Hon) in H1.
+now apply H1, rngl_1_neq_0_iff.
+Qed.
+
 Theorem rngl_mul_div_assoc :
   rngl_has_inv T = true →
   ∀ a b c, (a * (b / c) = a * b / c)%L.

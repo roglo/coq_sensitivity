@@ -1081,6 +1081,40 @@ Definition other_sin θ :=
    c'est-à-dire, si Dieu le veut, que la dérivée du cos, c'est "- sin" *)
 
 (* to be completed
+Theorem glop : ∀ θ, rngl_cos θ = other_cos θ.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+intros.
+progress unfold other_cos.
+progress unfold circ_trigo_param.
+remember (θ =? 0)%A as tz eqn:Htz.
+remember (θ =? angle_straight)%A as ts eqn:Hts.
+symmetry in Htz, Hts.
+destruct tz. {
+  apply angle_eqb_eq in Htz; subst θ.
+  rewrite (rngl_squ_0 Hos).
+  rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+  now rewrite (rngl_div_1_r' Hon Hos Hiq).
+}
+destruct ts. {
+  apply angle_eqb_eq in Hts; subst θ.
+  rewrite (rngl_squ_opp Hop).
+  rewrite (rngl_squ_1 Hon).
+  rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_div_0_l Hos Hi1); [ | ].
+(* ah bin non c'est pas bon... *)
+...
+  rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+  now rewrite (rngl_div_1_r' Hon Hos Hiq).
+...
+  apply angle_eqb_eq in Hts; subst θ.
+...
+Search (_ / _ = 1)%L.
+  rewrite rngl_mul_div.
+...
+
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
 Proof.
