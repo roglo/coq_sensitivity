@@ -1209,12 +1209,13 @@ apply (rngl_add_sub Hos).
 Qed.
 
 Theorem rngl_eq_is_derivative_is_derivative :
-  ∀ dist f g f',
+  ∀ f f' g g' dist,
   (∀ x, f x = g x)
+  → (∀ x, f' x = g' x)
   → is_derivative angle_eucl_dist dist f f'
-  → is_derivative angle_eucl_dist dist g f'.
+  → is_derivative angle_eucl_dist dist g g'.
 Proof.
-intros * Hfg Hff.
+intros * Hfg Hfg' Hff.
 intros θ ε Hε.
 specialize (Hff θ ε Hε).
 destruct Hff as (η & Hη & Hff).
@@ -1222,6 +1223,7 @@ exists η.
 split; [ easy | ].
 intros θ' Hθ'.
 do 2 rewrite <- Hfg.
+rewrite <- Hfg'.
 now apply Hff.
 Qed.
 
@@ -1240,9 +1242,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 (*3*)
-apply rngl_eq_is_derivative_is_derivative with (f := other_cos). {
+apply (rngl_eq_is_derivative_is_derivative other_cos (λ θ, (- rngl_sin θ)))%L. {
   intros; symmetry.
   apply rngl_other_cos.
+} {
+  easy.
 }
 ...3
 intros θ₀ ε Hε.
