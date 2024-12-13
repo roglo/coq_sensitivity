@@ -1068,6 +1068,81 @@ progress unfold angle_eqb.
 now do 2 rewrite (rngl_eqb_refl Hed).
 Qed.
 
+Theorem rngl_1_sub_cos_div_squ_sin :
+  ∀ θ,
+  (rngl_sin θ ≠ 0)%L
+  → (((1 - rngl_cos θ) / (rngl_sin θ)²)%L =
+     1 / (1 + rngl_cos θ))%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+intros * Hcz.
+assert (H1scnz : (1 - rngl_cos θ)%L ≠ 0%L). {
+  intros H.
+  apply -> (rngl_sub_move_0_r Hop) in H.
+  symmetry in H.
+  apply eq_rngl_cos_1 in H.
+  now subst θ.
+}
+specialize (cos2_sin2_1 θ) as H1.
+apply (rngl_add_move_l Hop) in H1.
+rewrite H1; clear H1.
+rewrite <- (rngl_squ_1 Hon) at 2.
+rewrite (rngl_squ_sub_squ Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_add_sub Hos).
+rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
+  intros H.
+  rewrite rngl_add_comm in H.
+  apply -> (rngl_add_move_0_r Hop) in H.
+  apply eq_rngl_cos_opp_1 in H.
+  now subst θ.
+}
+now rewrite (rngl_div_diag Hon Hiq).
+Qed.
+
+(*
+Theorem rngl_1_sub_cos_div_sin_squ :
+  ∀ θ,
+  (rngl_sin θ ≠ 0)%L
+  → (((1 - rngl_cos θ) / rngl_sin θ)² =
+     1 / (1 + rngl_cos θ))%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+intros * Hcz.
+assert (H1scnz : (1 - rngl_cos θ)%L ≠ 0%L). {
+  intros H.
+  apply -> (rngl_sub_move_0_r Hop) in H.
+  symmetry in H.
+  apply eq_rngl_cos_1 in H.
+  now subst θ.
+}
+rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+specialize (cos2_sin2_1 θ) as H1.
+apply (rngl_add_move_l Hop) in H1.
+rewrite H1; clear H1.
+rewrite <- (rngl_squ_1 Hon) at 2.
+rewrite (rngl_squ_sub_squ Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_add_sub Hos).
+rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
+  intros H.
+  rewrite rngl_add_comm in H.
+  apply -> (rngl_add_move_0_r Hop) in H.
+  apply eq_rngl_cos_opp_1 in H.
+  now subst θ.
+}
+progress unfold rngl_squ.
+rewrite (rngl_mul_div Hi1); [ | easy ].
+...
+now rewrite (rngl_div_diag Hon Hiq).
+Qed.
+*)
+
 (* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
 Definition circ_trigo_param θ :=
   if (θ =? 0)%A then 0%L
@@ -1380,8 +1455,11 @@ enough (H :
        (- param_sin θ₀) < ε)%L). {
   destruct H as (η & Hη & H1).
   move η before ε.
-  exists η.
-  split; [ easy | ].
+  exists (rngl_min η 2).
+  split. {
+    apply rngl_min_glb_lt; [ easy | ].
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
   intros θ (Htz, Hze).
   progress unfold param_cos.
   progress unfold param_sin.
@@ -1410,7 +1488,24 @@ enough (H :
     remember (θ₀ =? 0)%A as tzz eqn:Htzz.
     symmetry in Htzz.
     destruct tzz. {
+      exfalso.
       apply angle_eqb_eq in Htzz; subst θ₀.
+      apply rngl_nle_gt in Hze.
+      apply Hze; clear Hze.
+      (* lemma *)
+      progress unfold angle_eucl_dist.
+      progress unfold rl_modl.
+      cbn.
+      rewrite (rngl_sub_0_r Hos).
+      rewrite (rngl_sub_opp_r Hop).
+      rewrite (rngl_squ_0 Hos).
+      rewrite rngl_add_0_r.
+      rewrite (rl_sqrt_squ Hon Hop Hor).
+      rewrite (rngl_abs_2 Hon Hos Hor).
+      apply (rngl_le_min_r Hor).
+    }
+Search ((1 - rngl_cos _) / _²)%L.
+...
       rewrite (rngl_mul_0_r Hos).
       rewrite (rngl_squ_0 Hos).
       rewrite rngl_add_0_r.
