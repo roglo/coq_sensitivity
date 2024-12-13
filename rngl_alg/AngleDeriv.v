@@ -1433,6 +1433,23 @@ rewrite <- Hfg'.
 now apply Hff.
 Qed.
 
+Theorem angle_eucl_dist_0_straight :
+  angle_eucl_dist 0 angle_straight = 2%L.
+Proof.
+destruct_ac.
+progress unfold angle_eucl_dist.
+progress unfold rl_modl.
+cbn.
+rewrite <- (rngl_opp_add_distr Hop).
+rewrite (rngl_squ_opp Hop).
+rewrite (rngl_sub_0_r Hos).
+rewrite (rngl_squ_0 Hos).
+rewrite rngl_add_0_r.
+rewrite (rl_sqrt_squ Hon Hop Hor).
+apply (rngl_abs_nonneg_eq Hop Hor).
+apply (rngl_0_le_2 Hon Hos Hor).
+Qed.
+
 (* to be completed
 Theorem param_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist param_cos (λ θ, (- param_sin θ)%L).
@@ -1463,10 +1480,6 @@ enough (H :
   intros θ (Htz, Hze).
   progress unfold param_cos.
   progress unfold param_sin.
-(*
-  set (t₀ := circ_trigo_param θ₀).
-  set (t := circ_trigo_param θ).
-*)
   remember (θ =? angle_straight)%A as ts eqn:Hts.
   remember (θ₀ =? angle_straight)%A as tzs eqn:Htzs.
   symmetry in Hts, Htzs.
@@ -1490,29 +1503,13 @@ enough (H :
     destruct tzz. {
       exfalso.
       apply angle_eqb_eq in Htzz; subst θ₀.
+      rewrite angle_eucl_dist_symmetry in Hze.
+      rewrite angle_eucl_dist_0_straight in Hze.
       apply rngl_nle_gt in Hze.
       apply Hze; clear Hze.
-      (* lemma *)
-      progress unfold angle_eucl_dist.
-      progress unfold rl_modl.
-      cbn.
-      rewrite (rngl_sub_0_r Hos).
-      rewrite (rngl_sub_opp_r Hop).
-      rewrite (rngl_squ_0 Hos).
-      rewrite rngl_add_0_r.
-      rewrite (rl_sqrt_squ Hon Hop Hor).
-      rewrite (rngl_abs_2 Hon Hos Hor).
       apply (rngl_le_min_r Hor).
     }
-Search ((1 - rngl_cos _) / _²)%L.
-...
-      rewrite (rngl_mul_0_r Hos).
-      rewrite (rngl_squ_0 Hos).
-      rewrite rngl_add_0_r.
-      rewrite (rngl_sub_0_r Hos).
-      do 2 rewrite (rngl_div_1_r Hon Hiq Hc1).
-      rewrite (rngl_sub_0_l Hop).
-      rewrite (rngl_abs_opp Hop Hor).
+    remember ((1 - rngl_cos _) / _)%L as x eqn:Hx.
 ...
 
 Theorem rngl_cos_derivative :
