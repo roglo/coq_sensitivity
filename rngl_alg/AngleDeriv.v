@@ -1539,6 +1539,9 @@ enough (H :
     rewrite <- rngl_param_sin.
     rewrite <- rngl_param_cos.
 ...
+  ============================
+  (rngl_abs (rngl_sin θ₀ - (rngl_cos θ₀ + 1) / angle_eucl_dist angle_straight θ₀) < ε)%L
+...
 rewrite angle_eucl_dist_is_sqrt.
 rewrite rngl_cos_sub_straight_r.
 rewrite (rngl_sub_opp_r Hop).
@@ -1546,7 +1549,9 @@ rewrite (rngl_sub_opp_r Hop).
 remember ((1 - _²) / _)%L as y.
 rewrite rngl_sub_add_distr.
 ...
+*)
 
+(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
 Proof.
@@ -1554,7 +1559,7 @@ destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-(*3*)
+(*3
 apply
   (rngl_eq_is_derivative_is_derivative
      param_cos
@@ -1567,6 +1572,7 @@ apply
   apply rngl_param_sin.
 }
 ...3
+*)
 intros θ₀ ε Hε.
 enough (H :
   if (θ₀ <? angle_straight)%A then
@@ -1671,9 +1677,42 @@ enough (H :
           apply angle_lt_le_incl in Htzs.
           now apply rngl_sin_nonneg_angle_le_straight.
         }
+        generalize Htzs; intros Hz.
+        apply angle_lt_le_incl in Hz.
+        apply rngl_sin_nonneg_angle_le_straight in Hz.
         apply (rngl_nle_gt_iff Hor) in Hzsd.
-        change_angle_sub_l dθ angle_straight.
+        change_angle_add_r dθ angle_straight.
         progress sin_cos_add_sub_straight_hyp T Hzc.
+        progress sin_cos_add_sub_straight_hyp T Ht.
+        progress sin_cos_add_sub_straight_hyp T Hzt.
+        progress sin_cos_add_sub_straight_hyp T Hzsd.
+        progress sin_cos_add_sub_straight_hyp T Hzcd.
+        progress sin_cos_add_sub_straight_goal T.
+        change_angle_sub_l dθ angle_right.
+        progress sin_cos_add_sub_right_hyp T Hzc.
+        progress sin_cos_add_sub_right_hyp T Ht.
+        progress sin_cos_add_sub_right_hyp T Hzt.
+        progress sin_cos_add_sub_right_hyp T Hzsd.
+        progress sin_cos_add_sub_right_hyp T Hzcd.
+        progress sin_cos_add_sub_right_goal T.
+        rewrite (rngl_add_opp_l Hop).
+        apply (rngl_le_0_sub Hop Hor).
+        rewrite rngl_sin_sub_anticomm in Hzc.
+        apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzc.
+        rewrite rngl_cos_sub_comm.
+        change_angle_sub_l θ₀ angle_right.
+        progress sin_cos_add_sub_right_hyp T Hz.
+        progress sin_cos_add_sub_right_hyp T Hzcz.
+        progress sin_cos_add_sub_right_hyp T Hzc.
+        progress sin_cos_add_sub_right_hyp T Ht.
+        progress sin_cos_add_sub_right_hyp T Hzt.
+        progress sin_cos_add_sub_right_goal T.
+        rewrite <- angle_sub_add_distr.
+        rewrite rngl_cos_sub_right_l.
+        apply -> (rngl_lt_0_sub Hop Hor) in Ht.
+...
+Search (rngl_cos (_ - _) ≤ rngl_cos _)%L.
+Search (rngl_cos _ < rngl_cos (_ - _))%L.
 ...
             apply (rngl_lt_le_incl Hor) in Hzcd.
             now apply (rngl_mul_nonpos_nonneg Hop Hor).
