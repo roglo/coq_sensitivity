@@ -1060,6 +1060,14 @@ apply (rngl_lt_le_incl Hor) in Hzs2.
 now apply (rngl_mul_nonneg_nonpos Hop Hor).
 Qed.
 
+Theorem angle_eqb_refl : ∀ θ, (θ =? θ)%A = true.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_eqb.
+now do 2 rewrite (rngl_eqb_refl Hed).
+Qed.
+
 (* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
 Definition circ_trigo_param θ :=
   if (θ =? 0)%A then 0%L
@@ -1077,13 +1085,12 @@ Definition other_sin θ :=
     let t := circ_trigo_param θ in
     (2 * t / (1 + t²))%L.
 
-(* faut montrer que rngl_cos θ = other_cos θ et rngl_sin θ = other_sin θ,
-   avec les conditions qu'il faut (en particulier pour l'angle plat π,
-   et alors, avec de l'espoir, je peux arriver, normalement facilement à
-   montrer que la dérivée de other_cos θ est égale à "- other_sin θ",
-   c'est-à-dire, si Dieu le veut, que la dérivée du cos, c'est "- sin" *)
-
-Theorem rngl_other_cos : ∀ θ, rngl_cos θ = other_cos θ.
+Theorem rngl_cos_of_param :
+  ∀ θ t,
+  θ ≠ 0%A
+  → θ ≠ angle_straight%A
+  → t = circ_trigo_param θ
+  → rngl_cos θ = ((1 - t²) / (1 + t²))%L.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1098,27 +1105,15 @@ assert (Hio :
 }
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  rewrite (H1 (other_cos _)).
+  intros * Htz Hts Ht.
+  rewrite (H1 (_ / _))%L.
   apply H1.
 }
-intros.
-progress unfold other_cos.
+intros * Htz Hts Ht; subst t.
 progress unfold circ_trigo_param.
-remember (θ =? 0)%A as tz eqn:Htz.
-remember (θ =? angle_straight)%A as ts eqn:Hts.
-symmetry in Htz, Hts.
-destruct ts. {
-  now apply angle_eqb_eq in Hts; subst θ.
-}
-destruct tz. {
-  apply angle_eqb_eq in Htz; subst θ.
-  rewrite (rngl_squ_0 Hos).
-  rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
-  now rewrite (rngl_div_1_r' Hon Hos Hiq).
-}
-(* lemma *)
-apply angle_eqb_neq in Htz, Hts.
+apply angle_eqb_neq in Htz.
+rewrite Htz.
+apply angle_eqb_neq in Htz.
 rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
   intros H.
   apply eq_rngl_sin_0 in H.
@@ -1208,6 +1203,28 @@ symmetry.
 apply (rngl_add_sub Hos).
 Qed.
 
+Theorem rngl_other_cos : ∀ θ, rngl_cos θ = other_cos θ.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+intros.
+progress unfold other_cos.
+remember (θ =? 0)%A as tz eqn:Htz.
+remember (θ =? angle_straight)%A as ts eqn:Hts.
+symmetry in Htz, Hts.
+destruct ts; [ now apply angle_eqb_eq in Hts; subst θ | ].
+destruct tz. {
+  apply angle_eqb_eq in Htz; subst θ.
+  progress unfold circ_trigo_param.
+  rewrite angle_eqb_refl.
+  rewrite (rngl_squ_0 Hos).
+  rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+  now rewrite (rngl_div_1_r' Hon Hos Hiq).
+}
+apply angle_eqb_neq in Htz, Hts.
+now apply rngl_cos_of_param.
+Qed.
+
 Theorem rngl_eq_is_derivative_is_derivative :
   ∀ f f' g g' dist,
   (∀ x, f x = g x)
@@ -1235,18 +1252,17 @@ destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros θ ε Hε.
-  rewrite H1 in Hε.
-  now apply (rngl_lt_irrefl Hor) in Hε.
-}
 (*3*)
-apply (rngl_eq_is_derivative_is_derivative other_cos (λ θ, (- rngl_sin θ)))%L. {
+apply
+  (rngl_eq_is_derivative_is_derivative
+     other_cos
+     (λ θ, (- other_sin θ)))%L. {
   intros; symmetry.
   apply rngl_other_cos.
 } {
-  easy.
+  intros θ.
+  f_equal.
+...
 }
 ...3
 intros θ₀ ε Hε.
