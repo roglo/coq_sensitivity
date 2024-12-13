@@ -1359,6 +1359,67 @@ now apply Hff.
 Qed.
 
 (* to be completed
+Theorem param_cos_derivative :
+  is_derivative angle_eucl_dist rngl_dist param_cos (λ θ, (- param_sin θ)%L).
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros θ₀ ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros θ₀ ε Hε.
+enough (H :
+  ∃ η : T,
+  (0 < η)%L ∧
+  ∀ θ : angle T,
+  (0 < angle_eucl_dist θ θ₀ < η)%L
+  → (rngl_dist ((param_cos θ - param_cos θ₀) / angle_eucl_dist θ θ₀)
+       (- param_sin θ₀) < ε)%L). {
+  destruct H as (η & Hη & H1).
+  move η before ε.
+  exists η.
+  split; [ easy | ].
+  intros θ (Htz, Hze).
+  progress unfold param_cos.
+  progress unfold param_sin.
+(*
+  set (t₀ := circ_trigo_param θ₀).
+  set (t := circ_trigo_param θ).
+*)
+  remember (θ =? angle_straight)%A as ts eqn:Hts.
+  remember (θ₀ =? angle_straight)%A as tzs eqn:Htzs.
+  symmetry in Hts, Htzs.
+  destruct ts. {
+    apply angle_eqb_eq in Hts; subst θ.
+    destruct tzs. {
+      apply angle_eqb_eq in Htzs; subst θ₀.
+      rewrite (proj2 (angle_eucl_dist_separation _ _) eq_refl) in Htz.
+      now apply (rngl_lt_irrefl Hor) in Htz.
+    }
+    set (t₀ := circ_trigo_param θ₀).
+    progress unfold rngl_dist.
+    rewrite <- (rngl_opp_add_distr Hop).
+    rewrite (rngl_sub_opp_r Hop).
+    rewrite (rngl_div_opp_l Hop Hiv).
+    rewrite (rngl_add_opp_l Hop).
+    progress unfold t₀.
+    progress unfold circ_trigo_param.
+    remember (θ₀ =? 0)%A as tzz eqn:Htzz.
+    symmetry in Htzz.
+    destruct tzz. {
+      apply angle_eqb_eq in Htzz; subst θ₀.
+      rewrite (rngl_mul_0_r Hos).
+      rewrite (rngl_squ_0 Hos).
+      rewrite rngl_add_0_r.
+      rewrite (rngl_sub_0_r Hos).
+      do 2 rewrite (rngl_div_1_r Hon Hiq Hc1).
+      rewrite (rngl_sub_0_l Hop).
+      rewrite (rngl_abs_opp Hop Hor).
+...
+
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
 Proof.
