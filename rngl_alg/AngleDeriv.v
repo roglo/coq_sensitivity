@@ -1450,6 +1450,30 @@ apply (rngl_abs_nonneg_eq Hop Hor).
 apply (rngl_0_le_2 Hon Hos Hor).
 Qed.
 
+Theorem fold_param_cos :
+  ∀ θ,
+  θ ≠ angle_straight
+  → let t := circ_trigo_param θ in
+    ((1 - t²) / (1 + t²))%L = param_cos θ.
+Proof.
+intros * Hts.
+progress unfold param_cos.
+apply angle_eqb_neq in Hts.
+now rewrite Hts.
+Qed.
+
+Theorem fold_param_sin :
+  ∀ θ,
+  θ ≠ angle_straight
+  → let t := circ_trigo_param θ in
+    (2 * t / (1 + t²))%L = param_sin θ.
+Proof.
+intros * Hts.
+progress unfold param_sin.
+apply angle_eqb_neq in Hts.
+now rewrite Hts.
+Qed.
+
 (* to be completed
 Theorem param_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist param_cos (λ θ, (- param_sin θ)%L).
@@ -1490,14 +1514,12 @@ enough (H :
       rewrite (proj2 (angle_eucl_dist_separation _ _) eq_refl) in Htz.
       now apply (rngl_lt_irrefl Hor) in Htz.
     }
-    set (t₀ := circ_trigo_param θ₀).
+    set (t := circ_trigo_param θ₀).
     progress unfold rngl_dist.
     rewrite <- (rngl_opp_add_distr Hop).
     rewrite (rngl_sub_opp_r Hop).
     rewrite (rngl_div_opp_l Hop Hiv).
     rewrite (rngl_add_opp_l Hop).
-    progress unfold t₀.
-    progress unfold circ_trigo_param.
     remember (θ₀ =? 0)%A as tzz eqn:Htzz.
     symmetry in Htzz.
     destruct tzz. {
@@ -1509,7 +1531,20 @@ enough (H :
       apply Hze; clear Hze.
       apply (rngl_le_min_r Hor).
     }
-    remember ((1 - rngl_cos _) / _)%L as x eqn:Hx.
+    apply angle_eqb_neq in Htzz, Htzs.
+    move Htzz after Htzs.
+    progress unfold t.
+    rewrite fold_param_sin; [ | easy ].
+    rewrite fold_param_cos; [ | easy ].
+    rewrite <- rngl_param_sin.
+    rewrite <- rngl_param_cos.
+...
+rewrite angle_eucl_dist_is_sqrt.
+rewrite rngl_cos_sub_straight_r.
+rewrite (rngl_sub_opp_r Hop).
+...
+remember ((1 - _²) / _)%L as y.
+rewrite rngl_sub_add_distr.
 ...
 
 Theorem rngl_cos_derivative :
