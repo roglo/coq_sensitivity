@@ -16,6 +16,7 @@ Require Import AngleEuclDist_sin.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleDivNat.
 Require Import Trigo.SeqAngleIsCauchy.
+Require Import Main.IterAdd.
 
 Section a.
 
@@ -1104,46 +1105,19 @@ rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
 now rewrite (rngl_div_diag Hon Hiq).
 Qed.
 
-(*
-Theorem rngl_1_sub_cos_div_sin_squ :
-  ∀ θ,
-  (rngl_sin θ ≠ 0)%L
-  → (((1 - rngl_cos θ) / rngl_sin θ)² =
-     1 / (1 + rngl_cos θ))%L.
+Theorem angle_right_le_straight :
+  (angle_right ≤ angle_straight)%A.
 Proof.
 destruct_ac.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-intros * Hcz.
-assert (H1scnz : (1 - rngl_cos θ)%L ≠ 0%L). {
-  intros H.
-  apply -> (rngl_sub_move_0_r Hop) in H.
-  symmetry in H.
-  apply eq_rngl_cos_1 in H.
-  now subst θ.
-}
-rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
-specialize (cos2_sin2_1 θ) as H1.
-apply (rngl_add_move_l Hop) in H1.
-rewrite H1; clear H1.
-rewrite <- (rngl_squ_1 Hon) at 2.
-rewrite (rngl_squ_sub_squ Hop).
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_1_r Hon).
-rewrite (rngl_add_sub Hos).
-rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
-  intros H.
-  rewrite rngl_add_comm in H.
-  apply -> (rngl_add_move_0_r Hop) in H.
-  apply eq_rngl_cos_opp_1 in H.
-  now subst θ.
-}
-progress unfold rngl_squ.
-rewrite (rngl_mul_div Hi1); [ | easy ].
-...
-now rewrite (rngl_div_diag Hon Hiq).
+progress unfold angle_leb.
+cbn.
+rewrite (rngl_0_leb_1 Hon Hos Hor).
+rewrite (rngl_leb_refl Hor).
+apply rngl_leb_le.
+apply (rngl_opp_1_le_0 Hon Hop Hor).
 Qed.
-*)
+
+(* parametric sin and cos *)
 
 (* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
 Definition circ_trigo_param θ :=
@@ -1476,7 +1450,41 @@ apply angle_eqb_neq in Hts.
 now rewrite Hts.
 Qed.
 
+Definition seq_cos_param_when_lt_right θ :=
+  let t := circ_trigo_param θ in
+  λ i, (1 + 2 * ∑ (k = 1, i), (-1)^k * t ^ (2 * k))%L.
+
 (* to be completed
+Theorem lim_seq_cos_param_when_lt_right :
+  ∀ θ,
+  (θ < angle_right)%A
+  → is_limit_when_tending_to_inf rngl_dist
+      (seq_cos_param_when_lt_right θ) (rngl_cos θ).
+Proof.
+intros * Hθ.
+intros ε Hε.
+rewrite rngl_param_cos.
+remember (λ (ε : T), 1) as f.
+clear Heqf.
+exists (f ε).
+intros n Hn.
+progress unfold seq_cos_param_when_lt_right.
+progress unfold param_cos.
+remember (θ =? angle_straight)%A as ts eqn:Hts.
+symmetry in Hts.
+destruct ts. {
+  exfalso.
+  apply angle_eqb_eq in Hts.
+  subst θ.
+  apply angle_nle_gt in Hθ.
+  apply Hθ; clear Hθ.
+  apply angle_right_le_straight.
+}
+clear Hts.
+set (t := circ_trigo_param θ).
+progress unfold rngl_dist.
+...
+
 Theorem param_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist param_cos (λ θ, (- param_sin θ)%L).
 Proof.
