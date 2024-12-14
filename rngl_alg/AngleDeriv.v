@@ -1567,6 +1567,33 @@ induction n. {
   rewrite fold_rngl_squ.
   apply (rngl_div_opp_l Hop Hiv).
 }
+rewrite rngl_summation_split_first; [ | flia ].
+do 2 rewrite (rngl_pow_1_r Hon).
+rewrite (rngl_summation_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite rngl_add_assoc.
+rewrite (rngl_add_opp_r Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite Nat.add_comm at 2.
+  do 2 rewrite (rngl_pow_add_r Hon).
+  do 2 rewrite (rngl_pow_1_r Hon).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite rngl_mul_assoc.
+  rewrite <- (rngl_mul_opp_l Hop).
+  easy.
+}
+cbn.
+rewrite <- (rngl_mul_summation_distr_r Hos).
+rewrite <- (rngl_opp_summation Hop).
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_add_opp_r Hop).
+(* chiasse de pute, je me suis gourré *)
 ...
 enough (H :
   ∃ N : nat, ∀ n : nat, N ≤ n →
