@@ -1710,6 +1710,7 @@ enough (H :
         rewrite <- angle_sub_add_distr.
         rewrite rngl_cos_sub_right_l.
         apply -> (rngl_lt_0_sub Hop Hor) in Ht.
+(* je crois que c'est faux *)
 ...
 Search (rngl_cos (_ - _) ≤ rngl_cos _)%L.
 Search (rngl_cos _ < rngl_cos (_ - _))%L.
