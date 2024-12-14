@@ -14,6 +14,8 @@ Require Import Trigo.TacChangeAngle.
 Require Import AngleEuclDist_sin.
 
 Require Import Trigo.AngleAddOverflowLe.
+Require Import Trigo.AngleDivNat.
+Require Import Trigo.SeqAngleIsCauchy.
 
 Section a.
 
@@ -1487,6 +1489,60 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros θ₀ ε Hε.
+(*4*)
+remember (λ a, (2 * a + 1)%L) as f eqn:Hf.
+clear Hf.
+exists (rngl_min (f ε) 2).
+split; [ admit | ].
+intros θ (Htz, Hze).
+progress unfold param_cos.
+progress unfold param_sin.
+remember (θ =? angle_straight)%A as ts eqn:Hts.
+remember (θ₀ =? angle_straight)%A as tzs eqn:Htzs.
+symmetry in Hts, Htzs.
+destruct ts. {
+  apply angle_eqb_eq in Hts; subst θ.
+  destruct tzs. {
+    apply angle_eqb_eq in Htzs; subst θ₀.
+    rewrite (proj2 (angle_eucl_dist_separation _ _) eq_refl) in Htz.
+    now apply (rngl_lt_irrefl Hor) in Htz.
+  }
+  set (t := circ_trigo_param θ₀).
+  progress unfold rngl_dist.
+  rewrite <- (rngl_opp_add_distr Hop).
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite (rngl_div_opp_l Hop Hiv).
+  rewrite (rngl_add_opp_l Hop).
+  remember (θ₀ =? 0)%A as tzz eqn:Htzz.
+  symmetry in Htzz.
+  destruct tzz. {
+    exfalso.
+    apply angle_eqb_eq in Htzz; subst θ₀.
+    rewrite angle_eucl_dist_symmetry in Hze.
+    rewrite angle_eucl_dist_0_straight in Hze.
+    apply rngl_nle_gt in Hze.
+    apply Hze; clear Hze.
+    apply (rngl_le_min_r Hor).
+  }
+  apply angle_eqb_neq in Htzz, Htzs.
+  move Htzz after Htzs.
+  progress unfold t.
+  rewrite fold_param_sin; [ | easy ].
+  rewrite fold_param_cos; [ | easy ].
+  rewrite <- rngl_param_sin.
+  rewrite <- rngl_param_cos.
+Check rngl_cos_lt_angle_eucl_dist_lt.
+apply rngl_cos_lt_angle_eucl_dist_lt in Hze.
+rewrite rngl_cos_sub_straight_r in Hze.
+apply (rngl_lt_opp_r Hop Hor) in Hze.
+rewrite <- (rngl_add_sub_swap Hop) in Hze.
+apply -> (rngl_lt_sub_0 Hop Hor) in Hze.
+(* ouais, chais pas *)
+...
+Check angle_le_angle_eucl_dist_le.
+Check angle_eucl_dist_is_2_mul_sin_sub_div_2.
+Check angle_eucl_dist_is_sqrt.
+...4
 enough (H :
   ∃ η : T,
   (0 < η)%L ∧
