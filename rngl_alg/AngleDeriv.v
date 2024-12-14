@@ -1461,6 +1461,14 @@ Theorem lim_seq_cos_param_when_lt_right :
   → is_limit_when_tending_to_inf rngl_dist
       (seq_cos_param_when_lt_right θ) (rngl_cos θ).
 Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hθ ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros * Hθ.
 intros ε Hε.
 rewrite rngl_param_cos.
@@ -1483,6 +1491,24 @@ destruct ts. {
 clear Hts.
 set (t := circ_trigo_param θ).
 progress unfold rngl_dist.
+induction n. {
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite (rngl_mul_0_r Hos).
+  rewrite rngl_add_0_r.
+Arguments rngl_div_diag {T ro rp} Hon Hiq a%L.
+  rewrite <- (rngl_div_diag Hon Hiq (1 + t²)) at 1. 2: {
+    intros H.
+    rewrite rngl_add_comm in H.
+    apply (rngl_add_move_0_r Hop) in H.
+    specialize (rngl_squ_nonneg Hos Hor t) as H1.
+    rewrite H in H1.
+    apply rngl_nlt_ge in H1.
+    apply H1; clear H1.
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  }
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  rewrite (rngl_sub_sub_distr Hop).
+  rewr
 ...
 
 Theorem param_cos_derivative :
