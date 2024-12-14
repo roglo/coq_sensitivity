@@ -768,3 +768,4 @@ Qed.
 End a.
 
 Arguments rngl_div_add_distr_r {T ro rp} Hiv (a b c)%_L.
+Arguments rngl_div_diag {T ro rp} Hon Hiq a%L.

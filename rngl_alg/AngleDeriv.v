@@ -1495,7 +1495,6 @@ induction n. {
   rewrite rngl_summation_empty; [ | easy ].
   rewrite (rngl_mul_0_r Hos).
   rewrite rngl_add_0_r.
-Arguments rngl_div_diag {T ro rp} Hon Hiq a%L.
   rewrite <- (rngl_div_diag Hon Hiq (1 + t²)) at 1. 2: {
     intros H.
     rewrite rngl_add_comm in H.
