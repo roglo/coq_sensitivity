@@ -2,6 +2,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
+Require Import Main.Misc.
 Require Import Main.RingLike.
 Require Import Trigo.RealLike.
 
@@ -1511,6 +1512,40 @@ induction n. {
   rewrite (rngl_sub_diag Hos).
   rewrite rngl_add_0_l.
   rewrite <- (rngl_mul_2_l Hon).
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    apply (rngl_squ_nonneg Hos Hor).
+    apply (rngl_lt_le_trans Hor _ 1).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    apply (rngl_le_add_r Hor).
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  admit.
+}
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  rewrite rngl_summation_only_one.
+  cbn.
+  do 2 rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite fold_rngl_squ.
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_add_opp_r Hop).
+  admit.
+}
+rewrite rngl_summation_split_last; [ | now apply -> Nat.succ_le_mono ].
+rewrite (rngl_summation_shift 1); [ | flia Hnz ].
+do 2 rewrite Nat_sub_succ_1.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite Nat.add_comm, Nat.add_sub.
+  easy.
+}
+cbn - [ "*" ].
+(* ahhhh, pute vierge... *)
 ...
   progress unfold t.
   progress unfold circ_trigo_param.
