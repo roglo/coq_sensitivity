@@ -1464,6 +1464,7 @@ Theorem lim_seq_cos_param_when_lt_right :
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hθ ε Hε.
@@ -1539,7 +1540,37 @@ enough (H :
       apply (rngl_le_add_r Hor).
       apply (rngl_squ_nonneg Hos Hor).
     }
-(* ah, fait chier, tiens *)
+    rewrite rngl_summation_split_first; [ | flia ].
+    cbn - [ "*" ].
+    do 2 rewrite (rngl_mul_opp_l Hop).
+    do 2 rewrite (rngl_mul_1_l Hon).
+    rewrite Nat.mul_1_r.
+    rewrite <- (rngl_squ_pow_2 Hon).
+    rewrite rngl_mul_add_distr_l.
+    rewrite (rngl_mul_opp_r Hop).
+    rewrite rngl_add_assoc.
+    rewrite (rngl_add_opp_r Hop).
+Arguments rngl_mul_div {T ro rp} Hiv (a b)%_L.
+    rewrite <- (rngl_mul_div Hi1 (2 * t²) (1 + t²)) at 2. 2: {
+      intros H.
+      rewrite rngl_add_comm in H.
+      apply (rngl_add_move_0_r Hop) in H.
+      specialize (rngl_squ_nonneg Hos Hor t) as H1.
+      rewrite H in H1.
+      apply rngl_nlt_ge in H1.
+      apply H1; clear H1.
+      apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+    }
+    rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+    rewrite rngl_mul_add_distr_l.
+    rewrite (rngl_mul_1_r Hon).
+    rewrite (rngl_sub_add_distr Hos).
+    rewrite (rngl_sub_diag Hos).
+    rewrite (rngl_sub_0_l Hop).
+    rewrite <- rngl_mul_assoc.
+...
+Search (_ / _ - _)%L.
+Search (_ / _ + _)%L.
 ...
   induction n. {
     rewrite rngl_summation_empty; [ | easy ].
