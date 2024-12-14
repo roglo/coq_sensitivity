@@ -1472,30 +1472,31 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hθ.
 intros ε Hε.
-rewrite rngl_param_cos.
-remember (λ (ε : T), 1) as f.
-clear Heqf.
-exists (f ε).
-intros n Hn.
-progress unfold seq_cos_param_when_lt_right.
-progress unfold param_cos.
-remember (θ =? angle_straight)%A as ts eqn:Hts.
-symmetry in Hts.
-destruct ts. {
-  exfalso.
-  apply angle_eqb_eq in Hts.
-  subst θ.
-  apply angle_nle_gt in Hθ.
-  apply Hθ; clear Hθ.
-  apply angle_right_le_straight.
-}
-clear Hts.
-set (t := circ_trigo_param θ).
-progress unfold rngl_dist.
-induction n. {
-  rewrite rngl_summation_empty; [ | easy ].
-  rewrite (rngl_mul_0_r Hos).
-  rewrite rngl_add_0_r.
+enough (H :
+  ∃ N : nat, ∀ n : nat, N ≤ n →
+  let t := circ_trigo_param θ in
+  (rngl_abs
+     (2 * t² / (1 + t²) +
+      2 * (∑ (k = 1, n), (-1) ^ k * t ^ (2 * k))) < ε)%L). {
+  destruct H as (N & HN).
+  exists N.
+  intros n Hn.
+  progress unfold rngl_dist.
+  progress unfold seq_cos_param_when_lt_right.
+  rewrite rngl_param_cos.
+  progress unfold param_cos.
+  remember (θ =? angle_straight)%A as ts eqn:Hts.
+  symmetry in Hts.
+  destruct ts. {
+    exfalso.
+    apply angle_eqb_eq in Hts.
+    subst θ.
+    apply angle_nle_gt in Hθ.
+    apply Hθ; clear Hθ.
+    apply angle_right_le_straight.
+  }
+  set (t := circ_trigo_param θ).
+  rewrite (rngl_add_sub_swap Hop).
   rewrite <- (rngl_div_diag Hon Hiq (1 + t²)) at 1. 2: {
     intros H.
     rewrite rngl_add_comm in H.
@@ -1512,6 +1513,18 @@ induction n. {
   rewrite (rngl_sub_diag Hos).
   rewrite rngl_add_0_l.
   rewrite <- (rngl_mul_2_l Hon).
+  now apply HN.
+}
+remember (λ (ε : T), 1) as f.
+clear Heqf.
+exists (f ε).
+intros n Hn.
+cbn - [ "*" ].
+set (t := circ_trigo_param θ).
+induction n. {
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite (rngl_mul_0_r Hos).
+  rewrite rngl_add_0_r.
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     apply (rngl_div_nonneg Hon Hop Hiv Hor).
     apply (rngl_mul_nonneg_nonneg Hos Hor).
@@ -1522,7 +1535,7 @@ induction n. {
     apply (rngl_le_add_r Hor).
     apply (rngl_squ_nonneg Hos Hor).
   }
-  admit.
+...
 }
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
@@ -1534,7 +1547,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite fold_rngl_squ.
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_add_opp_r Hop).
-  admit.
+...
 }
 rewrite rngl_summation_split_last; [ | now apply -> Nat.succ_le_mono ].
 rewrite (rngl_summation_shift 1); [ | flia Hnz ].
@@ -1575,7 +1588,7 @@ enough (H :
 remember (λ a, (2 * a + 1)%L) as f eqn:Hf.
 clear Hf.
 exists (rngl_min (f ε) 2).
-split; [ admit | ].
+split; [ ... | ].
 intros θ (Htz, Hze).
 progress unfold param_cos.
 progress unfold param_sin.
