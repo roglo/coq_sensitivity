@@ -4,20 +4,19 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.Misc.
 Require Import Main.RingLike.
-Require Import Trigo.RealLike.
+Require Import Main.IterAdd.
 
+Require Import Trigo.RealLike.
 Require Import Trigo.Angle.
 Require Import Trigo.AngleDiv2.
 Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.TrigoWithoutPiExt.
 Require Import Trigo.Angle_order.
 Require Import Trigo.TacChangeAngle.
-Require Import AngleEuclDist_sin.
-
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleDivNat.
 Require Import Trigo.SeqAngleIsCauchy.
-Require Import Main.IterAdd.
+Require Import AngleEuclDist_sin.
 
 Section a.
 
@@ -1478,7 +1477,7 @@ enough (H :
   let t := circ_trigo_param θ in
   (rngl_abs
      (2 * t² / (1 + t²) +
-      2 * (∑ (k = 1, n), (-1) ^ k * t ^ (2 * k))) < ε)%L). {
+      2 * (∑ (k = 1, n), (-1) ^ k * t² ^ k)) < ε)%L). {
   destruct H as (N & HN).
   exists N.
   intros n Hn.
@@ -1514,8 +1513,61 @@ enough (H :
   rewrite (rngl_sub_diag Hos).
   rewrite rngl_add_0_l.
   rewrite <- (rngl_mul_2_l Hon).
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    rewrite (rngl_pow_mul_r Hic Hon).
+    rewrite <- (rngl_squ_pow_2 Hon).
+    easy.
+  }
   now apply HN.
 }
+Theorem formula_div_add_summation_succ :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ (a : T) n,
+  (0 ≤ a)%L
+  → (a / (1 + a) + (∑ (k = 1, S n), (-1) ^ k * a ^ k) =
+    - (a² / (1 + a) + ∑ (k = 1, n), (-1) ^ k * a ^ k))%L.
+Proof.
+intros Hon Hop Hiv Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hza.
+  rewrite (H1 (- (_ + _)))%L.
+  apply H1.
+}
+intros * Hza.
+induction n. {
+  rewrite rngl_summation_only_one.
+  rewrite rngl_summation_empty; [ | easy ].
+  do 2 rewrite (rngl_pow_1_r Hon).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_add_opp_r Hop).
+  rewrite rngl_add_0_r.
+  rewrite <- (rngl_mul_div Hi1 a (1 + a)) at 3. 2: {
+    intros H.
+    rewrite rngl_add_comm in H.
+    apply (rngl_add_move_0_r Hop) in H.
+    rewrite H in Hza.
+    apply rngl_nlt_ge in Hza.
+    apply Hza; clear Hza.
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  }
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  rewrite rngl_mul_add_distr_l.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_sub_add_distr Hos).
+  rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_sub_0_l Hop).
+  rewrite fold_rngl_squ.
+  apply (rngl_div_opp_l Hop Hiv).
+}
+...
 enough (H :
   ∃ N : nat, ∀ n : nat, N ≤ n →
   let t := circ_trigo_param θ in
@@ -1525,6 +1577,8 @@ enough (H :
   intros n Hn.
   cbn - [ "*" ].
   set (t := circ_trigo_param θ).
+...
+  rewrite glop.
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     clear Hn.
     induction n. {
