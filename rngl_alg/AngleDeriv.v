@@ -1508,7 +1508,13 @@ Arguments rngl_div_diag {T ro rp} Hon Hiq a%L.
   }
   rewrite <- (rngl_div_sub_distr_r Hop Hiv).
   rewrite (rngl_sub_sub_distr Hop).
-  rewr
+  rewrite (rngl_add_sub_swap Hop).
+  rewrite (rngl_sub_diag Hos).
+  rewrite rngl_add_0_l.
+  rewrite <- (rngl_mul_2_l Hon).
+...
+  progress unfold t.
+  progress unfold circ_trigo_param.
 ...
 
 Theorem param_cos_derivative :
