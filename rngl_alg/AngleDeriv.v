@@ -1489,6 +1489,14 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros θ₀ ε Hε.
+enough (H :
+  ∃ η, (0 < η)%L ∧
+  ∀ θ,
+ (0 < angle_eucl_dist θ θ₀ < η)%L
+ → (rngl_dist
+      ((param_cos θ - param_cos θ₀) / angle_eucl_dist θ θ₀)
+      (- param_sin θ₀) < ε)%L) by easy.
+...
 (*4*)
 remember (λ a, (2 * a + 1)%L) as f eqn:Hf.
 clear Hf.
