@@ -1515,6 +1515,53 @@ enough (H :
   rewrite <- (rngl_mul_2_l Hon).
   now apply HN.
 }
+enough (H :
+  ∃ N : nat, ∀ n : nat, N ≤ n →
+  let t := circ_trigo_param θ in
+  (2 * t² ^ n / (1 + t²) < ε)%L). {
+  destruct H as (N & HN).
+  exists N.
+  intros n Hn.
+  cbn - [ "*" ].
+  set (t := circ_trigo_param θ).
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    clear Hn.
+    induction n. {
+      rewrite rngl_summation_empty; [ | easy ].
+      rewrite (rngl_mul_0_r Hos).
+      rewrite rngl_add_0_r.
+      apply (rngl_div_nonneg Hon Hop Hiv Hor).
+      apply (rngl_mul_nonneg_nonneg Hos Hor).
+      apply (rngl_0_le_2 Hon Hos Hor).
+      apply (rngl_squ_nonneg Hos Hor).
+      apply (rngl_lt_le_trans Hor _ 1).
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+      apply (rngl_le_add_r Hor).
+      apply (rngl_squ_nonneg Hos Hor).
+    }
+(* ah, fait chier, tiens *)
+...
+  induction n. {
+    rewrite rngl_summation_empty; [ | easy ].
+    rewrite (rngl_mul_0_r Hos).
+    rewrite rngl_add_0_r.
+    rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+      apply (rngl_div_nonneg Hon Hop Hiv Hor).
+      apply (rngl_mul_nonneg_nonneg Hos Hor).
+      apply (rngl_0_le_2 Hon Hos Hor).
+      apply (rngl_squ_nonneg Hos Hor).
+      apply (rngl_lt_le_trans Hor _ 1).
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+      apply (rngl_le_add_r Hor).
+      apply (rngl_squ_nonneg Hos Hor).
+    }
+    apply Nat.le_0_r in Hn; subst N.
+    specialize (HN 1 Nat.le_0_1).
+    cbn in HN.
+    rewrite (rngl_mul_1_r Hon) in HN.
+    easy.
+  }
+...
 remember (λ (ε : T), 1) as f.
 clear Heqf.
 exists (f ε).
