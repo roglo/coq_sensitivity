@@ -1531,6 +1531,17 @@ destruct ts. {
   rewrite fold_param_cos; [ | easy ].
   rewrite <- rngl_param_sin.
   rewrite <- rngl_param_cos.
+  remember (rngl_sin θ₀) as x.
+  remember ((rngl_cos θ₀ + 1) / _)%L as y.
+  progress unfold rngl_abs.
+  rewrite (rngl_leb_sub_0 Hop Hor).
+  remember (x ≤? y)%L as xy eqn:Hxy.
+  subst x y.
+  symmetry in Hxy.
+  destruct xy. {
+    apply rngl_leb_le in Hxy.
+    rewrite (rngl_opp_sub_distr Hop).
+...
 Check rngl_cos_lt_angle_eucl_dist_lt.
 apply rngl_cos_lt_angle_eucl_dist_lt in Hze.
 rewrite rngl_cos_sub_straight_r in Hze.
