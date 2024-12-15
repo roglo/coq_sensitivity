@@ -1691,45 +1691,6 @@ assert (Hte : ((circ_trigo_param θ)² < 1)%L). {
   apply angle_right_le_straight.
 }
 Check formula_div_add_summation_succ.
-...
-enough (H :
-  ∃ N : nat, ∀ n : nat, N ≤ n →
-  let t := circ_trigo_param θ in
-  (2 * rngl_abs
-     (t² / (1 + t²) +
-      (∑ (k = 1, n), (-1) ^ k * t² ^ k)) < ε)%L). {
-  destruct H as (N & HN).
-  exists (S N).
-  intros n Hn.
-  cbn.
-  set (t := circ_trigo_param θ).
-  destruct n; [ easy | ].
-  apply Nat.succ_le_mono in Hn.
-  rewrite (formula_div_add_summation_succ Hic Hon Hop Hiv Hor). 2: {
-    apply (rngl_squ_nonneg Hos Hor).
-  }
-  rewrite (rngl_abs_mul Hop Hi1 Hor).
-  rewrite (rngl_abs_opp Hop Hor).
-  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-    apply (rngl_squ_nonneg Hos Hor).
-  }
-  rewrite rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic 2).
-  rewrite <- rngl_mul_assoc.
-  eapply (rngl_lt_le_trans Hor). {
-    apply (rngl_mul_lt_mono_nonneg Hop Hor Hii). 2: {
-      split; [ | now apply HN ].
-      apply (rngl_mul_nonneg_nonneg Hos Hor).
-      apply (rngl_0_le_2 Hon Hos Hor).
-      apply (rngl_abs_nonneg Hop Hor).
-    }
-    split; [ apply (rngl_squ_nonneg Hos Hor) | ].
-    apply Hte.
-  }
-  rewrite (rngl_mul_1_l Hon).
-  apply (rngl_le_refl Hor).
-}
-...
 enough (H :
   ∃ N : nat, ∀ n : nat, N ≤ n →
   let t := circ_trigo_param θ in
@@ -1739,17 +1700,13 @@ enough (H :
   intros n Hn.
   cbn - [ "*" ].
   set (t := circ_trigo_param θ).
-...
-  rewrite glop.
+  fold t in Hte.
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     clear Hn.
     induction n. {
       rewrite rngl_summation_empty; [ | easy ].
-      rewrite (rngl_mul_0_r Hos).
       rewrite rngl_add_0_r.
       apply (rngl_div_nonneg Hon Hop Hiv Hor).
-      apply (rngl_mul_nonneg_nonneg Hos Hor).
-      apply (rngl_0_le_2 Hon Hos Hor).
       apply (rngl_squ_nonneg Hos Hor).
       apply (rngl_lt_le_trans Hor _ 1).
       apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
@@ -1760,6 +1717,7 @@ enough (H :
     cbn - [ "*" ].
     do 2 rewrite (rngl_mul_opp_l Hop).
     do 2 rewrite (rngl_mul_1_l Hon).
+...
     rewrite Nat.mul_1_r.
     rewrite <- (rngl_squ_pow_2 Hon).
     rewrite rngl_mul_add_distr_l.
