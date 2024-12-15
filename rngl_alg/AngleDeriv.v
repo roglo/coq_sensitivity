@@ -1567,6 +1567,7 @@ Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert (Hio :
   (rngl_is_integral_domain T ||
@@ -1696,13 +1697,15 @@ enough (H :
   let t := circ_trigo_param θ in
   (2 * t² ^ S n / (1 + t²) < ε)%L). {
   destruct H as (N & HN).
-  exists N.
+  exists (S N).
   intros n Hn.
   cbn - [ "*" ].
   set (t := circ_trigo_param θ).
   fold t in Hte.
 (*6*)
-  induction n. {
+  revert ε N Hε HN Hn.
+  induction n; intros; [ easy | ].
+(*
     apply Nat.le_0_r in Hn; subst N.
     rewrite rngl_summation_empty; [ | easy ].
     rewrite rngl_add_0_r.
@@ -1719,7 +1722,7 @@ enough (H :
     apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
     apply (rngl_le_add_r Hor).
     apply (rngl_squ_nonneg Hos Hor).
-  }
+*)
   rewrite (formula_div_add_summation_succ Hic Hon Hop Hiv Hor). 2: {
     apply (rngl_squ_nonneg Hos Hor).
   }
@@ -1728,9 +1731,39 @@ enough (H :
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     apply (rngl_squ_nonneg Hos Hor).
   }
-  destruct (Nat.eq_dec N (S n)) as [Hnn| Hnn]. {
-    subst N.
-    clear IHn Hn.
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hic 2).
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hic).
+  destruct (rngl_eq_dec Heo t² 0) as [Hez| Hez]. {
+    rewrite Hez.
+    rewrite rngl_add_0_r.
+    rewrite (rngl_div_1_r Hon Hiq Hc1).
+    rewrite rngl_add_0_l.
+    rewrite all_0_rngl_summation_0. 2: {
+      intros i Hi.
+      rewrite (rngl_pow_0_l Hos).
+      destruct i; [ easy | ].
+      apply (rngl_mul_0_r Hos).
+    }
+    now rewrite (rngl_mul_0_r Hos).
+  }
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_lt_iff Hor).
+    split; [ apply (rngl_squ_nonneg Hos Hor) | easy ].
+  }
+...
+  apply (IHn _ N).
+2: {
+easy.
+...
+    apply (eq_rngl_sin_0) in H1.
+  destruct H; subst θ; [ easy | ].
+  exfalso.
+  apply angle_nle_gt in Hθ.
+  apply Hθ; clear Hθ.
+  apply angle_right_le_straight.
+2: {
 ...6
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     clear Hn.
