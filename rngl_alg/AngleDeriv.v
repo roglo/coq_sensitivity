@@ -1568,6 +1568,14 @@ destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hθ ε Hε.
@@ -1659,12 +1667,30 @@ assert (Hte : ((circ_trigo_param θ)² < 1)%L). {
     apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). {
       apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
     }
-...
-Search (_² < _)%L.
-...
-    rewrite <- (rngl_squ_1 Hon) at 2.
-rewrite (rngl_mul_1_l Hon).
-        rewrite rngl_add_add_swap in H2.
+    apply (rngl_lt_0_sub Hop Hor).
+    progress unfold rngl_squ.
+    rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+    apply (rngl_mul_pos_pos Hos Hor Hii). {
+      now apply rngl_lt_0_cos.
+    }
+    apply (rngl_lt_0_sub Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H.
+    now apply eq_rngl_cos_1 in H.
+  }
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_squ_nonneg Hos Hor) | ].
+  intros H; symmetry in H.
+  apply (eq_rngl_squ_0 Hos Hio) in H.
+  apply (eq_rngl_sin_0) in H.
+  destruct H; subst θ; [ easy | ].
+  exfalso.
+  apply angle_nle_gt in Hθ.
+  apply Hθ; clear Hθ.
+  apply angle_right_le_straight.
+}
+Check formula_div_add_summation_succ.
 ...
 enough (H :
   ∃ N : nat, ∀ n : nat, N ≤ n →
