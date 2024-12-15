@@ -1693,18 +1693,18 @@ assert (Hte : ((circ_trigo_param θ)² < 1)%L). {
 }
 Check formula_div_add_summation_succ.
 enough (H :
-  ∃ N : nat, ∀ n : nat, N ≤ n →
+  ∀ n,
   let t := circ_trigo_param θ in
   (2 * t² ^ S n / (1 + t²) < ε)%L). {
-  destruct H as (N & HN).
-  exists (S N).
-  intros n Hn.
+  exists 0.
+  intros n _.
   cbn - [ "*" ].
   set (t := circ_trigo_param θ).
   fold t in Hte.
 (*6*)
-  revert ε N Hε HN Hn.
-  induction n; intros; [ easy | ].
+  revert ε Hε H.
+  induction n; intros. {
+...
 (*
     apply Nat.le_0_r in Hn; subst N.
     rewrite rngl_summation_empty; [ | easy ].
@@ -1752,9 +1752,10 @@ enough (H :
     apply (rngl_lt_iff Hor).
     split; [ apply (rngl_squ_nonneg Hos Hor) | easy ].
   }
+  apply Nat.succ_le_mono in Hn.
 ...
   apply (IHn _ N).
-2: {
+3: {
 easy.
 ...
     apply (eq_rngl_sin_0) in H1.
