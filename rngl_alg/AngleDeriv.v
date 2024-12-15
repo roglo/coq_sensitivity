@@ -1555,7 +1555,7 @@ Qed.
 
 Definition seq_cos_param_when_lt_right θ :=
   let t := circ_trigo_param θ in
-  λ i, (1 + 2 * ∑ (k = 1, i), (-1)^k * t ^ (2 * k))%L.
+  λ i, (1 + 2 * ∑ (k = 1, i), (-1)^k * t² ^ k)%L.
 
 (* to be completed
 Theorem lim_seq_cos_param_when_lt_right :
@@ -1617,18 +1617,55 @@ enough (H :
   rewrite (rngl_sub_diag Hos).
   rewrite rngl_add_0_l.
   rewrite <- (rngl_mul_2_l Hon).
-  erewrite rngl_summation_eq_compat. 2: {
-    intros i Hi.
-    rewrite (rngl_pow_mul_r Hic Hon).
-    rewrite <- (rngl_squ_pow_2 Hon).
-    easy.
-  }
   rewrite <- (rngl_mul_div_assoc Hiv).
   rewrite <- rngl_mul_add_distr_l.
   rewrite (rngl_abs_mul Hop Hi1 Hor).
   rewrite (rngl_abs_2 Hon Hos Hor).
   now apply HN.
 }
+assert (Hte : ((circ_trigo_param θ)² < 1)%L). {
+  progress unfold circ_trigo_param.
+  remember (θ =? 0)%A as tz eqn:Htz.
+  symmetry in Htz.
+  destruct tz. {
+    rewrite (rngl_squ_0 Hos).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  }
+  apply angle_eqb_neq in Htz.
+  rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
+    intros H.
+    apply eq_rngl_sin_0 in H.
+    destruct H; subst θ; [ easy | ].
+    exfalso.
+    apply angle_nle_gt in Hθ.
+    apply Hθ; clear Hθ.
+    apply angle_right_le_straight.
+  }
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). 2: {
+    rewrite (rngl_mul_1_l Hon).
+    specialize (cos2_sin2_1 θ) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    rewrite (rngl_squ_sub Hop Hic Hon).
+    rewrite (rngl_mul_1_r Hon).
+    rewrite (rngl_squ_1 Hon).
+    rewrite <- (rngl_add_sub_swap Hop).
+    apply (rngl_lt_sub_lt_add_r Hop Hor).
+    rewrite <- (rngl_add_sub_swap Hop).
+    apply -> (rngl_lt_add_lt_sub_r Hop Hor).
+    rewrite <- rngl_add_assoc.
+    rewrite <- (rngl_mul_2_l Hon).
+    apply (rngl_add_lt_mono_l Hop Hor).
+    apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+...
+Search (_² < _)%L.
+...
+    rewrite <- (rngl_squ_1 Hon) at 2.
+rewrite (rngl_mul_1_l Hon).
+        rewrite rngl_add_add_swap in H2.
+...
 enough (H :
   ∃ N : nat, ∀ n : nat, N ≤ n →
   let t := circ_trigo_param θ in
@@ -1636,45 +1673,36 @@ enough (H :
      (t² / (1 + t²) +
       (∑ (k = 1, n), (-1) ^ k * t² ^ k)) < ε)%L). {
   destruct H as (N & HN).
-  exists N.
+  exists (S N).
   intros n Hn.
   cbn.
   set (t := circ_trigo_param θ).
-  destruct n. 2: {
-    rewrite (formula_div_add_summation_succ Hic Hon Hop Hiv Hor). 2: {
-      apply (rngl_squ_nonneg Hos Hor).
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hn.
+  rewrite (formula_div_add_summation_succ Hic Hon Hop Hiv Hor). 2: {
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  rewrite (rngl_abs_mul Hop Hi1 Hor).
+  rewrite (rngl_abs_opp Hop Hor).
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hic 2).
+  rewrite <- rngl_mul_assoc.
+  eapply (rngl_lt_le_trans Hor). {
+    apply (rngl_mul_lt_mono_nonneg Hop Hor Hii). 2: {
+      split; [ | now apply HN ].
+      apply (rngl_mul_nonneg_nonneg Hos Hor).
+      apply (rngl_0_le_2 Hon Hos Hor).
+      apply (rngl_abs_nonneg Hop Hor).
     }
-    rewrite (rngl_abs_mul Hop Hi1 Hor).
-    rewrite (rngl_abs_opp Hop Hor).
-    rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-      apply (rngl_squ_nonneg Hos Hor).
-    }
-    rewrite rngl_mul_assoc.
-    rewrite (rngl_mul_comm Hic 2).
-    rewrite <- rngl_mul_assoc.
-...
-    enough (Hte : (t² < 1)%L).
-    destruct (Nat.eq_dec (S n) N) as [Hnn| Hnn]. {
-      subst N.
-      eapply (rngl_lt_le_trans Hor). {
-        apply (rngl_mul_lt_mono_nonneg Hop Hor Hii). 2: {
-          split; [ | now apply HN ].
-          apply (rngl_mul_nonneg_nonneg Hos Hor).
-          apply (rngl_0_le_2 Hon Hos Hor).
-          apply (rngl_abs_nonneg Hop Hor).
-        }
-        split; [ apply (rngl_squ_nonneg Hos Hor) | ].
-        apply Hte.
-      }
-      rewrite (rngl_mul_1_l Hon).
-      apply (rngl_le_refl Hor).
-    }
-    eapply (rngl_lt_le_trans Hor). {
-      apply (rngl_mul_lt_mono_nonneg Hop Hor Hii). 2: {
-        split. 2: {
-          apply HN.
-
-        split; [ | apply HN; flia Hn Hnn ].
+    split; [ apply (rngl_squ_nonneg Hos Hor) | ].
+    apply Hte.
+  }
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_le_refl Hor).
+}
 ...
 enough (H :
   ∃ N : nat, ∀ n : nat, N ≤ n →
