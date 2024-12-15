@@ -1118,6 +1118,7 @@ apply (rngl_opp_1_le_0 Hon Hop Hor).
 Qed.
 
 Theorem formula_div_add_summation_succ :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -1125,15 +1126,15 @@ Theorem formula_div_add_summation_succ :
   ∀ (a : T) n,
   (0 ≤ a)%L
   → (a / (1 + a) + (∑ (k = 1, S n), (-1) ^ k * a ^ k) =
-    - (a² / (1 + a) + (∑ (k = 1, n), (-1) ^ k * a ^ k) * a))%L.
+    - a * (a / (1 + a) + (∑ (k = 1, n), (-1) ^ k * a ^ k)))%L.
 Proof.
-intros Hon Hop Hiv Hor.
+intros Hic Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hza.
-  rewrite (H1 (- (_ + _)))%L.
+  rewrite (H1 (- _ * _))%L.
   apply H1.
 }
 intros * Hza.
@@ -1144,7 +1145,6 @@ destruct n. {
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
   rewrite (rngl_add_opp_r Hop).
-  rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_0_r.
   rewrite <- (rngl_mul_div Hi1 a (1 + a)) at 3. 2: {
     intros H.
@@ -1161,8 +1161,11 @@ destruct n. {
   rewrite (rngl_sub_add_distr Hos).
   rewrite (rngl_sub_diag Hos).
   rewrite (rngl_sub_0_l Hop).
-  rewrite fold_rngl_squ.
-  apply (rngl_div_opp_l Hop Hiv).
+  rewrite (rngl_div_opp_l Hop Hiv).
+  rewrite (rngl_mul_opp_l Hop).
+  f_equal.
+  rewrite (rngl_mul_div_assoc Hiv).
+  easy.
 }
 rewrite rngl_summation_split_first; [ | flia ].
 do 2 rewrite (rngl_pow_1_r Hon).
@@ -1206,11 +1209,15 @@ rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_sub_add_distr Hos).
 rewrite (rngl_sub_diag Hos).
 rewrite (rngl_sub_0_l Hop).
-rewrite fold_rngl_squ.
 rewrite (rngl_div_opp_l Hop Hiv).
 rewrite <- (rngl_opp_add_distr Hop).
 rewrite rngl_add_comm.
-easy.
+rewrite (rngl_mul_opp_l Hop).
+rewrite rngl_mul_add_distr_l.
+rewrite (rngl_mul_div_assoc Hiv).
+f_equal.
+f_equal.
+apply (rngl_mul_comm Hic).
 Qed.
 
 (* parametric sin and cos *)
@@ -1559,6 +1566,7 @@ Theorem lim_seq_cos_param_when_lt_right :
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1621,8 +1629,52 @@ enough (H :
   rewrite (rngl_abs_2 Hon Hos Hor).
   now apply HN.
 }
-Check formula_div_add_summation_succ.
-(* ah ouai faut peut-être mettre a en facteur *)
+enough (H :
+  ∃ N : nat, ∀ n : nat, N ≤ n →
+  let t := circ_trigo_param θ in
+  (2 * rngl_abs
+     (t² / (1 + t²) +
+      (∑ (k = 1, n), (-1) ^ k * t² ^ k)) < ε)%L). {
+  destruct H as (N & HN).
+  exists N.
+  intros n Hn.
+  cbn.
+  set (t := circ_trigo_param θ).
+  destruct n. 2: {
+    rewrite (formula_div_add_summation_succ Hic Hon Hop Hiv Hor). 2: {
+      apply (rngl_squ_nonneg Hos Hor).
+    }
+    rewrite (rngl_abs_mul Hop Hi1 Hor).
+    rewrite (rngl_abs_opp Hop Hor).
+    rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+      apply (rngl_squ_nonneg Hos Hor).
+    }
+    rewrite rngl_mul_assoc.
+    rewrite (rngl_mul_comm Hic 2).
+    rewrite <- rngl_mul_assoc.
+...
+    enough (Hte : (t² < 1)%L).
+    destruct (Nat.eq_dec (S n) N) as [Hnn| Hnn]. {
+      subst N.
+      eapply (rngl_lt_le_trans Hor). {
+        apply (rngl_mul_lt_mono_nonneg Hop Hor Hii). 2: {
+          split; [ | now apply HN ].
+          apply (rngl_mul_nonneg_nonneg Hos Hor).
+          apply (rngl_0_le_2 Hon Hos Hor).
+          apply (rngl_abs_nonneg Hop Hor).
+        }
+        split; [ apply (rngl_squ_nonneg Hos Hor) | ].
+        apply Hte.
+      }
+      rewrite (rngl_mul_1_l Hon).
+      apply (rngl_le_refl Hor).
+    }
+    eapply (rngl_lt_le_trans Hor). {
+      apply (rngl_mul_lt_mono_nonneg Hop Hor Hii). 2: {
+        split. 2: {
+          apply HN.
+
+        split; [ | apply HN; flia Hn Hnn ].
 ...
 enough (H :
   ∃ N : nat, ∀ n : nat, N ≤ n →
