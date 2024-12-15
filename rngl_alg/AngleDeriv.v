@@ -1694,13 +1694,44 @@ Check formula_div_add_summation_succ.
 enough (H :
   ∃ N : nat, ∀ n : nat, N ≤ n →
   let t := circ_trigo_param θ in
-  (2 * t² ^ n / (1 + t²) < ε)%L). {
+  (2 * t² ^ S n / (1 + t²) < ε)%L). {
   destruct H as (N & HN).
   exists N.
   intros n Hn.
   cbn - [ "*" ].
   set (t := circ_trigo_param θ).
   fold t in Hte.
+(*6*)
+  induction n. {
+    apply Nat.le_0_r in Hn; subst N.
+    rewrite rngl_summation_empty; [ | easy ].
+    rewrite rngl_add_0_r.
+    specialize (HN _ (Nat.le_0_l 0)).
+    cbn - [ "^"%L ] in HN.
+    rewrite (rngl_pow_1_r Hon) in HN.
+    progress fold t in HN.
+    rewrite <- (rngl_mul_div_assoc Hiv) in HN.
+    rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
+    apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+      apply (rngl_squ_nonneg Hos Hor).
+    }
+    apply (rngl_lt_le_trans Hor _ 1).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    apply (rngl_le_add_r Hor).
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  rewrite (formula_div_add_summation_succ Hic Hon Hop Hiv Hor). 2: {
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  rewrite (rngl_abs_mul Hop Hi1 Hor).
+  rewrite (rngl_abs_opp Hop Hor).
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  destruct (Nat.eq_dec N (S n)) as [Hnn| Hnn]. {
+    subst N.
+    clear IHn Hn.
+...6
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     clear Hn.
     induction n. {
@@ -1717,15 +1748,10 @@ enough (H :
     cbn - [ "*" ].
     do 2 rewrite (rngl_mul_opp_l Hop).
     do 2 rewrite (rngl_mul_1_l Hon).
-...
-    rewrite Nat.mul_1_r.
-    rewrite <- (rngl_squ_pow_2 Hon).
-    rewrite rngl_mul_add_distr_l.
-    rewrite (rngl_mul_opp_r Hop).
+    rewrite (rngl_mul_1_r Hon).
     rewrite rngl_add_assoc.
     rewrite (rngl_add_opp_r Hop).
-Arguments rngl_mul_div {T ro rp} Hiv (a b)%_L.
-    rewrite <- (rngl_mul_div Hi1 (2 * t²) (1 + t²)) at 2. 2: {
+    rewrite <- (rngl_mul_div Hi1 t² (1 + t²)) at 3. 2: {
       intros H.
       rewrite rngl_add_comm in H.
       apply (rngl_add_move_0_r Hop) in H.
@@ -1741,7 +1767,6 @@ Arguments rngl_mul_div {T ro rp} Hiv (a b)%_L.
     rewrite (rngl_sub_add_distr Hos).
     rewrite (rngl_sub_diag Hos).
     rewrite (rngl_sub_0_l Hop).
-    rewrite <- rngl_mul_assoc.
 ...
 Search (_ / _ - _)%L.
 Search (_ / _ + _)%L.
