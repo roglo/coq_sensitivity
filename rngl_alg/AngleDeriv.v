@@ -1117,6 +1117,102 @@ apply rngl_leb_le.
 apply (rngl_opp_1_le_0 Hon Hop Hor).
 Qed.
 
+Theorem formula_div_add_summation_succ :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ (a : T) n,
+  (0 ≤ a)%L
+  → (a / (1 + a) + (∑ (k = 1, S n), (-1) ^ k * a ^ k) =
+    - (a² / (1 + a) + (∑ (k = 1, n), (-1) ^ k * a ^ k) * a))%L.
+Proof.
+intros Hon Hop Hiv Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hza.
+  rewrite (H1 (- (_ + _)))%L.
+  apply H1.
+}
+intros * Hza.
+destruct n. {
+  rewrite rngl_summation_only_one.
+  rewrite rngl_summation_empty; [ | easy ].
+  do 2 rewrite (rngl_pow_1_r Hon).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_add_opp_r Hop).
+  rewrite (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r.
+  rewrite <- (rngl_mul_div Hi1 a (1 + a)) at 3. 2: {
+    intros H.
+    rewrite rngl_add_comm in H.
+    apply (rngl_add_move_0_r Hop) in H.
+    rewrite H in Hza.
+    apply rngl_nlt_ge in Hza.
+    apply Hza; clear Hza.
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  }
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  rewrite rngl_mul_add_distr_l.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_sub_add_distr Hos).
+  rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_sub_0_l Hop).
+  rewrite fold_rngl_squ.
+  apply (rngl_div_opp_l Hop Hiv).
+}
+rewrite rngl_summation_split_first; [ | flia ].
+do 2 rewrite (rngl_pow_1_r Hon).
+rewrite (rngl_summation_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite rngl_add_assoc.
+rewrite (rngl_add_opp_r Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite Nat.add_comm at 2.
+  do 2 rewrite (rngl_pow_add_r Hon).
+  do 2 rewrite (rngl_pow_1_r Hon).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite rngl_mul_assoc.
+  rewrite <- (rngl_mul_opp_l Hop).
+  easy.
+}
+cbn.
+rewrite <- (rngl_mul_summation_distr_r Hos).
+rewrite <- (rngl_opp_summation Hop).
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_add_opp_r Hop).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite <- (rngl_mul_div Hi1 a (1 + a)) at 3. 2: {
+  intros H.
+  rewrite rngl_add_comm in H.
+  apply (rngl_add_move_0_r Hop) in H.
+  rewrite H in Hza.
+  apply rngl_nlt_ge in Hza.
+  apply Hza; clear Hza.
+  apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+}
+rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+rewrite rngl_mul_add_distr_l.
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_diag Hos).
+rewrite (rngl_sub_0_l Hop).
+rewrite fold_rngl_squ.
+rewrite (rngl_div_opp_l Hop Hiv).
+rewrite <- (rngl_opp_add_distr Hop).
+rewrite rngl_add_comm.
+easy.
+Qed.
+
 (* parametric sin and cos *)
 
 (* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
@@ -1475,9 +1571,9 @@ intros ε Hε.
 enough (H :
   ∃ N : nat, ∀ n : nat, N ≤ n →
   let t := circ_trigo_param θ in
-  (rngl_abs
-     (2 * t² / (1 + t²) +
-      2 * (∑ (k = 1, n), (-1) ^ k * t² ^ k)) < ε)%L). {
+  (2 * rngl_abs
+     (t² / (1 + t²) +
+      (∑ (k = 1, n), (-1) ^ k * t² ^ k)) < ε)%L). {
   destruct H as (N & HN).
   exists N.
   intros n Hn.
@@ -1519,81 +1615,14 @@ enough (H :
     rewrite <- (rngl_squ_pow_2 Hon).
     easy.
   }
+  rewrite <- (rngl_mul_div_assoc Hiv).
+  rewrite <- rngl_mul_add_distr_l.
+  rewrite (rngl_abs_mul Hop Hi1 Hor).
+  rewrite (rngl_abs_2 Hon Hos Hor).
   now apply HN.
 }
-Theorem formula_div_add_summation_succ :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ (a : T) n,
-  (0 ≤ a)%L
-  → (a / (1 + a) + (∑ (k = 1, S n), (-1) ^ k * a ^ k) =
-    - (a² / (1 + a) + ∑ (k = 1, n), (-1) ^ k * a ^ k))%L.
-Proof.
-intros Hon Hop Hiv Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hza.
-  rewrite (H1 (- (_ + _)))%L.
-  apply H1.
-}
-intros * Hza.
-induction n. {
-  rewrite rngl_summation_only_one.
-  rewrite rngl_summation_empty; [ | easy ].
-  do 2 rewrite (rngl_pow_1_r Hon).
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_add_opp_r Hop).
-  rewrite rngl_add_0_r.
-  rewrite <- (rngl_mul_div Hi1 a (1 + a)) at 3. 2: {
-    intros H.
-    rewrite rngl_add_comm in H.
-    apply (rngl_add_move_0_r Hop) in H.
-    rewrite H in Hza.
-    apply rngl_nlt_ge in Hza.
-    apply Hza; clear Hza.
-    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-  }
-  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
-  rewrite rngl_mul_add_distr_l.
-  rewrite (rngl_mul_1_r Hon).
-  rewrite (rngl_sub_add_distr Hos).
-  rewrite (rngl_sub_diag Hos).
-  rewrite (rngl_sub_0_l Hop).
-  rewrite fold_rngl_squ.
-  apply (rngl_div_opp_l Hop Hiv).
-}
-rewrite rngl_summation_split_first; [ | flia ].
-do 2 rewrite (rngl_pow_1_r Hon).
-rewrite (rngl_summation_shift 1); [ | flia ].
-do 2 rewrite Nat_sub_succ_1.
-rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_mul_1_l Hon).
-rewrite rngl_add_assoc.
-rewrite (rngl_add_opp_r Hop).
-rewrite <- (rngl_add_sub_swap Hop).
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite Nat.add_comm at 2.
-  do 2 rewrite (rngl_pow_add_r Hon).
-  do 2 rewrite (rngl_pow_1_r Hon).
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite rngl_mul_assoc.
-  rewrite <- (rngl_mul_opp_l Hop).
-  easy.
-}
-cbn.
-rewrite <- (rngl_mul_summation_distr_r Hos).
-rewrite <- (rngl_opp_summation Hop).
-rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_add_opp_r Hop).
-(* chiasse de pute, je me suis gourré *)
+Check formula_div_add_summation_succ.
+(* ah ouai faut peut-être mettre a en facteur *)
 ...
 enough (H :
   ∃ N : nat, ∀ n : nat, N ≤ n →
