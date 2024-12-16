@@ -1220,6 +1220,84 @@ f_equal.
 apply (rngl_mul_comm Hic).
 Qed.
 
+Theorem formula_div_add_summation :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ a n,
+  (a ≠ -1)%L
+  → (a / (1 + a) + (∑ (k = 1, n), (-1) ^ k * a ^ k) =
+     (-1) ^ n * a ^ S n / (1 + a))%L.
+Proof.
+intros Hic Hon Hop Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+intros * Ha1.
+induction n. {
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_add_0_r.
+  rewrite rngl_pow_0_r.
+  rewrite (rngl_mul_1_l Hon).
+  now rewrite (rngl_pow_1_r Hon).
+}
+rewrite rngl_summation_split_first; [ | now apply -> Nat.succ_le_mono ].
+do 2 rewrite (rngl_pow_1_r Hon).
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite rngl_add_assoc.
+rewrite (rngl_add_opp_r Hop).
+rewrite <- (rngl_mul_div Hi1 a (1 + a)) at 3. 2: {
+  intros H.
+  rewrite rngl_add_comm in H.
+  now apply (rngl_add_move_0_r Hop) in H.
+}
+rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+rewrite rngl_mul_add_distr_l.
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_diag Hos).
+rewrite (rngl_sub_0_l Hop).
+destruct n. {
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_add_0_r.
+  rewrite (rngl_pow_1_r Hon).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  cbn.
+  now rewrite (rngl_mul_1_r Hon).
+}
+rewrite (rngl_summation_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  do 2 rewrite rngl_pow_succ_r.
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_mul_swap Hic (-1)).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite <- rngl_mul_assoc.
+  easy.
+}
+cbn - [ "^"%L ].
+rewrite <- (rngl_mul_summation_distr_l Hos).
+rewrite <- (rngl_mul_opp_l Hop).
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite <- rngl_mul_add_distr_l.
+rewrite IHn.
+rewrite (rngl_mul_div_assoc Hiv).
+f_equal.
+rewrite rngl_mul_assoc.
+rewrite (rngl_mul_opp_l Hop).
+rewrite <- (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_comm Hic a).
+rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite (rngl_pow_succ_r (S n)).
+rewrite (rngl_mul_opp_l Hop).
+now rewrite (rngl_mul_1_l Hon).
+Qed.
+
 (* parametric sin and cos *)
 
 (* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
@@ -1691,7 +1769,6 @@ assert (Hte : ((circ_trigo_param θ)² < 1)%L). {
   apply Hθ; clear Hθ.
   apply angle_right_le_straight.
 }
-Check formula_div_add_summation_succ.
 enough (H :
   ∀ n,
   let t := circ_trigo_param θ in
@@ -1700,10 +1777,55 @@ enough (H :
   intros n _.
   cbn - [ "*" ].
   set (t := circ_trigo_param θ).
-  fold t in Hte.
-(*6*)
-  revert ε Hε H.
-  induction n; intros. {
+  rewrite (formula_div_add_summation Hic Hon Hop Hiv). 2: {
+    specialize (rngl_squ_nonneg Hos Hor t) as H1.
+    intros H2.
+    rewrite H2 in H1.
+    apply rngl_nlt_ge in H1.
+    apply H1; clear H1.
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  }
+  rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
+    specialize (rngl_squ_nonneg Hos Hor t) as H1.
+    intros H2.
+    rewrite rngl_add_comm in H2.
+    apply (rngl_add_move_0_r Hop) in H2.
+    rewrite H2 in H1.
+    apply rngl_nlt_ge in H1.
+    apply H1; clear H1.
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  }
+  rewrite (rngl_abs_mul Hop Hi1 Hor).
+  (* lemma to do *)
+  replace (rngl_abs ((-1) ^ n)) with 1%L. 2: {
+    symmetry.
+    induction n; [ apply (rngl_abs_1 Hon Hos Hor) | ].
+    rewrite rngl_pow_succ_r.
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_1_l Hon).
+    now rewrite (rngl_abs_opp Hop Hor).
+  }
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    induction n. {
+      rewrite (rngl_pow_1_r Hon).
+      apply (rngl_squ_nonneg Hos Hor).
+    }
+    rewrite rngl_pow_succ_r.
+    apply (rngl_mul_nonneg_nonneg Hos Hor); [ | easy ].
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    apply (rngl_le_trans Hor _ 1). {
+      apply (rngl_0_le_1 Hon Hos Hor).
+    }
+    apply (rngl_le_add_r Hor).
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  rewrite (rngl_mul_div_assoc Hiv).
+  apply H.
+}
+intros.
 ...
 (*
     apply Nat.le_0_r in Hn; subst N.
