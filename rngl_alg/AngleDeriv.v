@@ -1637,12 +1637,14 @@ Definition seq_cos_param_when_lt_right θ :=
 
 (* to be completed
 Theorem lim_seq_cos_param_when_lt_right :
+  rngl_is_archimedean T = true →
   ∀ θ,
   (θ < angle_right)%A
   → is_limit_when_tending_to_inf rngl_dist
       (seq_cos_param_when_lt_right θ) (rngl_cos θ).
 Proof.
 destruct_ac.
+intros Har.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
@@ -1828,6 +1830,15 @@ enough (H :
   rewrite (rngl_mul_div_assoc Hiv).
   now apply HN.
 }
+enough (H :
+  ∃ N, ∀ n, N ≤ n →
+  let t := circ_trigo_param θ in (2 * t² ^ S n / (1 + t²) < ε)%L). {
+  specialize (int_part Hon Hop Hc1 Hor Har) as Hint.
+  destruct (Hint (2 / ε))%L as (n2ε & Hn2ε).
+  exists (1 + Nat.log2_up n2ε).
+  intros n Hn.
+  cbn - [ rngl_power ].
+  set (t := circ_trigo_param θ).
 ...
 (*
     apply Nat.le_0_r in Hn; subst N.
