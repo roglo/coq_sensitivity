@@ -1298,6 +1298,21 @@ rewrite (rngl_mul_opp_l Hop).
 now rewrite (rngl_mul_1_l Hon).
 Qed.
 
+Theorem rngl_eq_div_0_r :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_has_inv T = true →
+  ∀ a b, (a / b = 0 → b ≠ 0 → a = 0)%L.
+Proof.
+intros Hon Hos Hiv.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hab Hbz.
+progress unfold rngl_div in Hab.
+rewrite Hiv in Hab.
+apply (rngl_eq_mul_0_l Hos Hii) in Hab; [ easy | ].
+now apply (rngl_inv_neq_0 Hon Hos Hiv).
+Qed.
+
 (* parametric sin and cos *)
 
 (* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
@@ -1872,7 +1887,27 @@ apply (rngl_le_lt_trans Hor _ ε). 2: {
   remember (θ =? 0)%A as tz eqn:Htz.
   symmetry in Htz.
   destruct tz; [ now rewrite rngl_squ_0 in Htpz | ].
-Search (_ / _ = 0)%L.
+  apply angle_eqb_neq in Htz.
+  apply (rngl_eq_div_0_r Hon Hos Hiv) in H. 2: {
+    intros H1.
+    apply eq_rngl_sin_0 in H1.
+    destruct H1; [ easy | subst θ ].
+    apply angle_nle_gt in Hθ.
+    apply Hθ; clear Hθ.
+    apply angle_right_le_straight.
+  }
+  apply -> (rngl_sub_move_0_r Hop) in H.
+  symmetry in H.
+  now apply eq_rngl_cos_1 in H.
+}
+apply Nat.le_add_le_sub_l in Hn.
+apply Nat.log2_up_le_pow2 in Hn.
+2: {
+...
+Search (Nat.log2_up).
+Search (Nat.log2_up _ ≤ Nat.log2_up _).
+Search (Nat.log2_up _ ≤ _).
+Search (Nat.log2_up _ ≤ _).
 ...
 (*
     apply Nat.le_0_r in Hn; subst N.
