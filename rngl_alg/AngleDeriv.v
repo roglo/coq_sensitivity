@@ -1770,11 +1770,12 @@ assert (Hte : ((circ_trigo_param θ)² < 1)%L). {
   apply angle_right_le_straight.
 }
 enough (H :
-  ∀ n,
+  ∃ N, ∀ n, N ≤ n →
   let t := circ_trigo_param θ in
   (2 * t² ^ S n / (1 + t²) < ε)%L). {
-  exists 0.
-  intros n _.
+  destruct H as (N & HN).
+  exists N.
+  intros n Hn.
   cbn - [ "*" ].
   set (t := circ_trigo_param θ).
   rewrite (formula_div_add_summation Hic Hon Hop Hiv). 2: {
@@ -1799,6 +1800,7 @@ enough (H :
   (* lemma to do *)
   replace (rngl_abs ((-1) ^ n)) with 1%L. 2: {
     symmetry.
+    clear Hn.
     induction n; [ apply (rngl_abs_1 Hon Hos Hor) | ].
     rewrite rngl_pow_succ_r.
     rewrite (rngl_mul_opp_l Hop).
@@ -1807,6 +1809,7 @@ enough (H :
   }
   rewrite (rngl_mul_1_l Hon).
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    clear Hn.
     induction n. {
       rewrite (rngl_pow_1_r Hon).
       apply (rngl_squ_nonneg Hos Hor).
@@ -1823,9 +1826,8 @@ enough (H :
     apply (rngl_squ_nonneg Hos Hor).
   }
   rewrite (rngl_mul_div_assoc Hiv).
-  apply H.
+  now apply HN.
 }
-intros.
 ...
 (*
     apply Nat.le_0_r in Hn; subst N.
