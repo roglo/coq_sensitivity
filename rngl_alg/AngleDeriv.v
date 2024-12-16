@@ -1901,8 +1901,18 @@ apply (rngl_le_lt_trans Hor _ ε). 2: {
   now apply eq_rngl_cos_1 in H.
 }
 apply Nat.le_add_le_sub_l in Hn.
-apply Nat.log2_up_le_pow2 in Hn.
-2: {
+...
+apply Nat.log2_up_le_pow2 in Hn. 2: {
+  apply Nat.neq_0_lt_0.
+  intros H1; subst n2ε.
+  cbn in Hn2ε.
+  rewrite rngl_add_0_r in Hn2ε.
+...
+  apply (Nat.add_le_mono_r _ _ 1).
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  eapply (rngl_le_lt_trans Hor); [ | apply Hn2ε ].
+...
+Search (rngl_of_nat _ < rngl_of_nat _)%L.
 ...
 Search (Nat.log2_up).
 Search (Nat.log2_up _ ≤ Nat.log2_up _).
