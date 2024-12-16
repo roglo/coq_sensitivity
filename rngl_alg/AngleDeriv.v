@@ -1712,6 +1712,22 @@ enough (H :
   rewrite (rngl_abs_2 Hon Hos Hor).
   now apply HN.
 }
+destruct (rngl_eq_dec Heo (circ_trigo_param θ)² 0) as [Htpz| Htpz]. {
+  exists 0.
+  intros n _.
+  cbn; rewrite Htpz.
+  rewrite rngl_add_0_r.
+  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  rewrite rngl_add_0_l.
+  rewrite all_0_rngl_summation_0. 2: {
+    intros i Hi.
+    rewrite (rngl_pow_0_l Hos).
+    destruct i; [ easy | ].
+    apply (rngl_mul_0_r Hos).
+  }
+  rewrite (rngl_abs_0 Hop).
+  now rewrite (rngl_mul_0_r Hos).
+}
 assert (Hte : ((circ_trigo_param θ)² < 1)%L). {
   progress unfold circ_trigo_param.
   remember (θ =? 0)%A as tz eqn:Htz.
@@ -1830,15 +1846,33 @@ enough (H :
   rewrite (rngl_mul_div_assoc Hiv).
   now apply HN.
 }
-enough (H :
-  ∃ N, ∀ n, N ≤ n →
-  let t := circ_trigo_param θ in (2 * t² ^ S n / (1 + t²) < ε)%L). {
-  specialize (int_part Hon Hop Hc1 Hor Har) as Hint.
-  destruct (Hint (2 / ε))%L as (n2ε & Hn2ε).
-  exists (1 + Nat.log2_up n2ε).
-  intros n Hn.
-  cbn - [ rngl_power ].
-  set (t := circ_trigo_param θ).
+specialize (int_part Hon Hop Hc1 Hor Har) as Hint.
+destruct (Hint (2 / ε))%L as (n2ε & Hn2ε).
+exists (1 + Nat.log2_up n2ε).
+intros n Hn.
+cbn - [ rngl_power ].
+set (t := circ_trigo_param θ).
+apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+  apply (rngl_lt_le_trans Hor _ 1).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  apply (rngl_le_add_r Hor).
+  apply (rngl_squ_nonneg Hos Hor).
+}
+apply (rngl_le_lt_trans Hor _ ε). 2: {
+  rewrite <- (rngl_mul_1_r Hon ε) at 1.
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
+  apply (rngl_lt_add_r Hos Hor).
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_squ_nonneg Hos Hor) | ].
+  intros H; symmetry in H.
+  apply (eq_rngl_squ_0 Hos) in H.
+  subst t.
+  progress unfold circ_trigo_param in H.
+  progress unfold circ_trigo_param in Htpz.
+  remember (θ =? 0)%A as tz eqn:Htz.
+  symmetry in Htz.
+  destruct tz; [ now rewrite rngl_squ_0 in Htpz | ].
+Search (_ / _ = 0)%L.
 ...
 (*
     apply Nat.le_0_r in Hn; subst N.
