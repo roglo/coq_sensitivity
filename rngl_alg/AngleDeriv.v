@@ -1865,7 +1865,7 @@ apply (rngl_le_lt_trans Hor _ ε). 2: {
   apply (rngl_lt_iff Hor).
   split; [ apply (rngl_squ_nonneg Hos Hor) | ].
   intros H; symmetry in H.
-  apply (eq_rngl_squ_0 Hos) in H.
+  apply (eq_rngl_squ_0 Hos Hio) in H.
   subst t.
   progress unfold circ_trigo_param in H.
   progress unfold circ_trigo_param in Htpz.
