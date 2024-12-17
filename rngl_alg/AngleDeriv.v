@@ -1901,12 +1901,34 @@ apply (rngl_le_lt_trans Hor _ ε). 2: {
   now apply eq_rngl_cos_1 in H.
 }
 apply Nat.le_add_le_sub_l in Hn.
-...
+(**)
+destruct (rngl_le_dec Hor 2 ε) as [H2e| H2e]. {
+  apply (rngl_le_trans Hor _ 2); [ | easy ].
+  fold t in Hte.
+  rewrite <- (rngl_mul_1_r Hon 2) at 2.
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  rewrite <- (rngl_pow_1_l Hon (S n)).
+  apply (rngl_pow_le_mono_l Hop Hon Hor).
+  apply (rngl_squ_nonneg Hos Hor).
+  now apply (rngl_lt_le_incl Hor) in Hte.
+}
+apply (rngl_nle_gt_iff Hor) in H2e.
 apply Nat.log2_up_le_pow2 in Hn. 2: {
   apply Nat.neq_0_lt_0.
   intros H1; subst n2ε.
   cbn in Hn2ε.
   rewrite rngl_add_0_r in Hn2ε.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hn2ε. 2: {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+    now apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  destruct Hn2ε as (H1, H2).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor) in H2; [ | easy ].
+  rewrite (rngl_mul_1_l Hon) in H2.
+  apply (rngl_lt_le_incl Hor) in H2.
+  now apply rngl_nlt_ge in H2.
+}
 ...
   apply (Nat.add_le_mono_r _ _ 1).
   apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
