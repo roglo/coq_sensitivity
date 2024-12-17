@@ -1651,6 +1651,52 @@ Definition seq_cos_param_when_lt_right θ :=
   λ i, (1 + 2 * ∑ (k = 1, i), (-1)^k * t² ^ k)%L.
 
 (* to be completed
+Theorem param_cos_derivative :
+  is_derivative angle_eucl_dist rngl_dist param_cos (λ θ, (- param_sin θ)%L).
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros θ₀ ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros θ₀ ε Hε.
+enough (H :
+  ∃ η : T, (0 < η)%L ∧
+  ∀ x : angle T,
+  (0 < angle_eucl_dist x θ₀ < η)%L
+  → (rngl_dist
+       ((param_cos x - param_cos θ₀) / angle_eucl_dist x θ₀)
+       (- param_sin θ₀) < ε)%L). {
+  destruct H as (η & Hη & Hde).
+  move η before ε.
+  exists η.
+  split; [ easy | ].
+  intros θ Hθ.
+  progress unfold param_cos.
+  progress unfold param_sin.
+  progress unfold rngl_dist.
+  remember (circ_trigo_param θ) as t eqn:Ht.
+  remember (θ =? angle_straight)%A as ts eqn:Hts.
+  symmetry in Hts.
+  destruct ts. {
+    apply angle_eqb_eq in Hts.
+    subst θ.
+    remember (θ₀ =? angle_straight)%A as tsz eqn:Htsz.
+    symmetry in Htsz.
+    destruct tsz. {
+      apply angle_eqb_eq in Htsz.
+      subst θ₀.
+      rewrite angle_eucl_dist_diag in Hθ.
+      destruct Hθ as (H1, _).
+      now apply (rngl_lt_irrefl Hor) in H1.
+    }
+    remember (circ_trigo_param θ₀) as tz eqn:Htz.
+    clear t Ht.
+...
+
 Theorem lim_seq_cos_param_when_lt_right :
   rngl_is_archimedean T = true →
   ∀ θ,
