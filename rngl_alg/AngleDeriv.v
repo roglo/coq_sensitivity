@@ -1863,6 +1863,7 @@ enough (H :
 }
 specialize (int_part Hon Hop Hc1 Hor Har) as Hint.
 destruct (Hint (2 / ε))%L as (n2ε & Hn2ε).
+...
 exists (1 + Nat.log2_up n2ε).
 intros n Hn.
 cbn - [ rngl_power ].
