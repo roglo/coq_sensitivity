@@ -1914,27 +1914,38 @@ destruct (rngl_le_dec Hor 2 ε) as [H2e| H2e]. {
   now apply (rngl_lt_le_incl Hor) in Hte.
 }
 apply (rngl_nle_gt_iff Hor) in H2e.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in Hn2ε. 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+  now apply (rngl_0_le_2 Hon Hos Hor).
+}
 apply Nat.log2_up_le_pow2 in Hn. 2: {
   apply Nat.neq_0_lt_0.
   intros H1; subst n2ε.
   cbn in Hn2ε.
   rewrite rngl_add_0_r in Hn2ε.
-  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hn2ε. 2: {
-    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
-    now apply (rngl_0_le_2 Hon Hos Hor).
-  }
   destruct Hn2ε as (H1, H2).
   apply (rngl_lt_div_l Hon Hop Hiv Hor) in H2; [ | easy ].
   rewrite (rngl_mul_1_l Hon) in H2.
   apply (rngl_lt_le_incl Hor) in H2.
   now apply rngl_nlt_ge in H2.
 }
-...
-  apply (Nat.add_le_mono_r _ _ 1).
-  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-  eapply (rngl_le_lt_trans Hor); [ | apply Hn2ε ].
-...
-Search (rngl_of_nat _ < rngl_of_nat _)%L.
+assert (H2ee: (2 / ε < 2 ^ (n - 1) + 1)%L). {
+  eapply (rngl_lt_le_trans Hor); [ apply Hn2ε | ].
+  rewrite rngl_of_nat_add.
+  rewrite rngl_of_nat_1.
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite (rngl_add_sub Hos).
+  rewrite <- rngl_of_nat_2.
+  rewrite <- (rngl_of_nat_pow Hon Hos).
+  now apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+}
+apply (rngl_lt_div_l Hon Hop Hiv Hor) in H2ee; [ | easy ].
+eapply (rngl_mul_le_mono_pos_l Hop Hor Hii). 2: {
+  eapply (rngl_le_trans Hor). 2: {
+    apply (rngl_lt_le_incl Hor) in H2ee.
+    apply H2ee.
+  }
+(* ouais, chais pas, d'ailleurs ça sent pas très bon *)
 ...
 Search (Nat.log2_up).
 Search (Nat.log2_up _ ≤ Nat.log2_up _).
