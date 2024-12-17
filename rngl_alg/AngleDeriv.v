@@ -1681,7 +1681,13 @@ enough (H :
   remember (circ_trigo_param θ) as t eqn:Ht.
   remember (θ =? angle_straight)%A as ts eqn:Hts.
   symmetry in Hts.
-  destruct ts. {
+  destruct ts. 2: {
+    remember (θ₀ =? angle_straight)%A as tsz eqn:Htsz.
+    symmetry in Htsz.
+    destruct tsz. 2: {
+      remember (circ_trigo_param θ₀) as tz eqn:Htz.
+      rewrite (rngl_sub_opp_r Hop).
+...
     apply angle_eqb_eq in Hts.
     subst θ.
     remember (θ₀ =? angle_straight)%A as tsz eqn:Htsz.
