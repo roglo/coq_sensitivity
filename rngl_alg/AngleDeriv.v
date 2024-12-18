@@ -1660,6 +1660,10 @@ Theorem chain_rule :
   → is_derivative da dt (λ x, f (g x)) (λ x, (f' (g x) * g' x)%L).
 Proof.
 intros * Hdt Hda Hff Hgg.
+progress unfold is_derivative.
+intros a.
+progress unfold derivative_at.
+...
 intros x ε Hε.
 specialize (Hgg x ε Hε).
 cbn in Hgg.
@@ -1685,6 +1689,9 @@ move Hy before Hu.
 move Δu before y.
 move Δy before Δu.
 specialize (Hgg (x + Δx) Hx')%A.
+Print is_derivative.
+Print derivative_at.
+Print is_limit_when_tending_to_neighbourhood.
 ...
 
 Theorem param_cos_derivative :
