@@ -1651,6 +1651,21 @@ Definition seq_cos_param_when_lt_right θ :=
   λ i, (1 + 2 * ∑ (k = 1, i), (-1)^k * t² ^ k)%L.
 
 (* to be completed
+Theorem chain_rule :
+  ∀ A (f f' : T → T) (g g' : A → T) dt da,
+  is_dist dt
+  → is_dist da
+  → is_derivative dt dt f f'
+  → is_derivative da dt g g'
+  → is_derivative da dt (λ x, f (g x)) (λ x, (f' (g x) * g' x)%L).
+Proof.
+intros * Hdt Hda Hff Hgg.
+intros a ε Hε.
+specialize (Hgg a ε Hε).
+cbn in Hgg.
+destruct Hgg as (η & Hη & Hgg).
+...
+
 Theorem param_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist param_cos (λ θ, (- param_sin θ)%L).
 Proof.
@@ -1662,6 +1677,16 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
+(*8*)
+Print param_cos.
+specialize (chain_rule (angle T)) as H1.
+specialize (H1 (λ t, ((1 - t²) / (1 + t²))%L)).
+specialize (H1 (λ t, ((2 / (1 + t²)) * (- (2 * t) / (1 + t²)))%L)).
+specialize (H1 rngl_cos).
+specialize (H1 (λ x, (- rngl_sin x)%L)).
+specialize (H1 rngl_dist angle_eucl_dist).
+cbn in H1.
+...8
 intros θ ε Hε.
 enough (H :
   ∃ η : T, (0 < η)%L ∧
