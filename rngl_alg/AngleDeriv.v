@@ -1699,6 +1699,16 @@ enough (H :
   split; [ easy | ].
   intros dθ Hdt.
   progress unfold param_cos.
+  remember (θ + dθ =? angle_straight)%A as tds eqn:Htds.
+  symmetry in Htds.
+  destruct tds. 2: {
+    remember (θ =? angle_straight)%A as ts eqn:Hts.
+    symmetry in Hts.
+    destruct ts. 2: {
+      remember (circ_trigo_param (θ + dθ)) as td eqn:Htd.
+      remember (circ_trigo_param θ) as t eqn:Ht.
+      move t before td.
+      symmetry in Htd, Ht.
 Print circ_trigo_param.
 ...
   progress unfold param_cos.
