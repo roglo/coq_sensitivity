@@ -1652,7 +1652,7 @@ Definition seq_cos_param_when_lt_right θ :=
 
 (* to be completed
 Theorem chain_rule :
-  ∀ A (f f' : T → T) (g g' : A → T) dt da,
+  ∀ (f f' : T → T) (g g' : angle T → T) dt da,
   is_dist dt
   → is_dist da
   → is_derivative dt dt f f'
@@ -1660,10 +1660,31 @@ Theorem chain_rule :
   → is_derivative da dt (λ x, f (g x)) (λ x, (f' (g x) * g' x)%L).
 Proof.
 intros * Hdt Hda Hff Hgg.
-intros a ε Hε.
-specialize (Hgg a ε Hε).
+intros x ε Hε.
+specialize (Hgg x ε Hε).
 cbn in Hgg.
 destruct Hgg as (η & Hη & Hgg).
+remember (g x) as u eqn:Hu.
+remember (f u) as y eqn:Hy.
+exists η. (* temporaire *)
+split; [ easy | ].
+intros x' Hx'.
+remember (x' - x)%A as Δx eqn:Hdx.
+symmetry in Hdx.
+apply angle_sub_move_r in Hdx.
+rewrite angle_add_comm in Hdx.
+subst x'.
+remember (g (x + Δx)%A - u)%L as Δu eqn:Hdu.
+remember (f (u + Δu)%L - f u)%L as Δy eqn:Hdy.
+move Δx before x.
+move u before η.
+move y before u.
+move Δy before Δu.
+move Hε after Hη.
+move Hy before Hu.
+move Δu before y.
+move Δy before Δu.
+specialize (Hgg (x + Δx) Hx')%A.
 ...
 
 Theorem param_cos_derivative :
