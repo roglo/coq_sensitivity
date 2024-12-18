@@ -1662,19 +1662,31 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-intros θ₀ ε Hε.
+intros θ ε Hε.
 enough (H :
   ∃ η : T, (0 < η)%L ∧
-  ∀ x : angle T,
-  (0 < angle_eucl_dist x θ₀ < η)%L
-  → (rngl_dist
-       ((param_cos x - param_cos θ₀) / angle_eucl_dist x θ₀)
-       (- param_sin θ₀) < ε)%L). {
+  ∀ dθ,
+  (0 < angle_eucl_dist dθ 0 < η)%L
+  → (rngl_abs
+        ((param_cos (θ + dθ) - param_cos θ) / angle_eucl_dist dθ 0 +
+         param_sin θ) < ε)%L). {
   destruct H as (η & Hη & Hde).
   move η before ε.
   exists η.
   split; [ easy | ].
-  intros θ Hθ.
+  intros θ' Ht.
+  remember (θ' - θ)%A as dθ eqn:Hdt.
+  symmetry in Hdt.
+  apply angle_sub_move_r in Hdt.
+  subst θ'.
+  rewrite angle_eucl_dist_move_0_r in Ht |-*.
+  rewrite angle_add_sub in Ht |-*.
+  progress unfold rngl_dist.
+  rewrite angle_add_comm.
+  rewrite (rngl_sub_opp_r Hop).
+  now apply Hde.
+}
+...
   progress unfold param_cos.
   progress unfold param_sin.
   progress unfold rngl_dist.
