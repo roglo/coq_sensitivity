@@ -1686,6 +1686,20 @@ enough (H :
   rewrite (rngl_sub_opp_r Hop).
   now apply Hde.
 }
+enough (H :
+  ∃ η : T, (0 < η)%L ∧
+  ∀ dθ,
+  (0 < angle_eucl_dist dθ 0 < η)%L
+  → (rngl_abs
+        ((param_cos (θ + dθ) - param_cos θ) / angle_eucl_dist dθ 0 +
+         param_sin θ) < ε)%L). {
+  destruct H as (η & Hη & Hde).
+  move η before ε.
+  exists η.
+  split; [ easy | ].
+  intros dθ Hdt.
+  progress unfold param_cos.
+Print circ_trigo_param.
 ...
   progress unfold param_cos.
   progress unfold param_sin.
