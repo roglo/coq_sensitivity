@@ -1723,6 +1723,9 @@ progress unfold is_derivative in Hgg.
 progress unfold derivative_at in Hgg.
 progress unfold is_limit_when_tending_to_neighbourhood in Hgg.
 progress unfold rngl_dist in Hgg.
+Definition differentiable f a :=
+  ∃ f'a, ∃ ε, ∀ h, (f (a + h) - f a = f'a * h + ε h * h)%L.
+Print differentiable.
 ...
 progress unfold is_derivative in Hgg, Hff |-*.
 progress unfold derivative_at in Hgg, Hff |-*.
