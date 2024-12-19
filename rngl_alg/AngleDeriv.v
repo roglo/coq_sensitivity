@@ -1710,7 +1710,37 @@ Definition seq_cos_param_when_lt_right θ :=
 
 (* to be completed
 Theorem chain_rule :
-  ∀ (f f' : T → T) (g g' : angle T → T) dt da,
+  ∀ A (f f' : T → T) (g g' : A → T) da,
+  is_dist da
+  → is_derivative rngl_dist rngl_dist f f'
+  → is_derivative da rngl_dist g g'
+  → is_derivative da rngl_dist (λ x, f (g x)) (λ x, (f' (g x) * g' x)%L).
+Proof.
+intros * Hda Hff Hgg.
+(* "second" proof in wikipedia "chain rule" *)
+(* g(a+h) - g(a) = g'(a)*h + ε(h)*h *)
+progress unfold is_derivative in Hgg.
+progress unfold derivative_at in Hgg.
+progress unfold is_limit_when_tending_to_neighbourhood in Hgg.
+progress unfold rngl_dist in Hgg.
+...
+progress unfold is_derivative in Hgg, Hff |-*.
+progress unfold derivative_at in Hgg, Hff |-*.
+progress unfold is_limit_when_tending_to_neighbourhood in Hgg, Hff |-*.
+progress unfold rngl_dist in Hff, Hgg |-*.
+intros a ε Hε.
+specialize (Hgg a ε Hε).
+destruct Hgg as (η & Hη & Hgg).
+exists η.
+split; [ easy | ].
+intros b Hb.
+specialize (Hff (g a) ε Hε).
+destruct Hff as (η' & Hη' & Hff).
+specialize (Hff (g b)) as H1.
+...
+
+Theorem chain_rule :
+  ∀ A (f f' : T → T) (g g' : A → T) dt da,
   is_dist dt
   → is_dist da
   → is_derivative dt dt f f'
@@ -1745,7 +1775,6 @@ move Δy before Δu.
 specialize (Hgg (x + Δx) Hx')%A.
 subst u y.
 Check rngl_acos_cos.
-Check rngl_cos_of_chord.
 ...
 
 Theorem param_cos_derivative :
