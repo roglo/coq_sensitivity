@@ -1344,6 +1344,25 @@ apply (rngl_mul_move_r Hi1) in Htr. 2: {
 now apply (rngl_sub_move_l Hop) in Htr.
 Qed.
 
+Theorem rngl_acos_cos :
+  ∀ θ,
+  (0 ≤ rngl_sin θ)%L
+  → rngl_acos (rngl_cos θ) = θ.
+Proof.
+destruct_ac.
+intros * Hzs.
+apply eq_angle_eq.
+rewrite rngl_cos_acos; [ | apply rngl_cos_bound ].
+rewrite rngl_sin_acos; [ | apply rngl_cos_bound ].
+f_equal.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+rewrite <- (rl_sqrt_squ Hon Hop Hor (rngl_sin _)).
+f_equal.
+apply (rngl_sub_move_r Hop).
+symmetry; rewrite rngl_add_comm.
+apply cos2_sin2_1.
+Qed.
+
 (* parametric sin and cos *)
 
 (* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
@@ -1717,7 +1736,8 @@ move Δu before y.
 move Δy before Δu.
 specialize (Hgg (x + Δx) Hx')%A.
 subst u y.
-Check rngl_acos.
+Check rngl_acos_cos.
+Check rngl_cos_of_arc.
 ...
 
 Theorem param_cos_derivative :
