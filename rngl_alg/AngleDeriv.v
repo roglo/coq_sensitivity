@@ -1313,6 +1313,37 @@ apply (rngl_eq_mul_0_l Hos Hii) in Hab; [ easy | ].
 now apply (rngl_inv_neq_0 Hon Hos Hiv).
 Qed.
 
+Theorem rngl_cos_of_arc :
+  ∀ θ, rngl_cos θ = (1 - (angle_eucl_dist θ 0)² / 2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ - _))%L.
+  apply H1.
+}
+intros.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite angle_sub_0_l.
+rewrite rngl_cos_opp.
+remember √_ as r eqn:Htr.
+symmetry in Htr.
+apply (f_equal rngl_squ) in Htr.
+rewrite (rngl_squ_sqrt Hon) in Htr. 2: {
+  apply (rngl_mul_nonneg_nonneg Hos Hor).
+  now apply (rngl_0_le_2 Hon Hos Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_mul_comm Hic) in Htr.
+apply (rngl_mul_move_r Hi1) in Htr. 2: {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+now apply (rngl_sub_move_l Hop) in Htr.
+Qed.
+
 (* parametric sin and cos *)
 
 (* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
@@ -1660,10 +1691,6 @@ Theorem chain_rule :
   → is_derivative da dt (λ x, f (g x)) (λ x, (f' (g x) * g' x)%L).
 Proof.
 intros * Hdt Hda Hff Hgg.
-progress unfold is_derivative.
-intros a.
-progress unfold derivative_at.
-...
 intros x ε Hε.
 specialize (Hgg x ε Hε).
 cbn in Hgg.
@@ -1689,9 +1716,8 @@ move Hy before Hu.
 move Δu before y.
 move Δy before Δu.
 specialize (Hgg (x + Δx) Hx')%A.
-Print is_derivative.
-Print derivative_at.
-Print is_limit_when_tending_to_neighbourhood.
+subst u y.
+Check rngl_acos.
 ...
 
 Theorem param_cos_derivative :
