@@ -1313,7 +1313,7 @@ apply (rngl_eq_mul_0_l Hos Hii) in Hab; [ easy | ].
 now apply (rngl_inv_neq_0 Hon Hos Hiv).
 Qed.
 
-Theorem rngl_cos_of_arc :
+Theorem rngl_cos_of_chord :
   ∀ θ, rngl_cos θ = (1 - (angle_eucl_dist θ 0)² / 2)%L.
 Proof.
 destruct_ac.
@@ -1700,7 +1700,7 @@ Definition seq_cos_param_when_lt_right θ :=
   let t := circ_trigo_param θ in
   λ i, (1 + 2 * ∑ (k = 1, i), (-1)^k * t² ^ k)%L.
 
-(* to be completed
+(* to be completed... see further
 Theorem chain_rule :
   ∀ (f f' : T → T) (g g' : angle T → T) dt da,
   is_dist dt
@@ -1737,7 +1737,7 @@ move Δy before Δu.
 specialize (Hgg (x + Δx) Hx')%A.
 subst u y.
 Check rngl_acos_cos.
-Check rngl_cos_of_arc.
+Check rngl_cos_of_chord.
 ...
 
 Theorem param_cos_derivative :
@@ -2482,6 +2482,27 @@ apply
 ...3
 *)
 intros θ₀ ε Hε.
+(*4*)
+enough (H :
+  ∃ η, (0 < η)%L ∧
+  ∀ θ,
+  (0 < angle_eucl_dist θ θ₀ < η)%L
+  → (rngl_dist
+        ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀)
+        (- rngl_sin θ₀) < ε)%L). {
+  destruct H as (η & Hη & Hd).
+  exists η.
+  move η before ε.
+  split; [ easy | ].
+  intros θ Hθ.
+  do 2 rewrite rngl_cos_of_chord.
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite (rngl_sub_sub_swap Hop).
+  rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_sub_0_l Hop).
+  rewrite (rngl_add_opp_l Hop).
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+...4
 enough (H :
   if (θ₀ <? angle_straight)%A then
     ∃ η : T, (0 < η)%L ∧
