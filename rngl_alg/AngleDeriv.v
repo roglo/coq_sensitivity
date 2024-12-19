@@ -2471,7 +2471,13 @@ enough (H :
   rewrite (rngl_sub_0_l Hop).
   rewrite (rngl_add_opp_l Hop).
   rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  progress unfold rngl_dist.
+  rewrite (rngl_div_div_swap Hic Hiv).
+  rewrite (rngl_sub_opp_r Hop).
+Check angle_eucl_dist_is_2_mul_sin_sub_div_2.
+Search (rngl_sin _ = _).
 Search (angle_eucl_dist _ _ + _)%L.
+(* bof, j'y arrive pas, chuis nul *)
 ...4
 enough (H :
   if (θ₀ <? angle_straight)%A then
