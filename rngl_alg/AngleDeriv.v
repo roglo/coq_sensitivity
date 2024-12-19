@@ -1708,7 +1708,7 @@ Definition seq_cos_param_when_lt_right θ :=
   let t := circ_trigo_param θ in
   λ i, (1 + 2 * ∑ (k = 1, i), (-1)^k * t² ^ k)%L.
 
-(* to be completed... see further
+(* to be completed
 Theorem chain_rule :
   ∀ (f f' : T → T) (g g' : angle T → T) dt da,
   is_dist dt
@@ -2514,6 +2514,7 @@ enough (H :
   rewrite (rngl_div_div_swap Hic Hiv).
   rewrite (rngl_sub_opp_r Hop).
 Check rngl_sin_angle_eucl_dist'.
+rewrite rngl_sin_angle_eucl_dist'.
 ...
 Check angle_eucl_dist_is_2_mul_sin_sub_div_2.
 Search (rngl_sin _ = _).
