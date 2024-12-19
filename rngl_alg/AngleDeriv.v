@@ -1332,6 +1332,45 @@ symmetry; rewrite rngl_add_comm.
 apply cos2_sin2_1.
 Qed.
 
+Theorem rngl_sin_angle_eucl_dist' :
+  ∀ θ,
+  (θ ≤ angle_straight)%A
+  → rngl_sin θ = (angle_eucl_dist (2 * θ) 0 / 2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ / _))%L.
+  apply H1.
+}
+intros * Hts.
+destruct (angle_eq_dec θ angle_straight) as [Hts'| Hts']. {
+  subst θ.
+  rewrite angle_mul_2_l.
+  rewrite angle_straight_add_straight.
+  rewrite angle_eucl_dist_diag.
+  symmetry.
+  apply (rngl_div_0_l Hos Hi1).
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+rewrite angle_sub_0_r.
+rewrite <- angle_mul_nat_div_2. 2: {
+  cbn.
+  rewrite angle_add_0_r.
+  rewrite Bool.orb_false_r.
+  apply angle_add_not_overflow_lt_straight_le_straight; [ | easy ].
+  now apply angle_lt_iff.
+}
+rewrite angle_div_2_mul_2.
+rewrite (rngl_mul_comm Hic).
+symmetry.
+apply (rngl_mul_div Hi1).
+apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+Qed.
+
 (* parametric sin and cos *)
 
 (* cos θ = (1-t²)/(1+t²), sin θ = 2t/(1+t²) *)
@@ -2474,6 +2513,8 @@ enough (H :
   progress unfold rngl_dist.
   rewrite (rngl_div_div_swap Hic Hiv).
   rewrite (rngl_sub_opp_r Hop).
+Check rngl_sin_angle_eucl_dist'.
+...
 Check angle_eucl_dist_is_2_mul_sin_sub_div_2.
 Search (rngl_sin _ = _).
 Search (angle_eucl_dist _ _ + _)%L.
