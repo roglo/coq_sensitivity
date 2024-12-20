@@ -1709,77 +1709,6 @@ Definition seq_cos_param_when_lt_right θ :=
   λ i, (1 + 2 * ∑ (k = 1, i), (-1)^k * t² ^ k)%L.
 
 (* to be completed
-Theorem chain_rule :
-  ∀ A (f f' : T → T) (g g' : A → T) da,
-  is_dist da
-  → is_derivative rngl_dist rngl_dist f f'
-  → is_derivative da rngl_dist g g'
-  → is_derivative da rngl_dist (λ x, f (g x)) (λ x, (f' (g x) * g' x)%L).
-Proof.
-intros * Hda Hff Hgg.
-(* "second" proof in wikipedia "chain rule" *)
-(* g(a+h) - g(a) = g'(a)*h + ε(h)*h *)
-progress unfold is_derivative in Hgg.
-progress unfold derivative_at in Hgg.
-progress unfold is_limit_when_tending_to_neighbourhood in Hgg.
-progress unfold rngl_dist in Hgg.
-Definition differentiable f a :=
-  ∃ f'a, ∃ ε, ∀ h, (f (a + h) - f a = f'a * h + ε h * h)%L.
-Print differentiable.
-...
-progress unfold is_derivative in Hgg, Hff |-*.
-progress unfold derivative_at in Hgg, Hff |-*.
-progress unfold is_limit_when_tending_to_neighbourhood in Hgg, Hff |-*.
-progress unfold rngl_dist in Hff, Hgg |-*.
-intros a ε Hε.
-specialize (Hgg a ε Hε).
-destruct Hgg as (η & Hη & Hgg).
-exists η.
-split; [ easy | ].
-intros b Hb.
-specialize (Hff (g a) ε Hε).
-destruct Hff as (η' & Hη' & Hff).
-specialize (Hff (g b)) as H1.
-...
-
-Theorem chain_rule :
-  ∀ A (f f' : T → T) (g g' : A → T) dt da,
-  is_dist dt
-  → is_dist da
-  → is_derivative dt dt f f'
-  → is_derivative da dt g g'
-  → is_derivative da dt (λ x, f (g x)) (λ x, (f' (g x) * g' x)%L).
-Proof.
-intros * Hdt Hda Hff Hgg.
-intros x ε Hε.
-specialize (Hgg x ε Hε).
-cbn in Hgg.
-destruct Hgg as (η & Hη & Hgg).
-remember (g x) as u eqn:Hu.
-remember (f u) as y eqn:Hy.
-exists η. (* temporaire *)
-split; [ easy | ].
-intros x' Hx'.
-remember (x' - x)%A as Δx eqn:Hdx.
-symmetry in Hdx.
-apply angle_sub_move_r in Hdx.
-rewrite angle_add_comm in Hdx.
-subst x'.
-remember (g (x + Δx)%A - u)%L as Δu eqn:Hdu.
-remember (f (u + Δu)%L - f u)%L as Δy eqn:Hdy.
-move Δx before x.
-move u before η.
-move y before u.
-move Δy before Δu.
-move Hε after Hη.
-move Hy before Hu.
-move Δu before y.
-move Δy before Δu.
-specialize (Hgg (x + Δx) Hx')%A.
-subst u y.
-Check rngl_acos_cos.
-...
-
 Theorem param_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist param_cos (λ θ, (- param_sin θ)%L).
 Proof.
@@ -1791,16 +1720,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-(*8*)
-Print param_cos.
-specialize (chain_rule (angle T)) as H1.
-specialize (H1 (λ t, ((1 - t²) / (1 + t²))%L)).
-specialize (H1 (λ t, ((2 / (1 + t²)) * (- (2 * t) / (1 + t²)))%L)).
-specialize (H1 rngl_cos).
-specialize (H1 (λ x, (- rngl_sin x)%L)).
-specialize (H1 rngl_dist angle_eucl_dist).
-cbn in H1.
-...8
 intros θ ε Hε.
 enough (H :
   ∃ η : T, (0 < η)%L ∧
