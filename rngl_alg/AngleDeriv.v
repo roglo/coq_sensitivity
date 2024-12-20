@@ -1768,6 +1768,9 @@ enough (H :
       move t before td.
       symmetry in Htd, Ht.
 Print circ_trigo_param.
+progress unfold param_sin.
+rewrite Hts.
+rewrite Ht.
 ...
   progress unfold param_cos.
   progress unfold param_sin.
