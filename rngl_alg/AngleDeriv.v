@@ -1798,7 +1798,19 @@ specialize (Hle h Hzη).
 now do 2 rewrite (rngl_add_comm _ x²) in Hle.
 Qed.
 
+Fixpoint is_nth_partial_deriv_on_x n f f' :=
+  match n with
+  | 0 => f = f'
+  | S n' =>
+      ∃ f₁,
+      is_partial_deriv_on_x f f₁ ∧
+      is_nth_partial_deriv_on_x n' f₁ f'
+  end.
+
 (* to be completed
+Theorem U_implicit_function_partial_C_infinite :
+  ∀ n, ∃ f,
+  is_nth_partial_deriv_on_x n U_implicit_function f.
 ...
 *)
 
