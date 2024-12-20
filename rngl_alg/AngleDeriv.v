@@ -1763,6 +1763,7 @@ rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
 now apply (rngl_lt_le_incl Hor) in Hzh.
 Qed.
 
+(*
 Theorem U_implicit_function_partial_deriv_on_x :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1797,46 +1798,79 @@ intros h Hzη.
 specialize (Hle h Hzη).
 now do 2 rewrite (rngl_add_comm _ x²) in Hle.
 Qed.
+*)
 
-Fixpoint is_nth_partial_deriv_on_x n f f' :=
+Fixpoint has_nth_partial_deriv_on_x n f :=
   match n with
-  | 0 => f = f'
+  | 0 => True
   | S n' =>
       ∃ f₁,
       is_partial_deriv_on_x f f₁ ∧
-      is_nth_partial_deriv_on_x n' f₁ f'
+      has_nth_partial_deriv_on_x n' f₁
   end.
 
-(* to be completed
 Theorem U_implicit_function_partial_C_infinite :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv_and_1_or_quot T = true →
   rngl_is_ordered T = true →
-  ∀ n, ∃ f, is_nth_partial_deriv_on_x n U_implicit_function f.
+  ∀ n, has_nth_partial_deriv_on_x n U_implicit_function.
 Proof.
 intros Hic Hon Hop Hi1 Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
-induction n; [ now exists U_implicit_function | ].
-destruct n. {
-  exists (λ x y, (2 * x)%L).
-  cbn.
-...
+destruct n; [ easy | cbn ].
+exists (λ x y, (2 * x)%L).
+split. {
+  intros x y ε Hε.
   progress unfold U_implicit_function.
   now apply (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor).
 }
-cbn in IHn |-*.
-destruct n. {
-  cbn.
-  exists (λ x y, (2 * x)%L).
-  split. {
-    intros x y ε Hε.
-    progress unfold U_implicit_function.
-    now apply (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor).
+destruct n; [ easy | cbn ].
+exists (λ x y, 2%L).
+split. {
+  intros x y ε Hε.
+  exists ε.
+  split; [ easy | ].
+  intros h (Hhz, Hhe).
+  rewrite <- (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_add_comm x), (rngl_add_sub Hos).
+  rewrite (rngl_mul_div Hi1). 2: {
+    intros H; subst h.
+    now apply (rngl_lt_irrefl Hor) in Hhz.
   }
-...
-*)
+  rewrite (rngl_sub_diag Hos).
+  now rewrite (rngl_abs_0 Hop).
+}
+destruct n; [ easy | cbn ].
+exists (λ _ _, 0%L).
+split. {
+  intros x y ε Hε.
+  exists ε.
+  split; [ easy | ].
+  intros h (Hhz, Hhe).
+  rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+  rewrite (rngl_div_0_l Hos Hi1). 2: {
+    intros H; subst h.
+    now apply (rngl_lt_irrefl Hor) in Hhz.
+  }
+  now rewrite (rngl_abs_0 Hop).
+}
+induction n; [ easy | cbn ].
+exists (λ _ _, 0%L).
+split; [ | easy ].
+intros x y ε Hε.
+exists ε.
+split; [ easy | ].
+intros h (Hhz, Hhe).
+rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+rewrite (rngl_div_0_l Hos Hi1). 2: {
+  intros H; subst h.
+  now apply (rngl_lt_irrefl Hor) in Hhz.
+}
+now rewrite (rngl_abs_0 Hop).
+Qed.
 
 (* to be completed
 Theorem param_cos_derivative :
