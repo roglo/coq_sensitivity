@@ -1777,7 +1777,6 @@ progress unfold U_implicit_function.
 now apply (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor).
 Qed.
 
-(* to be completed
 Theorem U_implicit_function_partial_deriv_on_y :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1791,6 +1790,15 @@ intros x y ε Hε.
 progress unfold U_implicit_function.
 specialize (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor) as H1.
 specialize (H1 y x ε Hε).
+destruct H1 as (η & Hη & Hle).
+exists η.
+split; [ easy | ].
+intros h Hzη.
+specialize (Hle h Hzη).
+now do 2 rewrite (rngl_add_comm _ x²) in Hle.
+Qed.
+
+(* to be completed
 ...
 *)
 
