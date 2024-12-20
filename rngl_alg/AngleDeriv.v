@@ -1798,13 +1798,13 @@ specialize (Hle h Hzη).
 now do 2 rewrite (rngl_add_comm _ x²) in Hle.
 Qed.
 
-Fixpoint has_nth_partial_deriv_on_x n f :=
+Fixpoint is_nth_partial_deriv_on_x n f f' :=
   match n with
-  | 0 => True
+  | 0 => f = f'
   | S n' =>
       ∃ f₁,
       is_partial_deriv_on_x f f₁ ∧
-      has_nth_partial_deriv_on_x n' f₁
+      is_nth_partial_deriv_on_x n' f₁ f'
   end.
 
 (* to be completed
@@ -1814,15 +1814,15 @@ Theorem U_implicit_function_partial_C_infinite :
   rngl_has_opp T = true →
   rngl_has_inv_and_1_or_quot T = true →
   rngl_is_ordered T = true →
-  ∀ n, has_nth_partial_deriv_on_x n U_implicit_function.
+  ∀ n, ∃ f, is_nth_partial_deriv_on_x n U_implicit_function f.
 Proof.
 intros Hic Hon Hop Hi1 Hor.
 intros.
-induction n; [ easy | cbn ].
+induction n; [ now exists U_implicit_function | ].
 destruct n. {
   exists (λ x y, (2 * x)%L).
-  split; [ | easy ].
-  intros x y ε Hε.
+  cbn.
+...
   progress unfold U_implicit_function.
   now apply (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor).
 }
