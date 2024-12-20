@@ -1767,10 +1767,13 @@ enough (H :
       remember (circ_trigo_param θ) as t eqn:Ht.
       move t before td.
       symmetry in Htd, Ht.
-Print circ_trigo_param.
-progress unfold param_sin.
-rewrite Hts.
-rewrite Ht.
+      progress unfold param_sin.
+      rewrite Hts.
+      rewrite Ht.
+      progress unfold circ_trigo_param in Htd, Ht.
+      remember (θ + dθ =? 0)%A as tdz eqn:Htdz.
+      symmetry in Htdz.
+      destruct tdz. 2: {
 ...
   progress unfold param_cos.
   progress unfold param_sin.
