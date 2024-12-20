@@ -1708,6 +1708,92 @@ Definition seq_cos_param_when_lt_right θ :=
   let t := circ_trigo_param θ in
   λ i, (1 + 2 * ∑ (k = 1, i), (-1)^k * t² ^ k)%L.
 
+(* proof that the implicit function x²+y²-1 is of class C∞ *)
+
+Definition U_implicit_function x y := (x² + y² - 1)%L.
+
+Definition is_partial_deriv_on_x (f f' : T → T → T) :=
+  ∀ x y,
+  ∀ ε, (0 < ε)%L → ∃ η, (0 < η)%L ∧
+  ∀ h, (0 < h < η)%L → (rngl_abs ((f (x + h) y - f x y) / h - f' x y) < ε)%L.
+
+Definition is_partial_deriv_on_y (f f' : T → T → T) :=
+  ∀ x y,
+  ∀ ε, (0 < ε)%L → ∃ η, (0 < η)%L ∧
+  ∀ h, (0 < h < η)%L → (rngl_abs ((f x (y + h) - f x y) / h - f' x y) < ε)%L.
+
+Theorem U_implicit_function_partial_deriv :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv_and_1_or_quot T = true →
+  rngl_is_ordered T = true →
+  ∀ x y ε, (0 < ε)%L → ∃ η : T, (0 < η)%L ∧
+  ∀ h : T,
+  (0 < h < η)%L
+  → (rngl_abs (((x + h)² + y² - 1 - (x² + y² - 1)) / h - 2 * x) < ε)%L.
+Proof.
+intros Hic Hon Hop Hi1 Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hε.
+exists ε.
+split; [ easy | ].
+intros h Hh.
+rewrite (rngl_sub_sub_distr Hop).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite (rngl_sub_add Hop).
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite (rngl_add_sub Hos).
+rewrite (rngl_squ_add Hic Hon).
+do 2 rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+progress unfold rngl_squ.
+rewrite <- rngl_mul_add_distr_r.
+destruct Hh as (Hzh, Hhη).
+rewrite (rngl_mul_div Hi1). 2: {
+  intros H; subst h.
+  now apply (rngl_lt_irrefl Hor) in Hzh.
+}
+rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
+now apply (rngl_lt_le_incl Hor) in Hzh.
+Qed.
+
+Theorem U_implicit_function_partial_deriv_on_x :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv_and_1_or_quot T = true →
+  rngl_is_ordered T = true →
+  is_partial_deriv_on_x U_implicit_function (λ x y, (2 * x)%L).
+Proof.
+intros Hic Hon Hop Hi1 Hor.
+intros x y ε Hε.
+progress unfold U_implicit_function.
+now apply (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor).
+Qed.
+
+(* to be completed
+Theorem U_implicit_function_partial_deriv_on_y :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv_and_1_or_quot T = true →
+  rngl_is_ordered T = true →
+  is_partial_deriv_on_y U_implicit_function (λ x y, (2 * y)%L).
+Proof.
+intros Hic Hon Hop Hi1 Hor.
+intros x y ε Hε.
+progress unfold U_implicit_function.
+specialize (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor) as H1.
+specialize (H1 y x ε Hε).
+...
+*)
+
 (* to be completed
 Theorem param_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist param_cos (λ θ, (- param_sin θ)%L).
