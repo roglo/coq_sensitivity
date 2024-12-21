@@ -2751,6 +2751,64 @@ enough (H :
   move η before ε.
   split; [ easy | ].
   intros dθ Hdθ.
+  progress unfold rngl_dist.
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite rngl_cos_sub_cos.
+  remember (angle_add_overflow (θ₀ + dθ) θ₀) as ovt eqn:Hovt.
+  remember (θ₀ + dθ <? θ₀)%A as tt eqn:Htt.
+  symmetry in Hovt, Htt.
+  destruct ovt. 2: {
+    destruct tt. 2: {
+      do 2 rewrite angle_add_0_r.
+      rewrite (angle_add_comm θ₀).
+      rewrite angle_add_sub.
+      rewrite <- angle_add_assoc.
+      rewrite <- angle_mul_2_l.
+      rewrite angle_div_2_add_not_overflow. 2: {
+        rewrite angle_mul_2_l.
+        rewrite angle_add_comm in Hovt.
+        rewrite angle_add_not_overflow_move_add; [ easy | | easy ].
+        rewrite angle_add_overflow_comm.
+        now rewrite <- angle_add_overflow_equiv2.
+      }
+      rewrite <- angle_mul_nat_div_2. 2: {
+        cbn.
+        rewrite Bool.orb_false_r.
+        rewrite angle_add_0_r.
+        rewrite <- angle_add_overflow_equiv2 in Hovt.
+        rewrite <- angle_add_overflow_equiv2.
+        progress unfold angle_add_overflow2 in Hovt.
+        progress unfold angle_add_overflow2.
+        apply Bool.not_true_iff_false in Htt.
+        apply Bool.not_true_iff_false.
+        intros H; apply Htt; clear Htt.
+...
+Search (_ * _ /₂)%A.
+Search (angle_add_overflow _ _ = false → angle_add_overflow _ _ = false).
+Search ((_ + _) /₂)%A.
+Search ((_ + 2 * _)/₂)%A.
+Search ((_ + _ * _)/₂)%A.
+Search ((2 * _ + _)/₂)%A.
+Search ((_ * _ + _)/₂)%A.
+...
+rngl_cos_angle_eucl_dist:
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} 
+    {ac : angle_ctx T} (θ : angle T), rngl_cos θ = (1 - (angle_eucl_dist θ 0)² / 2)%L
+rngl_sin_angle_eucl_dist':
+  ∀ θ : angle T, (θ ≤ angle_straight)%A → rngl_sin θ = (angle_eucl_dist (2 * θ) 0 / 2)%L
+...
+enough (H :
+  ∃ η : T, (0 < η)%L ∧
+  ∀ dθ : angle T,
+  (0 < angle_eucl_dist dθ 0 < η)%L
+  → (rngl_dist
+       ((rngl_cos (θ₀ + dθ) - rngl_cos θ₀) / angle_eucl_dist dθ 0)
+       (- rngl_sin θ₀) < ε)%L). {
+  destruct H as (η & Hη & Hd).
+  exists η.
+  move η before ε.
+  split; [ easy | ].
+  intros dθ Hdθ.
   do 2 rewrite rngl_cos_angle_eucl_dist.
   rewrite (rngl_sub_sub_distr Hop).
   rewrite (rngl_sub_sub_swap Hop).
@@ -2780,6 +2838,14 @@ enough (H :
     rewrite (angle_eucl_dist_move_0_r (_ + _) θ₀).
     rewrite angle_add_sub.
     rewrite <- (rngl_mul_2_r Hon).
+Search (rngl_cos _ - rngl_cos _ = _)%L.
+Check rngl_cos_sub_cos.
+...
+rngl_cos_angle_eucl_dist:
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} 
+    {ac : angle_ctx T} (θ : angle T), rngl_cos θ = (1 - (angle_eucl_dist θ 0)² / 2)%L
+rngl_sin_angle_eucl_dist':
+  ∀ θ : angle T, (θ ≤ angle_straight)%A → rngl_sin θ = (angle_eucl_dist (2 * θ) 0 / 2)%L
 ...
 enough (H :
   ∃ η, (0 < η)%L ∧
