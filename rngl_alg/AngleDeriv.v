@@ -2696,6 +2696,12 @@ destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros θ₀ ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 (*3
 apply
   (rngl_eq_is_derivative_is_derivative
@@ -2738,8 +2744,21 @@ enough (H :
     rewrite rngl_sin_angle_eucl_dist'; [ | easy ].
     rewrite <- (rngl_div_add_distr_r Hiv).
     rewrite angle_mul_2_l.
-Search (angle_eucl_dist (_ + _)).
-Search (angle_eucl_dist (_ - _)).
+    rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
+      apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+    }
+    rewrite (rngl_abs_2 Hon Hos Hor).
+    apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    rewrite (rngl_abs_nonneg_eq Hop Hor).
+    eapply (rngl_le_lt_trans Hor). {
+      apply (rngl_add_le_mono_l Hop Hor).
+      apply (angle_eucl_dist_triangular _ θ₀).
+    }
+    rewrite (angle_eucl_dist_move_0_r (_ + _)).
+    rewrite angle_add_sub.
+    rewrite <- (rngl_mul_2_r Hon).
 ...
 Check angle_eucl_dist_is_2_mul_sin_sub_div_2.
 Search (rngl_sin _ = _).
