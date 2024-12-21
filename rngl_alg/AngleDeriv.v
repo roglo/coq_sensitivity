@@ -1876,10 +1876,6 @@ split. {
     progress unfold U_implicit_function.
     now apply (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor).
   }
-(*
-  ============================
-  has_nth_partial_deriv n (λ x _ : T, (2 * x)%L)
-*)
   destruct n; [ easy | cbn ].
   split. {
     exists (λ x y, 2%L).
@@ -1928,10 +1924,6 @@ split. {
     do 2 rewrite (rngl_add_comm x²).
     now apply Hle.
   }
-(*
-  ============================
-  has_nth_partial_deriv n (λ _ y : T, (2 * y)%L)
-*)
   destruct n; [ easy | cbn ].
   split. {
     exists (λ x y, 0%L).
