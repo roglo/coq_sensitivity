@@ -1963,6 +1963,15 @@ split. {
 }
 Qed.
 
+Theorem angle_le_dec :
+  ∀ θ1 θ2 : angle T, {(θ1 ≤ θ2)%A} + {¬ (θ1 ≤ θ2)%A}.
+Proof.
+intros.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+destruct t12; [ now left | now right ].
+Qed.
+
 (* to be completed
 Theorem param_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist param_cos (λ θ, (- param_sin θ)%L).
@@ -2725,8 +2734,12 @@ enough (H :
   progress unfold rngl_dist.
   rewrite (rngl_div_div_swap Hic Hiv).
   rewrite (rngl_sub_opp_r Hop).
-Check rngl_sin_angle_eucl_dist'.
-rewrite rngl_sin_angle_eucl_dist'.
+  destruct (angle_le_dec θ₀ angle_straight) as [Hts| Hts]. {
+    rewrite rngl_sin_angle_eucl_dist'; [ | easy ].
+    rewrite <- (rngl_div_add_distr_r Hiv).
+    rewrite angle_mul_2_l.
+Search (angle_eucl_dist (_ + _)).
+Search (angle_eucl_dist (_ - _)).
 ...
 Check angle_eucl_dist_is_2_mul_sin_sub_div_2.
 Search (rngl_sin _ = _).
