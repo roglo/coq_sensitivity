@@ -1763,50 +1763,16 @@ rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
 now apply (rngl_lt_le_incl Hor) in Hzh.
 Qed.
 
-(*
-Theorem U_implicit_function_partial_deriv_on_x :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv_and_1_or_quot T = true →
-  rngl_is_ordered T = true →
-  is_partial_deriv_on_x U_implicit_function (λ x y, (2 * x)%L).
-Proof.
-intros Hic Hon Hop Hi1 Hor.
-intros x y ε Hε.
-progress unfold U_implicit_function.
-now apply (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor).
-Qed.
-
-Theorem U_implicit_function_partial_deriv_on_y :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv_and_1_or_quot T = true →
-  rngl_is_ordered T = true →
-  is_partial_deriv_on_y U_implicit_function (λ x y, (2 * y)%L).
-Proof.
-intros Hic Hon Hop Hi1 Hor.
-intros x y ε Hε.
-progress unfold U_implicit_function.
-specialize (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor) as H1.
-specialize (H1 y x ε Hε).
-destruct H1 as (η & Hη & Hle).
-exists η.
-split; [ easy | ].
-intros h Hzη.
-specialize (Hle h Hzη).
-now do 2 rewrite (rngl_add_comm _ x²) in Hle.
-Qed.
-*)
-
-Fixpoint has_nth_partial_deriv_on_x n f :=
+Fixpoint has_nth_partial_deriv n f :=
   match n with
   | 0 => True
   | S n' =>
-      ∃ f₁,
-      is_partial_deriv_on_x f f₁ ∧
-      has_nth_partial_deriv_on_x n' f₁
+      (∃ f₁,
+       is_partial_deriv_on_x f f₁ ∧
+       has_nth_partial_deriv n' f₁) ∧
+      (∃ f₂,
+       is_partial_deriv_on_y f f₂ ∧
+       has_nth_partial_deriv n' f₂)
   end.
 
 Theorem U_implicit_function_partial_C_infinite :
@@ -1815,61 +1781,444 @@ Theorem U_implicit_function_partial_C_infinite :
   rngl_has_opp T = true →
   rngl_has_inv_and_1_or_quot T = true →
   rngl_is_ordered T = true →
-  ∀ n, has_nth_partial_deriv_on_x n U_implicit_function.
+  ∀ n, has_nth_partial_deriv n U_implicit_function.
 Proof.
 intros Hic Hon Hop Hi1 Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
 destruct n; [ easy | cbn ].
-exists (λ x y, (2 * x)%L).
 split. {
-  intros x y ε Hε.
-  progress unfold U_implicit_function.
-  now apply (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor).
-}
-destruct n; [ easy | cbn ].
-exists (λ x y, 2%L).
-split. {
-  intros x y ε Hε.
-  exists ε.
-  split; [ easy | ].
-  intros h (Hhz, Hhe).
-  rewrite <- (rngl_mul_sub_distr_l Hop).
-  rewrite (rngl_add_comm x), (rngl_add_sub Hos).
-  rewrite (rngl_mul_div Hi1). 2: {
-    intros H; subst h.
-    now apply (rngl_lt_irrefl Hor) in Hhz.
+  exists (λ x y, (2 * x)%L).
+  split. {
+    intros x y ε Hε.
+    progress unfold U_implicit_function.
+    now apply (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor).
   }
-  rewrite (rngl_sub_diag Hos).
-  now rewrite (rngl_abs_0 Hop).
-}
-destruct n; [ easy | cbn ].
-exists (λ _ _, 0%L).
-split. {
-  intros x y ε Hε.
-  exists ε.
-  split; [ easy | ].
-  intros h (Hhz, Hhe).
-  rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
-  rewrite (rngl_div_0_l Hos Hi1). 2: {
-    intros H; subst h.
-    now apply (rngl_lt_irrefl Hor) in Hhz.
+  destruct n; [ easy | cbn ].
+  split. {
+    exists (λ x y, 2%L).
+    split. {
+      intros x y ε Hε.
+      exists ε.
+      split; [ easy | ].
+      intros h (Hhz, Hhe).
+      rewrite <- (rngl_mul_sub_distr_l Hop).
+      rewrite (rngl_add_comm x), (rngl_add_sub Hos).
+      rewrite (rngl_mul_div Hi1). 2: {
+        intros H; subst h.
+        now apply (rngl_lt_irrefl Hor) in Hhz.
+      }
+      rewrite (rngl_sub_diag Hos).
+      now rewrite (rngl_abs_0 Hop).
+    }
+    destruct n; [ easy | cbn ].
+    split. {
+      exists (λ _ _, 0%L).
+      split. {
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+      induction n; [ easy | cbn ].
+      split. {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      } {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+    } {
+      exists (λ _ _, 0%L).
+      split. {
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+      induction n; [ easy | cbn ].
+      split. {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      } {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+    }
+  } {
+    exists (λ x y, 0%L).
+    split. {
+      intros x y ε Hε.
+      exists ε.
+      split; [ easy | ].
+      intros h (Hhz, Hhe).
+      rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+      rewrite (rngl_div_0_l Hos Hi1). 2: {
+        intros H; subst h.
+        now apply (rngl_lt_irrefl Hor) in Hhz.
+      }
+      now rewrite (rngl_abs_0 Hop).
+    }
+    destruct n; [ easy | cbn ].
+    split. {
+      exists (λ _ _, 0%L).
+      split. {
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+      induction n; [ easy | cbn ].
+      split. {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      } {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+    } {
+      exists (λ _ _, 0%L).
+      split. {
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+      induction n; [ easy | cbn ].
+      split. {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      } {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+    }
   }
-  now rewrite (rngl_abs_0 Hop).
+} {
+  exists (λ x y, (2 * y)%L).
+  split. {
+    intros x y ε Hε.
+    progress unfold U_implicit_function.
+    specialize (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor) as H1.
+    specialize (H1 y x ε Hε).
+    destruct H1 as (η & Hη & Hle).
+    exists η.
+    split; [ easy | ].
+    intros h Hh.
+    do 2 rewrite (rngl_add_comm x²).
+    now apply Hle.
+  }
+  destruct n; [ easy | cbn ].
+  split. {
+    exists (λ x y, 0%L).
+    split. {
+      intros x y ε Hε.
+      exists ε.
+      split; [ easy | ].
+      intros h (Hhz, Hhe).
+      rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+      rewrite (rngl_div_0_l Hos Hi1). 2: {
+        intros H; subst h.
+        now apply (rngl_lt_irrefl Hor) in Hhz.
+      }
+      now rewrite (rngl_abs_0 Hop).
+    }
+    destruct n; [ easy | cbn ].
+    split. {
+      exists (λ _ _, 0%L).
+      split. {
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+      induction n; [ easy | cbn ].
+      split. {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      } {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+    } {
+      exists (λ _ _, 0%L).
+      split. {
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+      induction n; [ easy | cbn ].
+      split. {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      } {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+    }
+  } {
+    exists (λ x y, 2%L).
+    split. {
+      intros x y ε Hε.
+      exists ε.
+      split; [ easy | ].
+      intros h (Hhz, Hhe).
+      rewrite rngl_mul_add_distr_l.
+      rewrite (rngl_add_sub_swap Hop).
+      rewrite (rngl_sub_diag Hos).
+      rewrite rngl_add_0_l.
+      rewrite (rngl_mul_div Hi1). 2: {
+        intros H; subst h.
+        now apply (rngl_lt_irrefl Hor) in Hhz.
+      }
+      rewrite (rngl_sub_diag Hos).
+      now rewrite (rngl_abs_0 Hop).
+    }
+    destruct n; [ easy | cbn ].
+    split. {
+      exists (λ _ _, 0%L).
+      split. {
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+      induction n; [ easy | cbn ].
+      split. {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      } {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+    } {
+      exists (λ _ _, 0%L).
+      split. {
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+      induction n; [ easy | cbn ].
+      split. {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      } {
+        exists (λ _ _, 0%L).
+        split; [ | easy ].
+        intros x y ε Hε.
+        exists ε.
+        split; [ easy | ].
+        intros h (Hhz, Hhe).
+        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+        rewrite (rngl_div_0_l Hos Hi1). 2: {
+          intros H; subst h.
+          now apply (rngl_lt_irrefl Hor) in Hhz.
+        }
+        now rewrite (rngl_abs_0 Hop).
+      }
+    }
+  }
 }
-induction n; [ easy | cbn ].
-exists (λ _ _, 0%L).
-split; [ | easy ].
-intros x y ε Hε.
-exists ε.
-split; [ easy | ].
-intros h (Hhz, Hhe).
-rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
-rewrite (rngl_div_0_l Hos Hi1). 2: {
-  intros H; subst h.
-  now apply (rngl_lt_irrefl Hor) in Hhz.
-}
-now rewrite (rngl_abs_0 Hop).
 Qed.
 
 (* to be completed
