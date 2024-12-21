@@ -1814,6 +1814,49 @@ split. {
 }
 Qed.
 
+Theorem fun_2_has_nth_partial_deriv :
+  rngl_has_opp T = true →
+  rngl_has_inv_and_1_or_quot T = true →
+  rngl_is_ordered T = true →
+  ∀ n, has_nth_partial_deriv n (λ _ _ : T, 2%L).
+Proof.
+intros Hop Hi1 Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+destruct n; [ easy | cbn ].
+split. {
+  exists (λ _ _, 0%L).
+  split. {
+    intros x y ε Hε.
+    exists ε.
+    split; [ easy | ].
+    intros h (Hhz, Hhe).
+    rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+    rewrite (rngl_div_0_l Hos Hi1). 2: {
+      intros H; subst h.
+      now apply (rngl_lt_irrefl Hor) in Hhz.
+    }
+    now rewrite (rngl_abs_0 Hop).
+  }
+  apply (zero_fun_has_nth_partial_deriv Hop Hi1 Hor).
+} {
+  exists (λ _ _, 0%L).
+  split. {
+    intros x y ε Hε.
+    exists ε.
+    split; [ easy | ].
+    intros h (Hhz, Hhe).
+    rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
+    rewrite (rngl_div_0_l Hos Hi1). 2: {
+      intros H; subst h.
+      now apply (rngl_lt_irrefl Hor) in Hhz.
+    }
+    now rewrite (rngl_abs_0 Hop).
+  }
+  apply (zero_fun_has_nth_partial_deriv Hop Hi1 Hor).
+}
+Qed.
+
 Theorem U_implicit_function_partial_C_infinite :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1833,6 +1876,10 @@ split. {
     progress unfold U_implicit_function.
     now apply (U_implicit_function_partial_deriv Hic Hon Hop Hi1 Hor).
   }
+(*
+  ============================
+  has_nth_partial_deriv n (λ x _ : T, (2 * x)%L)
+*)
   destruct n; [ easy | cbn ].
   split. {
     exists (λ x y, 2%L).
@@ -1850,38 +1897,7 @@ split. {
       rewrite (rngl_sub_diag Hos).
       now rewrite (rngl_abs_0 Hop).
     }
-    destruct n; [ easy | cbn ].
-    split. {
-      exists (λ _ _, 0%L).
-      split. {
-        intros x y ε Hε.
-        exists ε.
-        split; [ easy | ].
-        intros h (Hhz, Hhe).
-        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
-        rewrite (rngl_div_0_l Hos Hi1). 2: {
-          intros H; subst h.
-          now apply (rngl_lt_irrefl Hor) in Hhz.
-        }
-        now rewrite (rngl_abs_0 Hop).
-      }
-      apply (zero_fun_has_nth_partial_deriv Hop Hi1 Hor).
-    } {
-      exists (λ _ _, 0%L).
-      split. {
-        intros x y ε Hε.
-        exists ε.
-        split; [ easy | ].
-        intros h (Hhz, Hhe).
-        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
-        rewrite (rngl_div_0_l Hos Hi1). 2: {
-          intros H; subst h.
-          now apply (rngl_lt_irrefl Hor) in Hhz.
-        }
-        now rewrite (rngl_abs_0 Hop).
-      }
-      apply (zero_fun_has_nth_partial_deriv Hop Hi1 Hor).
-    }
+    apply (fun_2_has_nth_partial_deriv Hop Hi1 Hor).
   } {
     exists (λ x y, 0%L).
     split. {
@@ -1912,6 +1928,10 @@ split. {
     do 2 rewrite (rngl_add_comm x²).
     now apply Hle.
   }
+(*
+  ============================
+  has_nth_partial_deriv n (λ _ y : T, (2 * y)%L)
+*)
   destruct n; [ easy | cbn ].
   split. {
     exists (λ x y, 0%L).
@@ -1946,38 +1966,7 @@ split. {
       rewrite (rngl_sub_diag Hos).
       now rewrite (rngl_abs_0 Hop).
     }
-    destruct n; [ easy | cbn ].
-    split. {
-      exists (λ _ _, 0%L).
-      split. {
-        intros x y ε Hε.
-        exists ε.
-        split; [ easy | ].
-        intros h (Hhz, Hhe).
-        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
-        rewrite (rngl_div_0_l Hos Hi1). 2: {
-          intros H; subst h.
-          now apply (rngl_lt_irrefl Hor) in Hhz.
-        }
-        now rewrite (rngl_abs_0 Hop).
-      }
-      apply (zero_fun_has_nth_partial_deriv Hop Hi1 Hor).
-    } {
-      exists (λ _ _, 0%L).
-      split. {
-        intros x y ε Hε.
-        exists ε.
-        split; [ easy | ].
-        intros h (Hhz, Hhe).
-        rewrite (rngl_sub_diag Hos), (rngl_sub_0_r Hos).
-        rewrite (rngl_div_0_l Hos Hi1). 2: {
-          intros H; subst h.
-          now apply (rngl_lt_irrefl Hor) in Hhz.
-        }
-        now rewrite (rngl_abs_0 Hop).
-      }
-      apply (zero_fun_has_nth_partial_deriv Hop Hi1 Hor).
-    }
+    apply (fun_2_has_nth_partial_deriv Hop Hi1 Hor).
   }
 }
 Qed.
