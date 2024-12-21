@@ -2717,7 +2717,70 @@ apply
 ...3
 *)
 intros θ₀ ε Hε.
-(*4*)
+enough (H :
+  ∃ η, (0 < η)%L ∧
+  ∀ dθ,
+  (0 < angle_eucl_dist dθ 0 < η)%L
+  → (rngl_dist
+        ((rngl_cos (θ₀ + dθ) - rngl_cos θ₀) / angle_eucl_dist dθ 0)
+        (- rngl_sin θ₀) < ε)%L). {
+  destruct H as (η & Hη & Hd).
+  exists η.
+  move η before ε.
+  split; [ easy | ].
+  intros θ Hθ.
+  remember (θ - θ₀)%A as dθ eqn:H.
+  symmetry in H.
+  apply angle_sub_move_r in H.
+  subst θ.
+  specialize (Hd dθ).
+  rewrite angle_eucl_dist_move_0_r in Hθ |-*.
+  rewrite angle_add_sub in Hθ |-*.
+  rewrite angle_add_comm.
+  now apply Hd.
+}
+enough (H :
+  ∃ η : T, (0 < η)%L ∧
+  ∀ dθ : angle T,
+  (0 < angle_eucl_dist dθ 0 < η)%L
+  → (rngl_dist
+       ((rngl_cos (θ₀ + dθ) - rngl_cos θ₀) / angle_eucl_dist dθ 0)
+       (- rngl_sin θ₀) < ε)%L). {
+  destruct H as (η & Hη & Hd).
+  exists η.
+  move η before ε.
+  split; [ easy | ].
+  intros dθ Hdθ.
+  do 2 rewrite rngl_cos_angle_eucl_dist.
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite (rngl_sub_sub_swap Hop).
+  rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_sub_0_l Hop).
+  rewrite (rngl_add_opp_l Hop).
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  progress unfold rngl_dist.
+  rewrite (rngl_div_div_swap Hic Hiv).
+  rewrite (rngl_sub_opp_r Hop).
+  destruct (angle_le_dec θ₀ angle_straight) as [Hts| Hts]. {
+    rewrite rngl_sin_angle_eucl_dist'; [ | easy ].
+    rewrite <- (rngl_div_add_distr_r Hiv).
+    rewrite angle_mul_2_l.
+    rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
+      apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+    }
+    rewrite (rngl_abs_2 Hon Hos Hor).
+    apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    rewrite (rngl_abs_nonneg_eq Hop Hor).
+    eapply (rngl_le_lt_trans Hor). {
+      apply (rngl_add_le_mono_l Hop Hor).
+      apply (angle_eucl_dist_triangular _ θ₀).
+    }
+    rewrite (angle_eucl_dist_move_0_r (_ + _) θ₀).
+    rewrite angle_add_sub.
+    rewrite <- (rngl_mul_2_r Hon).
+...
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ,
