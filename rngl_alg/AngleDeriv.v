@@ -2689,6 +2689,54 @@ rewrite rngl_sub_add_distr.
 ...
 *)
 
+Theorem angle_lt_straight_add_same_not_overflow :
+  rngl_characteristic T ≠ 1 →
+  ∀ θ, (θ < angle_straight)%A ↔ angle_add_overflow θ θ = false.
+Proof.
+intros Hc1.
+destruct_ac.
+intros.
+split; intros Hθ. {
+  apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
+  now apply angle_lt_le_incl.
+} {
+  progress unfold angle_add_overflow in Hθ.
+  apply Bool.andb_false_iff in Hθ.
+  destruct Hθ as [Hθ| Hθ]. {
+    apply (f_equal negb) in Hθ.
+    rewrite Bool.negb_involutive in Hθ.
+    apply angle_eqb_eq in Hθ; subst θ.
+    apply (angle_straight_pos Hc1).
+  }
+  apply angle_leb_gt in Hθ.
+  progress unfold angle_ltb in Hθ.
+  progress unfold angle_ltb.
+  cbn in Hθ |-*.
+  rewrite (rngl_leb_refl Hor).
+  rewrite (rngl_leb_0_opp Hop Hor) in Hθ.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+  symmetry in Hzs, Hsz.
+  destruct sz. {
+    destruct zs; [ | easy ].
+    apply rngl_ltb_lt in Hθ.
+    now apply (rngl_lt_irrefl Hor) in Hθ.
+  }
+  destruct zs. {
+    apply rngl_ltb_lt.
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H; symmetry in H.
+    apply eq_rngl_cos_opp_1 in H.
+    subst θ.
+    cbn in Hsz.
+    now rewrite (rngl_leb_refl Hor) in Hsz.
+  }
+  apply rngl_ltb_lt in Hθ.
+  now apply (rngl_lt_irrefl Hor) in Hθ.
+}
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
@@ -2784,8 +2832,11 @@ enough (H :
         cbn.
         rewrite Bool.orb_false_r.
         rewrite angle_add_0_r.
+        apply (angle_lt_straight_add_same_not_overflow Hc1).
+...
 rewrite fold_angle_add_overflow2 in Htt.
 rewrite angle_add_overflow_equiv2 in Htt.
+Search (_ < angle_straight)%A.
 ...
         rewrite <- angle_add_overflow_equiv2 in Hovt.
         rewrite <- angle_add_overflow_equiv2.
