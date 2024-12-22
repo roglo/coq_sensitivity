@@ -2784,7 +2784,16 @@ enough (H :
         cbn.
         rewrite Bool.orb_false_r.
         rewrite angle_add_0_r.
-Search (_ → angle_add_overflow _ _ = false).
+        rewrite <- angle_add_overflow_equiv2 in Hovt.
+        rewrite <- angle_add_overflow_equiv2.
+        progress unfold angle_add_overflow2 in Hovt.
+        progress unfold angle_add_overflow2.
+        apply angle_ltb_ge in Htt, Hovt.
+        apply angle_ltb_ge.
+...
+rewrite <- angle_add_0_r at 1.
+Search (_ + _ ≤ _ + _)%A.
+apply angle_add_le_mono_l.
 ...
 (**)
         apply angle_add_not_overflow_lt_straight_le_straight.
