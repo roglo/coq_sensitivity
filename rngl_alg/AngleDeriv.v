@@ -16,6 +16,7 @@ Require Import Trigo.TacChangeAngle.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleDivNat.
 Require Import Trigo.SeqAngleIsCauchy.
+Require Import Trigo.AngleAddLeMonoL.
 Require Import AngleEuclDist_sin.
 
 Section a.
@@ -2771,10 +2772,25 @@ enough (H :
         rewrite angle_add_overflow_comm.
         now rewrite <- angle_add_overflow_equiv2.
       }
+      rewrite (rngl_sin_angle_eucl_dist' (dθ/₂)). 2: {
+        apply angle_div_2_le_straight.
+      }
       rewrite <- angle_mul_nat_div_2. 2: {
+        rewrite angle_add_comm in Hovt.
+        apply angle_add_not_overflow_move_add in Hovt. 2: {
+          rewrite angle_add_overflow_comm.
+          now rewrite <- angle_add_overflow_equiv2.
+        }
         cbn.
         rewrite Bool.orb_false_r.
         rewrite angle_add_0_r.
+Search (_ → angle_add_overflow _ _ = false).
+...
+(**)
+        apply angle_add_not_overflow_lt_straight_le_straight.
+...
+Search (_ → angle_add_overflow _ _ = false).
+...
         rewrite <- angle_add_overflow_equiv2 in Hovt.
         rewrite <- angle_add_overflow_equiv2.
         progress unfold angle_add_overflow2 in Hovt.
@@ -2782,6 +2798,34 @@ enough (H :
         apply Bool.not_true_iff_false in Htt.
         apply Bool.not_true_iff_false.
         intros H; apply Htt; clear Htt.
+        apply angle_ltb_ge in Hovt.
+        eapply angle_le_lt_trans; [ | apply H ].
+        apply angle_add_le_mono_l.
+(* non mais ça marche pas, merde *)
+Search (_ + _ ≤ _ + _)%A.
+Search ((_ <? _)%A = false).
+... ...
+      do 2 rewrite angle_div_2_mul_2.
+      rewrite (rngl_mul_div_assoc Hiv).
+      rewrite (rngl_div_opp_l Hop Hiv).
+      rewrite (rngl_div_div_swap Hic Hiv).
+      rewrite (rngl_mul_div Hi1). 2: {
+        intros H.
+        rewrite H in Hdθ.
+        destruct Hdθ as (H1, _).
+        now apply (rngl_lt_irrefl Hor) in H1.
+      }
+      rewrite <- (rngl_div_opp_l Hop Hiv).
+      rewrite (rngl_mul_comm Hic).
+      rewrite <- (rngl_mul_opp_l Hop).
+      rewrite (rngl_mul_div Hi1). 2: {
+        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+      }
+      rewrite <- (rngl_abs_opp Hop Hor).
+      rewrite (rngl_opp_add_distr Hop).
+      rewrite (rngl_sub_opp_r Hop).
+      rewrite (rngl_add_opp_l Hop).
+      rewrite angle_add_comm.
 ...
 Search (_ * _ /₂)%A.
 Search (angle_add_overflow _ _ = false → angle_add_overflow _ _ = false).
