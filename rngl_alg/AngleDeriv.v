@@ -2784,6 +2784,9 @@ enough (H :
         cbn.
         rewrite Bool.orb_false_r.
         rewrite angle_add_0_r.
+rewrite fold_angle_add_overflow2 in Htt.
+rewrite angle_add_overflow_equiv2 in Htt.
+...
         rewrite <- angle_add_overflow_equiv2 in Hovt.
         rewrite <- angle_add_overflow_equiv2.
         progress unfold angle_add_overflow2 in Hovt.
