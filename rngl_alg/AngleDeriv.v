@@ -2826,6 +2826,31 @@ enough (H :
         rewrite (rngl_add_opp_l Hop).
         rewrite angle_add_comm.
         rewrite rngl_sin_sub_sin.
+        rewrite (angle_add_comm θ₀).
+        rewrite angle_add_sub.
+        remember (angle_add_overflow (dθ /₂ + θ₀) θ₀) as ovtd eqn:Hovtd.
+        remember (dθ /₂ + θ₀ <? θ₀)%A as dt eqn:Hdt.
+        symmetry in Hdt, Hovtd.
+        destruct ovtd. {
+          rewrite <- angle_add_overflow_equiv2 in Hovt, Hovtd.
+          progress unfold angle_add_overflow2 in Hovt.
+          progress unfold angle_add_overflow2 in Hovtd.
+          apply angle_ltb_ge in Htt, Hovt.
+...
+          apply angle_nle_gt in Hovtd.
+...
+          apply Hovtd; clear Hovtd.
+Search (_ + _ ≤ _ + _)%A.
+rewrite <- angle_add_assoc.
+apply angle_add_le_mono_l.
+...
+          rewrite (angle_add_comm θ₀) in Hovt.
+...
+          eapply angle_le_trans.
+          eapply angle_le_trans; [ apply Hovt | ].
+...
+          destruct dt. {
+            rewrite rngl_abs
 ...
 Search (_ * _ /₂)%A.
 Search (angle_add_overflow _ _ = false → angle_add_overflow _ _ = false).
