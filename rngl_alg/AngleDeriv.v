@@ -2755,6 +2755,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros θ₀ Htz ε Hε.
+clear Htz. (* AAAAAAA VOIR ..... *)
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ dθ,
@@ -2808,61 +2809,6 @@ clear Hd.
       now apply (rngl_min_glb_lt).
     }
     intros dθ Hdθ.
-    assert (Htds : (θ₀ + dθ < angle_straight)%A). {
-      destruct Hdθ as (_, H1).
-      apply (rngl_min_glb_lt_iff Hor) in H1.
-      destruct H1 as (H1, _).
-      apply angle_eucl_dist_lt_angle_eucl_dist in H1.
-      rewrite rngl_cos_sub_straight_r in H1.
-      rewrite angle_sub_0_r in H1.
-      progress unfold angle_ltb in Hts.
-      progress unfold angle_ltb.
-      cbn - [ angle_add ] in Hts |-*.
-      rewrite (rngl_leb_refl Hor) in Hts |-*.
-      remember (0 ≤? rngl_sin θ₀)%L as zs eqn:Hzs.
-      symmetry in Hzs.
-      destruct zs; [ | easy ].
-      apply rngl_leb_le in Hzs.
-      apply rngl_ltb_lt in Hts.
-      remember (0 ≤? rngl_sin (θ₀ + dθ))%L as zsd eqn:Hzsd.
-      symmetry in Hzsd.
-      destruct zsd. {
-        apply rngl_leb_le in Hzsd.
-        apply rngl_ltb_lt.
-        apply (rngl_lt_iff Hor).
-        split; [ apply rngl_cos_bound | ].
-        intros H; symmetry in H.
-        apply eq_rngl_cos_opp_1 in H.
-        apply angle_add_move_r in H.
-        subst θ₀.
-        rewrite rngl_cos_sub_straight_l in H1.
-        rewrite (rngl_opp_involutive Hop) in H1.
-        now apply (rngl_lt_irrefl Hor) in H1.
-      }
-      exfalso.
-      apply (rngl_leb_gt Hor) in Hzsd.
-      apply rngl_nle_gt in Hzsd.
-      apply Hzsd; clear Hzsd.
-      cbn.
-      rewrite rngl_add_comm.
-      apply (rngl_le_opp_l Hop Hor).
-      apply (rngl_mul_lt_mono_pos_l Hop Hor Hii (rngl_sin θ₀)) in H1. 2: {
-        apply (rngl_lt_iff Hor).
-        split; [ easy | ].
-        clear H.
-        intros H; symmetry in H.
-        apply eq_rngl_sin_0 in H.
-        destruct H; subst θ₀; [ easy | ].
-        cbn in H1.
-        rewrite (rngl_opp_involutive Hop) in H1.
-        apply rngl_nle_gt in H1.
-        apply H1, rngl_cos_bound.
-      }
-      eapply (rngl_le_trans Hor). 2: {
-        apply (rngl_lt_le_incl Hor).
-        apply H1.
-      }
-...
     progress unfold rngl_dist.
     rewrite (rngl_sub_opp_r Hop).
     rewrite rngl_cos_sub_cos.
@@ -2986,9 +2932,26 @@ clear Hd.
       apply (rngl_le_min_l Hor).
     }
     apply angle_nle_gt in Htds.
+    rewrite (angle_add_comm θ₀).
+    rewrite angle_add_sub.
+    rewrite <- angle_add_assoc.
+    rewrite <- angle_mul_2_l.
+    destruct ovt. {
+      rewrite rngl_sin_add_straight_r.
+      rewrite angle_add_comm in Hovt.
+      apply angle_add_overflow_move_add in Hovt. 2: {
+        now apply angle_lt_straight_add_same_not_overflow.
+      }
+      rewrite <- angle_mul_2_l in Hovt.
+      rewrite angle_div_2_add. {
+        rewrite Hovt.
+        rewrite rngl_sin_add_straight_r.
+        rewrite angle_mul_2_div_2; [ | easy ].
+        rewrite (rngl_opp_involutive Hop).
 ...
     destruct tt. 2: {
       apply angle_ltb_ge in Htt.
+...
       exfalso.
       apply angle_nle_gt in Htds.
       apply Htds; clear Htds.
