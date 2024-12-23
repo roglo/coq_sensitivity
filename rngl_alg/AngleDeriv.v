@@ -2785,6 +2785,7 @@ progress unfold continuous_at in Hsc.
 progress unfold is_limit_when_tending_to in Hsc.
 specialize (Hsc θ₀ ε Hε).
 destruct Hsc as (η1 & Hη1 & Hsc).
+move η1 before ε.
 enough (H :
   ∃ η : T, (0 < η)%L ∧
   ∀ dθ : angle T,
@@ -2795,6 +2796,7 @@ enough (H :
   destruct H as (η & Hη & Hd).
   exists (rngl_min η1 η).
   move η before ε.
+  move Hη before Hε.
   split; [ now apply rngl_min_glb_lt | ].
   intros dθ Hdθ.
   progress unfold rngl_dist.
@@ -2805,6 +2807,16 @@ enough (H :
   symmetry in Hovt, Htt.
   destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
     destruct (angle_le_dec dθ angle_straight) as [Htds| Htds]. {
+      destruct tt. {
+        exfalso.
+        apply angle_nle_gt in Htt.
+        apply Htt; clear Htt.
+        (* lemma *)
+        rewrite <- (angle_add_0_r θ₀) at 1.
+        apply angle_add_le_mono_l; [ | apply angle_nonneg ].
+        now apply angle_add_not_overflow_lt_straight_le_straight.
+      }
+      apply angle_ltb_ge in Htt.
       rewrite angle_add_sub_swap.
       rewrite angle_sub_diag.
       rewrite angle_add_0_l.
@@ -2813,67 +2825,67 @@ enough (H :
         rewrite (angle_add_comm θ₀).
         rewrite <- angle_add_assoc.
         rewrite <- angle_mul_2_l.
-        destruct tt. 2: {
-          rewrite angle_add_0_r.
-          rewrite angle_div_2_add_not_overflow. 2: {
-            rewrite angle_mul_2_l.
-            rewrite angle_add_comm in Hovt.
-            rewrite angle_add_not_overflow_move_add; [ easy | | easy ].
+        rewrite angle_add_0_r.
+        rewrite angle_div_2_add_not_overflow. 2: {
+          rewrite angle_mul_2_l.
+          rewrite angle_add_comm in Hovt.
+          rewrite angle_add_not_overflow_move_add; [ easy | | easy ].
+          rewrite angle_add_overflow_comm.
+          apply angle_ltb_ge in Htt.
+          now rewrite <- angle_add_overflow_equiv2.
+        }
+        rewrite (rngl_sin_angle_eucl_dist' (dθ/₂)). 2: {
+          apply angle_div_2_le_straight.
+        }
+        rewrite <- angle_mul_nat_div_2. 2: {
+          rewrite angle_add_comm in Hovt.
+          apply angle_add_not_overflow_move_add in Hovt. 2: {
             rewrite angle_add_overflow_comm.
+            apply angle_ltb_ge in Htt.
             now rewrite <- angle_add_overflow_equiv2.
           }
-          rewrite (rngl_sin_angle_eucl_dist' (dθ/₂)). 2: {
+          cbn.
+          rewrite Bool.orb_false_r.
+          rewrite angle_add_0_r.
+          now apply angle_lt_straight_add_same_not_overflow.
+        }
+        do 2 rewrite angle_div_2_mul_2.
+        rewrite (rngl_mul_div_assoc Hiv).
+        rewrite (rngl_div_opp_l Hop Hiv).
+        rewrite (rngl_div_div_swap Hic Hiv).
+        rewrite (rngl_mul_div Hi1). 2: {
+          intros H.
+          rewrite H in Hdθ.
+          destruct Hdθ as (H1, _).
+          now apply (rngl_lt_irrefl Hor) in H1.
+        }
+        rewrite <- (rngl_div_opp_l Hop Hiv).
+        rewrite (rngl_mul_comm Hic).
+        rewrite <- (rngl_mul_opp_l Hop).
+        rewrite (rngl_mul_div Hi1). 2: {
+          apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+        }
+        rewrite <- (rngl_abs_opp Hop Hor).
+        rewrite (rngl_opp_add_distr Hop).
+        rewrite (rngl_sub_opp_r Hop).
+        rewrite (rngl_add_opp_l Hop).
+        rewrite angle_add_comm.
+        specialize (Hsc (θ₀ + dθ /₂))%A.
+        rewrite angle_eucl_dist_move_0_r in Hsc.
+        rewrite angle_add_comm, angle_add_sub in Hsc.
+        assert (H : (angle_eucl_dist (dθ /₂) 0 < η1)%L). {
+          apply (rngl_lt_le_trans Hor _ (rngl_min η1 η)). {
+            apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)); [ | easy ].
+            apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
+              apply angle_div_2_le.
+            }
             apply angle_div_2_le_straight.
           }
-          rewrite <- angle_mul_nat_div_2. 2: {
-            rewrite angle_add_comm in Hovt.
-            apply angle_add_not_overflow_move_add in Hovt. 2: {
-              rewrite angle_add_overflow_comm.
-              now rewrite <- angle_add_overflow_equiv2.
-            }
-            cbn.
-            rewrite Bool.orb_false_r.
-            rewrite angle_add_0_r.
-            now apply angle_lt_straight_add_same_not_overflow.
-          }
-          do 2 rewrite angle_div_2_mul_2.
-          rewrite (rngl_mul_div_assoc Hiv).
-          rewrite (rngl_div_opp_l Hop Hiv).
-          rewrite (rngl_div_div_swap Hic Hiv).
-          rewrite (rngl_mul_div Hi1). 2: {
-            intros H.
-            rewrite H in Hdθ.
-            destruct Hdθ as (H1, _).
-            now apply (rngl_lt_irrefl Hor) in H1.
-          }
-          rewrite <- (rngl_div_opp_l Hop Hiv).
-          rewrite (rngl_mul_comm Hic).
-          rewrite <- (rngl_mul_opp_l Hop).
-          rewrite (rngl_mul_div Hi1). 2: {
-            apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-          }
-          rewrite <- (rngl_abs_opp Hop Hor).
-          rewrite (rngl_opp_add_distr Hop).
-          rewrite (rngl_sub_opp_r Hop).
-          rewrite (rngl_add_opp_l Hop).
-          rewrite angle_add_comm.
-          specialize (Hsc (θ₀ + dθ /₂))%A.
-          rewrite angle_eucl_dist_move_0_r in Hsc.
-          rewrite angle_add_comm, angle_add_sub in Hsc.
-          assert (H : (angle_eucl_dist (dθ /₂) 0 < η1)%L). {
-            apply (rngl_lt_le_trans Hor _ (rngl_min η1 η)). {
-              apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)); [ | easy ].
-              apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
-                apply angle_div_2_le.
-              }
-              apply angle_div_2_le_straight.
-            }
-            apply (rngl_le_min_l Hor).
-          }
-          specialize (Hsc H); clear H.
-          now rewrite angle_add_comm in Hsc.
+          apply (rngl_le_min_l Hor).
         }
-(* Htt ne devrait pas arriver *)
+        specialize (Hsc H); clear H.
+        now rewrite angle_add_comm in Hsc.
+      }
 ...
 enough (H :
   ∃ η : T, (0 < η)%L ∧
