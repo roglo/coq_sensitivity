@@ -2822,6 +2822,17 @@ destruct zsdt. {
   destruct zs; [ | easy ].
   apply rngl_leb_le in Hzs'.
   apply rngl_ltb_lt.
+  apply (rngl_nle_gt_iff Hor).
+  intros Hcc.
+  apply rngl_nle_gt in Htt.
+  apply Htt; clear Htt.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+apply angle_add_overflow_le_lemma_2; try easy.
+eapply angle_add_overflow_le_lemma_4.
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
+...
+Search (rngl_cos _ < rngl_cos (_ + _))%L.
+  apply quadrant_1_quadrant_4_cos_lt_cos_add; try easy.
 ...
           rewrite angle_add_overflow_move_add; [ easy | | ].
 ...
