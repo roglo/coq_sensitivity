@@ -3048,6 +3048,7 @@ destruct H1 as (H1, _).
 move Hts at bottom.
 move H1 at bottom.
 ...
+*)
 (*
 apply angle_nle_gt in Htds.
 apply Htds; clear Htds.
@@ -3083,7 +3084,6 @@ rewrite <- (angle_add_0_r θ₀) at 1.
 apply angle_add_le_mono_l; [ | apply angle_nonneg ].
 ...
 *)
-*)
           rewrite rngl_sin_add_straight_r.
           rewrite (rngl_mul_opp_r Hop).
           rewrite (rngl_opp_involutive Hop).
@@ -3104,6 +3104,7 @@ apply angle_add_le_mono_l; [ | apply angle_nonneg ].
             apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
           }
           rewrite angle_add_comm.
+...
           progress unfold rngl_dist in Hsc.
           rewrite rngl_sin_add_sin.
           rewrite (angle_add_comm θ₀).
