@@ -2780,11 +2780,12 @@ enough (H :
     rewrite angle_sub_diag.
     rewrite angle_add_0_l.
     destruct ovt. 2: {
+      rewrite angle_add_0_r.
+      rewrite (angle_add_comm θ₀).
+      rewrite <- angle_add_assoc.
+      rewrite <- angle_mul_2_l.
       destruct tt. 2: {
-        do 2 rewrite angle_add_0_r.
-        rewrite (angle_add_comm θ₀).
-        rewrite <- angle_add_assoc.
-        rewrite <- angle_mul_2_l.
+        rewrite angle_add_0_r.
         rewrite angle_div_2_add_not_overflow. 2: {
           rewrite angle_mul_2_l.
           rewrite angle_add_comm in Hovt.
