@@ -2804,18 +2804,28 @@ enough (H :
        ((rngl_cos (θ₀ + dθ) - rngl_cos θ₀) / angle_eucl_dist dθ 0)
        (- rngl_sin θ₀) < ε)%L). {
   destruct H as (η & Hη & Hd).
-  exists (rngl_min η1 η).
+clear Hd.
+(* delete η one day *)
   move η before ε.
   move Hη before Hε.
-  split; [ now apply rngl_min_glb_lt | ].
-  intros dθ Hdθ.
-  progress unfold rngl_dist.
-  rewrite (rngl_sub_opp_r Hop).
-  rewrite rngl_cos_sub_cos.
-  remember (angle_add_overflow (θ₀ + dθ) θ₀) as ovt eqn:Hovt.
-  remember (θ₀ + dθ <? θ₀)%A as tt eqn:Htt.
-  symmetry in Hovt, Htt.
   destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
+    exists (rngl_min (angle_eucl_dist θ₀ angle_straight) (rngl_min η1 η)).
+    split. {
+      apply rngl_min_glb_lt. {
+        apply angle_eucl_dist_pos_angle_neq.
+        intros H.
+        rewrite H in Hts.
+        now apply angle_lt_irrefl in Hts.
+      }
+      now apply (rngl_min_glb_lt).
+    }
+    intros dθ Hdθ.
+    progress unfold rngl_dist.
+    rewrite (rngl_sub_opp_r Hop).
+    rewrite rngl_cos_sub_cos.
+    remember (angle_add_overflow (θ₀ + dθ) θ₀) as ovt eqn:Hovt.
+    remember (θ₀ + dθ <? θ₀)%A as tt eqn:Htt.
+    symmetry in Hovt, Htt.
     destruct (angle_le_dec dθ angle_straight) as [Htds| Htds]. {
       destruct tt. {
         exfalso.
@@ -2875,11 +2885,14 @@ enough (H :
         rewrite angle_add_comm.
         apply Hsc.
         apply (rngl_lt_le_trans Hor _ (rngl_min η1 η)). {
-          apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)); [ | easy ].
-          apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
-            apply angle_div_2_le.
+          apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)). {
+            apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
+              apply angle_div_2_le.
+            }
+            apply angle_div_2_le_straight.
           }
-          apply angle_div_2_le_straight.
+          eapply (rngl_lt_le_trans Hor); [ apply Hdθ | ].
+          apply (rngl_le_min_r Hor).
         }
         apply (rngl_le_min_l Hor).
       }
@@ -2918,15 +2931,28 @@ enough (H :
       rewrite angle_eucl_dist_move_0_r.
       rewrite angle_add_sub.
       apply (rngl_lt_le_trans Hor _ (rngl_min η1 η)). {
-        apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)); [ | easy ].
-        apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
-          apply angle_div_2_le.
+        apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)). {
+          apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
+            apply angle_div_2_le.
+          }
+          apply angle_div_2_le_straight.
         }
-        apply angle_div_2_le_straight.
+        eapply (rngl_lt_le_trans Hor); [ apply Hdθ | ].
+        apply (rngl_le_min_r Hor).
       }
       apply (rngl_le_min_l Hor).
     }
     apply angle_nle_gt in Htds.
+    exfalso.
+    destruct Hdθ as (_, H1).
+    apply rngl_nle_gt in H1.
+    apply H1; clear H1.
+... à voir...
+    apply (rngl_min_le_iff Hor).
+    left.
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
+    apply angle_nle_gt in Htds.
+    apply Htds; clear Htds.
 ...
 enough (H :
   ∃ η : T, (0 < η)%L ∧
