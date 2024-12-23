@@ -2943,6 +2943,13 @@ clear Hd.
       apply (rngl_le_min_l Hor).
     }
     apply angle_nle_gt in Htds.
+...
+    destruct tt. 2: {
+      apply angle_ltb_ge in Htt.
+      exfalso.
+      apply angle_nle_gt in Htds.
+      apply Htds; clear Htds.
+...
     exfalso.
     destruct Hdθ as (_, H1).
     apply rngl_nle_gt in H1.
