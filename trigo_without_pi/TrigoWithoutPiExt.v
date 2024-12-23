@@ -2152,6 +2152,24 @@ apply Bool.not_true_iff_false in H13.
 now apply angle_nlt_ge in H13.
 Qed.
 
+Theorem angle_add_overflow_move_add :
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ2 θ3 = false
+  → angle_add_overflow (θ1 + θ2) θ3 = true
+  → angle_add_overflow θ1 (θ2 + θ3) = true.
+Proof.
+destruct_ac.
+intros * H23 H123.
+apply Bool.not_false_iff_true in H123.
+apply Bool.not_false_iff_true.
+intros H; apply H123.
+rewrite angle_add_overflow_comm.
+apply angle_add_not_overflow_move_add.
+now rewrite angle_add_overflow_comm.
+rewrite angle_add_comm.
+now rewrite angle_add_overflow_comm.
+Qed.
+
 Theorem angle_mul_2_l : ∀ θ, (2 * θ = θ + θ)%A.
 Proof.
 intros; cbn.
