@@ -2949,15 +2949,20 @@ clear Hd.
         rewrite angle_mul_2_div_2; [ | easy ].
         rewrite (rngl_opp_involutive Hop).
         destruct tt. {
+(**)
 exfalso.
 destruct Hdθ as (_, H1).
 apply (rngl_min_glb_lt_iff Hor) in H1.
 destruct H1 as (H1, _).
 move Hts at bottom.
 move H1 at bottom.
+...
+(*
 apply angle_nle_gt in Htds.
 apply Htds; clear Htds.
-Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
+apply angle_eucl_dist_lt_angle_eucl_dist in H1.
+rewrite rngl_cos_sub_straight_r in H1.
+rewrite angle_sub_0_r in H1.
 ...
 apply angle_nle_gt in Htt.
 apply Htt; clear Htt.
@@ -2986,6 +2991,7 @@ apply angle_ltb_ge.
 rewrite <- (angle_add_0_r θ₀) at 1.
 apply angle_add_le_mono_l; [ | apply angle_nonneg ].
 ...
+*)
           rewrite rngl_sin_add_straight_r.
           rewrite (rngl_mul_opp_r Hop).
           rewrite (rngl_opp_involutive Hop).
