@@ -2948,8 +2948,66 @@ clear Hd.
         rewrite rngl_sin_add_straight_r.
         rewrite angle_mul_2_div_2; [ | easy ].
         rewrite (rngl_opp_involutive Hop).
+        destruct tt. {
+exfalso.
+destruct Hdθ as (_, H1).
+apply (rngl_min_glb_lt_iff Hor) in H1.
+destruct H1 as (H1, _).
+move Hts at bottom.
+move H1 at bottom.
+apply angle_nle_gt in Htds.
+apply Htds; clear Htds.
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
 ...
-    destruct tt. 2: {
+apply angle_nle_gt in Htt.
+apply Htt; clear Htt.
+rewrite <- (angle_add_0_r θ₀) at 1.
+apply angle_add_le_mono_l; [ | apply angle_nonneg ].
+...
+rewrite angle_add_overflow_comm.
+apply (angle_add_overflow_le _ angle_straight). {
+  now apply angle_lt_le_incl.
+}
+(*
+progress unfold angle_leb.
+progress unfold angle_ltb in Htds.
+cbn in Htds.
+rewrite (rngl_leb_refl Hor) in Htds.
+*)
+...
+destruct Hdθ as (_, H1).
+apply (rngl_min_glb_lt_iff Hor) in H1.
+destruct H1 as (H1, _).
+move Hts at bottom.
+move H1 at bottom.
+rewrite <- angle_add_overflow_equiv2.
+progress unfold angle_add_overflow2.
+apply angle_ltb_ge.
+rewrite <- (angle_add_0_r θ₀) at 1.
+apply angle_add_le_mono_l; [ | apply angle_nonneg ].
+...
+          rewrite rngl_sin_add_straight_r.
+          rewrite (rngl_mul_opp_r Hop).
+          rewrite (rngl_opp_involutive Hop).
+          rewrite (rngl_sin_angle_eucl_dist' (dθ /₂)). 2: {
+            apply angle_div_2_le_straight.
+          }
+          rewrite angle_div_2_mul_2.
+          rewrite (rngl_mul_div_assoc Hiv).
+          rewrite (rngl_div_div_swap Hic Hiv).
+          rewrite (rngl_mul_div Hi1). 2: {
+            intros H.
+            rewrite H in Hdθ.
+            destruct Hdθ as (H1, _).
+            now apply (rngl_lt_irrefl Hor) in H1.
+          }
+          rewrite (rngl_mul_comm Hic).
+          rewrite (rngl_mul_div Hi1). 2: {
+            apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+          }
+          rewrite angle_add_comm.
+          progress unfold rngl_dist in Hsc.
+...
       apply angle_ltb_ge in Htt.
 ...
       exfalso.
