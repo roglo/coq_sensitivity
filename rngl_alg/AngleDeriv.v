@@ -2776,11 +2776,13 @@ enough (H :
   remember (θ₀ + dθ <? θ₀)%A as tt eqn:Htt.
   symmetry in Hovt, Htt.
   destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
+    rewrite angle_add_sub_swap.
+    rewrite angle_sub_diag.
+    rewrite angle_add_0_l.
     destruct ovt. 2: {
       destruct tt. 2: {
         do 2 rewrite angle_add_0_r.
         rewrite (angle_add_comm θ₀).
-        rewrite angle_add_sub.
         rewrite <- angle_add_assoc.
         rewrite <- angle_mul_2_l.
         rewrite angle_div_2_add_not_overflow. 2: {
@@ -2825,6 +2827,11 @@ enough (H :
         rewrite (rngl_sub_opp_r Hop).
         rewrite (rngl_add_opp_l Hop).
         rewrite angle_add_comm.
+(*
+rewrite rngl_sin_angle_eucl_dist'.
+        rewrite rngl_sin_angle_eucl_dist'; [ | now apply angle_lt_le_incl ].
+*)
+...
         rewrite rngl_sin_sub_sin.
         rewrite (angle_add_comm θ₀).
         rewrite angle_add_sub.
