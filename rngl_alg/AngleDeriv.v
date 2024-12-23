@@ -2832,10 +2832,23 @@ enough (H :
         remember (dθ /₂ + θ₀ <? θ₀)%A as dt eqn:Hdt.
         symmetry in Hdt, Hovtd.
         destruct ovtd. {
+(*
           rewrite <- angle_add_overflow_equiv2 in Hovt, Hovtd.
           progress unfold angle_add_overflow2 in Hovt.
           progress unfold angle_add_overflow2 in Hovtd.
           apply angle_ltb_ge in Htt, Hovt.
+*)
+          rewrite angle_div_2_add_overflow; [ | easy ].
+          rewrite <- angle_add_assoc.
+          rewrite angle_straight_add_straight.
+          rewrite angle_add_0_r.
+          destruct dt. {
+            rewrite rngl_sin_add_straight_r.
+            rewrite (rngl_mul_opp_r Hop).
+            rewrite (rngl_abs_opp Hop Hor).
+            rewrite angle_div_2_add_overflow. 2: {
+              rewrite <- angle_add_overflow_equiv2.
+              progress unfold angle_add_overflow2.
 ...
           apply angle_nle_gt in Hovtd.
 ...
