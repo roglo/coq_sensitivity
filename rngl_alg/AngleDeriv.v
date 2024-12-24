@@ -3041,15 +3041,6 @@ clear Hd.
         rewrite (rngl_opp_involutive Hop).
         destruct tt. {
 (*
-exfalso.
-destruct Hdθ as (_, H1).
-apply (rngl_min_glb_lt_iff Hor) in H1.
-destruct H1 as (H1, _).
-move Hts at bottom.
-move H1 at bottom.
-...
-*)
-(*
 apply angle_nle_gt in Htds.
 apply Htds; clear Htds.
 apply angle_eucl_dist_lt_angle_eucl_dist in H1.
@@ -3104,6 +3095,39 @@ apply angle_add_le_mono_l; [ | apply angle_nonneg ].
             apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
           }
           rewrite angle_add_comm.
+destruct Hdθ as (_, H1).
+apply (rngl_min_glb_lt_iff Hor) in H1.
+destruct H1 as (H1, _).
+move Hts at bottom.
+move H1 at bottom.
+progress unfold angle_ltb in Htt.
+progress unfold angle_ltb in Htds.
+progress unfold angle_ltb in Hts.
+apply angle_eucl_dist_lt_angle_eucl_dist in H1.
+rewrite rngl_cos_sub_straight_r in H1.
+rewrite angle_sub_0_r in H1.
+cbn in Htds, Hts.
+rewrite (rngl_leb_refl Hor) in Htds, Hts.
+remember (0 ≤? rngl_sin θ₀)%L as zst eqn:Hzst.
+symmetry in Hzst.
+destruct zst; [ | easy ].
+apply rngl_leb_le in Hzst.
+apply rngl_ltb_lt in Hts.
+remember (0 ≤? rngl_sin dθ)%L as zsd eqn:Hzsd.
+symmetry in Hzsd.
+remember (0 ≤? rngl_sin (θ₀ + dθ))%L as zstd eqn:Hzstd.
+symmetry in Hzstd.
+destruct zstd; [ | easy ].
+apply rngl_leb_le in Hzstd.
+apply rngl_ltb_lt in Htt.
+destruct zsd. {
+  exfalso.
+  apply rngl_ltb_lt in Htds.
+  apply rngl_nle_gt in Htds.
+  apply Htds, rngl_cos_bound.
+}
+clear Htds.
+apply (rngl_leb_gt Hor) in Hzsd.
 ...
           progress unfold rngl_dist in Hsc.
           rewrite rngl_sin_add_sin.
