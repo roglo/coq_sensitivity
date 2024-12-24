@@ -3172,6 +3172,67 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
       rewrite (rngl_opp_add_distr Hop).
       rewrite (rngl_sub_opp_r Hop).
       rewrite (rngl_add_opp_l Hop).
+apply angle_ltb_ge in Htt.
+(* Htt indique que dθ>π est plus proche de π que θ₀<π est proche de π
+   et Hdθ indique que dθ est plus proche de 0 que θ₀ est proche de π *)
+exfalso.
+move Hts at bottom.
+move Htds at bottom.
+move Htt at bottom.
+destruct Hdθ as (H1, H2).
+apply (rngl_min_glb_lt_iff Hor) in H2.
+destruct H2 as (H2, H3).
+move H2 at bottom.
+progress unfold angle_ltb in Hts.
+progress unfold angle_ltb in Htds.
+progress unfold angle_leb in Htt.
+apply angle_eucl_dist_lt_angle_eucl_dist in H2.
+rewrite rngl_cos_sub_straight_r in H2.
+rewrite angle_sub_0_r in H2.
+cbn in Hts, Htds.
+rewrite (rngl_leb_refl Hor) in Hts, Htds.
+remember (0 ≤? rngl_sin θ₀)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs; [ | easy ].
+apply rngl_leb_le in Hzs.
+apply rngl_ltb_lt in Hts.
+remember (0 ≤? rngl_sin dθ)%L as zsd eqn:Hzsd.
+symmetry in Hzsd.
+destruct zsd. {
+  apply rngl_ltb_lt in Htds.
+  apply rngl_nle_gt in Htds.
+  apply Htds, rngl_cos_bound.
+}
+clear Htds.
+apply (rngl_leb_gt Hor) in Hzsd.
+remember (0 ≤? rngl_sin (θ₀ + dθ))%L as zst eqn:Hzst.
+symmetry in Hzst.
+destruct zst. {
+  apply rngl_leb_le in Hzst.
+  apply rngl_leb_le in Htt.
+  change_angle_add_r dθ angle_straight.
+  progress sin_cos_add_sub_straight_hyp T H2.
+  progress sin_cos_add_sub_straight_hyp T Htt.
+  progress sin_cos_add_sub_straight_hyp T Hzst.
+  progress sin_cos_add_sub_straight_hyp T Hzsd.
+  destruct (rngl_le_dec Hor 0 (rngl_cos dθ)) as [Hzcd| Hzcd]. {
+    apply rngl_nlt_ge in Hzst.
+    apply Hzst; clear Hzst.
+    cbn.
+    apply (rngl_add_nonneg_pos Hor). {
+      now apply (rngl_mul_nonneg_nonneg Hos Hor).
+    }
+    apply (rngl_mul_pos_pos Hos Hor Hii); [ | easy ].
+    now apply (rngl_le_lt_trans Hor _ (rngl_cos dθ)).
+  }
+  apply (rngl_nle_gt_iff Hor) in Hzcd.
+  change_angle_sub_l dθ angle_straight.
+  progress sin_cos_add_sub_straight_hyp T Hzcd.
+  progress sin_cos_add_sub_straight_hyp T Hzsd.
+  progress sin_cos_add_sub_straight_hyp T Hzst.
+  progress sin_cos_add_sub_straight_hyp T Htt.
+  progress sin_cos_add_sub_straight_hyp T H2.
+...
       apply Hsc.
       rewrite angle_eucl_dist_move_0_r.
       rewrite angle_add_comm.
