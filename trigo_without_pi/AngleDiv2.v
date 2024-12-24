@@ -529,6 +529,82 @@ rewrite (rngl_div_mul Hon Hiv). 2: {
 now apply (rngl_add_le_mono_l Hop Hor).
 Qed.
 
+Theorem rngl_cos_lt_sqrt_1_add_cos_div_2 :
+  rngl_characteristic T ≠ 1 →
+  ∀ θ,
+  θ ≠ 0%A
+  → (rngl_cos θ < √((1 + rngl_cos θ) / 2))%L.
+Proof.
+destruct_ac.
+intros Hc1.
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hsz.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
+  apply rl_sqrt_nonneg.
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_opp_l Hop Hor).
+  apply rngl_cos_bound.
+}
+destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hcz| Hzc]. {
+  apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
+  apply (rngl_abs_nonneg Hop Hor).
+}
+apply (rngl_nlt_ge_iff Hor) in Hzc.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos θ)) at 1; [ | easy ].
+apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_opp_l Hop Hor).
+  apply rngl_cos_bound.
+}
+apply -> (rngl_lt_div_r Hon Hop Hiv Hor); [ | easy ].
+apply (rngl_le_lt_trans Hor _ (rngl_cos θ * 2))%L. 2: {
+  rewrite rngl_mul_add_distr_l.
+  rewrite (rngl_mul_1_r Hon).
+  apply (rngl_add_lt_le_mono Hop Hor); [ | now apply (rngl_le_refl Hor) ].
+  apply (rngl_lt_iff Hor).
+  split; [ apply rngl_cos_bound | ].
+  intros H.
+  now apply eq_rngl_cos_1 in H.
+}
+apply (rngl_mul_le_mono_pos_r Hop Hor Hii); [ easy | ].
+progress unfold rngl_squ.
+rewrite <- (rngl_mul_1_r Hon).
+apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+apply rngl_cos_bound.
+Qed.
+
+Theorem rngl_cos_le_cos_div_2 :
+  ∀ θ, (0 ≤ rngl_sin θ)%L → (rngl_cos θ ≤ rngl_cos (θ /₂))%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  do 2 rewrite (H1 (rngl_cos _)).
+  apply (rngl_le_refl Hor).
+}
+intros * Hzs.
+remember (θ =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
+destruct tz. {
+  apply angle_eqb_eq in Htz.
+  subst θ.
+  rewrite angle_0_div_2.
+  apply (rngl_le_refl Hor).
+}
+apply angle_eqb_neq in Htz.
+cbn.
+apply rngl_leb_le in Hzs.
+rewrite Hzs.
+apply (rngl_lt_le_incl Hor).
+rewrite (rngl_mul_1_l Hon).
+now apply (rngl_cos_lt_sqrt_1_add_cos_div_2 Hc1).
+Qed.
+
 Fixpoint angle_div_2_pow θ i :=
   match i with
   | 0 => θ

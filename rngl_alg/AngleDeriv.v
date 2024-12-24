@@ -3131,6 +3131,26 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
         progress sin_cos_add_sub_straight_hyp T Hzsd.
         progress sin_cos_add_sub_straight_hyp T Hzc.
         progress sin_cos_add_sub_straight_hyp T H2.
+        apply rngl_cos_le_iff_angle_eucl_le.
+        rewrite angle_div_2_sub.
+        rewrite angle_straight_div_2.
+        remember (dθ ≤? angle_straight)%A as ds eqn:Hds.
+        symmetry in Hds.
+        apply (rngl_lt_le_incl Hor) in Hzsd.
+        destruct ds. {
+          rewrite angle_sub_sub_swap.
+          rewrite angle_sub_diag, angle_sub_0_l.
+          do 2 rewrite rngl_cos_opp.
+          now apply rngl_cos_le_cos_div_2.
+        }
+        apply angle_leb_gt in Hds.
+        exfalso.
+        apply angle_nle_gt in Hds.
+        apply Hds; clear Hds.
+        now apply rngl_sin_nonneg_angle_le_straight.
+      }
+      rewrite angle_add_0_r.
+...
         move Hovt at bottom.
         rewrite <- angle_add_overflow_equiv2 in Hovt.
         progress unfold angle_add_overflow2 in Hovt.
