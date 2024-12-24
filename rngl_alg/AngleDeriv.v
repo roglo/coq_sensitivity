@@ -2074,7 +2074,7 @@ symmetry in Ht12.
 destruct t12; [ now left | now right ].
 Qed.
 
-(* to be completed
+(* to be completed - no
 Theorem param_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist param_cos (λ θ, (- param_sin θ)%L).
 Proof.
@@ -2875,6 +2875,7 @@ progress unfold continuous_at in Hsc.
 progress unfold is_limit_when_tending_to in Hsc.
 specialize (Hsc θ₀ ε Hε).
 destruct Hsc as (η1 & Hη1 & Hsc).
+progress unfold rngl_dist in Hsc.
 move η1 before ε.
 enough (H :
   ∃ η : T, (0 < η)%L ∧
@@ -3128,6 +3129,63 @@ destruct zsd. {
 }
 clear Htds.
 apply (rngl_leb_gt Hor) in Hzsd.
+change_angle_add_r dθ angle_straight.
+progress sin_cos_add_sub_straight_hyp T Hzsd.
+progress sin_cos_add_sub_straight_hyp T Htt.
+progress sin_cos_add_sub_straight_hyp T Hzstd.
+progress sin_cos_add_sub_straight_hyp T H1.
+rewrite angle_div_2_sub.
+rewrite angle_straight_div_2.
+remember (angle_straight ≤? dθ)%A as sd eqn:Hsd.
+symmetry in Hsd.
+destruct sd. {
+  (* lemma *)
+  progress unfold angle_leb in Hsd.
+  cbn in Hsd.
+  rewrite (rngl_leb_refl Hor) in Hsd.
+  generalize Hzsd; intros H.
+  apply (rngl_lt_le_incl Hor) in H.
+  apply rngl_leb_le in H.
+  rewrite H in Hsd; clear H.
+  apply rngl_leb_le in Hsd.
+  apply (rngl_lt_eq_cases Hor) in Hsd.
+  destruct Hsd as [Hsd| Hsd]. {
+    exfalso.
+    apply rngl_nle_gt in Hsd.
+    apply Hsd, rngl_cos_bound.
+  }
+  apply eq_rngl_cos_opp_1 in Hsd.
+  subst dθ.
+  now apply (rngl_lt_irrefl Hor) in Hzsd.
+}
+apply angle_leb_gt in Hsd.
+rewrite angle_add_assoc.
+rewrite rngl_sin_add_straight_r.
+rewrite <- (rngl_abs_opp Hop Hor).
+rewrite (rngl_opp_add_distr Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_add_opp_l Hop).
+apply Hsc.
+rewrite angle_add_sub_assoc.
+rewrite angle_eucl_dist_move_0_r.
+rewrite angle_sub_sub_swap.
+rewrite angle_add_sub_swap.
+rewrite angle_sub_diag.
+rewrite angle_add_0_l.
+apply rngl_cos_lt_angle_eucl_dist_lt. {
+  now apply (rngl_lt_le_incl Hor).
+}
+rewrite angle_sub_0_l.
+rewrite rngl_cos_opp.
+rewrite rngl_cos_sub_right_r.
+Search (angle_eucl_dist _ _ < _)%L.
+...
+Search (0 < rngl_sin _)%L.
+Search (angle_straight ≤ _)%A.
+Search (_ ≤ angle_straight)%A.
+  apply rngl_sin_nonneg_angle_le_straight in Hsd.
+
+
 ...
           progress unfold rngl_dist in Hsc.
           rewrite rngl_sin_add_sin.
