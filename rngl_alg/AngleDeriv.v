@@ -3117,6 +3117,16 @@ rewrite angle_sub_sub_swap.
 rewrite angle_add_sub_swap.
 rewrite angle_sub_diag.
 rewrite angle_add_0_l.
+eapply (rngl_le_lt_trans Hor); [ | apply H3 ].
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+(**)
+apply angle_le_angle_eucl_dist_le. {
+Search (_ - _ ≤ _)%A.
+...
+apply rngl_cos_le_iff_angle_eucl_le.
+rewrite rngl_cos_sub_straight_r.
+rewrite rngl_cos_sub_right_r.
+apply angle_eucl_dist_lt_angle_eucl_dist.
 ...
 apply rngl_cos_lt_angle_eucl_dist_lt. {
   now apply (rngl_lt_le_incl Hor).
