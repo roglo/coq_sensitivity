@@ -3366,6 +3366,11 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
         rewrite (rngl_opp_add_distr Hop).
         rewrite (rngl_sub_opp_r Hop).
         rewrite (rngl_add_opp_l Hop).
+        rewrite angle_sub_sub_swap in H2.
+        rewrite angle_sub_diag, angle_sub_0_l in H2.
+        rewrite <- angle_add_sub_swap in H4, Hovt.
+        rewrite angle_straight_add_straight in H4, Hovt.
+        rewrite angle_sub_0_l in H4, Hovt.
 ...
   eapply (rngl_le_trans Hor); [ | apply Htt ].
   apply (rngl_lt_le_incl Hor) in Hzsd, Hzcd.
