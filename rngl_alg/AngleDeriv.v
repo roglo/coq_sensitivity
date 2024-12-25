@@ -3059,6 +3059,7 @@ clear - Hc1 Hon Hop Hos Hiv Hic Hi1 Hor Hdθ Hts Htt Htds Hsc.
           apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
         }
         rewrite angle_add_comm.
+clear - Hor Hop Hdθ Htt Htds Hts Hsc.
         destruct Hdθ as (H1, H2).
         apply (rngl_min_glb_lt_iff Hor) in H2.
         destruct H2 as (H2, H4).
