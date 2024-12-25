@@ -13,11 +13,11 @@ Require Import Trigo.TrigoWithoutPiExt.
 Require Import Trigo.Angle_order.
 Require Import Trigo.TacChangeAngle.
 Require Import Trigo.AngleAddOverflowLe.
+Require Import Trigo.AngleDivNat.
 Require Import Trigo.SeqAngleIsCauchy.
 Require Import Trigo.AngleTypeIsComplete.
 Require Import Trigo.AngleAddLeMonoL.
 Require Import Trigo.AngleDiv2Add.
-Require Import Trigo.AngleDivNat.
 Require Import AngleEuclDist_sin.
 Require Import AngleAddOverflowEquiv.
 
@@ -2879,13 +2879,16 @@ specialize rngl_sin_is_continuous as Hsc.
 progress unfold continuous in Hsc.
 progress unfold continuous_at in Hsc.
 progress unfold is_limit_when_tending_to in Hsc.
-progress unfold rngl_dist in Hsc.
 specialize (Hsc θ₀ ε Hε).
 destruct Hsc as (η1 & Hη1 & Hsc).
+progress unfold rngl_dist in Hsc.
 move η1 before ε.
-destruct (angle_lt_dec θ₀ angle_right) as [Hts| Hts]. {
+destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
   remember (angle_eucl_dist angle_right 0) as x.
-  exists (rngl_min3 x (angle_eucl_dist θ₀ angle_right) η1).
+(*
+  remember (angle_eucl_dist θ₀ 0) as y.
+*)
+  exists (rngl_min3 x (angle_eucl_dist θ₀ angle_straight) η1).
   subst x.
   split. {
     apply rngl_min_glb_lt; [ | easy ].
@@ -2915,9 +2918,7 @@ destruct (angle_lt_dec θ₀ angle_right) as [Hts| Hts]. {
       (* lemma *)
       rewrite <- (angle_add_0_r θ₀) at 1.
       apply angle_add_le_mono_l; [ | apply angle_nonneg ].
-      apply angle_add_not_overflow_lt_straight_le_straight; [ | easy ].
-      apply (angle_lt_le_trans _ angle_right); [ easy | ].
-      apply angle_right_le_straight.
+      now apply angle_add_not_overflow_lt_straight_le_straight.
     }
     apply angle_ltb_ge in Htt.
     rewrite angle_add_sub_swap.
@@ -2940,10 +2941,7 @@ destruct (angle_lt_dec θ₀ angle_right) as [Hts| Hts]. {
       rewrite (rngl_sin_angle_eucl_dist' (dθ/₂)). 2: {
         apply angle_div_2_le_straight.
       }
-      rewrite angle_mul_2_div_2. 2: {
-        apply (angle_lt_le_trans _ angle_right); [ easy | ].
-        apply angle_right_le_straight.
-      }
+      rewrite angle_mul_2_div_2; [ | easy ].
       rewrite angle_div_2_mul_2.
       rewrite (rngl_mul_div_assoc Hiv).
       rewrite (rngl_div_opp_l Hop Hiv).
@@ -2983,17 +2981,12 @@ destruct (angle_lt_dec θ₀ angle_right) as [Hts| Hts]. {
       rewrite angle_mul_2_l.
       rewrite angle_add_comm in Hovt.
       rewrite angle_add_overflow_move_add; [ easy | | easy ].
-      apply angle_lt_straight_add_same_not_overflow.
-      apply (angle_lt_le_trans _ angle_right); [ easy | ].
-      apply angle_right_le_straight.
+      now apply angle_lt_straight_add_same_not_overflow.
     }
     rewrite <- angle_add_assoc.
     rewrite angle_straight_add_straight.
     rewrite angle_add_0_r.
-    rewrite angle_mul_2_div_2. 2: {
-      apply (angle_lt_le_trans _ angle_right); [ easy | ].
-      apply angle_right_le_straight.
-    }
+    rewrite angle_mul_2_div_2; [ | easy ].
     rewrite (rngl_sin_angle_eucl_dist' (dθ/₂)). 2: {
       apply angle_div_2_le_straight.
     }
@@ -3036,18 +3029,13 @@ destruct (angle_lt_dec θ₀ angle_right) as [Hts| Hts]. {
     rewrite rngl_sin_add_straight_r.
     rewrite angle_add_comm in Hovt.
     apply angle_add_overflow_move_add in Hovt. 2: {
-      apply angle_lt_straight_add_same_not_overflow.
-      apply (angle_lt_le_trans _ angle_right); [ easy | ].
-      apply angle_right_le_straight.
+      now apply angle_lt_straight_add_same_not_overflow.
     }
     rewrite <- angle_mul_2_l in Hovt.
     rewrite angle_div_2_add. {
       rewrite Hovt.
       rewrite rngl_sin_add_straight_r.
-      rewrite angle_mul_2_div_2. 2: {
-        apply (angle_lt_le_trans _ angle_right); [ easy | ].
-        apply angle_right_le_straight.
-      }
+      rewrite angle_mul_2_div_2; [ | easy ].
       rewrite (rngl_opp_involutive Hop).
       destruct tt. {
         rewrite rngl_sin_add_straight_r.
@@ -3081,11 +3069,10 @@ destruct (angle_lt_dec θ₀ angle_right) as [Hts| Hts]. {
         progress unfold angle_ltb in Htds.
         progress unfold angle_ltb in Hts.
         apply angle_eucl_dist_lt_angle_eucl_dist in H3.
-        rewrite rngl_cos_sub_right_r in H3.
+        rewrite rngl_cos_sub_straight_r in H3.
         rewrite angle_sub_0_r in H3.
         cbn in Htds, Hts.
-        rewrite (rngl_leb_refl Hor) in Htds.
-        rewrite (rngl_0_leb_1 Hon Hos Hor) in Hts.
+        rewrite (rngl_leb_refl Hor) in Htds, Hts.
         remember (0 ≤? rngl_sin θ₀)%L as zst eqn:Hzst.
         symmetry in Hzst.
         destruct zst; [ | easy ].
@@ -3200,11 +3187,10 @@ destruct (angle_lt_dec θ₀ angle_right) as [Hts| Hts]. {
       progress unfold angle_ltb in Htds.
       progress unfold angle_leb in Htt.
       apply angle_eucl_dist_lt_angle_eucl_dist in H3.
-      rewrite rngl_cos_sub_right_r in H3.
+      rewrite rngl_cos_sub_straight_r in H3.
       rewrite angle_sub_0_r in H3.
       cbn in Hts, Htds.
-      rewrite (rngl_leb_refl Hor) in Htds.
-      rewrite (rngl_0_leb_1 Hon Hos Hor) in Hts.
+      rewrite (rngl_leb_refl Hor) in Hts, Htds.
       remember (0 ≤? rngl_sin θ₀)%L as zs eqn:Hzs.
       symmetry in Hzs.
       destruct zs; [ | easy ].
@@ -3238,7 +3224,8 @@ destruct (angle_lt_dec θ₀ angle_right) as [Hts| Hts]. {
           apply (rngl_add_nonneg_pos Hor). {
             now apply (rngl_mul_nonneg_nonneg Hos Hor).
           }
-          now apply (rngl_mul_pos_pos Hos Hor Hii).
+          apply (rngl_mul_pos_pos Hos Hor Hii); [ | easy ].
+          now apply (rngl_le_lt_trans Hor _ (rngl_cos dθ)).
         }
         apply (rngl_nle_gt_iff Hor) in Hzcd.
         change_angle_sub_l dθ angle_straight.
@@ -3399,8 +3386,6 @@ destruct (angle_lt_dec θ₀ angle_right) as [Hts| Hts]. {
         rewrite angle_straight_add_straight in H4, Hovt.
         rewrite angle_sub_0_l in H4, Hovt.
         rewrite angle_eucl_dist_opp_0 in H2, H4.
-...
-  exists (rngl_min3 x (angle_eucl_dist θ₀ angle_straight) η1).
 ...
 rewrite rngl_sin_sub_sin.
 rewrite angle_sub_add.
