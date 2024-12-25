@@ -3174,7 +3174,6 @@ clear - Hc1 Hon Hop Hos Hiv Hic Hi1 Hor Hdθ Hts Htt Htds Hsc.
         apply Hds; clear Hds.
         now apply rngl_sin_nonneg_angle_le_straight.
       }
-...
       apply angle_ltb_ge in Htt.
       move Hts at bottom.
       move Htds at bottom.
