@@ -3150,7 +3150,6 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
         now apply rngl_sin_nonneg_angle_le_straight.
       }
       apply angle_ltb_ge in Htt.
-      exfalso.
       move Hts at bottom.
       move Htds at bottom.
       move Htt at bottom.
@@ -3174,6 +3173,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
       remember (0 ≤? rngl_sin dθ)%L as zsd eqn:Hzsd.
       symmetry in Hzsd.
       destruct zsd. {
+        exfalso.
         apply rngl_ltb_lt in Htds.
         apply rngl_nle_gt in Htds.
         apply Htds, rngl_cos_bound.
@@ -3183,6 +3183,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
       remember (0 ≤? rngl_sin (θ₀ + dθ))%L as zst eqn:Hzst.
       symmetry in Hzst.
       destruct zst. {
+        exfalso.
         apply rngl_leb_le in Hzst.
         apply rngl_leb_le in Htt.
         change_angle_add_r dθ angle_straight.
@@ -3265,6 +3266,10 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
       }
       clear Htt.
       apply (rngl_leb_gt Hor) in Hzst.
+      change_angle_add_r dθ angle_straight.
+      progress sin_cos_add_sub_straight_hyp T H2.
+      progress sin_cos_add_sub_straight_hyp T Hzst.
+      progress sin_cos_add_sub_straight_hyp T Hzsd.
 ...
   eapply (rngl_le_trans Hor); [ | apply Htt ].
   apply (rngl_lt_le_incl Hor) in Hzsd, Hzcd.
