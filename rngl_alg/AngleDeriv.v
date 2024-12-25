@@ -3038,6 +3038,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
       rewrite angle_mul_2_div_2; [ | easy ].
       rewrite (rngl_opp_involutive Hop).
       destruct tt. {
+clear - Hc1 Hon Hop Hos Hiv Hic Hi1 Hor Hdθ Hts Htt Htds Hsc.
         rewrite rngl_sin_add_straight_r.
         rewrite (rngl_mul_opp_r Hop).
         rewrite (rngl_opp_involutive Hop).
@@ -3103,6 +3104,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
         remember (angle_straight ≤? dθ)%A as sd eqn:Hsd.
         symmetry in Hsd.
         destruct sd. {
+          exfalso.
           (* lemma *)
           progress unfold angle_leb in Hsd.
           cbn in Hsd.
@@ -3114,7 +3116,6 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
           apply rngl_leb_le in Hsd.
           apply (rngl_lt_eq_cases Hor) in Hsd.
           destruct Hsd as [Hsd| Hsd]. {
-            exfalso.
             apply rngl_nle_gt in Hsd.
             apply Hsd, rngl_cos_bound.
           }
@@ -3147,9 +3148,9 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
         }
         apply (rngl_nle_gt_iff Hor) in Hzc.
         change_angle_sub_l dθ angle_straight.
-        rewrite angle_sub_sub_swap in H1, H4, Hovt |-*.
-        rewrite angle_sub_diag in H1, H4, Hovt |-*.
-        rewrite angle_sub_0_l in H1, H4, Hovt |-*.
+        rewrite angle_sub_sub_swap in H1, H4 |-*.
+        rewrite angle_sub_diag in H1, H4 |-*.
+        rewrite angle_sub_0_l in H1, H4 |-*.
         progress sin_cos_add_sub_straight_hyp T Hzstd.
         progress sin_cos_add_sub_straight_hyp T Htt.
         progress sin_cos_add_sub_straight_hyp T Hzsd.
@@ -3167,12 +3168,13 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
           do 2 rewrite rngl_cos_opp.
           now apply rngl_cos_le_cos_div_2.
         }
-        apply angle_leb_gt in Hds.
         exfalso.
+        apply angle_leb_gt in Hds.
         apply angle_nle_gt in Hds.
         apply Hds; clear Hds.
         now apply rngl_sin_nonneg_angle_le_straight.
       }
+...
       apply angle_ltb_ge in Htt.
       move Hts at bottom.
       move Htds at bottom.
@@ -3210,6 +3212,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
       symmetry in Hzst.
       destruct zst. {
         exfalso.
+clear - Hop Hii Hor Hos H3 Htt Hzst Hzs Hzsd.
         apply rngl_leb_le in Hzst.
         apply rngl_leb_le in Htt.
         change_angle_add_r dθ angle_straight.
@@ -3244,7 +3247,6 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
         }
         apply (rngl_nle_gt_iff Hor) in Hzc.
         change_angle_sub_l θ₀ angle_straight.
-        progress sin_cos_add_sub_straight_hyp T Hts.
         progress sin_cos_add_sub_straight_hyp T Hzs.
         progress sin_cos_add_sub_straight_hyp T Hzc.
         progress sin_cos_add_sub_straight_hyp T H3.
