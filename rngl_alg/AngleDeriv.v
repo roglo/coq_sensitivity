@@ -2824,6 +2824,17 @@ apply angle_add_le_mono_l; [ easy | ].
 now apply angle_opp_le_compat_if.
 Qed.
 
+Theorem angle_eucl_dist_opp_0 :
+  ∀ θ, angle_eucl_dist (- θ) 0 = angle_eucl_dist θ 0.
+Proof.
+intros.
+rewrite <- angle_opp_0 at 1.
+apply angle_eucl_dist_opp_opp.
+Qed.
+
+Definition rngl_min4 a b c d :=
+  rngl_min (rngl_min (rngl_min a b) c) d.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   ∀ θ₀, θ₀ ≠ 0%A →
@@ -2874,6 +2885,9 @@ progress unfold rngl_dist in Hsc.
 move η1 before ε.
 destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
   remember (angle_eucl_dist angle_right 0) as x.
+(*
+  remember (angle_eucl_dist θ₀ 0) as y.
+*)
   exists (rngl_min3 x (angle_eucl_dist θ₀ angle_straight) η1).
   subst x.
   split. {
@@ -3371,6 +3385,13 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
         rewrite <- angle_add_sub_swap in H4, Hovt.
         rewrite angle_straight_add_straight in H4, Hovt.
         rewrite angle_sub_0_l in H4, Hovt.
+        rewrite angle_eucl_dist_opp_0 in H2, H4.
+Print rngl_acos.
+apply Hsc.
+(* chais pas *)
+...
+(* θ₀ < dθ/2 *)
+(* angle_eucl_dist dθ 0 < ε *)
 ...
   eapply (rngl_le_trans Hor); [ | apply Htt ].
   apply (rngl_lt_le_incl Hor) in Hzsd, Hzcd.
