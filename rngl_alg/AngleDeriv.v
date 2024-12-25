@@ -3386,9 +3386,22 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
         rewrite angle_straight_add_straight in H4, Hovt.
         rewrite angle_sub_0_l in H4, Hovt.
         rewrite angle_eucl_dist_opp_0 in H2, H4.
-Print rngl_acos.
-apply Hsc.
-(* chais pas *)
+...
+rewrite rngl_sin_sub_sin.
+rewrite angle_sub_add.
+...
+        destruct (angle_le_dec θ₀ (dθ /₂)) as [Htd| Htd]. {
+          apply Hsc.
+          rewrite angle_eucl_dist_move_0_r.
+          rewrite <- angle_sub_add_distr.
+          rewrite <- angle_mul_2_l.
+          rewrite <- angle_eucl_dist_move_0_r.
+...
+enough (angle_eucl_dist dθ 0 < angle_eucl_dist (2 * θ₀) 0)%L.
+apply angle_eucl_dist_lt_angle_eucl_dist in H.
+Search (angle_eucl_dist (_ /₂)).
+Search (angle_eucl_dist (_ + _)).
+Search (angle_eucl_dist (_ - _)).
 ...
 (* θ₀ < dθ/2 *)
 (* angle_eucl_dist dθ 0 < ε *)
