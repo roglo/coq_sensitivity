@@ -3270,6 +3270,31 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
       progress sin_cos_add_sub_straight_hyp T H2.
       progress sin_cos_add_sub_straight_hyp T Hzst.
       progress sin_cos_add_sub_straight_hyp T Hzsd.
+      rewrite angle_sub_straight_eq_add_straight in Hovt, H3, H1 |-*.
+      rewrite angle_add_0_r.
+      rewrite angle_div_2_add.
+      rewrite <- angle_add_overflow_equiv2.
+      progress unfold angle_add_overflow2.
+      progress unfold angle_ltb.
+      rewrite rngl_sin_add_straight_r.
+      rewrite rngl_cos_add_straight_r.
+      rewrite (rngl_leb_0_opp Hop Hor).
+      generalize Hzsd; intros H.
+      apply (rngl_leb_gt Hor) in H.
+      rewrite H; clear H.
+      generalize Hzsd; intros H.
+      apply (rngl_lt_le_incl Hor) in H.
+      apply rngl_leb_le in H.
+      rewrite H; clear H.
+      rewrite angle_straight_div_2.
+      rewrite angle_add_add_swap.
+      do 2 rewrite rngl_sin_add_right_r.
+      destruct (rngl_le_dec Hor 0 (rngl_cos dθ)) as [Hzd| Hzd]. {
+(* il faudrait peut-être que le "exists" inclue le fait que la
+   distance soit également inférieure à d(π/2,0), ce qui ferait qu'on
+   demanderait alors, par H3, que dθ+π soit inférieur à π/2, ce qui
+   est impossible *)
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
 ...
   eapply (rngl_le_trans Hor); [ | apply Htt ].
   apply (rngl_lt_le_incl Hor) in Hzsd, Hzcd.
