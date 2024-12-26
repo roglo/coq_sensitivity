@@ -3486,9 +3486,12 @@ clear - Hop Hii Hor Hos H3 Htt Hzst Hzs Hzsd.
       rewrite (rngl_opp_add_distr Hop).
       rewrite (rngl_sub_opp_r Hop).
       rewrite (rngl_add_opp_l Hop).
+      apply angle_ltb_ge in Hovt.
+...
       apply Hsc.
       rewrite angle_eucl_dist_move_0_r.
       rewrite angle_add_sub.
+...
       apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)). {
 (* ah bin non, c'est pas sûr *)
 ...
