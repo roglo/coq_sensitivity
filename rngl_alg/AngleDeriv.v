@@ -3384,6 +3384,20 @@ clear - Hop Hii Hor Hos H3 Htt Hzst Hzs Hzsd.
         apply (rngl_lt_le_incl Hor) in Hzsd.
         now apply rngl_sin_nonneg_angle_le_straight.
       }
+      rewrite <- angle_add_sub_swap in H1.
+      rewrite angle_straight_add_straight in H1.
+      rewrite angle_sub_0_l in H1.
+      (* lemma *)
+      rewrite <- angle_opp_0 in H1.
+      rewrite angle_eucl_dist_opp_opp in H1.
+      rewrite angle_sub_sub_swap in H2, H5.
+      rewrite angle_sub_diag, angle_sub_0_l in H2, H5.
+      rewrite <- angle_add_sub_swap in H4, Hovt.
+      rewrite angle_straight_add_straight in H4, Hovt.
+      rewrite angle_sub_0_l in H4, Hovt.
+      rewrite angle_eucl_dist_opp_0 in H2, H4, H5.
+      apply angle_eucl_dist_lt_angle_eucl_dist in H5.
+      do 2 rewrite angle_sub_0_r in H5.
       destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzc| Hzc]. {
         rewrite angle_straight_div_2.
         rewrite <- angle_sub_sub_distr.
@@ -3399,12 +3413,6 @@ clear - Hop Hii Hor Hos H3 Htt Hzst Hzs Hzsd.
         rewrite <- (rngl_div_opp_l Hop Hiv).
         rewrite (rngl_div_div_swap Hic Hiv).
         rewrite (rngl_div_opp_l Hop Hiv).
-        rewrite <- angle_add_sub_swap in H1.
-        rewrite angle_straight_add_straight in H1.
-        rewrite angle_sub_0_l in H1.
-        (* lemma *)
-        rewrite <- angle_opp_0 in H1.
-        rewrite angle_eucl_dist_opp_opp in H1.
         rewrite (rngl_mul_div Hi1). 2: {
           intros H.
           rewrite H in H1.
@@ -3419,14 +3427,6 @@ clear - Hop Hii Hor Hos H3 Htt Hzst Hzs Hzsd.
         rewrite (rngl_opp_add_distr Hop).
         rewrite (rngl_sub_opp_r Hop).
         rewrite (rngl_add_opp_l Hop).
-        rewrite angle_sub_sub_swap in H2, H5.
-        rewrite angle_sub_diag, angle_sub_0_l in H2, H5.
-        rewrite <- angle_add_sub_swap in H4, Hovt.
-        rewrite angle_straight_add_straight in H4, Hovt.
-        rewrite angle_sub_0_l in H4, Hovt.
-        rewrite angle_eucl_dist_opp_0 in H2, H4, H5.
-        apply angle_eucl_dist_lt_angle_eucl_dist in H5.
-        do 2 rewrite angle_sub_0_r in H5.
         apply (rngl_lt_le_incl Hor) in Hzsd, Hzd.
         apply quadrant_1_sin_sub_pos_cos_lt in Hzst; try easy.
         now apply (rngl_lt_asymm Hor) in H5.
