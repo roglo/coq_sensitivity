@@ -3448,34 +3448,50 @@ clear - Hop Hii Hor Hos H3 Htt Hzst Hzs Hzsd.
       now apply rngl_sin_add_nonneg.
     }
   }
-...
-        destruct (angle_le_dec θ₀ (dθ /₂)) as [Htd| Htd]. {
-          apply Hsc.
-          rewrite angle_eucl_dist_move_0_r.
-          rewrite <- angle_sub_add_distr.
-          rewrite <- angle_mul_2_l.
-          rewrite <- angle_eucl_dist_move_0_r.
-...
-enough (angle_eucl_dist dθ 0 < angle_eucl_dist (2 * θ₀) 0)%L.
-apply angle_eucl_dist_lt_angle_eucl_dist in H.
-Search (angle_eucl_dist (_ /₂)).
-Search (angle_eucl_dist (_ + _)).
-Search (angle_eucl_dist (_ - _)).
-...
-(* θ₀ < dθ/2 *)
-(* angle_eucl_dist dθ 0 < ε *)
-...
-  eapply (rngl_le_trans Hor); [ | apply Htt ].
-  apply (rngl_lt_le_incl Hor) in Hzsd, Hzcd.
-  apply rngl_cos_sub_nonneg; try easy.
-
-...
+  rewrite angle_add_0_r.
+  rewrite angle_div_2_add.
+  rewrite angle_mul_2_div_2; [ | easy ].
+  destruct tt. {
+    remember (angle_add_overflow dθ (2 * θ₀)) as ovd eqn:Hovd.
+    symmetry in Hovd.
+    rewrite angle_add_overflow_comm in Hovd.
+    rewrite angle_mul_2_l in Hovd.
+    move Hovd before Hovt.
+    destruct ovd. {
+      rewrite <- angle_add_overflow_equiv2 in Hovt, Hovd.
+      progress unfold angle_add_overflow2 in Hovt, Hovd.
+      rewrite angle_add_add_swap in Hovt.
+      do 2 rewrite rngl_sin_add_straight_r.
+      do 2 rewrite (rngl_mul_opp_r Hop).
+      rewrite (rngl_mul_opp_l Hop).
+      rewrite (rngl_opp_involutive Hop).
+      rewrite (rngl_div_opp_l Hop Hiv).
+      rewrite (rngl_sin_angle_eucl_dist' (dθ /₂)). 2: {
+        apply angle_div_2_le_straight.
+      }
+      rewrite angle_div_2_mul_2.
+      rewrite (rngl_mul_div_assoc Hiv).
+      rewrite (rngl_div_div_swap Hic Hiv).
+      rewrite (rngl_mul_div Hi1). 2: {
+        intros H.
+        rewrite H in Hdθ.
+        destruct Hdθ as (H1, _).
+        now apply (rngl_lt_irrefl Hor) in H1.
+      }
+      rewrite (rngl_mul_comm Hic).
+      rewrite (rngl_mul_div Hi1). 2: {
+        apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+      }
+      rewrite <- (rngl_abs_opp Hop Hor).
+      rewrite (rngl_opp_add_distr Hop).
+      rewrite (rngl_sub_opp_r Hop).
+      rewrite (rngl_add_opp_l Hop).
       apply Hsc.
       rewrite angle_eucl_dist_move_0_r.
-      rewrite angle_add_comm.
       rewrite angle_add_sub.
-...
       apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)). {
+(* ah bin non, c'est pas sûr *)
+...
         apply angle_le_angle_eucl_dist_le; [ | | ]. 2: {
 ...
         apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
