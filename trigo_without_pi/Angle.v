@@ -2648,6 +2648,18 @@ rewrite angle_add_assoc.
 apply angle_add_add_swap.
 Qed.
 
+Theorem angle_mul_sub_distr_l :
+  ∀ n θ1 θ2, (n * (θ1 - θ2) = n * θ1 - n * θ2)%A.
+Proof.
+intros.
+induction n; intros; cbn; [ symmetry; apply angle_sub_diag | ].
+rewrite angle_sub_add_distr.
+rewrite angle_add_sub_swap.
+rewrite <- angle_add_sub_assoc.
+f_equal.
+apply IHn.
+Qed.
+
 Theorem angle_mul_sub_distr_r :
   ∀ a b θ, b ≤ a → ((a - b) * θ = a * θ - b * θ)%A.
 Proof.

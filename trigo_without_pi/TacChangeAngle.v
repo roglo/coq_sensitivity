@@ -80,6 +80,7 @@ Ltac sin_cos_add_sub_straight_hyp T H :=
   repeat rewrite -> (angle_add_sub_swap _ angle_straight) in H;
   repeat rewrite -> (angle_sub_sub_swap _ angle_straight) in H;
   repeat rewrite <- (angle_sub_sub_distr angle_straight) in H;
+  repeat rewrite (angle_sub_sub_distr _ angle_straight) in H;
   set (Hor' := ac_or);
   assert (Hos' : rngl_has_opp_or_subt T = true) by
     apply (rngl_has_opp_has_opp_or_subt Hop');

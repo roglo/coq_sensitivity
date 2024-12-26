@@ -3431,12 +3431,23 @@ clear - Hop Hii Hor Hos H3 Htt Hzst Hzs Hzsd.
         apply quadrant_1_sin_sub_pos_cos_lt in Hzst; try easy.
         now apply (rngl_lt_asymm Hor) in H5.
       }
-...
-      apply quadrant_1_sin_sub_nonneg_cos_le in Hzst.
-Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
-...
-rewrite rngl_sin_sub_sin.
-rewrite angle_sub_add.
+      exfalso.
+      apply (rngl_nle_gt_iff Hor) in Hzc.
+      change_angle_sub_l θ₀ angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hts.
+      progress sin_cos_add_sub_straight_hyp T Hzs.
+      progress sin_cos_add_sub_straight_hyp T H3.
+      rewrite angle_sub_sub_distr in Hzst.
+      rewrite <- angle_add_sub_swap in Hzst.
+      progress sin_cos_add_sub_straight_hyp T Hzst.
+      progress sin_cos_add_sub_straight_hyp T Hzc.
+      (* lemma *)
+      apply rngl_nle_gt in Hzst.
+      apply Hzst; clear Hzst.
+      apply (rngl_lt_le_incl Hor) in Hzsd, Hzd, Hzc.
+      now apply rngl_sin_add_nonneg.
+    }
+  }
 ...
         destruct (angle_le_dec θ₀ (dθ /₂)) as [Htd| Htd]. {
           apply Hsc.
