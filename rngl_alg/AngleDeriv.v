@@ -3514,7 +3514,7 @@ clear Htds.
 apply rngl_leb_gt in Hzsd.
 remember (0 ≤? rngl_sin (θ₀ + θ₀))%L as zstt eqn:Hzstt.
 symmetry in Hzstt.
-destruct zstt.{
+destruct zstt. {
   apply rngl_leb_le in Hzstt.
   remember (0 ≤? rngl_sin (θ₀ + θ₀ + dθ))%L as zsttd eqn:Hzsttd.
   symmetry in Hzsttd.
@@ -3541,6 +3541,18 @@ destruct zstt.{
       apply angle_eqb_neq in Hdz.
       rewrite angle_add_add_swap.
       rewrite rngl_sin_add_straight_r.
+      destruct Hdθ as (H1, H2).
+      apply (rngl_min_glb_lt_iff Hor) in H2.
+      destruct H2 as (H2, H4).
+      apply (rngl_min_glb_lt_iff Hor) in H2.
+      destruct H2 as (H2, H3).
+      apply (rngl_min_glb_lt_iff Hor) in H2.
+      destruct H2 as (H2, H5).
+      rewrite angle_eucl_dist_opp_0 in H1, H2, H3, H4, H5.
+...
+rewrite angle_add_opp_l.
+rewrite <- rngl_sin_sub_anticomm.
+apply Hsc.
 ...
       rewrite angle_add_comm.
       rewrite angle_add_opp_r.
