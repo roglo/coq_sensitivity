@@ -2852,7 +2852,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros θ₀ Htz ε Hε.
-clear Htz. (* AAAAAAA VOIR ..... *)
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ dθ,
@@ -2885,18 +2884,19 @@ progress unfold rngl_dist in Hsc.
 move η1 before ε.
 destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
   remember (angle_eucl_dist angle_right 0) as x.
-(*
   remember (angle_eucl_dist θ₀ 0) as y.
-*)
-  exists (rngl_min3 x (angle_eucl_dist θ₀ angle_straight) η1).
-  subst x.
+  exists (rngl_min4 x y (angle_eucl_dist θ₀ angle_straight) η1).
+  subst x y.
   split. {
     apply rngl_min_glb_lt; [ | easy ].
     apply rngl_min_glb_lt. {
-      apply angle_eucl_dist_pos_angle_neq.
-      apply neq_angle_neq; intros H.
-      injection H; clear H; intros H1 H2.
-      now apply (rngl_1_neq_0_iff Hon) in H1.
+      apply rngl_min_glb_lt. {
+        apply angle_eucl_dist_pos_angle_neq.
+        apply neq_angle_neq; intros H.
+        injection H; clear H; intros H1 H2.
+        now apply (rngl_1_neq_0_iff Hon) in H1.
+      }
+      now apply angle_eucl_dist_pos_angle_neq.
     }
     apply angle_eucl_dist_pos_angle_neq.
     intros H.
@@ -3184,6 +3184,8 @@ clear - Hor Hop Hdθ Htt Htds Hts Hsc.
       destruct H2 as (H2, H4).
       apply (rngl_min_glb_lt_iff Hor) in H2.
       destruct H2 as (H2, H3).
+      apply (rngl_min_glb_lt_iff Hor) in H2.
+      destruct H2 as (H2, H5).
       move H3 at bottom.
       progress unfold angle_ltb in Hts.
       progress unfold angle_ltb in Htds.
@@ -3382,12 +3384,21 @@ clear - Hop Hii Hor Hos H3 Htt Hzst Hzs Hzsd.
         rewrite (rngl_opp_add_distr Hop).
         rewrite (rngl_sub_opp_r Hop).
         rewrite (rngl_add_opp_l Hop).
-        rewrite angle_sub_sub_swap in H2.
-        rewrite angle_sub_diag, angle_sub_0_l in H2.
+        rewrite angle_sub_sub_swap in H2, H5.
+        rewrite angle_sub_diag, angle_sub_0_l in H2, H5.
         rewrite <- angle_add_sub_swap in H4, Hovt.
         rewrite angle_straight_add_straight in H4, Hovt.
         rewrite angle_sub_0_l in H4, Hovt.
-        rewrite angle_eucl_dist_opp_0 in H2, H4.
+        rewrite angle_eucl_dist_opp_0 in H2, H4, H5.
+        apply angle_eucl_dist_lt_angle_eucl_dist in H5.
+        do 2 rewrite angle_sub_0_r in H5.
+        apply (rngl_lt_le_incl Hor) in Hzsd, Hzd.
+        apply quadrant_1_sin_sub_pos_cos_lt in Hzst; try easy.
+        now apply (rngl_lt_asymm Hor) in H5.
+      }
+...
+      apply quadrant_1_sin_sub_nonneg_cos_le in Hzst.
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
 ...
 rewrite rngl_sin_sub_sin.
 rewrite angle_sub_add.
