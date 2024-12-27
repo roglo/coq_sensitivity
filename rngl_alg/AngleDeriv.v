@@ -3518,6 +3518,11 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
   rewrite angle_div_2_add.
   rewrite angle_mul_2_div_2; [ | easy ].
   destruct tt. {
+rewrite fold_angle_add_overflow2 in Htt.
+rewrite angle_add_overflow_equiv2 in Htt.
+progress unfold angle_add_overflow in Htt.
+(* ne devrait pas arriver *)
+...
     remember (angle_add_overflow dθ (2 * θ₀)) as ovd eqn:Hovd.
     symmetry in Hovd.
     rewrite angle_add_overflow_comm in Hovd.
