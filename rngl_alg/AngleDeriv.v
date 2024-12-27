@@ -3418,6 +3418,66 @@ split; intros. {
   rewrite (rngl_sub_diag Hos).
   apply (rngl_abs_0 Hop).
 } {
+Theorem angle_dist_to_0_le_compat :
+  ∀ θ1 θ2, (angle_dist_to_0 θ1 ≤ angle_dist_to_0 θ2)%L ↔ (θ1 ≤ θ2)%A.
+Proof.
+destruct_ac.
+intros.
+split; intros H12. {
+  progress unfold angle_dist_to_0 in H12.
+  remember (θ1 ≤? angle_straight)%A as aas eqn:Haas.
+  remember (θ2 ≤? angle_straight)%A as bas eqn:Hbas.
+  symmetry in Haas, Hbas.
+  destruct aas. {
+    destruct bas. {
+      now apply angle_le_angle_eucl_dist_le in H12.
+    }
+    apply angle_leb_gt in Hbas.
+    apply angle_lt_le_incl in Hbas.
+    now apply (angle_le_trans _ angle_straight).
+  } {
+    apply angle_leb_gt in Haas.
+    destruct bas. {
+      exfalso.
+      apply rngl_nlt_ge in H12.
+      apply H12; clear H12.
+      apply (rngl_lt_iff Hor).
+      split. {
+        apply (rngl_le_trans Hor _ 2).
+        apply angle_eucl_dist_bound.
+        apply (rngl_le_add_r Hor).
+        apply angle_eucl_dist_nonneg.
+      }
+      intros H.
+      specialize (angle_eucl_dist_bound θ2 0) as H1.
+      rewrite H in H1; clear H.
+      apply rngl_nlt_ge in H1.
+      apply H1; clear H1.
+      apply (rngl_lt_add_r Hos Hor).
+      apply (rngl_lt_iff Hor).
+      split; [ apply angle_eucl_dist_nonneg | ].
+      intros H; symmetry in H.
+      apply angle_eucl_dist_separation in H.
+      now subst θ1; apply angle_lt_irrefl in Haas.
+    }
+    apply angle_leb_gt in Hbas.
+    apply (rngl_add_le_mono_l Hop Hor) in H12.
+    do 2 rewrite (angle_eucl_dist_move_0_r _ angle_straight) in H12.
+    apply rngl_cos_le_iff_angle_eucl_le in H12.
+(*
+    do 2 rewrite rngl_cos_sub_straight_r in H12.
+    apply (rngl_opp_le_compat Hop Hor) in H12.
+*)
+    apply rngl_sin_sub_nonneg in H12. {
+      rewrite angle_sub_sub_distr in H12.
+      rewrite <- angle_add_sub_swap in H12.
+      rewrite angle_sub_add in H12.
+Search (0 ≤ rngl_sin (_ - _))%L.
+Check rngl_cos_decr.
+...
+      apply rngl_sin_incr in H12.
+    apply (rngl_opp_le_compat Hop Hor) in H12.
+...
   progress unfold angle_dist_to_0.
   remember (a ≤? angle_straight)%A as aas eqn:Haas.
   remember (b ≤? angle_straight)%A as bas eqn:Hbas.
