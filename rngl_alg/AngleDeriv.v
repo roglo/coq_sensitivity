@@ -3488,208 +3488,158 @@ split; intros H12. {
 }
 Qed.
 
-Theorem angle_dist_is_dist : is_dist angle_dist.
+Theorem angle_dist_symmetry :
+  ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist θ2 θ1.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_dist.
+rewrite <- (rngl_abs_opp Hop Hor).
+now rewrite (rngl_opp_sub_distr Hop).
+Qed.
+
+Theorem angle_dist_separation :
+  ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  split; intros. {
-    rewrite (H1 (angle_dist b a)).
-    apply H1.
-  } {
-    rewrite (H1 (angle_dist _ _)).
-    split; [ | easy ].
-    intros _.
-    apply eq_angle_eq.
-    do 2 rewrite (H1 (rngl_cos _)), (H1 (rngl_sin _)).
-    easy.
-  } {
-    do 3 rewrite (H1 (angle_dist _ _)).
-    rewrite rngl_add_0_l.
-    apply (rngl_le_refl Hor).
-  }
+  intros.
+  rewrite (H1 (angle_dist _ _)).
+  split; [ | easy ].
+  intros _.
+  apply eq_angle_eq.
+  do 2 rewrite (H1 (rngl_cos _)), (H1 (rngl_sin _)).
+  easy.
 }
+intros.
 progress unfold angle_dist.
-split; intros. {
-  rewrite <- (rngl_abs_opp Hop Hor).
-  now rewrite (rngl_opp_sub_distr Hop).
-} {
-  split; intros Hab. {
-    apply (eq_rngl_abs_0 Hop) in Hab.
-    apply -> (rngl_sub_move_0_r Hop) in Hab.
-    progress unfold angle_dist_to_0 in Hab.
-    remember (a ≤? angle_straight)%A as aas eqn:Haas.
-    remember (b ≤? angle_straight)%A as bas eqn:Hbas.
-    symmetry in Haas, Hbas.
-    destruct aas. {
-      destruct bas. {
-        apply angle_le_antisymm. {
-          apply angle_le_angle_eucl_dist_le; [ easy | easy | ].
-          rewrite Hab.
-          apply (rngl_le_refl Hor).
-        } {
-          apply angle_le_angle_eucl_dist_le; [ easy | easy | ].
-          rewrite Hab.
-          apply (rngl_le_refl Hor).
-        }
-      }
-      apply angle_leb_gt in Hbas.
-      specialize (angle_eucl_dist_bound a 0) as H1.
-      rewrite Hab in H1.
-      apply rngl_nlt_ge in H1.
-      exfalso; apply H1; clear H1.
-      apply (rngl_lt_add_r Hos Hor).
-      apply (rngl_lt_iff Hor).
-      split; [ apply angle_eucl_dist_nonneg | ].
-      intros H; symmetry in H.
-      apply angle_eucl_dist_separation in H.
-      subst b.
-      now apply angle_lt_irrefl in Hbas.
-    }
-    apply angle_leb_gt in Haas.
+split; intros Hab. {
+  apply (eq_rngl_abs_0 Hop) in Hab.
+  apply -> (rngl_sub_move_0_r Hop) in Hab.
+  progress unfold angle_dist_to_0 in Hab.
+  remember (θ1 ≤? angle_straight)%A as aas eqn:Haas.
+  remember (θ2 ≤? angle_straight)%A as bas eqn:Hbas.
+  symmetry in Haas, Hbas.
+  destruct aas. {
     destruct bas. {
-      specialize (angle_eucl_dist_bound b 0) as H1.
-      rewrite <- Hab in H1.
-      apply rngl_nlt_ge in H1.
-      exfalso; apply H1; clear H1.
-      apply (rngl_lt_add_r Hos Hor).
-      apply (rngl_lt_iff Hor).
-      split; [ apply angle_eucl_dist_nonneg | ].
-      intros H; symmetry in H.
-      apply angle_eucl_dist_separation in H.
-      subst a.
-      now apply angle_lt_irrefl in Haas.
+      apply angle_le_antisymm. {
+        apply angle_le_angle_eucl_dist_le; [ easy | easy | ].
+        rewrite Hab.
+        apply (rngl_le_refl Hor).
+      } {
+        apply angle_le_angle_eucl_dist_le; [ easy | easy | ].
+        rewrite Hab.
+        apply (rngl_le_refl Hor).
+      }
     }
-    apply (rngl_add_cancel_l Hos) in Hab.
     apply angle_leb_gt in Hbas.
-    (* lemma *)
-    do 2 rewrite angle_eucl_dist_is_sqrt in Hab.
-    do 2 rewrite rngl_cos_sub_straight_l in Hab.
-    do 2 rewrite (rngl_sub_opp_r Hop) in Hab.
-    apply (f_equal rngl_squ) in Hab.
-    rewrite (rngl_squ_sqrt Hon) in Hab. 2: {
-      apply (rngl_mul_nonneg_nonneg Hos Hor).
-      apply (rngl_0_le_2 Hon Hos Hor).
-      apply (rngl_le_opp_l Hop Hor).
-      apply rngl_cos_bound.
-    }
-    rewrite (rngl_squ_sqrt Hon) in Hab. 2: {
-      apply (rngl_mul_nonneg_nonneg Hos Hor).
-      apply (rngl_0_le_2 Hon Hos Hor).
-      apply (rngl_le_opp_l Hop Hor).
-      apply rngl_cos_bound.
-    }
-    apply (rngl_mul_cancel_l Hi1) in Hab. 2: {
-      now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-    }
-    apply (rngl_add_cancel_l Hos) in Hab.
-    apply rngl_cos_eq in Hab.
-    destruct Hab as [| Hab]; [ easy | subst a ].
-    apply angle_opp_lt_compat_if in Haas. 2: {
-      intros H.
-      apply eq_rngl_cos_1 in H; cbn in H.
-      symmetry in H.
-      apply (rngl_add_move_0_r Hop) in H.
-      now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H.
-    }
-    rewrite angle_opp_involutive in Haas.
-    rewrite angle_opp_straight in Haas.
-    apply angle_lt_le_incl in Haas.
-    now apply angle_nlt_ge in Haas.
+    specialize (angle_eucl_dist_bound θ1 0) as H1.
+    rewrite Hab in H1.
+    apply rngl_nlt_ge in H1.
+    exfalso; apply H1; clear H1.
+    apply (rngl_lt_add_r Hos Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_eucl_dist_nonneg | ].
+    intros H; symmetry in H.
+    apply angle_eucl_dist_separation in H.
+    subst θ2.
+    now apply angle_lt_irrefl in Hbas.
   }
-  subst a.
-  rewrite (rngl_sub_diag Hos).
-  apply (rngl_abs_0 Hop).
-} {
-  destruct (angle_le_dec a c) as [Hac| Hac]. {
+  apply angle_leb_gt in Haas.
+  destruct bas. {
+    specialize (angle_eucl_dist_bound θ2 0) as H1.
+    rewrite <- Hab in H1.
+    apply rngl_nlt_ge in H1.
+    exfalso; apply H1; clear H1.
+    apply (rngl_lt_add_r Hos Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_eucl_dist_nonneg | ].
+    intros H; symmetry in H.
+    apply angle_eucl_dist_separation in H.
+    subst θ1.
+    now apply angle_lt_irrefl in Haas.
+  }
+  apply (rngl_add_cancel_l Hos) in Hab.
+  apply angle_leb_gt in Hbas.
+  (* lemma *)
+  do 2 rewrite angle_eucl_dist_is_sqrt in Hab.
+  do 2 rewrite rngl_cos_sub_straight_l in Hab.
+  do 2 rewrite (rngl_sub_opp_r Hop) in Hab.
+  apply (f_equal rngl_squ) in Hab.
+  rewrite (rngl_squ_sqrt Hon) in Hab. 2: {
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    apply (rngl_le_opp_l Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rngl_squ_sqrt Hon) in Hab. 2: {
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    apply (rngl_le_opp_l Hop Hor).
+    apply rngl_cos_bound.
+  }
+  apply (rngl_mul_cancel_l Hi1) in Hab. 2: {
+    now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_add_cancel_l Hos) in Hab.
+  apply rngl_cos_eq in Hab.
+  destruct Hab as [| Hab]; [ easy | subst θ1 ].
+  apply angle_opp_lt_compat_if in Haas. 2: {
+    intros H.
+    apply eq_rngl_cos_1 in H; cbn in H.
+    symmetry in H.
+    apply (rngl_add_move_0_r Hop) in H.
+    now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H.
+  }
+  rewrite angle_opp_involutive in Haas.
+  rewrite angle_opp_straight in Haas.
+  apply angle_lt_le_incl in Haas.
+  now apply angle_nlt_ge in Haas.
+}
+subst θ1.
+rewrite (rngl_sub_diag Hos).
+apply (rngl_abs_0 Hop).
+Qed.
+
+Theorem angle_dist_triangular :
+  ∀ θ1 θ2 θ3, (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_dist.
+destruct (angle_le_dec θ1 θ3) as [Hac| Hac]. {
+  rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+    apply (rngl_le_sub_0 Hop Hor).
+    now apply angle_dist_to_0_le_compat.
+  }
+  rewrite (rngl_opp_sub_distr Hop).
+  destruct (angle_le_dec θ1 θ2) as [Hab| Hab]. {
     rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
       apply (rngl_le_sub_0 Hop Hor).
       now apply angle_dist_to_0_le_compat.
     }
     rewrite (rngl_opp_sub_distr Hop).
-    destruct (angle_le_dec a b) as [Hab| Hab]. {
+    rewrite <- (rngl_add_sub_swap Hop).
+    apply (rngl_sub_le_mono_r Hop Hor).
+    destruct (angle_le_dec θ2 θ3) as [Hbc| Hbc]. {
       rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
         apply (rngl_le_sub_0 Hop Hor).
         now apply angle_dist_to_0_le_compat.
       }
       rewrite (rngl_opp_sub_distr Hop).
-      rewrite <- (rngl_add_sub_swap Hop).
-      apply (rngl_sub_le_mono_r Hop Hor).
-      destruct (angle_le_dec b c) as [Hbc| Hbc]. {
-        rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
-          apply (rngl_le_sub_0 Hop Hor).
-          now apply angle_dist_to_0_le_compat.
-        }
-        rewrite (rngl_opp_sub_distr Hop).
-        rewrite rngl_add_comm.
-        rewrite (rngl_sub_add Hop).
-        apply (rngl_le_refl Hor).
-      }
-      apply angle_nle_gt in Hbc.
-      apply angle_lt_le_incl in Hbc.
-      rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-        apply (rngl_le_0_sub Hop Hor).
-        now apply angle_dist_to_0_le_compat.
-      }
-      rewrite (rngl_add_sub_assoc Hop).
-      apply (rngl_le_add_le_sub_r Hop Hor).
-      do 2 rewrite <- (rngl_mul_2_l Hon (angle_dist_to_0 _)).
-      apply (rngl_mul_le_mono_nonneg_l Hop Hor).
-      apply (rngl_0_le_2 Hon Hos Hor).
-      now apply angle_dist_to_0_le_compat.
+      rewrite rngl_add_comm.
+      rewrite (rngl_sub_add Hop).
+      apply (rngl_le_refl Hor).
     }
-    apply angle_nle_gt in Hab.
-    apply angle_lt_le_incl in Hab.
-    rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-      apply (rngl_le_0_sub Hop Hor).
-      now apply angle_dist_to_0_le_compat.
-    }
-    rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
-      apply (rngl_le_sub_0 Hop Hor).
-      apply angle_dist_to_0_le_compat.
-      now apply (angle_le_trans _ a).
-    }
-    rewrite (rngl_add_opp_r Hop).
-    rewrite (rngl_sub_sub_distr Hop).
-    rewrite rngl_add_comm.
-    rewrite <- (rngl_add_opp_r Hop).
-    apply (rngl_add_le_mono_l Hop Hor).
-    rewrite <- (rngl_sub_add_distr Hos).
-    apply (rngl_le_add_le_sub_r Hop Hor).
-    rewrite (rngl_add_opp_l Hop).
-    apply (rngl_le_sub_le_add_r Hop Hor).
-    do 2 rewrite <- (rngl_mul_2_l Hon (angle_dist_to_0 _)).
-    apply (rngl_mul_le_mono_nonneg_l Hop Hor).
-    apply (rngl_0_le_2 Hon Hos Hor).
-    now apply angle_dist_to_0_le_compat.
-  }
-  apply angle_nle_gt in Hac.
-  apply angle_lt_le_incl in Hac.
-  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-    apply (rngl_le_0_sub Hop Hor).
-    now apply angle_dist_to_0_le_compat.
-  }
-  destruct (angle_le_dec a b) as [Hab| Hab]. {
-    rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
-      apply (rngl_le_sub_0 Hop Hor).
-      now apply angle_dist_to_0_le_compat.
-    }
-    rewrite (rngl_opp_sub_distr Hop).
-    destruct (angle_lt_dec b c) as [Hbc| Hbc]. {
-      exfalso.
-      apply angle_nle_gt in Hbc.
-      apply Hbc.
-      now apply (angle_le_trans _ a).
-    }
-    apply angle_nlt_ge in Hbc.
+    apply angle_nle_gt in Hbc.
+    apply angle_lt_le_incl in Hbc.
     rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
       apply (rngl_le_0_sub Hop Hor).
       now apply angle_dist_to_0_le_compat.
     }
     rewrite (rngl_add_sub_assoc Hop).
-    apply (rngl_sub_le_mono_r Hop Hor).
-    rewrite <- (rngl_add_sub_swap Hop).
     apply (rngl_le_add_le_sub_r Hop Hor).
     do 2 rewrite <- (rngl_mul_2_l Hon (angle_dist_to_0 _)).
     apply (rngl_mul_le_mono_nonneg_l Hop Hor).
@@ -3702,35 +3652,106 @@ split; intros. {
     apply (rngl_le_0_sub Hop Hor).
     now apply angle_dist_to_0_le_compat.
   }
-  rewrite <- (rngl_sub_sub_distr Hop).
-  apply (rngl_sub_le_mono_l Hop Hor).
-  destruct (angle_le_dec b c) as [Hbc| Hbc]. {
-    rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
-      apply (rngl_le_sub_0 Hop Hor).
-      now apply angle_dist_to_0_le_compat.
-    }
-    rewrite (rngl_sub_opp_r Hop).
-    rewrite (rngl_add_sub_assoc Hop).
-    apply (rngl_le_sub_le_add_r Hop Hor).
-    do 2 rewrite <- (rngl_mul_2_l Hon (angle_dist_to_0 _)).
-    apply (rngl_mul_le_mono_nonneg_l Hop Hor).
-    apply (rngl_0_le_2 Hon Hos Hor).
+  rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+    apply (rngl_le_sub_0 Hop Hor).
+    apply angle_dist_to_0_le_compat.
+    now apply (angle_le_trans _ θ1).
+  }
+  rewrite (rngl_add_opp_r Hop).
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite rngl_add_comm.
+  rewrite <- (rngl_add_opp_r Hop).
+  apply (rngl_add_le_mono_l Hop Hor).
+  rewrite <- (rngl_sub_add_distr Hos).
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite (rngl_add_opp_l Hop).
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  do 2 rewrite <- (rngl_mul_2_l Hon (angle_dist_to_0 _)).
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
+  now apply angle_dist_to_0_le_compat.
+}
+apply angle_nle_gt in Hac.
+apply angle_lt_le_incl in Hac.
+rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  now apply angle_dist_to_0_le_compat.
+}
+destruct (angle_le_dec θ1 θ2) as [Hab| Hab]. {
+  rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+    apply (rngl_le_sub_0 Hop Hor).
     now apply angle_dist_to_0_le_compat.
   }
-  apply angle_nle_gt in Hbc.
-  apply angle_lt_le_incl in Hbc.
+  rewrite (rngl_opp_sub_distr Hop).
+  destruct (angle_lt_dec θ2 θ3) as [Hbc| Hbc]. {
+    exfalso.
+    apply angle_nle_gt in Hbc.
+    apply Hbc.
+    now apply (angle_le_trans _ θ1).
+  }
+  apply angle_nlt_ge in Hbc.
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     apply (rngl_le_0_sub Hop Hor).
     now apply angle_dist_to_0_le_compat.
   }
-  rewrite (rngl_sub_sub_distr Hop).
-  rewrite (rngl_sub_diag Hos).
-  rewrite rngl_add_0_l.
-  apply (rngl_le_refl Hor).
+  rewrite (rngl_add_sub_assoc Hop).
+  apply (rngl_sub_le_mono_r Hop Hor).
+  rewrite <- (rngl_add_sub_swap Hop).
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  do 2 rewrite <- (rngl_mul_2_l Hon (angle_dist_to_0 _)).
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
+  now apply angle_dist_to_0_le_compat.
+}
+apply angle_nle_gt in Hab.
+apply angle_lt_le_incl in Hab.
+rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  now apply angle_dist_to_0_le_compat.
+}
+rewrite <- (rngl_sub_sub_distr Hop).
+apply (rngl_sub_le_mono_l Hop Hor).
+destruct (angle_le_dec θ2 θ3) as [Hbc| Hbc]. {
+  rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+    apply (rngl_le_sub_0 Hop Hor).
+    now apply angle_dist_to_0_le_compat.
+  }
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite (rngl_add_sub_assoc Hop).
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  do 2 rewrite <- (rngl_mul_2_l Hon (angle_dist_to_0 _)).
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
+  now apply angle_dist_to_0_le_compat.
+}
+apply angle_nle_gt in Hbc.
+apply angle_lt_le_incl in Hbc.
+rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  now apply angle_dist_to_0_le_compat.
+}
+rewrite (rngl_sub_sub_distr Hop).
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+apply (rngl_le_refl Hor).
+Qed.
+
+Theorem angle_dist_is_dist : is_dist angle_dist.
+Proof.
+split. {
+  apply angle_dist_symmetry.
+} {
+  apply angle_dist_separation.
+} {
+  apply angle_dist_triangular.
 }
 Qed.
 
 (* to be completed
+Theorem rngl_cos_derivative :
+  is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
+...
+
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
 Proof.
