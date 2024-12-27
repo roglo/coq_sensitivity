@@ -3283,6 +3283,20 @@ rewrite angle_div_2_add. {
 }
 Qed.
 
+Theorem angle_eucl_dist_bound :
+  ∀ θ1 θ2, (angle_eucl_dist θ1 θ2 ≤ 2)%L.
+Proof.
+destruct_ac.
+intros.
+rewrite <- (rngl_mul_1_r Hon 2).
+rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+apply (rngl_0_le_2 Hon Hos Hor).
+apply rngl_sin_bound.
+Qed.
+
+(* distance of angles which respects angle inequality *)
+
 Definition angle_dist_to_0 θ :=
   if (θ ≤? angle_straight)%A then angle_eucl_dist θ 0
   else (2 + angle_eucl_dist θ angle_straight)%L.
@@ -3337,6 +3351,73 @@ split; intros. {
         }
       }
       apply angle_leb_gt in Hbas.
+      specialize (angle_eucl_dist_bound a 0) as H1.
+      rewrite Hab in H1.
+      apply rngl_nlt_ge in H1.
+      exfalso; apply H1; clear H1.
+      apply (rngl_lt_add_r Hos Hor).
+      apply (rngl_lt_iff Hor).
+      split; [ apply angle_eucl_dist_nonneg | ].
+      intros H; symmetry in H.
+      apply angle_eucl_dist_separation in H.
+      subst b.
+      now apply angle_lt_irrefl in Hbas.
+    }
+    apply angle_leb_gt in Haas.
+    destruct bas. {
+      specialize (angle_eucl_dist_bound b 0) as H1.
+      rewrite <- Hab in H1.
+      apply rngl_nlt_ge in H1.
+      exfalso; apply H1; clear H1.
+      apply (rngl_lt_add_r Hos Hor).
+      apply (rngl_lt_iff Hor).
+      split; [ apply angle_eucl_dist_nonneg | ].
+      intros H; symmetry in H.
+      apply angle_eucl_dist_separation in H.
+      subst a.
+      now apply angle_lt_irrefl in Haas.
+    }
+    apply (rngl_add_cancel_l Hos) in Hab.
+    apply angle_leb_gt in Hbas.
+    (* lemma *)
+    do 2 rewrite angle_eucl_dist_is_sqrt in Hab.
+    do 2 rewrite rngl_cos_sub_straight_l in Hab.
+    do 2 rewrite (rngl_sub_opp_r Hop) in Hab.
+    apply (f_equal rngl_squ) in Hab.
+    rewrite (rngl_squ_sqrt Hon) in Hab. 2: {
+      apply (rngl_mul_nonneg_nonneg Hos Hor).
+      apply (rngl_0_le_2 Hon Hos Hor).
+      apply (rngl_le_opp_l Hop Hor).
+      apply rngl_cos_bound.
+    }
+    rewrite (rngl_squ_sqrt Hon) in Hab. 2: {
+      apply (rngl_mul_nonneg_nonneg Hos Hor).
+      apply (rngl_0_le_2 Hon Hos Hor).
+      apply (rngl_le_opp_l Hop Hor).
+      apply rngl_cos_bound.
+    }
+    apply (rngl_mul_cancel_l Hi1) in Hab. 2: {
+      now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_add_cancel_l Hos) in Hab.
+    apply rngl_cos_eq in Hab.
+    destruct Hab as [| Hab]; [ easy | subst a ].
+    apply angle_opp_lt_compat_if in Haas. 2: {
+      intros H.
+      apply eq_rngl_cos_1 in H; cbn in H.
+      symmetry in H.
+      apply (rngl_add_move_0_r Hop) in H.
+      now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H.
+    }
+    rewrite angle_opp_involutive in Haas.
+    rewrite angle_opp_straight in Haas.
+    apply angle_lt_le_incl in Haas.
+    now apply angle_nlt_ge in Haas.
+  }
+  subst a.
+  rewrite (rngl_sub_diag Hos).
+  apply (rngl_abs_0 Hop).
+} {
 ...
 
 Theorem rngl_cos_derivative :
