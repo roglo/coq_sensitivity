@@ -3283,7 +3283,62 @@ rewrite angle_div_2_add. {
 }
 Qed.
 
+Definition angle_dist_to_0 θ :=
+  if (θ ≤? angle_straight)%A then angle_eucl_dist θ 0
+  else (2 + angle_eucl_dist θ angle_straight)%L.
+
+Definition angle_dist θ1 θ2 := rngl_abs (angle_dist_to_0 θ1 - angle_dist_to_0 θ2).
+
 (* to be completed
+Theorem angle_dist_is_dist : is_dist angle_dist.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  split; intros. {
+    rewrite (H1 (angle_dist b a)).
+    apply H1.
+  } {
+    rewrite (H1 (angle_dist _ _)).
+    split; [ | easy ].
+    intros _.
+    apply eq_angle_eq.
+    do 2 rewrite (H1 (rngl_cos _)), (H1 (rngl_sin _)).
+    easy.
+  } {
+    do 3 rewrite (H1 (angle_dist _ _)).
+    rewrite rngl_add_0_l.
+    apply (rngl_le_refl Hor).
+  }
+}
+progress unfold angle_dist.
+split; intros. {
+  rewrite <- (rngl_abs_opp Hop Hor).
+  now rewrite (rngl_opp_sub_distr Hop).
+} {
+  split; intros Hab. {
+    apply (eq_rngl_abs_0 Hop) in Hab.
+    apply -> (rngl_sub_move_0_r Hop) in Hab.
+    progress unfold angle_dist_to_0 in Hab.
+    remember (a ≤? angle_straight)%A as aas eqn:Haas.
+    remember (b ≤? angle_straight)%A as bas eqn:Hbas.
+    symmetry in Haas, Hbas.
+    destruct aas. {
+      destruct bas. {
+        apply angle_le_antisymm. {
+          apply angle_le_angle_eucl_dist_le; [ easy | easy | ].
+          rewrite Hab.
+          apply (rngl_le_refl Hor).
+        } {
+          apply angle_le_angle_eucl_dist_le; [ easy | easy | ].
+          rewrite Hab.
+          apply (rngl_le_refl Hor).
+        }
+      }
+      apply angle_leb_gt in Hbas.
+...
+
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
 Proof.
