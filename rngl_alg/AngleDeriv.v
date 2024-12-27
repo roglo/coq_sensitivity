@@ -3529,6 +3529,9 @@ destruct zstt. {
 rewrite angle_add_opp_l.
 rewrite <- rngl_sin_sub_anticomm.
 apply Hsc.
+rewrite angle_eucl_dist_move_0_r.
+rewrite <- angle_sub_add_distr.
+rewrite <- angle_eucl_dist_move_0_r.
 ...
       rewrite angle_add_comm.
       rewrite angle_add_opp_r.
