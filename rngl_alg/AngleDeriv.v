@@ -2939,6 +2939,13 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
     now apply angle_lt_irrefl in Hts.
   }
   intros dθ Hdθ.
+  destruct Hdθ as (H1, H2).
+  apply (rngl_min_glb_lt_iff Hor) in H2.
+  destruct H2 as (H2, H4).
+  apply (rngl_min_glb_lt_iff Hor) in H2.
+  destruct H2 as (H2, H3).
+  apply (rngl_min_glb_lt_iff Hor) in H2.
+  destruct H2 as (H2, H5).
   progress unfold rngl_dist.
   rewrite (rngl_sub_opp_r Hop).
   rewrite rngl_cos_sub_cos.
@@ -2983,8 +2990,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
       rewrite (rngl_div_div_swap Hic Hiv).
       rewrite (rngl_mul_div Hi1). 2: {
         intros H.
-        rewrite H in Hdθ.
-        destruct Hdθ as (H1, _).
+        rewrite H in H1.
         now apply (rngl_lt_irrefl Hor) in H1.
       }
       rewrite <- (rngl_div_opp_l Hop Hiv).
@@ -3003,14 +3009,11 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
       rewrite angle_add_comm, angle_add_sub in Hsc.
       rewrite angle_add_comm.
       apply Hsc.
-      apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)). {
-        apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
-          apply angle_div_2_le.
-        }
-        apply angle_div_2_le_straight.
+      apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)); [ | easy ].
+      apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
+        apply angle_div_2_le.
       }
-      eapply (rngl_lt_le_trans Hor); [ apply Hdθ | ].
-      apply (rngl_le_min_r Hor).
+      apply angle_div_2_le_straight.
     }
     rewrite angle_div_2_add_overflow. 2: {
       rewrite angle_mul_2_l.
@@ -3035,7 +3038,6 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
     rewrite (rngl_div_opp_l Hop Hiv).
     rewrite (rngl_mul_div Hi1). 2: {
       intros H.
-      destruct Hdθ as (H1, _).
       rewrite H in H1.
       now apply (rngl_lt_irrefl Hor) in H1.
     }
@@ -3046,14 +3048,11 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
     apply Hsc.
     rewrite angle_eucl_dist_move_0_r.
     rewrite angle_add_sub.
-    apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)). {
-      apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
-        apply angle_div_2_le.
-      }
-      apply angle_div_2_le_straight.
+    apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)); [ | easy ].
+    apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
+      apply angle_div_2_le.
     }
-    eapply (rngl_lt_le_trans Hor); [ apply Hdθ | ].
-    apply (rngl_le_min_r Hor).
+    apply angle_div_2_le_straight.
   }
   apply angle_nle_gt in Htds.
   rewrite (angle_add_comm θ₀).
@@ -3073,7 +3072,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
       rewrite angle_mul_2_div_2; [ | easy ].
       rewrite (rngl_opp_involutive Hop).
       destruct tt. {
-clear - Hc1 Hon Hop Hos Hiv Hic Hi1 Hor Hdθ Hts Htt Htds Hsc.
+clear - Hc1 Hon Hop Hos Hiv Hic Hi1 H1 H3 H4 Hor Hts Htt Htds Hsc.
         rewrite rngl_sin_add_straight_r.
         rewrite (rngl_mul_opp_r Hop).
         rewrite (rngl_opp_involutive Hop).
@@ -3085,8 +3084,7 @@ clear - Hc1 Hon Hop Hos Hiv Hic Hi1 Hor Hdθ Hts Htt Htds Hsc.
         rewrite (rngl_div_div_swap Hic Hiv).
         rewrite (rngl_mul_div Hi1). 2: {
           intros H.
-          rewrite H in Hdθ.
-          destruct Hdθ as (H1, _).
+          rewrite H in H1.
           now apply (rngl_lt_irrefl Hor) in H1.
         }
         rewrite (rngl_mul_comm Hic).
@@ -3094,12 +3092,7 @@ clear - Hc1 Hon Hop Hos Hiv Hic Hi1 Hor Hdθ Hts Htt Htds Hsc.
           apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
         }
         rewrite angle_add_comm.
-clear - Hor Hop Hdθ Htt Htds Hts Hsc.
-        destruct Hdθ as (H1, H2).
-        apply (rngl_min_glb_lt_iff Hor) in H2.
-        destruct H2 as (H2, H4).
-        apply (rngl_min_glb_lt_iff Hor) in H2.
-        destruct H2 as (H2, H3).
+clear - Hor Hop Htt Htds Hts Hsc H1 H3 H4.
         move Hts at bottom.
         move H3 at bottom.
         progress unfold angle_ltb in Htt.
@@ -3214,14 +3207,6 @@ clear - Hor Hop Hdθ Htt Htds Hts Hsc.
       move Hts at bottom.
       move Htds at bottom.
       move Htt at bottom.
-      destruct Hdθ as (H1, H2).
-      apply (rngl_min_glb_lt_iff Hor) in H2.
-      destruct H2 as (H2, H4).
-      apply (rngl_min_glb_lt_iff Hor) in H2.
-      destruct H2 as (H2, H3).
-      apply (rngl_min_glb_lt_iff Hor) in H2.
-      destruct H2 as (H2, H5).
-      move H3 at bottom.
       progress unfold angle_ltb in Hts.
       progress unfold angle_ltb in Htds.
       progress unfold angle_leb in Htt.
@@ -3474,8 +3459,7 @@ clear - Hop Hii Hor Hos H3 Htt Hzst Hzs Hzsd.
       rewrite (rngl_div_div_swap Hic Hiv).
       rewrite (rngl_mul_div Hi1). 2: {
         intros H.
-        rewrite H in Hdθ.
-        destruct Hdθ as (H1, _).
+        rewrite H in H1.
         now apply (rngl_lt_irrefl Hor) in H1.
       }
       rewrite (rngl_mul_comm Hic).
@@ -3541,15 +3525,7 @@ destruct zstt. {
       apply angle_eqb_neq in Hdz.
       rewrite angle_add_add_swap.
       rewrite rngl_sin_add_straight_r.
-      destruct Hdθ as (H1, H2).
-      apply (rngl_min_glb_lt_iff Hor) in H2.
-      destruct H2 as (H2, H4).
-      apply (rngl_min_glb_lt_iff Hor) in H2.
-      destruct H2 as (H2, H3).
-      apply (rngl_min_glb_lt_iff Hor) in H2.
-      destruct H2 as (H2, H5).
       rewrite angle_eucl_dist_opp_0 in H1, H2, H3, H4, H5.
-...
 rewrite angle_add_opp_l.
 rewrite <- rngl_sin_sub_anticomm.
 apply Hsc.
