@@ -3472,6 +3472,45 @@ split; intros H12. {
       rewrite angle_sub_sub_distr in H12.
       rewrite <- angle_add_sub_swap in H12.
       rewrite angle_sub_add in H12.
+      progress unfold angle_ltb in Haas.
+      progress unfold angle_ltb in Hbas.
+      cbn in Haas, Hbas.
+      rewrite (rngl_leb_refl Hor) in Haas, Hbas.
+      progress unfold angle_leb.
+      remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+      remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+      symmetry in Hzs1, Hzs2.
+      destruct zs1. {
+        exfalso.
+        apply rngl_ltb_lt in Haas.
+        apply rngl_nle_gt in Haas.
+        apply Haas, rngl_cos_bound.
+      }
+      destruct zs2. {
+        exfalso.
+        apply rngl_ltb_lt in Hbas.
+        apply rngl_nle_gt in Hbas.
+        apply Hbas, rngl_cos_bound.
+      }
+      clear Haas Hbas.
+      apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
+      apply rngl_leb_le.
+...
+        destruct zs2; [ | easy ].
+        apply rngl_leb_le in Hzs1, Hzs2.
+        apply rngl_ltb_lt in Haas, Hbas.
+        apply rngl_leb_le.
+  apply (rngl_nlt_ge_iff Hor).
+  intros Hcc.
+  apply rngl_nlt_ge in H12.
+  apply H12; clear H12.
+  rewrite rngl_sin_sub_anticomm.
+  apply (rngl_opp_neg_pos Hop Hor).
+  rewrite rngl_sin_sub.
+...
+  apply rngl_cos_decr.
+...
+Check rngl_sin_nonneg_angle_le_straight.
 Search (0 ≤ rngl_sin (_ - _))%L.
 Check rngl_cos_decr.
 ...
