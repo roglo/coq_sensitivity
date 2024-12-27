@@ -3506,6 +3506,41 @@ destruct zstt. {
   apply rngl_leb_le in Hzsttd, Hovt.
   apply rngl_ltb_lt in Hovd.
   destruct (rngl_le_dec Hor 0 (rngl_cos dθ)) as [Hzcd| Hzcd]. {
+(*1
+    change_angle_add_r dθ angle_right.
+    progress sin_cos_add_sub_right_hyp T Hovt.
+    progress sin_cos_add_sub_right_hyp T Hzsttd.
+    progress sin_cos_add_sub_right_hyp T Hztd.
+    progress sin_cos_add_sub_right_hyp T Hovd.
+    progress sin_cos_add_sub_right_hyp T Hzsd.
+    progress sin_cos_add_sub_right_hyp T Htt.
+    progress sin_cos_add_sub_right_hyp T Hzcd.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzc| Hzc]. {
+      rewrite angle_div_2_sub.
+      remember (angle_right ≤? dθ)%A as rd eqn:Hrd.
+      symmetry in Hrd.
+      destruct rd. {
+        progress unfold angle_leb in Hrd.
+        cbn in Hrd.
+        rewrite (rngl_0_leb_1 Hon Hos Hor) in Hrd.
+        generalize Hzcd; intros H.
+        apply rngl_leb_le in H.
+        rewrite H in Hrd; clear H.
+        apply rngl_leb_le in Hrd.
+        now apply rngl_nlt_ge in Hrd.
+      }
+      clear Hrd.
+      rewrite angle_add_add_swap.
+      rewrite rngl_sin_add_straight_r.
+      rewrite <- angle_add_sub_swap.
+rewrite rngl_sin_sub_anticomm.
+rewrite (rngl_opp_involutive Hop).
+apply Hsc.
+rewrite angle_eucl_dist_move_0_r.
+rewrite <- angle_sub_add_distr.
+rewrite <- angle_eucl_dist_move_0_r.
+...1
+*)
     change_angle_opp dθ.
     progress sin_cos_opp_hyp T Hovt.
     progress sin_cos_opp_hyp T Hzsttd.
