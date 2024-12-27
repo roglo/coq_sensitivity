@@ -3512,6 +3512,8 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
     subst tt.
     now apply (rngl_cos_derivative_lemma_3 ε η1).
   }
+  move dθ before θ₀.
+  move Htds before Hts.
   rewrite angle_add_0_r.
   rewrite angle_div_2_add.
   rewrite angle_mul_2_div_2; [ | easy ].
@@ -3642,6 +3644,17 @@ rewrite <- angle_eucl_dist_move_0_r.
             rewrite angle_eucl_dist_opp_0 in H1, H2, H3, H4, H5.
             rewrite angle_add_opp_l.
             rewrite <- rngl_sin_sub_anticomm.
+            move Hzcd after Hzsd.
+            move Hzst after Hzcd.
+            move Hzc after Hzst.
+            move Hztd after Hzsd.
+            move Hzsttd after Hzstt.
+clear Hzstt Hzsttd Hovd Htt Hovt.
+move Hη1 before Hε.
+move Hdz before Htz.
+move dθ before θ₀.
+exfalso.
+...
             apply Hsc.
             rewrite angle_eucl_dist_move_0_r.
             rewrite <- angle_sub_add_distr.
