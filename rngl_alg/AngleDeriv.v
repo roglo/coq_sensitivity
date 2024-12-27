@@ -3418,6 +3418,27 @@ split; intros. {
   rewrite (rngl_sub_diag Hos).
   apply (rngl_abs_0 Hop).
 } {
+  progress unfold angle_dist_to_0.
+  remember (a ≤? angle_straight)%A as aas eqn:Haas.
+  remember (b ≤? angle_straight)%A as bas eqn:Hbas.
+  remember (c ≤? angle_straight)%A as cas eqn:Hcas.
+  symmetry in Haas, Hbas, Hcas.
+  destruct aas, bas, cas. {
+    do 3 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+    do 3 rewrite angle_sub_0_r.
+    do 3 rewrite <- (rngl_mul_sub_distr_l Hop).
+    do 3 rewrite (rngl_abs_mul Hop Hi1 Hor).
+    rewrite <- rngl_mul_add_distr_l.
+    rewrite (rngl_abs_2 Hon Hos Hor).
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+      apply (rngl_0_le_2 Hon Hos Hor).
+    }
+    rewrite rngl_sin_sub_sin.
+    rewrite angle_add_overflow_div_2_div_2.
+    rewrite angle_add_0_r.
+    destruct (angle_lt_dec a c) as [Hac| Hac]. {
+      rewrite angle_div_2_lt_compat; [ | easy ].
+(* ah, pute vierge, fait chier *)
 ...
 
 Theorem rngl_cos_derivative :
