@@ -3345,199 +3345,45 @@ apply (rngl_sub_0_r Hos).
 Qed.
 *)
 
-(* distance of angles which respects angle inequality *)
-
-Definition angle_dist_to_0 θ :=
-  if (θ ≤? angle_straight)%A then angle_eucl_dist θ 0
-  else (2 + angle_eucl_dist θ angle_straight)%L.
-
-Definition angle_dist θ1 θ2 :=
-  rngl_abs (angle_dist_to_0 θ1 - angle_dist_to_0 θ2).
-
-Theorem angle_dist_to_0_le_compat :
-  ∀ θ1 θ2, (angle_dist_to_0 θ1 ≤ angle_dist_to_0 θ2)%L ↔ (θ1 ≤ θ2)%A.
+Theorem angle_lt_asymm :
+  ∀ θ1 θ2, (θ1 < θ2 → ¬ (θ2 < θ1))%A.
 Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * H12.
+apply angle_lt_le_incl in H12.
+now apply angle_nlt_ge in H12.
+Qed.
+
+Definition angle_min θ1 θ2 := if (θ1 ≤? θ2)%A then θ1 else θ2.
+Definition angle_max θ1 θ2 := if (θ1 ≤? θ2)%A then θ2 else θ1.
+
+Theorem angle_max_l_iff :
+  ∀ θ1 θ2, angle_max θ1 θ2 = θ1 ↔ (θ2 ≤ θ1)%A.
+Proof.
 intros.
+progress unfold angle_max.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
 split; intros H12. {
-  progress unfold angle_dist_to_0 in H12.
-  remember (θ1 ≤? angle_straight)%A as aas eqn:Haas.
-  remember (θ2 ≤? angle_straight)%A as bas eqn:Hbas.
-  symmetry in Haas, Hbas.
-  destruct aas. {
-    destruct bas. {
-      now apply angle_le_angle_eucl_dist_le in H12.
-    }
-    apply angle_leb_gt in Hbas.
-    apply angle_lt_le_incl in Hbas.
-    now apply (angle_le_trans _ angle_straight).
-  } {
-    apply angle_leb_gt in Haas.
-    destruct bas. {
-      exfalso.
-      apply rngl_nlt_ge in H12.
-      apply H12; clear H12.
-      apply (rngl_lt_iff Hor).
-      split. {
-        apply (rngl_le_trans Hor _ 2).
-        apply angle_eucl_dist_bound.
-        apply (rngl_le_add_r Hor).
-        apply angle_eucl_dist_nonneg.
-      }
-      intros H.
-      specialize (angle_eucl_dist_bound θ2 0) as H1.
-      rewrite H in H1; clear H.
-      apply rngl_nlt_ge in H1.
-      apply H1; clear H1.
-      apply (rngl_lt_add_r Hos Hor).
-      apply (rngl_lt_iff Hor).
-      split; [ apply angle_eucl_dist_nonneg | ].
-      intros H; symmetry in H.
-      apply angle_eucl_dist_separation in H.
-      now subst θ1; apply angle_lt_irrefl in Haas.
-    }
-    apply angle_leb_gt in Hbas.
-    apply (rngl_add_le_mono_l Hop Hor) in H12.
-    do 2 rewrite (angle_eucl_dist_move_0_r _ angle_straight) in H12.
-    apply rngl_cos_le_iff_angle_eucl_le in H12.
-    apply rngl_sin_sub_nonneg in H12; cycle 1. {
-      progress unfold angle_ltb in Hbas.
-      cbn in Hbas.
-      rewrite (rngl_leb_refl Hor) in Hbas.
-      rewrite rngl_sin_sub_straight_r.
-      apply (rngl_opp_nonneg_nonpos Hop Hor).
-      apply (rngl_nlt_ge_iff Hor).
-      intros H.
-      apply (rngl_lt_le_incl Hor) in H.
-      apply rngl_leb_le in H.
-      rewrite H in Hbas.
-      apply rngl_ltb_lt in Hbas.
-      apply rngl_nle_gt in Hbas.
-      apply Hbas, rngl_cos_bound.
-    } {
-      progress unfold angle_ltb in Haas.
-      cbn in Haas.
-      rewrite (rngl_leb_refl Hor) in Haas.
-      rewrite rngl_sin_sub_straight_r.
-      apply (rngl_opp_nonneg_nonpos Hop Hor).
-      apply (rngl_nlt_ge_iff Hor).
-      intros H.
-      apply (rngl_lt_le_incl Hor) in H.
-      apply rngl_leb_le in H.
-      rewrite H in Haas.
-      apply rngl_ltb_lt in Haas.
-      apply rngl_nle_gt in Haas.
-      apply Haas, rngl_cos_bound.
-    }
-    rewrite angle_sub_sub_distr in H12.
-    rewrite <- angle_add_sub_swap in H12.
-    rewrite angle_sub_add in H12.
-    progress unfold angle_ltb in Haas.
-    progress unfold angle_ltb in Hbas.
-    cbn in Haas, Hbas.
-    rewrite (rngl_leb_refl Hor) in Haas, Hbas.
-    progress unfold angle_leb.
-    remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-    remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-    symmetry in Hzs1, Hzs2.
-    destruct zs1. {
-      exfalso.
-      apply rngl_ltb_lt in Haas.
-      apply rngl_nle_gt in Haas.
-      apply Haas, rngl_cos_bound.
-    }
-    destruct zs2. {
-      exfalso.
-      apply rngl_ltb_lt in Hbas.
-      apply rngl_nle_gt in Hbas.
-      apply Hbas, rngl_cos_bound.
-    }
-    clear Haas Hbas.
-    apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
-    apply rngl_leb_le.
-    change_angle_add_r θ1 angle_straight.
-    change_angle_add_r θ2 angle_straight.
-    progress sin_cos_add_sub_straight_hyp T Hzs1.
-    progress sin_cos_add_sub_straight_hyp T Hzs2.
-    progress sin_cos_add_sub_straight_hyp T H12.
-    progress sin_cos_add_sub_straight_goal T.
-    rewrite angle_sub_sub_distr in H12.
-    rewrite rngl_sin_add_straight_r in H12.
-    apply (rngl_nlt_ge_iff Hor).
-    intros Hcc.
-    apply rngl_nlt_ge in H12.
-    apply H12; clear H12.
-    rewrite <- rngl_sin_sub_anticomm.
-    apply (rngl_lt_iff Hor).
-    split. {
-      apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2, Hcc.
-      now apply rngl_sin_sub_nonneg.
-    }
-    intros H; symmetry in H.
-    apply eq_rngl_sin_0 in H.
-    destruct H as [H| H]. {
-      apply -> angle_sub_move_0_r in H; subst θ2.
-      now apply (rngl_lt_irrefl Hor) in Hcc.
-    }
-    apply -> angle_sub_move_r in H; subst θ1.
-    rewrite rngl_sin_add_straight_l in Hzs1.
-    apply (rngl_opp_pos_neg Hop Hor) in Hzs1.
-    now apply (rngl_lt_asymm Hor) in Hzs1.
+  destruct t12. {
+    subst θ2.
+    apply angle_le_refl.
   }
+  apply angle_leb_gt in Ht12.
+  now apply angle_lt_le_incl in Ht12.
 } {
-  progress unfold angle_dist_to_0.
-  remember (θ1 ≤? angle_straight)%A as aas eqn:Haas.
-  remember (θ2 ≤? angle_straight)%A as bas eqn:Hbas.
-  symmetry in Haas, Hbas.
-  destruct aas. {
-    destruct bas. {
-      now apply angle_le_angle_eucl_dist_le in H12.
-    }
-    apply (rngl_le_trans Hor _ 2).
-    apply angle_eucl_dist_bound.
-    apply (rngl_le_add_r Hor).
-    apply angle_eucl_dist_nonneg.
-  }
-  destruct bas. {
-    exfalso.
-    apply angle_nlt_ge in H12.
-    apply H12; clear H12.
-    apply angle_leb_gt in Haas.
-    now apply (angle_le_lt_trans _ angle_straight).
-  }
-  apply (rngl_add_le_mono_l Hop Hor).
-  apply angle_leb_gt in Haas, Hbas.
-  do 2 rewrite angle_eucl_dist_is_sqrt.
-  do 2 rewrite rngl_cos_sub_straight_l.
-  do 2 rewrite (rngl_sub_opp_r Hop).
-  apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
-    apply (rngl_mul_nonneg_nonneg Hos Hor).
-    apply (rngl_0_le_2 Hon Hos Hor).
-    apply (rngl_le_opp_l Hop Hor).
-    apply rngl_cos_bound.
-  }
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
-  apply (rngl_0_le_2 Hon Hos Hor).
-  apply (rngl_add_le_mono_l Hop Hor).
-  progress unfold angle_leb in H12.
-  progress unfold angle_ltb in Haas.
-  progress unfold angle_ltb in Hbas.
-  cbn in Haas, Hbas.
-  rewrite (rngl_leb_refl Hor) in Haas, Hbas.
-  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-  symmetry in Hzs1, Hzs2.
-  destruct zs1. {
-    exfalso.
-    apply rngl_ltb_lt in Haas.
-    apply rngl_nle_gt in Haas.
-    apply Haas, rngl_cos_bound.
-  }
-  destruct zs2; [ easy | ].
-  now apply rngl_leb_le in H12.
+  destruct t12; [ | easy ].
+  now apply angle_le_antisymm.
 }
 Qed.
+
+(* distance of angles which respects angle inequality *)
+
+Definition angle_dist_greater_smaller θ1 θ2 :=
+  if (θ1 ≤? θ2 + angle_straight)%A then angle_eucl_dist θ1 θ2
+  else (2 + angle_eucl_dist θ1 (θ2 + angle_straight))%L.
+
+Definition angle_dist θ1 θ2 :=
+  angle_dist_greater_smaller (angle_max θ1 θ2) (angle_min θ1 θ2).
 
 Theorem angle_dist_symmetry :
   ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist θ2 θ1.
@@ -3545,10 +3391,23 @@ Proof.
 destruct_ac.
 intros.
 progress unfold angle_dist.
-rewrite <- (rngl_abs_opp Hop Hor).
-now rewrite (rngl_opp_sub_distr Hop).
+progress unfold angle_min.
+progress unfold angle_max.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+remember (θ2 ≤? θ1)%A as t21 eqn:Ht21.
+symmetry in Ht12, Ht21.
+destruct t12. {
+  destruct t21; [ | easy ].
+  apply angle_le_antisymm in Ht12; [ | easy ].
+  now subst θ2.
+} {
+  destruct t21; [ easy | ].
+  apply angle_leb_gt in Ht12, Ht21.
+  now apply angle_lt_asymm in Ht12.
+}
 Qed.
 
+(* to be completed
 Theorem angle_dist_separation :
   ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
@@ -3567,6 +3426,14 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros.
 progress unfold angle_dist.
 split; intros Hab. {
+  progress unfold angle_dist_greater_smaller in Hab.
+  destruct (angle_le_dec θ2 θ1) as [Ht21| Ht21]. {
+    rewrite (proj2 (angle_max_l_iff _ _) Ht21) in Hab.
+    rewrite (proj2 (angle_min_l_iff _ _) Ht21) in Hab.
+...
+Search rngl_max.
+Check rngl_max_l_iff.
+...
   apply (eq_rngl_abs_0 Hop) in Hab.
   apply -> (rngl_sub_move_0_r Hop) in Hab.
   progress unfold angle_dist_to_0 in Hab.
@@ -3653,6 +3520,8 @@ subst θ1.
 rewrite (rngl_sub_diag Hos).
 apply (rngl_abs_0 Hop).
 Qed.
+
+...
 
 Theorem angle_dist_triangular :
   ∀ θ1 θ2 θ3, (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
@@ -3798,7 +3667,6 @@ split. {
 }
 Qed.
 
-(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
 Proof.
