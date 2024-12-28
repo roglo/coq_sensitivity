@@ -3750,6 +3750,54 @@ Qed.
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
+Proof.
+intros θ₀ ε Hε.
+enough (H :
+  ∃ η, (0 < η)%L ∧
+  ∀ dθ,
+  (0 < angle_dist dθ 0 < η)%L
+  → (rngl_dist
+        ((rngl_cos (θ₀ + dθ) - rngl_cos θ₀) / angle_dist dθ 0)
+        (- rngl_sin θ₀) < ε)%L). {
+  destruct H as (η & Hη & Hd).
+  exists η.
+  move η before ε.
+  split; [ easy | ].
+  intros θ Hθ.
+  remember (θ - θ₀)%A as dθ eqn:H.
+  symmetry in H.
+  apply angle_sub_move_r in H.
+  subst θ.
+  specialize (Hd dθ).
+Check angle_eucl_dist_move_0_r.
+Theorem angle_dist_move_0_r :
+  ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist (θ1 - θ2) 0.
+Proof.
+intros.
+progress unfold angle_dist.
+progress unfold angle_dist_to_0.
+rewrite <- angle_eucl_dist_move_0_r.
+rewrite angle_eucl_dist_diag.
+Search (_ - _ ≤? _)%A.
+...
+remember (θ1 ≤? angle_straight)%A as t1s eqn:Ht1s.
+symmetry in Ht1s.
+destruct t1s.
+...
+  rewrite angle_dist_move_0_r in Hθ |-*.
+  rewrite angle_add_sub in Hθ |-*.
+  rewrite angle_add_comm.
+  now apply Hd.
+}
+specialize rngl_sin_is_continuous as Hsc.
+progress unfold continuous in Hsc.
+progress unfold continuous_at in Hsc.
+progress unfold is_limit_when_tending_to in Hsc.
+specialize (Hsc θ₀ ε Hε).
+destruct Hsc as (η1 & Hη1 & Hsc).
+progress unfold rngl_dist in Hsc.
+move η1 before ε.
+destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
 ...
 
 Theorem rngl_cos_derivative :
