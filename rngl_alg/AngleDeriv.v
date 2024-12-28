@@ -3295,6 +3295,54 @@ apply (rngl_0_le_2 Hon Hos Hor).
 apply rngl_sin_bound.
 Qed.
 
+Theorem angle_eucl_dist_sub_angle_eucl_dist :
+  ∀ θ1 θ2,
+  (θ1 ≤ angle_straight)%A
+  → (θ2 ≤ angle_straight)%A
+  → (θ1 - θ2 ≤ angle_straight)%A
+  → (angle_eucl_dist θ1 0 ≤ angle_eucl_dist θ2 0)%L
+  → (angle_eucl_dist θ2 0 - angle_eucl_dist θ1 0)%L = angle_eucl_dist θ1 θ2.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (angle_eucl_dist _ θ2)).
+  apply H1.
+}
+intros * Ht1s Ht2s Ht12s H12z.
+apply rngl_cos_le_iff_angle_eucl_le in H12z.
+apply rngl_sin_nonneg_angle_le_straight in Ht1s, Ht2s, Ht12s.
+generalize H12z; intros HHHH.
+apply rngl_sin_sub_nonneg in H12z; [ | easy | easy ].
+rewrite rngl_sin_sub_anticomm in H12z.
+apply (rngl_opp_nonneg_nonpos Hop Hor) in H12z.
+apply (rngl_le_antisymm Hor) in Ht12s; [ clear H12z | easy ].
+apply eq_rngl_sin_0 in Ht12s.
+destruct Ht12s as [H1| H1]. {
+  apply -> angle_sub_move_0_r in H1; subst θ2.
+  rewrite angle_eucl_dist_diag.
+  apply (rngl_sub_diag Hos).
+}
+apply -> angle_sub_move_r in H1; subst θ1.
+rewrite rngl_sin_add_straight_l in Ht1s.
+apply (rngl_opp_nonneg_nonpos Hop Hor) in Ht1s.
+apply (rngl_le_antisymm Hor) in Ht2s; [ clear Ht1s | easy ].
+apply eq_rngl_sin_0 in Ht2s.
+destruct Ht2s; subst θ2. {
+  exfalso.
+  rewrite angle_add_0_r in HHHH.
+  cbn in HHHH.
+  apply rngl_nlt_ge in HHHH.
+  apply HHHH; clear HHHH.
+  apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+}
+rewrite angle_straight_add_straight.
+rewrite angle_eucl_dist_diag.
+rewrite angle_eucl_dist_symmetry.
+apply (rngl_sub_0_r Hos).
+Qed.
+
 (* distance of angles which respects angle inequality *)
 
 Definition angle_dist_to_0 θ :=
@@ -3773,16 +3821,128 @@ Check angle_eucl_dist_move_0_r.
 Theorem angle_dist_move_0_r :
   ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist (θ1 - θ2) 0.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (angle_dist _ 0)).
+  apply H1.
+}
 intros.
 progress unfold angle_dist.
 progress unfold angle_dist_to_0.
 rewrite <- angle_eucl_dist_move_0_r.
 rewrite angle_eucl_dist_diag.
-Search (_ - _ ≤? _)%A.
-...
+rewrite angle_straight_nonneg.
+rewrite (rngl_sub_0_r Hos).
 remember (θ1 ≤? angle_straight)%A as t1s eqn:Ht1s.
-symmetry in Ht1s.
-destruct t1s.
+remember (θ2 ≤? angle_straight)%A as t2s eqn:Ht2s.
+remember (θ1 - θ2 ≤? angle_straight)%A as t12s eqn:Ht12s.
+symmetry in Ht1s, Ht2s, Ht12s.
+destruct t1s. {
+  destruct t2s. {
+    destruct t12s. {
+      rewrite (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist _ _)). 2: {
+        apply angle_eucl_dist_nonneg.
+      }
+      (* lemma *)
+      remember (angle_eucl_dist θ1 0) as d1z eqn:Hd1z.
+      remember (angle_eucl_dist θ2 0) as d2z eqn:Hd2z.
+      destruct (rngl_le_dec Hor d1z d2z) as [H12z| H12z]. {
+        rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+          now apply (rngl_le_sub_0 Hop Hor).
+        }
+        rewrite (rngl_opp_sub_distr Hop); subst d1z d2z.
+        now apply angle_eucl_dist_sub_angle_eucl_dist.
+      }
+      apply (rngl_nle_gt_iff Hor) in H12z.
+      apply (rngl_lt_le_incl Hor) in H12z.
+      rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+        now apply (rngl_le_0_sub Hop Hor).
+      }
+      rewrite angle_eucl_dist_symmetry.
+      subst d1z d2z.
+destruct (angle_le_dec (θ2 - θ1) angle_straight) as [H1| H1].
+      apply angle_eucl_dist_sub_angle_eucl_dist; [ easy | easy | | easy ].
+easy.
+apply angle_nle_gt in H1.
+...
+Search (_ - _ ≤ angle_straight).
+(*
+Theorem angle_sub_le_straight :
+  ∀ θ1 θ2, (θ1 - θ2 ≤ angle_straight → θ2 - θ1 ≤ angle_straight)%A.
+Proof.
+destruct_ac.
+intros * H12.
+progress unfold angle_leb in H12.
+progress unfold angle_leb.
+cbn - [ angle_sub ] in H12 |-*.
+rewrite (rngl_leb_refl Hor) in H12 |-*.
+remember (0 ≤? rngl_sin (θ1 - θ2))%L as zs12 eqn:Hzs12.
+remember (0 ≤? rngl_sin (θ2 - θ1))%L as zs21 eqn:Hzs21.
+symmetry in Hzs12, Hzs21.
+destruct zs12. {
+  destruct zs21. {
+    apply rngl_leb_le.
+    apply rngl_cos_bound.
+  }
+  apply rngl_leb_le in Hzs12.
+  apply (rngl_leb_gt Hor) in Hzs21.
+...
+*)
+      (* lemma *)
+      progress unfold angle_leb in Ht12s.
+      progress unfold angle_leb.
+      cbn - [ angle_sub ] in Ht12s |-*.
+      rewrite (rngl_leb_refl Hor) in Ht12s |-*.
+      remember (0 ≤? rngl_sin (θ1 - θ2))%L as zs12 eqn:Hzs12.
+      remember (0 ≤? rngl_sin (θ2 - θ1))%L as zs21 eqn:Hzs21.
+      symmetry in Hzs12, Hzs21.
+      destruct zs12; [ | easy ].
+      destruct zs21. {
+        apply rngl_leb_le.
+        apply rngl_cos_bound.
+      }
+      apply (rngl_leb_le) in Hzs12.
+      apply (rngl_leb_gt Hor) in Hzs21.
+      clear Ht12s.
+...
+Search (0 ≤ rngl_sin (_ - _))%L.
+...
+Search (_ ≤ angle_straight)%A.
+        progress unfold angle_leb in Ht1s.
+        progress unfold angle_leb in Ht2s.
+        progress unfold angle_leb in Ht12s.
+        cbn - [ angle_sub ] in Ht1s, Ht2s, Ht12s.
+        rewrite (rngl_leb_refl Hor) in Ht1s, Ht2s, Ht12s.
+        remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+        remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+        symmetry in Hzs1, Hzs2.
+        destruct zs1; [ | easy ].
+        destruct zs2; [ | easy ].
+...
+        apply (rngl_sub_move_r Hop).
+        rewrite (angle_eucl_dist_symmetry θ1).
+        apply (rngl_le_antisymm Hor). {
+          apply angle_eucl_dist_triangular.
+        }
+Search (_ - _ = _ → _)%L.
+Search (_ - _ = _ ↔ _)%L.
+
+Search (_ = _ - _ → _)%L.
+Search (_ = _ - _ ↔ _)%L.
+Search (_ = _ + _ → _)%L.
+Search (_ = _ + _ ↔ _)%L.
+        apply rngl_add_
+
+Search (angle_eucl_dist _ _ + angle_eucl_dist _ _)%L.
+        rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+...
+        apply angle_le_angle_eucl_dist_le in H12z; [ | easy | easy ].
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+...
+          apply (rngl_le_0_sub Hop Hor).
+Search (angle_eucl_dist _ _ - _)%L.
 ...
   rewrite angle_dist_move_0_r in Hθ |-*.
   rewrite angle_add_sub in Hθ |-*.
