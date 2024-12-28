@@ -3351,7 +3351,8 @@ Definition angle_dist_to_0 θ :=
   if (θ ≤? angle_straight)%A then angle_eucl_dist θ 0
   else (2 + angle_eucl_dist θ angle_straight)%L.
 
-Definition angle_dist θ1 θ2 := rngl_abs (angle_dist_to_0 θ1 - angle_dist_to_0 θ2).
+Definition angle_dist θ1 θ2 :=
+  rngl_abs (angle_dist_to_0 θ1 - angle_dist_to_0 θ2).
 
 Theorem angle_dist_to_0_le_compat :
   ∀ θ1 θ2, (angle_dist_to_0 θ1 ≤ angle_dist_to_0 θ2)%L ↔ (θ1 ≤ θ2)%A.
@@ -3821,7 +3822,7 @@ enough (H :
   specialize (Hd dθ).
 Check angle_eucl_dist_move_0_r.
 Theorem angle_dist_move_0_r :
-  ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist (θ1 - θ2) 0.
+  ∀ θ1 θ2, (θ2 ≤ θ1)%A → angle_dist θ1 θ2 = angle_dist (θ1 - θ2) 0.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -3830,7 +3831,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (angle_dist _ 0)).
   apply H1.
 }
-intros.
+intros * Ht21.
 progress unfold angle_dist.
 progress unfold angle_dist_to_0.
 rewrite <- angle_eucl_dist_move_0_r.
@@ -3844,6 +3845,8 @@ symmetry in Ht1s, Ht2s, Ht12s.
 destruct t1s. {
   destruct t2s. {
     destruct t12s. {
+About angle_eucl_dist_move_0_r.
+...
       rewrite (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist _ _)). 2: {
         apply angle_eucl_dist_nonneg.
       }
@@ -3893,6 +3896,7 @@ destruct t1s. {
       }
       rewrite angle_eucl_dist_symmetry.
       subst d1z d2z.
+...
       apply rngl_cos_le_iff_angle_eucl_le in H12z.
       apply rngl_sin_nonneg_angle_le_straight in Ht1s, Ht2s, Ht12s.
       do 3 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
@@ -3917,6 +3921,7 @@ destruct t1s. {
       apply angle_leb_gt in Ht12.
       rewrite rngl_sin_add_straight_r.
       rewrite <- rngl_sin_sub_anticomm.
+...
 (**)
       rewrite rngl_sin_sub.
 (* bon, c'est faux, il me semble *)
