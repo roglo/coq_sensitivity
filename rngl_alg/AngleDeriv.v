@@ -3668,11 +3668,62 @@ destruct b2. {
       remember (θ3 /₂)%A as θ; clear θ3 Heqθ; rename θ into θ3.
       rewrite angle_straight_div_2 in H1, H2, Hb2, Hb3.
       move θ3 before θ2.
+      progress unfold angle_leb in H12, H23, Hb2, Hb3.
+      progress unfold angle_ltb in H1, H2, H2s, H3s.
+      rewrite rngl_sin_add_right_r in H2, Hb2.
+      rewrite rngl_cos_add_right_r in H2, Hb2.
+      cbn in H12, H23, H1, H2, Hb2, Hb3, H2s, H3s.
+      rewrite (rngl_0_leb_1 Hon Hos Hor) in H1, Hb3.
+      rewrite (rngl_leb_refl Hor) in H2s, H3s.
+      remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+      remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+      remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+      remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
+      symmetry in Hzs1, Hzs2, Hzs3, Hzc1.
+      destruct zs1; [ | easy ].
+      destruct zs2; [ | easy ].
+      destruct zs3; [ | easy ].
+      destruct zc1; [ | easy ].
+      apply rngl_leb_le in Hzs1, Hzs2, H12, Hzs3, H23, Hzc1, Hb2, Hb3.
+      apply rngl_ltb_lt in H1, H2, H2s, H3s.
+      clear Hzc1; rename H1 into Hzc1.
       change_angle_sub_r θ2 angle_right.
-      change_angle_sub_r θ3 angle_right.
-(*
+      progress sin_cos_add_sub_right_hyp T H12.
+      progress sin_cos_add_sub_right_hyp T Hzs2.
       progress sin_cos_add_sub_right_hyp T H23.
+      progress sin_cos_add_sub_right_hyp T H2s.
+      progress sin_cos_add_sub_right_hyp T Hb3.
+      progress sin_cos_add_sub_right_hyp T Hb2.
+      progress sin_cos_add_sub_right_goal T.
+      rewrite (rngl_add_opp_r Hop) in H2s.
+(*
+      change_angle_sub_l θ3 angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hzs3.
+      progress sin_cos_add_sub_straight_hyp T H2.
+      progress sin_cos_add_sub_straight_hyp T H23.
+      progress sin_cos_add_sub_straight_hyp T H3s.
+      do 2 rewrite <- angle_sub_add_distr.
+      progress sin_cos_add_sub_straight_goal T.
+      do 2 rewrite (rngl_sub_opp_r Hop).
+...
 *)
+      change_angle_sub_r θ3 angle_right.
+      progress sin_cos_add_sub_right_hyp T Hzs3.
+      progress sin_cos_add_sub_right_hyp T H2.
+      progress sin_cos_add_sub_right_hyp T H23.
+      progress sin_cos_add_sub_right_hyp T H3s.
+      progress sin_cos_add_sub_right_goal T.
+      move θ2 before θ1.
+      move θ3 before θ2.
+      move Hb3 before Hzs1.
+      move H23 before Hb3.
+      move Hzc1 before H23.
+      move Hzs3 before Hzs2.
+      do 2 rewrite (rngl_sub_opp_r Hop).
+      rewrite (rngl_add_opp_r Hop) in H2, H3s.
+      apply -> (rngl_lt_0_sub Hop Hor) in H2.
+      apply -> (rngl_lt_0_sub Hop Hor) in H2s.
+      apply -> (rngl_lt_0_sub Hop Hor) in H3s.
 ...
 rewrite rngl_cos_sub.
 do 2 rewrite rngl_sin_sub.
