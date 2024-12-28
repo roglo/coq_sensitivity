@@ -3846,6 +3846,9 @@ destruct t1s. {
   destruct t2s. {
     destruct t12s. {
 About angle_eucl_dist_move_0_r.
+(* ma définition de angle_dist ne va pas ; si je veux être
+   compatible avec angle_eucl_dist, ça ne peut pas être
+   d(θ1,0)-d(θ2,0) *)
 ...
       rewrite (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist _ _)). 2: {
         apply angle_eucl_dist_nonneg.
