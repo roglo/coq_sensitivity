@@ -3649,6 +3649,30 @@ destruct b2. {
       rewrite angle_straight_div_2.
       rewrite rngl_sin_sub_right_r.
       rewrite (rngl_add_opp_r Hop).
+      apply angle_div_2_lt_compat in H2.
+      rewrite angle_div_2_add in H2.
+      rewrite angle_add_not_overflow_lt_straight_le_straight in H2.
+      2: easy.
+      2: apply angle_le_refl.
+      apply angle_div_2_le_compat in Hb2.
+      rewrite angle_div_2_add in Hb2.
+      rewrite angle_add_not_overflow_lt_straight_le_straight in Hb2.
+      2: easy.
+      2: apply angle_le_refl.
+      apply angle_div_2_le_compat in H12, H23, Hb3.
+      apply angle_div_2_lt_compat in H1.
+      specialize (angle_div_2_lt_straight Hc1 θ2) as H2s.
+      specialize (angle_div_2_lt_straight Hc1 θ3) as H3s.
+      remember (θ1 /₂)%A as θ; clear θ1 Heqθ; rename θ into θ1.
+      remember (θ2 /₂)%A as θ; clear θ2 Heqθ; rename θ into θ2.
+      remember (θ3 /₂)%A as θ; clear θ3 Heqθ; rename θ into θ3.
+      rewrite angle_straight_div_2 in H1, H2, Hb2, Hb3.
+      move θ3 before θ2.
+      change_angle_sub_r θ2 angle_right.
+      change_angle_sub_r θ3 angle_right.
+(*
+      progress sin_cos_add_sub_right_hyp T H23.
+*)
 ...
 rewrite rngl_cos_sub.
 do 2 rewrite rngl_sin_sub.
