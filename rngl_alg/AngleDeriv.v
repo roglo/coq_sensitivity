@@ -3543,7 +3543,99 @@ Proof.
 destruct_ac.
 intros.
 progress unfold angle_dist.
-destruct (angle_le_dec θ1 θ3) as [Hac| Hac]. {
+destruct (angle_le_dec θ1 θ3) as [H13| H13]. {
+  rewrite (proj2 (angle_max_r_iff _ _) H13).
+  rewrite (proj2 (angle_min_l_iff _ _) H13).
+  destruct (angle_le_dec θ1 θ2) as [H12| H12]. {
+    rewrite (proj2 (angle_max_r_iff _ _) H12).
+    rewrite (proj2 (angle_min_l_iff _ _) H12).
+    destruct (angle_le_dec θ2 θ3) as [H23| H23]. {
+      rewrite (proj2 (angle_max_r_iff _ _) H23).
+      rewrite (proj2 (angle_min_l_iff _ _) H23).
+Theorem angle_dist_greater_smaller_triangular :
+  ∀ θ1 θ2 θ3,
+  (θ1 ≤ θ2)%A
+  → (θ2 ≤ θ3)%A
+  → (angle_dist_greater_smaller θ3 θ1 ≤
+       angle_dist_greater_smaller θ2 θ1 + angle_dist_greater_smaller θ3 θ2)%L.
+Proof.
+intros * H12 H23.
+progress unfold angle_dist_greater_smaller.
+remember (_ || _)%bool as b1 eqn:Hb1.
+remember (_ || _)%bool as b2 eqn:Hb2 in |-*.
+remember (_ || _)%bool as b3 eqn:Hb3 in |-*.
+symmetry in Hb1, Hb2, Hb3.
+destruct b1. {
+  destruct b2. {
+    destruct b3. {
+      rewrite rngl_add_comm.
+      apply angle_eucl_dist_triangular.
+    }
+    exfalso.
+    apply Bool.orb_true_iff in Hb1, Hb2.
+    apply Bool.orb_false_iff in Hb3.
+    destruct Hb3 as (H1, H2).
+    apply angle_leb_gt in H1, H2.
+    destruct Hb1 as [Hb1| Hb1]. {
+      apply angle_nle_gt in H1.
+      apply H1; clear H1.
+      now apply (angle_le_trans _ θ1).
+    }
+    destruct Hb2 as [Hb2| Hb2]. {
+      apply angle_nle_gt in H1.
+      apply H1; clear H1.
+      now apply (angle_le_trans _ θ1).
+    }
+    apply angle_nle_gt in H2.
+    apply H2; clear H2.
+    apply (angle_le_trans _ (θ1 + angle_straight)); [ easy | ].
+    (* lemma *)
+    do 2 rewrite (angle_add_comm _ angle_straight).
+    apply angle_add_le_mono_l; [ | easy ].
+    rewrite angle_add_overflow_comm.
+    apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
+    apply angle_le_refl.
+  }
+  exfalso.
+  apply Bool.orb_true_iff in Hb1.
+  apply Bool.orb_false_iff in Hb2.
+  destruct Hb2 as (H1, H2).
+  destruct Hb1 as [Hb1| Hb1]. {
+    apply angle_leb_gt in H1.
+    now apply angle_nle_gt in H1.
+  }
+  apply angle_leb_gt in H1, H2.
+  apply angle_nle_gt in H2.
+  apply H2; clear H2.
+  now apply (angle_le_trans _ θ3).
+}
+apply Bool.orb_false_iff in Hb1.
+destruct Hb1 as (H1, H2).
+apply angle_leb_gt in H1, H2.
+destruct b2. {
+  apply Bool.orb_true_iff in Hb2.
+  destruct Hb2 as [Hb2| Hb2]. {
+    exfalso.
+    apply angle_leb_gt in H1.
+    now rewrite H1 in Hb2.
+  }
+  destruct b3. {
+    apply Bool.orb_true_iff in Hb3.
+    destruct Hb3 as [Hb3| Hb3]. {
+...
+      exfalso.
+      apply angle_nle_gt in H1.
+      apply H1; clear H1.
+      apply (angle_le_trans _ θ2).
+      appl
+    now rewrite H1 in Hb2.
+  }
+...
+      now apply angle_dist_greater_smaller_triangular.
+...
+
+  destruct (angle_le_dec θ1 θ2) as [Hac| Hac]. {
+...
   rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
     apply (rngl_le_sub_0 Hop Hor).
     now apply angle_dist_to_0_le_compat.
