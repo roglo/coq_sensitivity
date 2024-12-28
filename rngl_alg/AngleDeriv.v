@@ -3559,9 +3559,17 @@ Theorem angle_dist_greater_smaller_triangular :
   → (angle_dist_greater_smaller θ3 θ1 ≤
        angle_dist_greater_smaller θ2 θ1 + angle_dist_greater_smaller θ3 θ2)%L.
 Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * H12 H23.
+  rewrite (H1 (_ + _)%L), (H1 (angle_dist_greater_smaller _ _)).
+  apply (rngl_le_refl Hor).
+}
 intros * H12 H23.
 progress unfold angle_dist_greater_smaller.
-remember (_ || _)%bool as b1 eqn:Hb1.
+remember (_ || _)%bool as b1 eqn:Hb1 in |-*.
 remember (_ || _)%bool as b2 eqn:Hb2 in |-*.
 remember (_ || _)%bool as b3 eqn:Hb3 in |-*.
 symmetry in Hb1, Hb2, Hb3.
@@ -3622,6 +3630,31 @@ destruct b2. {
   destruct b3. {
     apply Bool.orb_true_iff in Hb3.
     destruct Hb3 as [Hb3| Hb3]. {
+      do 3 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+      rewrite (rngl_add_mul_r_diag_l Hon).
+      rewrite <- rngl_mul_add_distr_l.
+      apply (rngl_mul_le_mono_pos_l Hop Hor Hii).
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      rewrite angle_div_2_sub.
+      generalize H2; intros H.
+      apply angle_lt_le_incl in H.
+      rewrite H; clear H.
+      do 2 rewrite angle_div_2_sub.
+      rewrite H12, H23.
+      rewrite angle_div_2_add.
+      rewrite angle_add_not_overflow_lt_straight_le_straight; cycle 1.
+      easy.
+      apply angle_le_refl.
+      rewrite angle_sub_add_distr.
+      rewrite angle_straight_div_2.
+      rewrite rngl_sin_sub_right_r.
+      rewrite (rngl_add_opp_r Hop).
+...
+rewrite rngl_cos_sub.
+do 2 rewrite rngl_sin_sub.
+Search (angle_add_overflow _ _ = false).
+...
+      rewrite angle_sub_add_distr.
 ...
       exfalso.
       apply angle_nle_gt in H1.
