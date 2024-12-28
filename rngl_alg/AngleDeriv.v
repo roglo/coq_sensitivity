@@ -3387,6 +3387,13 @@ split; intros H12. {
 }
 Qed.
 
+Theorem angle_min_id : ∀ θ, angle_min θ θ = θ.
+Proof.
+intros.
+progress unfold angle_min.
+now rewrite angle_le_refl.
+Qed.
+
 Theorem angle_max_l_iff :
   ∀ θ1 θ2, angle_max θ1 θ2 = θ1 ↔ (θ2 ≤ θ1)%A.
 Proof.
@@ -3402,6 +3409,26 @@ split; intros H12. {
   destruct t12; [ | easy ].
   now apply angle_le_antisymm.
 }
+Qed.
+
+Theorem angle_max_r_iff :
+  ∀ θ1 θ2, angle_max θ1 θ2 = θ2 ↔ (θ1 ≤ θ2)%A.
+Proof.
+intros.
+progress unfold angle_max.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+destruct t12; [ easy | ].
+split; [ | easy ]; intros H12.
+subst θ2.
+now rewrite angle_le_refl in Ht12.
+Qed.
+
+Theorem angle_max_id : ∀ θ, angle_max θ θ = θ.
+Proof.
+intros.
+progress unfold angle_max.
+now rewrite angle_le_refl.
 Qed.
 
 (* distance of angles which respects angle inequality *)
@@ -3454,10 +3481,49 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros.
 progress unfold angle_dist.
 split; intros Hab. {
-  progress unfold angle_dist_greater_smaller in Hab.
   destruct (angle_le_dec θ2 θ1) as [Ht21| Ht21]. {
+    (* lemma *)
+    progress unfold angle_dist_greater_smaller in Hab.
     rewrite (proj2 (angle_max_l_iff _ _) Ht21) in Hab.
     rewrite (proj2 (angle_min_r_iff _ _) Ht21) in Hab.
+    remember (θ1 ≤? θ2 + angle_straight)%A as t12s eqn:Ht12s.
+    symmetry in Ht12s.
+    destruct t12s; [ now apply angle_eucl_dist_separation | ].
+    (* lemma *)
+    rewrite rngl_add_comm in Hab.
+    apply (rngl_add_move_0_r Hop) in Hab.
+    specialize (angle_eucl_dist_nonneg θ1 (θ2 + angle_straight)) as H.
+    rewrite Hab in H.
+    exfalso; apply rngl_nlt_ge in H; apply H; clear H.
+    apply (rngl_opp_neg_pos Hop Hor).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  progress unfold angle_dist_greater_smaller in Hab.
+  apply angle_nle_gt in Ht21.
+  apply angle_lt_le_incl in Ht21.
+  rewrite (proj2 (angle_max_r_iff _ _) Ht21) in Hab.
+  rewrite (proj2 (angle_min_l_iff _ _) Ht21) in Hab.
+  remember (θ2 ≤? θ1 + angle_straight)%A as t12s eqn:Ht12s.
+  symmetry in Ht12s |-*.
+  destruct t12s; [ now apply angle_eucl_dist_separation | ].
+  (* lemma *)
+  rewrite rngl_add_comm in Hab.
+  apply (rngl_add_move_0_r Hop) in Hab.
+  specialize (angle_eucl_dist_nonneg θ2 (θ1 + angle_straight)) as H.
+  rewrite Hab in H.
+  exfalso; apply rngl_nlt_ge in H; apply H; clear H.
+  apply (rngl_opp_neg_pos Hop Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+subst θ2.
+rewrite angle_max_id, angle_min_id.
+progress unfold angle_dist_greater_smaller.
+rewrite angle_eucl_dist_diag.
+remember (θ1 ≤? θ1 + angle_straight)%A as t11s eqn:Ht11s.
+symmetry in Ht11s.
+destruct t11s; [ easy | ].
+apply angle_leb_gt in Ht11s.
+(* merde, ça déconne *)
 ...
 Search rngl_max.
 Check rngl_max_l_iff.
