@@ -3356,6 +3356,37 @@ Qed.
 Definition angle_min θ1 θ2 := if (θ1 ≤? θ2)%A then θ1 else θ2.
 Definition angle_max θ1 θ2 := if (θ1 ≤? θ2)%A then θ2 else θ1.
 
+Theorem angle_min_l_iff :
+  ∀ θ1 θ2, angle_min θ1 θ2 = θ1 ↔ (θ1 ≤ θ2)%A.
+Proof.
+intros.
+progress unfold angle_min.
+split; intros H12; [ | now rewrite H12 ].
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+destruct t12; [ easy | ].
+subst θ2.
+apply angle_leb_gt in Ht12.
+now apply angle_lt_irrefl in Ht12.
+Qed.
+
+Theorem angle_min_r_iff :
+  ∀ θ1 θ2, angle_min θ1 θ2 = θ2 ↔ (θ2 ≤ θ1)%A.
+Proof.
+intros.
+progress unfold angle_min.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+split; intros H12. {
+  destruct t12; [ now subst θ2 | ].
+  apply angle_leb_gt in Ht12.
+  now apply angle_lt_le_incl in Ht12.
+} {
+  destruct t12; [ | easy ].
+  now apply angle_le_antisymm.
+}
+Qed.
+
 Theorem angle_max_l_iff :
   ∀ θ1 θ2, angle_max θ1 θ2 = θ1 ↔ (θ2 ≤ θ1)%A.
 Proof.
@@ -3364,10 +3395,7 @@ progress unfold angle_max.
 remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
 symmetry in Ht12.
 split; intros H12. {
-  destruct t12. {
-    subst θ2.
-    apply angle_le_refl.
-  }
+  destruct t12; [ now subst θ2 | ].
   apply angle_leb_gt in Ht12.
   now apply angle_lt_le_incl in Ht12.
 } {
@@ -3429,7 +3457,7 @@ split; intros Hab. {
   progress unfold angle_dist_greater_smaller in Hab.
   destruct (angle_le_dec θ2 θ1) as [Ht21| Ht21]. {
     rewrite (proj2 (angle_max_l_iff _ _) Ht21) in Hab.
-    rewrite (proj2 (angle_min_l_iff _ _) Ht21) in Hab.
+    rewrite (proj2 (angle_min_r_iff _ _) Ht21) in Hab.
 ...
 Search rngl_max.
 Check rngl_max_l_iff.
