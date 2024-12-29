@@ -2997,6 +2997,10 @@ split; intros H12. {
   apply angle_le_angle_eucl_dist_le.
   now apply angle_sub_straight_le_straight.
   now apply angle_sub_straight_le_straight.
+  do 2 rewrite angle_sub_straight_eq_add_straight.
+  do 2 rewrite (angle_add_comm _ angle_straight).
+  apply angle_add_le_mono_l; [ | easy ].
+(* fuck *)
 ...
   rewrite <- (angle_add_0_l angle_straight) at 2.
   rewrite <- angle_sub_straight_eq_add_straight.
