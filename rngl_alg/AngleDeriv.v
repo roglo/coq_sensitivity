@@ -3436,9 +3436,11 @@ Proof. now intros; destruct a, b. Qed.
 
 (* distance of angles which respects angle inequality *)
 
+Definition angles_same_side θ1 θ2 :=
+  Bool.eqb (θ1 ≤? angle_straight)%A (θ2 ≤? angle_straight)%A.
+
 Definition angle_dist θ1 θ2 :=
-  if Bool.eqb (θ1 ≤? angle_straight)%A (θ2 ≤? angle_straight)%A then
-    angle_eucl_dist θ1 θ2
+  if angles_same_side θ1 θ2 then angle_eucl_dist θ1 θ2
   else
     (angle_eucl_dist θ1 angle_straight + angle_eucl_dist θ2 angle_straight)%L.
 
@@ -3448,6 +3450,7 @@ Proof.
 destruct_ac.
 intros.
 progress unfold angle_dist.
+progress unfold angles_same_side.
 rewrite bool_eqb_sym.
 rewrite (angle_eucl_dist_symmetry θ1).
 rewrite rngl_add_comm.
@@ -3460,6 +3463,7 @@ Proof.
 destruct_ac.
 intros.
 progress unfold angle_dist.
+progress unfold angles_same_side.
 remember (Bool.eqb _ _) as b eqn:Hb.
 symmetry in Hb.
 destruct b; [ now apply angle_eucl_dist_separation | ].
@@ -3481,6 +3485,7 @@ Proof.
 destruct_ac.
 intros.
 progress unfold angle_dist.
+progress unfold angles_same_side.
 remember (Bool.eqb _ _) as b13 eqn:Hb13 in |-*.
 remember (Bool.eqb _ _) as b12 eqn:Hb12 in |-*.
 remember (Bool.eqb _ _) as b23 eqn:Hb23 in |-*.
@@ -3551,6 +3556,70 @@ apply angle_dist_separation.
 apply angle_dist_triangular.
 Qed.
 
+Theorem angle_dist_move_0_r :
+  ∀ θ1 θ2,
+  (θ2 ≤ θ1)%A
+  → angles_same_side θ1 θ2 = true
+  → angle_dist θ1 θ2 = angle_dist (θ1 - θ2) 0.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (angle_dist _ 0)).
+  apply H1.
+}
+intros * Ht21 Hb12.
+progress unfold angle_dist.
+rewrite angle_eucl_dist_0_straight.
+rewrite Hb12.
+remember (angles_same_side (θ1 - θ2) 0) as b12z eqn:Hb12z.
+symmetry in Hb12z.
+destruct b12z; [ apply angle_eucl_dist_move_0_r | ].
+exfalso.
+apply -> Bool.eqb_true_iff in Hb12.
+apply Bool.eqb_false_iff in Hb12z.
+rewrite angle_straight_nonneg in Hb12z.
+apply Hb12z; clear Hb12z.
+progress unfold angle_leb in Ht21.
+progress unfold angle_leb in Hb12.
+progress unfold angle_leb.
+cbn - [ angle_sub ] in Ht21, Hb12 |-*.
+rewrite (rngl_leb_refl Hor) in Hb12 |-*.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (0 ≤? rngl_sin (θ1 - θ2))%L as zs12 eqn:Hzs12.
+symmetry in Hzs1, Hzs2, Hzs12.
+destruct zs12; [ apply rngl_leb_le, rngl_cos_bound | exfalso ].
+apply Bool.not_true_iff_false in Hzs12.
+apply Hzs12; clear Hzs12.
+apply rngl_leb_le.
+destruct zs2. {
+  destruct zs1. {
+    apply rngl_leb_le in Hzs1, Hzs2, Ht21.
+    now apply rngl_sin_sub_nonneg.
+  }
+  exfalso.
+  clear Ht21; symmetry in Hb12.
+  apply Bool.not_true_iff_false in Hb12.
+  apply Hb12; clear Hb12.
+  apply rngl_leb_le, rngl_cos_bound.
+}
+destruct zs1; [ easy | ].
+apply rngl_leb_le in Ht21.
+apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
+clear Hb12.
+change_angle_opp θ1.
+change_angle_opp θ2.
+progress sin_cos_opp_hyp T Hzs1.
+progress sin_cos_opp_hyp T Hzs2.
+cbn in Ht21.
+rewrite angle_sub_opp_r.
+rewrite angle_add_opp_l.
+apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
+now apply rngl_sin_sub_nonneg.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
@@ -3573,186 +3642,7 @@ enough (H :
   apply angle_sub_move_r in H.
   subst θ.
   specialize (Hd dθ).
-Check angle_eucl_dist_move_0_r.
-Theorem angle_dist_move_0_r :
-  ∀ θ1 θ2, (θ2 ≤ θ1)%A → angle_dist θ1 θ2 = angle_dist (θ1 - θ2) 0.
-Proof.
-destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  rewrite (H1 (angle_dist _ 0)).
-  apply H1.
-}
-intros * Ht21.
-progress unfold angle_dist.
-rewrite angle_straight_nonneg.
-rewrite angle_eucl_dist_0_straight.
-remember (Bool.eqb _ _) as b12 eqn:Hb12 in |-*.
-remember (Bool.eqb _ _) as b12z eqn:Hb12z in |-*.
-symmetry in Hb12, Hb12z.
-destruct b12. {
-  destruct b12z; [ apply angle_eucl_dist_move_0_r | ].
-  exfalso.
-  apply -> Bool.eqb_true_iff in Hb12.
-  apply Bool.eqb_false_iff in Hb12z.
-  apply Hb12z; clear Hb12z.
-  progress unfold angle_leb in Ht21.
-  progress unfold angle_leb in Hb12.
-  progress unfold angle_leb.
-  cbn - [ angle_sub ] in Ht21, Hb12 |-*.
-  rewrite (rngl_leb_refl Hor) in Hb12 |-*.
-  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-  remember (0 ≤? rngl_sin (θ1 - θ2))%L as zs12 eqn:Hzs12.
-  symmetry in Hzs1, Hzs2, Hzs12.
-  destruct zs12; [ apply rngl_leb_le, rngl_cos_bound | exfalso ].
-  apply Bool.not_true_iff_false in Hzs12.
-  apply Hzs12; clear Hzs12.
-  apply rngl_leb_le.
-  destruct zs2. {
-    destruct zs1. {
-      apply rngl_leb_le in Hzs1, Hzs2, Ht21.
-      now apply rngl_sin_sub_nonneg.
-    }
-    exfalso.
-    clear Ht21; symmetry in Hb12.
-    apply Bool.not_true_iff_false in Hb12.
-    apply Hb12; clear Hb12.
-    apply rngl_leb_le, rngl_cos_bound.
-  }
-  destruct zs1; [ easy | ].
-  apply rngl_leb_le in Ht21.
-  apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
-  clear Hb12.
-  change_angle_opp θ1.
-  change_angle_opp θ2.
-  progress sin_cos_opp_hyp T Hzs1.
-  progress sin_cos_opp_hyp T Hzs2.
-  cbn in Ht21.
-  rewrite angle_sub_opp_r.
-  rewrite angle_add_opp_l.
-  apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
-  now apply rngl_sin_sub_nonneg.
-}
-apply Bool.eqb_false_iff in Hb12.
-remember (θ1 ≤? angle_straight)%A as t1s eqn:Ht1s.
-remember (θ2 ≤? angle_straight)%A as t2s eqn:Ht2s.
-symmetry in Ht1s, Ht2s.
-destruct t1s. {
-  destruct t2s; [ easy | clear Hb12 ].
-  exfalso.
-  apply angle_leb_gt in Ht2s.
-  apply angle_nle_gt in Ht2s.
-  apply Ht2s; clear Ht2s.
-  now apply (angle_le_trans _ θ1).
-}
-destruct t2s; [ clear Hb12 | easy ].
-apply angle_leb_gt in Ht1s.
-(* marche pas *)
-(* faut ajouter que θ1≤π ou θ2>π *)
-(* c'est-à-dire qu'ils sont du même côté *)
-destruct b12z. {
-  apply -> Bool.eqb_true_iff in Hb12z.
-...
-}  
-apply Bool.eqb_false_iff in Hb12z.
-apply angle_nle_gt in Hb12z.
-...
-rewrite <- angle_eucl_dist_move_0_r.
-rewrite angle_eucl_dist_diag.
-rewrite angle_straight_nonneg.
-rewrite (rngl_sub_0_r Hos).
-remember (θ1 ≤? angle_straight)%A as t1s eqn:Ht1s.
-remember (θ2 ≤? angle_straight)%A as t2s eqn:Ht2s.
-remember (θ1 - θ2 ≤? angle_straight)%A as t12s eqn:Ht12s.
-symmetry in Ht1s, Ht2s, Ht12s.
-destruct t1s. {
-  destruct t2s. {
-    destruct t12s. {
-About angle_eucl_dist_move_0_r.
-(* ma définition de angle_dist ne va pas ; si je veux être
-   compatible avec angle_eucl_dist, ça ne peut pas être
-   d(θ1,0)-d(θ2,0) *)
-...
-      rewrite (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist _ _)). 2: {
-        apply angle_eucl_dist_nonneg.
-      }
-      (* lemma *)
-      remember (angle_eucl_dist θ1 0) as d1z eqn:Hd1z.
-      remember (angle_eucl_dist θ2 0) as d2z eqn:Hd2z.
-      destruct (rngl_le_dec Hor d1z d2z) as [H12z| H12z]. {
-        rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
-          now apply (rngl_le_sub_0 Hop Hor).
-        }
-        rewrite (rngl_opp_sub_distr Hop); subst d1z d2z.
-        apply rngl_cos_le_iff_angle_eucl_le in H12z.
-        apply rngl_sin_nonneg_angle_le_straight in Ht1s, Ht2s, Ht12s.
-        generalize H12z; intros HHHH.
-        apply rngl_sin_sub_nonneg in H12z; [ | easy | easy ].
-        rewrite rngl_sin_sub_anticomm in H12z.
-        apply (rngl_opp_nonneg_nonpos Hop Hor) in H12z.
-        apply (rngl_le_antisymm Hor) in Ht12s; [ clear H12z | easy ].
-        apply eq_rngl_sin_0 in Ht12s.
-        destruct Ht12s as [H1| H1]. {
-          apply -> angle_sub_move_0_r in H1; subst θ2.
-          rewrite angle_eucl_dist_diag.
-          apply (rngl_sub_diag Hos).
-        }
-        apply -> angle_sub_move_r in H1; subst θ1.
-        rewrite rngl_sin_add_straight_l in Ht1s.
-        apply (rngl_opp_nonneg_nonpos Hop Hor) in Ht1s.
-        apply (rngl_le_antisymm Hor) in Ht2s; [ clear Ht1s | easy ].
-        apply eq_rngl_sin_0 in Ht2s.
-        destruct Ht2s; subst θ2. {
-          exfalso.
-          rewrite angle_add_0_r in HHHH.
-          cbn in HHHH.
-          apply rngl_nlt_ge in HHHH.
-          apply HHHH; clear HHHH.
-          apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
-        }
-        rewrite angle_straight_add_straight.
-        rewrite angle_eucl_dist_diag.
-        rewrite angle_eucl_dist_symmetry.
-        apply (rngl_sub_0_r Hos).
-      }
-      apply (rngl_nle_gt_iff Hor) in H12z.
-      apply (rngl_lt_le_incl Hor) in H12z.
-      rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-        now apply (rngl_le_0_sub Hop Hor).
-      }
-      rewrite angle_eucl_dist_symmetry.
-      subst d1z d2z.
-...
-      apply rngl_cos_le_iff_angle_eucl_le in H12z.
-      apply rngl_sin_nonneg_angle_le_straight in Ht1s, Ht2s, Ht12s.
-      do 3 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
-      do 2 rewrite angle_sub_0_r.
-      rewrite <- (rngl_mul_sub_distr_l Hop).
-      f_equal.
-      rewrite angle_div_2_sub.
-      assert (H21 : (θ2 ≤ θ1)%A). {
-        progress unfold angle_leb.
-        apply rngl_leb_le in Ht1s, Ht2s.
-        rewrite Ht1s, Ht2s.
-        now apply rngl_leb_le.
-      }
-      remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
-      symmetry in Ht12.
-      destruct t12. {
-        apply angle_le_antisymm in Ht12; [ | easy ].
-        subst θ2.
-        rewrite angle_sub_diag.
-        apply (rngl_sub_diag Hos).
-      }
-      apply angle_leb_gt in Ht12.
-      rewrite rngl_sin_add_straight_r.
-      rewrite <- rngl_sin_sub_anticomm.
-...
-(**)
-      rewrite rngl_sin_sub.
-(* bon, c'est faux, il me semble *)
+  rewrite angle_dist_move_0_r.
 ...
       rewrite rngl_sin_sub_sin.
       rewrite angle_add_overflow_div_2_div_2.
