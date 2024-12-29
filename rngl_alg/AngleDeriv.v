@@ -2896,6 +2896,44 @@ apply angle_leb_gt in Hss.
 now rewrite Hss.
 Qed.
 
+Theorem angle_sub_straight_le_straight :
+  ∀ θ,
+  (angle_straight ≤ θ)%A
+  → (θ - angle_straight ≤ angle_straight)%A.
+Proof.
+destruct_ac.
+intros * Has.
+progress unfold angle_leb in Has.
+progress unfold angle_leb.
+rewrite rngl_sin_sub_straight_r.
+rewrite rngl_cos_sub_straight_r.
+rewrite (rngl_leb_0_opp Hop Hor).
+cbn in Has |-*.
+rewrite (rngl_leb_refl Hor) in Has |-*.
+remember (rngl_sin θ ≤? 0)%L as s1z eqn:Hs1z.
+symmetry in Hs1z.
+destruct s1z. {
+  apply rngl_leb_le.
+  apply -> (rngl_opp_le_compat Hop Hor).
+  apply rngl_cos_bound.
+}
+exfalso.
+apply (rngl_leb_gt Hor) in Hs1z.
+generalize Hs1z; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+apply rngl_leb_le in H.
+rewrite H in Has; clear H.
+apply Bool.not_false_iff_true in Has.
+apply Has; clear Has.
+apply (rngl_leb_gt Hor).
+apply (rngl_lt_iff Hor).
+split; [ apply rngl_cos_bound | ].
+intros H; symmetry in H.
+apply eq_rngl_cos_opp_1 in H.
+subst θ.
+now apply (rngl_lt_irrefl Hor) in Hs1z.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
@@ -2953,10 +2991,15 @@ split; intros H12. {
     now apply (angle_le_trans _ θ2).
   }
   apply (rngl_add_le_mono_r Hop Hor).
-  (* lemma *)
   apply angle_gt_straight_not_same_side_0_iff in Has1, Has2.
   do 2 rewrite (angle_eucl_dist_move_0_r _ angle_straight).
+  apply angle_lt_le_incl in Has1, Has2.
   apply angle_le_angle_eucl_dist_le.
+  now apply angle_sub_straight_le_straight.
+  now apply angle_sub_straight_le_straight.
+...
+  rewrite <- (angle_add_0_l angle_straight) at 2.
+  rewrite <- angle_sub_straight_eq_add_straight.
 ...
 progress unfold angle_leb.
 rewrite rngl_sin_sub_straight_r.
