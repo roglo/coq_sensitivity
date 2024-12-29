@@ -3586,7 +3586,79 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Ht21.
 progress unfold angle_dist.
-progress unfold angle_dist_to_0.
+rewrite angle_straight_nonneg.
+rewrite angle_eucl_dist_0_straight.
+remember (Bool.eqb _ _) as b12 eqn:Hb12 in |-*.
+remember (Bool.eqb _ _) as b12z eqn:Hb12z in |-*.
+symmetry in Hb12, Hb12z.
+destruct b12. {
+  destruct b12z; [ apply angle_eucl_dist_move_0_r | ].
+  exfalso.
+  apply -> Bool.eqb_true_iff in Hb12.
+  apply Bool.eqb_false_iff in Hb12z.
+  apply Hb12z; clear Hb12z.
+  progress unfold angle_leb in Ht21.
+  progress unfold angle_leb in Hb12.
+  progress unfold angle_leb.
+  cbn - [ angle_sub ] in Ht21, Hb12 |-*.
+  rewrite (rngl_leb_refl Hor) in Hb12 |-*.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  remember (0 ≤? rngl_sin (θ1 - θ2))%L as zs12 eqn:Hzs12.
+  symmetry in Hzs1, Hzs2, Hzs12.
+  destruct zs12; [ apply rngl_leb_le, rngl_cos_bound | exfalso ].
+  apply Bool.not_true_iff_false in Hzs12.
+  apply Hzs12; clear Hzs12.
+  apply rngl_leb_le.
+  destruct zs2. {
+    destruct zs1. {
+      apply rngl_leb_le in Hzs1, Hzs2, Ht21.
+      now apply rngl_sin_sub_nonneg.
+    }
+    exfalso.
+    clear Ht21; symmetry in Hb12.
+    apply Bool.not_true_iff_false in Hb12.
+    apply Hb12; clear Hb12.
+    apply rngl_leb_le, rngl_cos_bound.
+  }
+  destruct zs1; [ easy | ].
+  apply rngl_leb_le in Ht21.
+  apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
+  clear Hb12.
+  change_angle_opp θ1.
+  change_angle_opp θ2.
+  progress sin_cos_opp_hyp T Hzs1.
+  progress sin_cos_opp_hyp T Hzs2.
+  cbn in Ht21.
+  rewrite angle_sub_opp_r.
+  rewrite angle_add_opp_l.
+  apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
+  now apply rngl_sin_sub_nonneg.
+}
+apply Bool.eqb_false_iff in Hb12.
+remember (θ1 ≤? angle_straight)%A as t1s eqn:Ht1s.
+remember (θ2 ≤? angle_straight)%A as t2s eqn:Ht2s.
+symmetry in Ht1s, Ht2s.
+destruct t1s. {
+  destruct t2s; [ easy | clear Hb12 ].
+  exfalso.
+  apply angle_leb_gt in Ht2s.
+  apply angle_nle_gt in Ht2s.
+  apply Ht2s; clear Ht2s.
+  now apply (angle_le_trans _ θ1).
+}
+destruct t2s; [ clear Hb12 | easy ].
+apply angle_leb_gt in Ht1s.
+(* marche pas *)
+(* faut ajouter que θ1≤π ou θ2>π *)
+(* c'est-à-dire qu'ils sont du même côté *)
+destruct b12z. {
+  apply -> Bool.eqb_true_iff in Hb12z.
+...
+}  
+apply Bool.eqb_false_iff in Hb12z.
+apply angle_nle_gt in Hb12z.
+...
 rewrite <- angle_eucl_dist_move_0_r.
 rewrite angle_eucl_dist_diag.
 rewrite angle_straight_nonneg.
