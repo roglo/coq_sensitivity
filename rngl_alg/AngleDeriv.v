@@ -3630,6 +3630,7 @@ destruct b2. {
   destruct b3. {
     apply Bool.orb_true_iff in Hb3.
     destruct Hb3 as [Hb3| Hb3]. {
+...
       do 3 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
       rewrite (rngl_add_mul_r_diag_l Hon).
       rewrite <- rngl_mul_add_distr_l.
@@ -3724,6 +3725,7 @@ destruct b2. {
       apply -> (rngl_lt_0_sub Hop Hor) in H2.
       apply -> (rngl_lt_0_sub Hop Hor) in H2s.
       apply -> (rngl_lt_0_sub Hop Hor) in H3s.
+clear H12 H23.
 ...
 rewrite rngl_cos_sub.
 do 2 rewrite rngl_sin_sub.
