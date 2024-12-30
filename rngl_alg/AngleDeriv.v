@@ -3282,7 +3282,20 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   rewrite (rngl_sub_opp_r Hop).
   rewrite (rngl_opp_0 Hop).
   destruct (angle_le_dec dθ angle_straight) as [Hts| Hts]. {
+Check rngl_cos_angle_dist.
+Check rngl_cos_angle_eucl_dist.
+Search (angle_eucl_dist _ 0).
+Search (angle_eucl_dist _ angle_straight).
+...
+rngl_cos_angle_eucl_dist:
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} 
+    {ac : angle_ctx T} (θ : angle T), rngl_cos θ = (1 - (angle_eucl_dist θ 0)² / 2)%L
+angle_eucl_dist_cos_sin:
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} 
+    {ac : angle_ctx T} (θ : angle T), (angle_eucl_dist θ 0)² = ((1 - rngl_cos θ)² + (rngl_sin θ)²)%L
+...
     rewrite rngl_cos_angle_dist; [ | easy ].
+...
     destruct Hdθ as (H1, H2).
     apply (rngl_min_glb_lt_iff Hor) in H2.
     destruct H2 as (H2, H3).
@@ -3294,6 +3307,7 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
     } {
       apply angle_right_le_straight.
     }
+...
     exfalso.
     apply angle_eucl_dist_lt_angle_eucl_dist in H3.
     apply rngl_nle_gt in H3.
