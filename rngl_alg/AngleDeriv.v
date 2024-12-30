@@ -3162,6 +3162,18 @@ apply angle_eucl_dist_nonneg.
 apply angle_eucl_dist_nonneg.
 Qed.
 
+Theorem angle_dist_angle_eucl_dist :
+  ∀ θ1 θ2,
+  (θ1 ≤ angle_straight)%A
+  → (θ2 ≤ angle_straight)%A
+  → angle_dist θ1 θ2 = angle_eucl_dist θ1 θ2.
+Proof.
+intros * H1s H2s.
+progress unfold angle_dist.
+progress unfold angle_same_side.
+now rewrite H1s, H2s.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
@@ -3258,8 +3270,60 @@ enough (H :
   apply angle_sub_move_r in H.
   subst θ.
   specialize (Hd dθ).
-  rewrite angle_dist_move_0_r.
+  rewrite angle_dist_move_0_r; cycle 1. {
+    (* lemma *)
+    rewrite angle_add_comm.
+    progress unfold angle_leb.
+    remember (0 ≤? rngl_sin θ₀)%L as zs eqn:Hzs.
+    remember (0 ≤? rngl_sin (θ₀ + dθ))%L as zstd eqn:Hzstd.
+    symmetry in Hzs, Hzstd.
+    destruct zs. {
+      destruct zstd; [ | easy ].
+      apply rngl_leb_le in Hzs, Hzstd.
+      apply rngl_leb_le.
+      rewrite angle_add_comm in Hθ.
+      destruct Hθ as (H1, H2).
+      apply (rngl_min_glb_lt_iff Hor) in H2.
+      destruct H2 as (H2, H3).
+      rewrite angle_dist_angle_eucl_dist in H3; cycle 1. {
+        now apply rngl_sin_nonneg_angle_le_straight.
+      } {
+        now apply rngl_sin_nonneg_angle_le_straight.
+      }
+      rewrite angle_dist_angle_eucl_dist in H3; cycle 1. {
+        now apply rngl_sin_nonneg_angle_le_straight.
+      } {
+        apply angle_straight_nonneg.
+      }
+      rewrite angle_eucl_dist_move_0_r in H3.
+      rewrite angle_add_comm, angle_add_sub in H3.
+      apply angle_eucl_dist_lt_angle_eucl_dist in H3.
+      do 2 rewrite angle_sub_0_r in H3.
+      destruct (rngl_le_dec Hor 0 (rngl_sin dθ)) as [Hzsd| Hzsd]. {
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzc| Hzc]. {
+          apply quadrant_1_rngl_cos_add_le_cos_l; [ easy | easy | easy | ].
+          apply (rngl_le_trans Hor _ (rngl_cos θ₀)); [ easy | ].
+          now apply (rngl_lt_le_incl Hor) in H3.
+        }
+        apply (rngl_nle_gt_iff Hor) in Hzc.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+...
+      apply rngl_cos_decr.
+      split; [ | now apply rngl_sin_nonneg_angle_le_straight ].
+      progress unfold angle_leb.
+      apply rngl_leb_le in Hzs, Hzsd.
+      rewrite Hzs, Hzsd.
+      apply rngl_leb_le.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+apply quadrant_1_rngl_cos_add_le_cos_l; [ easy | | | ].
 3: {
+...
+    rewrite angle_add_comm.
+    rewrite <- (angle_add_0_r θ₀) at 1.
+    (* lemma *)
+    apply angle_add_le_mono_l. 2: {
 ...
       rewrite rngl_sin_sub_sin.
       rewrite angle_add_overflow_div_2_div_2.
