@@ -3258,7 +3258,22 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   intros dθ Hdθ.
   rewrite (rngl_sub_opp_r Hop).
   rewrite (rngl_opp_0 Hop).
+  destruct (angle_le_dec dθ angle_straight) as [Hts| Hts]. {
+    rewrite rngl_cos_angle_dist; [ | easy ].
+...
 Check rngl_cos_angle_dist.
+Theorem rngl_cos_angle_dist' :
+  ∀ θ,
+  (angle_straight < θ)%A
+  → rngl_cos θ = (1 - (angle_dist θ angle_straight)² / 2)%L.
+...
+rewrite rngl_cos_angle_dist'.
+
+About rngl_cos_angle_eucl_dist.
+...
+Search (angle_dist _ _ = _).
+Search (angle_eucl_dist _ _ = _).
+Check angle_eucl_dist_is_sqrt.
 ...
   rewrite rngl_cos_angle_dist. 2: {
     destruct Hdθ as (H1, H2).
