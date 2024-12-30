@@ -2934,6 +2934,63 @@ subst θ.
 now apply (rngl_lt_irrefl Hor) in Hs1z.
 Qed.
 
+Theorem angle_le_sub_straight_sub_straight :
+  ∀ θ1 θ2,
+  (θ1 ≤ θ2)%A
+  → (angle_straight ≤ θ1)%A
+  → (angle_straight ≤ θ2)%A
+  → (θ1 - angle_straight ≤ θ2 - angle_straight)%A.
+Proof.
+destruct_ac.
+intros * H12 Has1 Has2.
+progress unfold angle_leb in H12.
+progress unfold angle_leb in Has1.
+progress unfold angle_leb in Has2.
+progress unfold angle_leb.
+do 2 rewrite rngl_sin_sub_straight_r.
+do 2 rewrite rngl_cos_sub_straight_r.
+do 2 rewrite (rngl_leb_0_opp Hop Hor).
+cbn in Has1, Has2 |-*.
+rewrite (rngl_leb_refl Hor) in Has1, Has2.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
+remember (rngl_sin θ2 ≤? 0)%L as s2z eqn:Hs2z.
+symmetry in Hzs1, Hzs2, Hs1z, Hs2z.
+destruct s1z. {
+  destruct s2z; [ | easy ].
+  apply rngl_leb_le in Hs1z, Hs2z.
+  apply rngl_leb_le.
+  apply -> (rngl_opp_le_compat Hop Hor).
+  destruct zs1. {
+    apply rngl_leb_le in Has1.
+    apply (rngl_lt_eq_cases Hor) in Has1.
+    destruct Has1 as [Has1| Has1]. {
+      exfalso; apply rngl_nle_gt in Has1.
+      apply Has1, rngl_cos_bound.
+    }
+    apply eq_rngl_cos_opp_1 in Has1; subst θ1.
+    apply rngl_cos_bound.
+  }
+  destruct zs2; [ easy | ].
+  now apply rngl_leb_le in H12.
+}
+exfalso.
+apply (rngl_leb_gt Hor) in Hs1z.
+generalize Hs1z; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+apply rngl_leb_le in H.
+rewrite H in Hzs1; clear H; subst zs1.
+apply rngl_leb_le in Has1.
+apply (rngl_lt_eq_cases Hor) in Has1.
+destruct Has1 as [Has1| Has1]. {
+  apply rngl_nle_gt in Has1.
+  apply Has1, rngl_cos_bound.
+}
+apply eq_rngl_cos_opp_1 in Has1; subst θ1.
+now apply (rngl_lt_irrefl Hor) in Hs1z.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
@@ -2997,6 +3054,9 @@ split; intros H12. {
   apply angle_le_angle_eucl_dist_le.
   now apply angle_sub_straight_le_straight.
   now apply angle_sub_straight_le_straight.
+  now apply angle_le_sub_straight_sub_straight.
+}
+...
   do 2 rewrite angle_sub_straight_eq_add_straight.
   do 2 rewrite (angle_add_comm _ angle_straight).
   apply angle_add_le_mono_l; [ | easy ].
