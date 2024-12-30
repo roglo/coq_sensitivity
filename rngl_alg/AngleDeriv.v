@@ -3149,6 +3149,19 @@ rewrite angle_0_straight_same_side.
 apply angle_eucl_dist_0_straight.
 Qed.
 
+Theorem angle_dist_nonneg : ∀ θ1 θ2 : angle T, (0 ≤ angle_dist θ1 θ2)%L.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_dist.
+remember (angle_same_side θ1 θ2) as ss eqn:Hss.
+symmetry in Hss.
+destruct ss; [ apply angle_eucl_dist_nonneg | ].
+apply (rngl_add_nonneg_nonneg Hor).
+apply angle_eucl_dist_nonneg.
+apply angle_eucl_dist_nonneg.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
@@ -3210,17 +3223,17 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
     apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
       apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
     }
-...
     apply angle_dist_nonneg.
   }
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   }
-  eapply (rngl_lt_le_trans Hor _ ε); [ easy | ].
-  rewrite <- (rngl_mul_1_r Hon ε) at 1.
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+  apply (rngl_lt_le_trans Hor _ (rngl_min ε 2)); [ easy | ].
+  apply (rngl_le_trans Hor _ ε).
+  apply (rngl_le_min_l Hor).
+  rewrite (rngl_mul_2_r Hon).
   apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  now apply (rngl_lt_le_incl Hor) in Hε.
 }
 enough (H :
   ∃ η, (0 < η)%L ∧
