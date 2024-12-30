@@ -3247,8 +3247,10 @@ enough (H :
   move η before ε.
   split. {
     apply rngl_min_glb_lt; [ easy | ].
-...
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_dist_nonneg | ].
+    intros H; symmetry in H.
+    now apply angle_dist_separation in H.
   }
   intros θ Hθ.
   remember (θ - θ₀)%A as dθ eqn:H.
@@ -3257,6 +3259,7 @@ enough (H :
   subst θ.
   specialize (Hd dθ).
   rewrite angle_dist_move_0_r.
+3: {
 ...
       rewrite rngl_sin_sub_sin.
       rewrite angle_add_overflow_div_2_div_2.
