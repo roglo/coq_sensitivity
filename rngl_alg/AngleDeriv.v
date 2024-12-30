@@ -3174,6 +3174,27 @@ progress unfold angle_same_side.
 now rewrite H1s, H2s.
 Qed.
 
+Theorem angle_eucl_dist_0_right : angle_eucl_dist 0 angle_right = √2%L.
+Proof.
+destruct_ac.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite angle_sub_0_r.
+cbn.
+rewrite (rngl_sub_0_r Hos).
+now rewrite (rngl_mul_1_r Hon).
+Qed.
+
+Theorem angle_dist_0_right : angle_dist 0 angle_right = √2%L.
+Proof.
+rewrite angle_dist_angle_eucl_dist. {
+  apply angle_eucl_dist_0_right.
+} {
+  apply angle_straight_nonneg.
+} {
+  apply angle_right_le_straight.
+}
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
@@ -3250,9 +3271,11 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
 destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   subst θ₀.
   cbn.
-  exists (rngl_min ε 2).
+  exists (rngl_min ε (angle_dist 0 angle_right)).
   split. {
     apply rngl_min_glb_lt; [ easy | ].
+    rewrite angle_dist_0_right.
+    apply (rl_sqrt_pos Hon Hos Hor).
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   }
   intros dθ Hdθ.
@@ -3260,6 +3283,30 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   rewrite (rngl_opp_0 Hop).
   destruct (angle_le_dec dθ angle_straight) as [Hts| Hts]. {
     rewrite rngl_cos_angle_dist; [ | easy ].
+    destruct Hdθ as (H1, H2).
+    apply (rngl_min_glb_lt_iff Hor) in H2.
+    destruct H2 as (H2, H3).
+    rewrite angle_dist_angle_eucl_dist in H3; [ | easy | ]. 2: {
+      apply angle_le_refl.
+    }
+    rewrite angle_dist_angle_eucl_dist in H3; cycle 1. {
+      apply angle_straight_nonneg.
+    } {
+      apply angle_right_le_straight.
+    }
+    exfalso.
+    apply angle_eucl_dist_lt_angle_eucl_dist in H3.
+    apply rngl_nle_gt in H3.
+    apply H3; clear H3.
+    rewrite angle_sub_0_l.
+    rewrite rngl_cos_sub_straight_r; cbn.
+    apply (rngl_opp_nonpos_nonneg Hop Hor).
+(* ah merde *)
+...
+    apply rngl_le_0_cos.
+
+    cbn in H3.
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
 ...
 Check rngl_cos_angle_dist.
 Theorem rngl_cos_angle_dist' :
