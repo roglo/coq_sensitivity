@@ -2991,43 +2991,27 @@ apply eq_rngl_cos_opp_1 in Has1; subst θ1.
 now apply (rngl_lt_irrefl Hor) in Hs1z.
 Qed.
 
-(* to be completed
-Theorem rngl_cos_derivative :
-  is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
-Proof.
-destruct_ac.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros θ₀ ε Hε.
-  rewrite (H1 ε) in Hε.
-  now apply (rngl_lt_irrefl Hor) in Hε.
-}
-intros θ₀ ε Hε.
-destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
-  subst θ₀.
-  cbn.
-  exists (rngl_min ε 2).
-  split. {
-    apply rngl_min_glb_lt; [ easy | ].
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-  }
-  intros dθ Hdθ.
-  rewrite (rngl_opp_0 Hop).
-  rewrite rngl_cos_angle_dist. 2: {
-    destruct Hdθ as (H1, H2).
-Check angle_le_angle_eucl_dist_le.
 Theorem angle_le_angle_dist_le :
   ∀ θ1 θ2, (θ1 ≤ θ2)%A ↔ (angle_dist θ1 0 ≤ angle_dist θ2 0)%L.
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H2.
+  intros.
+  rewrite (H2 θ1), (H2 θ2).
+  rewrite (H1 (angle_dist _ _)).
+  rewrite angle_le_refl.
+  split; [ intros | easy ].
+  apply (rngl_le_refl Hor).
+}
 intros.
 progress unfold angle_dist.
 rewrite angle_eucl_dist_0_straight.
+remember (angles_same_side θ1 0) as as1 eqn:Has1.
+remember (angles_same_side θ2 0) as as2 eqn:Has2.
+symmetry in Has1, Has2.
 split; intros H12. {
-  remember (angles_same_side θ1 0) as as1 eqn:Has1.
-  remember (angles_same_side θ2 0) as as2 eqn:Has2.
-  symmetry in Has1, Has2.
   destruct as1. {
     destruct as2. {
       apply angle_le_angle_eucl_dist_le; [ | | easy ].
@@ -3056,15 +3040,116 @@ split; intros H12. {
   now apply angle_sub_straight_le_straight.
   now apply angle_le_sub_straight_sub_straight.
 }
+destruct as1. {
+  destruct as2. {
+    apply angle_le_angle_eucl_dist_le in H12; [ easy | | ].
+    now apply angle_le_straight_same_side_0_iff.
+    now apply angle_le_straight_same_side_0_iff.
+  }
+  apply angle_le_straight_same_side_0_iff in Has1.
+  apply angle_gt_straight_not_same_side_0_iff in Has2.
+  apply (angle_le_trans _ angle_straight); [ easy | ].
+  now apply angle_lt_le_incl in Has2.
+}
+destruct as2. {
+  exfalso.
+  apply rngl_nlt_ge in H12.
+  apply H12; clear H12.
+  apply angle_le_straight_same_side_0_iff in Has2.
+  apply angle_gt_straight_not_same_side_0_iff in Has1.
+  eapply (rngl_le_lt_trans Hor _ 2). {
+    apply angle_eucl_dist_bound.
+  }
+  apply (rngl_lt_add_l Hos Hor).
+  apply (rngl_lt_iff Hor).
+  split ; [ apply angle_eucl_dist_nonneg | ].
+  intros H; symmetry in H.
+  apply angle_eucl_dist_separation in H.
+  subst θ1.
+  now apply angle_lt_irrefl in Has1.
+}
+apply (rngl_add_le_mono_r Hop Hor) in H12.
+apply angle_gt_straight_not_same_side_0_iff in Has1.
+apply angle_gt_straight_not_same_side_0_iff in Has2.
+(* lemma *)
+apply angle_nlt_ge.
+intros H21.
+apply rngl_nlt_ge in H12.
+apply H12; clear H12.
+apply angle_eucl_dist_lt_angle_eucl_dist.
+do 2 rewrite rngl_cos_sub_straight_r.
+apply -> (rngl_opp_lt_compat Hop Hor).
+change_angle_opp θ1.
+change_angle_opp θ2.
+cbn.
+(* lemma *)
+apply angle_opp_lt_compat_if in H21. 2: {
+  intros H.
+  apply (f_equal angle_opp) in H.
+  rewrite angle_opp_involutive in H.
+  rewrite angle_opp_0 in H; subst θ2.
+  rewrite angle_opp_0 in Has2.
+  apply angle_nle_gt in Has2.
+  apply Has2, angle_straight_nonneg.
+}
+do 2 rewrite angle_opp_involutive in H21.
+apply angle_lt_opp_r in Has1, Has2; cycle 1. {
+  (* lemma *)
+  intros H.
+  specialize (angle_straight_pos Hc1) as H1.
+  rewrite H in H1.
+  now apply angle_lt_irrefl in H1.
+} {
+  (* lemma *)
+  intros H.
+  specialize (angle_straight_pos Hc1) as H1.
+  rewrite H in H1.
+  now apply angle_lt_irrefl in H1.
+}
+rewrite angle_opp_straight in Has1, Has2.
+(* lemma *)
+apply (rngl_nle_gt_iff Hor).
+intros Hcc.
+apply angle_nle_gt in H21.
+apply H21; clear H21.
+progress unfold angle_leb.
+apply angle_lt_le_incl in Has1, Has2.
+apply rngl_sin_nonneg_angle_le_straight in Has1, Has2.
+apply rngl_leb_le in Has1, Has2.
+rewrite Has1, Has2.
+now apply rngl_leb_le.
+Qed.
+
+(* to be completed
+Theorem rngl_cos_derivative :
+  is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros θ₀ ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros θ₀ ε Hε.
+destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
+  subst θ₀.
+  cbn.
+  exists (rngl_min ε 2).
+  split. {
+    apply rngl_min_glb_lt; [ easy | ].
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  intros dθ Hdθ.
+  rewrite (rngl_opp_0 Hop).
+  rewrite rngl_cos_angle_dist. 2: {
+    destruct Hdθ as (H1, H2).
+    apply angle_le_angle_eucl_dist_le.
 ...
-  do 2 rewrite angle_sub_straight_eq_add_straight.
-  do 2 rewrite (angle_add_comm _ angle_straight).
-  apply angle_add_le_mono_l; [ | easy ].
-(* fuck *)
+apply Complex.rngl_cos_le_anticompat_when_sin_nonneg.
 ...
-  rewrite <- (angle_add_0_l angle_straight) at 2.
-  rewrite <- angle_sub_straight_eq_add_straight.
-...
+Search (rngl_cos _ < rngl_cos _)%L.
 progress unfold angle_leb.
 rewrite rngl_sin_sub_straight_r.
 rewrite rngl_cos_sub_straight_r.
