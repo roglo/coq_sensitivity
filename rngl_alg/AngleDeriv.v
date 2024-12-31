@@ -3547,14 +3547,27 @@ enough (H :
       rewrite angle_add_comm in Hθ.
       destruct Hθ as (H1, H2).
       apply (rngl_min_glb_lt_iff Hor) in H2.
+      destruct H2 as (H2, H4).
+      apply (rngl_min_glb_lt_iff Hor) in H2.
       destruct H2 as (H2, H3).
-      rewrite angle_dist_angle_eucl_dist in H3; cycle 1. {
+      rewrite angle_dist_angle_eucl_dist in H4. 2: {
         (* lemma *)
         apply rngl_sin_nonneg_angle_le_straight in Hzs, Hzstd.
         progress unfold angle_same_side.
         now rewrite Hzs, Hzstd.
-      } {
+      }
+      rewrite angle_dist_angle_eucl_dist in H4. 2: {
         (* lemma *)
+        apply rngl_sin_nonneg_angle_le_straight in Hzs, Hzstd.
+        progress unfold angle_same_side.
+        now rewrite Hzs, angle_straight_nonneg.
+      }
+      rewrite angle_dist_angle_eucl_dist in H2. 2: {
+        (* lemma *)
+        apply rngl_sin_nonneg_angle_le_straight in Hzs, Hzstd.
+        progress unfold angle_same_side.
+        now rewrite Hzs, Hzstd.
+      }
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 apply rngl_cos_decr.
 ...
