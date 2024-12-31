@@ -2873,7 +2873,25 @@ destruct ss32. {
   }
   destruct t21s. {
     apply angle_leb_gt in Ht31s.
-(* chuis pas sûr, là *)
+    destruct t32s. {
+      exfalso.
+      progress unfold angle_same_side in Hss31.
+      progress unfold angle_same_side in Hss21.
+      progress unfold angle_same_side in Hss32.
+      apply -> Bool.eqb_false_iff in Hss31.
+      apply -> Bool.eqb_true_iff in Hss32.
+      apply -> Bool.eqb_false_iff in Hss21.
+...
+    rewrite angle_eucl_dist_move_0_l.
+    rewrite angle_add_sub_swap.
+    rewrite <- angle_sub_straight_eq_add_straight.
+    rewrite <- angle_eucl_dist_move_0_r.
+Search (angle_eucl_dist _ (_ + _)).
+...
+    do 3 rewrite angle_eucl_dist_is_sqrt.
+    rewrite angle_add_sub_swap.
+    rewrite rngl_cos_add_straight_r.
+    rewrite (rngl_sub_opp_r Hop).
 ...
 
 Theorem angle_dist_triangular :
