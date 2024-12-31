@@ -3299,6 +3299,24 @@ apply angle_eucl_dist_nonneg.
 apply angle_eucl_dist_nonneg.
 Qed.
 
+Theorem angle_dist_pos_angle_neq :
+  ∀ θ1 θ2, (0 < angle_dist θ1 θ2)%L ↔ θ1 ≠ θ2.
+Proof.
+destruct_ac.
+intros.
+split; intros Hd. {
+  apply (rngl_lt_iff Hor) in Hd.
+  destruct Hd as (_, Hd).
+  intros H1; apply Hd; symmetry.
+  now apply angle_dist_separation.
+} {
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_dist_nonneg | ].
+  intros H1; apply Hd.
+  now apply angle_dist_separation.
+}
+Qed.
+
 Theorem angle_le_straight_dist_angle_eucl_dist :
   ∀ θ1 θ2,
   (θ1 ≤ angle_straight)%A
@@ -3507,12 +3525,7 @@ enough (H :
       apply eq_rngl_sin_0 in H1.
       now destruct H1.
     }
-...
-    apply rngl_min_glb_lt; [ easy | ].
-    apply (rngl_lt_iff Hor).
-    split; [ apply angle_dist_nonneg | ].
-    intros H; symmetry in H.
-    now apply angle_dist_separation in H.
+    now apply angle_dist_pos_angle_neq.
   }
   intros θ Hθ.
   remember (θ - θ₀)%A as dθ eqn:H.
@@ -3536,8 +3549,19 @@ enough (H :
       apply (rngl_min_glb_lt_iff Hor) in H2.
       destruct H2 as (H2, H3).
       rewrite angle_dist_angle_eucl_dist in H3; cycle 1. {
-        now apply rngl_sin_nonneg_angle_le_straight.
+        (* lemma *)
+        apply rngl_sin_nonneg_angle_le_straight in Hzs, Hzstd.
+        progress unfold angle_same_side.
+        now rewrite Hzs, Hzstd.
       } {
+        (* lemma *)
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+apply rngl_cos_decr.
+...
+Search (_ ≤ _ + _)%A.
+        apply Complex.rngl_cos_le_anticompat_when_sin_nonneg; [ easy | easy | ].
+...
+...
         now apply rngl_sin_nonneg_angle_le_straight.
       }
       rewrite angle_dist_angle_eucl_dist in H3; cycle 1. {
