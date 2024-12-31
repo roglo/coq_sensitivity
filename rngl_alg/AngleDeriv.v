@@ -3435,10 +3435,8 @@ destruct sss. {
   apply angle_le_straight_same_side_straight_iff in Hsss.
   now apply angle_nle_gt in Hsss.
 }
-Search (angle_dist).
-rewrite angle_dist_angle_eucl_dist.
-(* eh merde, non, c'est pas bon *)
-...
+progress unfold angle_dist.
+rewrite Hssz, Hsss.
 rewrite angle_eucl_dist_0_straight.
 rewrite (proj2 (angle_eucl_dist_separation angle_straight _)); [ | easy ].
 rewrite rngl_add_0_r.
@@ -3451,17 +3449,20 @@ progress unfold rngl_squ at 2 3.
 do 2 rewrite <- rngl_mul_add_distr_l.
 f_equal.
 specialize (rngl_squ_add Hic Hon) as H1.
-Check angle_eucl_dist_to_0_to_straight.
-...
-Print angle_dist.
-...
 specialize (H1 (angle_eucl_dist θ angle_straight) 1)%L.
 rewrite (rngl_mul_1_r Hon) in H1.
 rewrite (rngl_squ_1 Hon) in H1.
 symmetry in H1.
 rewrite (rngl_mul_comm Hic) in H1.
 apply (rngl_add_sub_eq_r Hos) in H1.
-rewrite <- H1.
+rewrite <- H1; clear H1.
+rewrite rngl_add_assoc.
+rewrite (rngl_sub_add Hop).
+f_equal.
+rewrite <- (rngl_squ_1 Hon) at 2.
+f_equal.
+rewrite <- (rngl_add_0_l 1%L) at 2.
+f_equal.
 ...
 Arguments rngl_add_cancel_r {T ro rp} Hos (a b c)%_L.
 Arguments rngl_mul_2_l {T ro rp} Hon a%_L.
