@@ -2673,10 +2673,13 @@ Proof. now intros; destruct a, b. Qed.
 Definition angle_same_side θ1 θ2 :=
   Bool.eqb (θ1 ≤? angle_straight)%A (θ2 ≤? angle_straight)%A.
 
-Definition angle_dist θ1 θ2 :=
+Definition angle_dist_greater_smaller θ1 θ2 :=
   if angle_same_side θ1 θ2 then angle_eucl_dist θ1 θ2
-  else
-    (angle_eucl_dist θ1 angle_straight + angle_eucl_dist θ2 angle_straight)%L.
+  else if (θ1 ≤? θ2 + angle_straight)%A then angle_eucl_dist θ1 θ2
+  else (2 + angle_eucl_dist θ1 (θ2 + angle_straight))%L.
+
+Definition angle_dist θ1 θ2 :=
+  angle_dist_greater_smaller (angle_max θ1 θ2) (angle_min θ1 θ2).
 
 Theorem angle_dist_symmetry :
   ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist θ2 θ1.
@@ -2684,41 +2687,98 @@ Proof.
 destruct_ac.
 intros.
 progress unfold angle_dist.
-progress unfold angle_same_side.
-rewrite bool_eqb_sym.
-rewrite (angle_eucl_dist_symmetry θ1).
-rewrite rngl_add_comm.
-easy.
+progress unfold angle_min.
+progress unfold angle_max.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+remember (θ2 ≤? θ1)%A as t21 eqn:Ht21.
+symmetry in Ht12, Ht21.
+destruct t12. {
+  destruct t21; [ | easy ].
+  apply angle_le_antisymm in Ht12; [ | easy ].
+  now subst θ2.
+} {
+  destruct t21; [ easy | ].
+  apply angle_leb_gt in Ht12, Ht21.
+  now apply angle_lt_asymm in Ht12.
+}
 Qed.
 
+(* to be completed *)
 Theorem angle_dist_separation :
   ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (angle_dist _ _)).
+  split; [ | easy ].
+  intros _.
+  apply eq_angle_eq.
+  do 2 rewrite (H1 (rngl_cos _)), (H1 (rngl_sin _)).
+  easy.
+}
 intros.
 progress unfold angle_dist.
-progress unfold angle_same_side.
-remember (Bool.eqb _ _) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ now apply angle_eucl_dist_separation | ].
-split; intros H12. {
-  apply (rngl_eq_add_0 Hor) in H12; cycle 1.
-  apply angle_eucl_dist_nonneg.
-  apply angle_eucl_dist_nonneg.
-  destruct H12 as (H1, H2).
-  apply angle_eucl_dist_separation in H1, H2.
-  congruence.
+split; intros Hab. {
+  progress unfold angle_dist_greater_smaller in Hab.
+  destruct (angle_le_dec θ2 θ1) as [Ht21| Ht21]. {
+    rewrite (proj2 (angle_max_l_iff _ _) Ht21) in Hab.
+    rewrite (proj2 (angle_min_r_iff _ _) Ht21) in Hab.
+    remember (angle_same_side θ1 θ2) as ss12 eqn:Hss12.
+    remember (θ1 ≤? θ2 + angle_straight)%A as t12s eqn:Ht12s.
+    symmetry in Hss12, Ht12s.
+    destruct ss12; [ now apply angle_eucl_dist_separation | ].
+    destruct t12s; [ now apply angle_eucl_dist_separation | ].
+    exfalso.
+    rewrite rngl_add_comm in Hab.
+    apply (rngl_add_move_0_r Hop) in Hab.
+    specialize (angle_eucl_dist_nonneg θ1 (θ2 + angle_straight)) as H1.
+    rewrite Hab in H1.
+    apply rngl_nlt_ge in H1.
+    apply H1; clear H1.
+    apply (rngl_opp_neg_pos Hop Hor).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  } {
+    apply angle_nle_gt in Ht21.
+    generalize Ht21; intros Ht21'.
+    apply angle_lt_le_incl in Ht21.
+    rewrite (proj2 (angle_max_r_iff _ _) Ht21) in Hab.
+    rewrite (proj2 (angle_min_l_iff _ _) Ht21) in Hab.
+    symmetry.
+    remember (angle_same_side θ2 θ1) as ss12 eqn:Hss12.
+    remember (θ2 ≤? θ1 + angle_straight)%A as t12s eqn:Ht12s.
+    symmetry in Hss12, Ht12s.
+    destruct ss12; [ now apply angle_eucl_dist_separation | ].
+    destruct t12s; [ now apply angle_eucl_dist_separation | ].
+    exfalso.
+    rewrite rngl_add_comm in Hab.
+    apply (rngl_add_move_0_r Hop) in Hab.
+    specialize (angle_eucl_dist_nonneg θ2 (θ1 + angle_straight)) as H1.
+    rewrite Hab in H1.
+    apply rngl_nlt_ge in H1.
+    apply H1; clear H1.
+    apply (rngl_opp_neg_pos Hop Hor).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
 }
 subst θ2.
-now rewrite Bool.eqb_reflx in Hb.
+rewrite angle_max_id, angle_min_id.
+progress unfold angle_dist_greater_smaller.
+progress unfold angle_same_side.
+rewrite Bool.eqb_reflx.
+apply angle_eucl_dist_diag.
 Qed.
 
+(* to be completed
 Theorem angle_dist_triangular :
   ∀ θ1 θ2 θ3, (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
 Proof.
 destruct_ac.
 intros.
 progress unfold angle_dist.
+...
 progress unfold angle_same_side.
 remember (Bool.eqb _ _) as b13 eqn:Hb13 in |-*.
 remember (Bool.eqb _ _) as b12 eqn:Hb12 in |-*.
@@ -2853,6 +2913,7 @@ rewrite angle_add_opp_l.
 apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
 now apply rngl_sin_sub_nonneg.
 Qed.
+*)
 
 Theorem angle_le_straight_same_side_0_iff :
   ∀ θ, angle_same_side θ 0 = true ↔ (θ ≤ angle_straight)%A.
@@ -2944,6 +3005,7 @@ symmetry.
 apply (rngl_mul_2_l Hon).
 Qed.
 
+(* to be completed
 Theorem angle_dist_angle_eucl_dist :
   ∀ θ1 θ2,
   angle_same_side θ1 θ2 = true
@@ -3023,6 +3085,7 @@ rewrite (rngl_sub_sub_swap Hop).
 rewrite (rngl_add_sub Hos).
 apply rngl_cos_angle_eucl_dist.
 Qed.
+*)
 
 Theorem angle_sub_straight_le_straight :
   ∀ θ,
@@ -3119,6 +3182,7 @@ apply eq_rngl_cos_opp_1 in Has1; subst θ1.
 now apply (rngl_lt_irrefl Hor) in Hs1z.
 Qed.
 
+(* to be completed
 Theorem angle_le_angle_dist_le :
   ∀ θ1 θ2, (θ1 ≤ θ2)%A ↔ (angle_dist θ1 0 ≤ angle_dist θ2 0)%L.
 Proof.
@@ -3260,6 +3324,7 @@ destruct t12; [ apply (rngl_le_refl Hor) | ].
 rewrite (angle_eucl_dist_symmetry θ2).
 apply angle_eucl_dist_triangular.
 Qed.
+*)
 
 Theorem angle_0_right_same_side :
   angle_same_side 0 angle_right = true.
@@ -3279,6 +3344,7 @@ apply Bool.eqb_true_iff.
 apply angle_straight_nonneg.
 Qed.
 
+(* to be completed
 Theorem angle_dist_0_straight : angle_dist 0 angle_straight = 2%L.
 Proof.
 progress unfold angle_dist.
@@ -3328,6 +3394,7 @@ progress unfold angle_dist.
 progress unfold angle_same_side.
 now rewrite H1s, H2s.
 Qed.
+*)
 
 Theorem angle_eucl_dist_0_right : angle_eucl_dist 0 angle_right = √2%L.
 Proof.
@@ -3339,6 +3406,7 @@ rewrite (rngl_sub_0_r Hos).
 now rewrite (rngl_mul_1_r Hon).
 Qed.
 
+(* to be completed
 Theorem angle_dist_0_right : angle_dist 0 angle_right = √2%L.
 Proof.
 rewrite angle_dist_angle_eucl_dist. {
@@ -3348,7 +3416,6 @@ rewrite angle_dist_angle_eucl_dist. {
 }
 Qed.
 
-(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
 Proof.
