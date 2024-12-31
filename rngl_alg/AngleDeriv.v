@@ -2703,7 +2703,6 @@ destruct t12. {
 }
 Qed.
 
-(* to be completed *)
 Theorem angle_dist_separation :
   ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
@@ -2772,12 +2771,67 @@ apply angle_eucl_dist_diag.
 Qed.
 
 (* to be completed
+Theorem angle_dist_greater_smaller_triangular :
+  ∀ θ1 θ2 θ3,
+  (θ1 ≤ θ2 ≤ θ3)%A
+  → (angle_dist_greater_smaller θ3 θ1 ≤
+       angle_dist_greater_smaller θ2 θ1 + angle_dist_greater_smaller θ3 θ2)%L.
+Proof.
+intros * (H12, H23).
+progress unfold angle_dist_greater_smaller.
+remember (angle_same_side θ3 θ1) as ss31 eqn:Hss31.
+remember (angle_same_side θ2 θ1) as ss21 eqn:Hss21.
+remember (angle_same_side θ3 θ2) as ss32 eqn:Hss32.
+remember (θ2 ≤? θ1 + angle_straight)%A as t21s eqn:Ht21s.
+remember (θ3 ≤? θ2 + angle_straight)%A as t32s eqn:Ht32s.
+symmetry in Hss31, Hss21, Hss32, Ht21s, Ht32s.
+destruct ss31. {
+  destruct ss21. {
+    destruct ss32. {
+      rewrite rngl_add_comm.
+      apply angle_eucl_dist_triangular.
+    }
+    progress unfold angle_same_side in Hss31.
+    progress unfold angle_same_side in Hss21.
+    progress unfold angle_same_side in Hss32.
+    apply -> Bool.eqb_true_iff in Hss31.
+    apply -> Bool.eqb_true_iff in Hss21.
+    apply Bool.eqb_false_iff in Hss32.
+    congruence.
+  }
+  destruct ss32. {
+    progress unfold angle_same_side in Hss31.
+    progress unfold angle_same_side in Hss21.
+    progress unfold angle_same_side in Hss32.
+    apply -> Bool.eqb_true_iff in Hss31.
+    apply -> Bool.eqb_true_iff in Hss32.
+    apply Bool.eqb_false_iff in Hss21.
+    congruence.
+  }
+  destruct t21s. {
+    destruct t32s. {
+      rewrite rngl_add_comm.
+      apply angle_eucl_dist_triangular.
+    }
+    apply angle_leb_gt in Ht32s.
+...
+
 Theorem angle_dist_triangular :
   ∀ θ1 θ2 θ3, (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
 Proof.
 destruct_ac.
 intros.
 progress unfold angle_dist.
+destruct (angle_le_dec θ1 θ3) as [H13| H13]. {
+  rewrite (proj2 (angle_max_r_iff _ _) H13).
+  rewrite (proj2 (angle_min_l_iff _ _) H13).
+  destruct (angle_le_dec θ1 θ2) as [H12| H12]. {
+    rewrite (proj2 (angle_max_r_iff _ _) H12).
+    rewrite (proj2 (angle_min_l_iff _ _) H12).
+    destruct (angle_le_dec θ2 θ3) as [H23| H23]. {
+      rewrite (proj2 (angle_max_r_iff _ _) H23).
+      rewrite (proj2 (angle_min_l_iff _ _) H23).
+      apply angle_dist_greater_smaller_triangular.
 ...
 progress unfold angle_same_side.
 remember (Bool.eqb _ _) as b13 eqn:Hb13 in |-*.
