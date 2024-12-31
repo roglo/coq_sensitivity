@@ -3533,6 +3533,8 @@ enough (H :
   apply angle_sub_move_r in H.
   subst θ.
   specialize (Hd dθ).
+Check angle_dist_move_0_r.
+...
   rewrite angle_dist_move_0_r; cycle 1. {
     (* lemma *)
     rewrite angle_add_comm.
@@ -3545,6 +3547,7 @@ enough (H :
       apply rngl_leb_le in Hzs, Hzstd.
       apply rngl_leb_le.
       rewrite angle_add_comm in Hθ.
+...
       destruct Hθ as (H1, H2).
       apply (rngl_min_glb_lt_iff Hor) in H2.
       destruct H2 as (H2, H4).
