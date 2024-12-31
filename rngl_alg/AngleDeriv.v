@@ -2775,8 +2775,9 @@ Theorem angle_dist_greater_smaller_triangular :
   ∀ θ1 θ2 θ3,
   (θ1 ≤ θ2 ≤ θ3)%A
   → (angle_dist_greater_smaller θ3 θ1 ≤
-       angle_dist_greater_smaller θ2 θ1 + angle_dist_greater_smaller θ3 θ2)%L.
+       angle_dist_greater_smaller θ3 θ2 + angle_dist_greater_smaller θ2 θ1)%L.
 Proof.
+destruct_ac.
 intros * (H12, H23).
 progress unfold angle_dist_greater_smaller.
 remember (angle_same_side θ3 θ1) as ss31 eqn:Hss31.
@@ -2784,13 +2785,11 @@ remember (angle_same_side θ2 θ1) as ss21 eqn:Hss21.
 remember (angle_same_side θ3 θ2) as ss32 eqn:Hss32.
 remember (θ2 ≤? θ1 + angle_straight)%A as t21s eqn:Ht21s.
 remember (θ3 ≤? θ2 + angle_straight)%A as t32s eqn:Ht32s.
-symmetry in Hss31, Hss21, Hss32, Ht21s, Ht32s.
+remember (θ3 ≤? θ1 + angle_straight)%A as t31s eqn:Ht31s.
+symmetry in Hss31, Hss21, Hss32, Ht21s, Ht32s, Ht31s.
 destruct ss31. {
   destruct ss21. {
-    destruct ss32. {
-      rewrite rngl_add_comm.
-      apply angle_eucl_dist_triangular.
-    }
+    destruct ss32; [ apply angle_eucl_dist_triangular | ].
     progress unfold angle_same_side in Hss31.
     progress unfold angle_same_side in Hss21.
     progress unfold angle_same_side in Hss32.
@@ -2809,11 +2808,72 @@ destruct ss31. {
     congruence.
   }
   destruct t21s. {
-    destruct t32s. {
-      rewrite rngl_add_comm.
-      apply angle_eucl_dist_triangular.
+    destruct t32s; [ apply angle_eucl_dist_triangular | ].
+    eapply (rngl_le_trans Hor). {
+      apply (angle_eucl_dist_triangular _ θ2).
     }
-    apply angle_leb_gt in Ht32s.
+    apply (rngl_add_le_mono_r Hop Hor).
+    apply (rngl_le_trans Hor _ 2); [ apply angle_eucl_dist_bound | ].
+    apply (rngl_le_add_r Hor).
+    apply angle_eucl_dist_nonneg.
+  }
+  apply (rngl_le_trans Hor _ 2); [ apply angle_eucl_dist_bound | ].
+  rewrite (rngl_add_comm _ (2 + _)).
+  rewrite <- rngl_add_assoc.
+  apply (rngl_le_add_r Hor).
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply angle_eucl_dist_nonneg.
+  destruct t32s; [ apply angle_eucl_dist_nonneg | ].
+  apply (rngl_add_nonneg_nonneg Hor); [ | apply angle_eucl_dist_nonneg ].
+  apply (rngl_0_le_2 Hon Hos Hor).
+}
+destruct t31s. {
+  destruct ss32. {
+    destruct ss21; [ apply angle_eucl_dist_triangular | ].
+    destruct t21s; [ apply angle_eucl_dist_triangular | ].
+    rewrite rngl_add_comm.
+    rewrite <- rngl_add_assoc.
+    eapply (rngl_le_trans Hor); [ apply angle_eucl_dist_bound | ].
+    apply (rngl_le_add_r Hor).
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply angle_eucl_dist_nonneg.
+    apply angle_eucl_dist_nonneg.
+  }
+  destruct t32s. {
+    destruct ss21; [ apply angle_eucl_dist_triangular | ].
+    destruct t21s; [ apply angle_eucl_dist_triangular | ].
+    rewrite rngl_add_comm.
+    rewrite <- rngl_add_assoc.
+    eapply (rngl_le_trans Hor); [ apply angle_eucl_dist_bound | ].
+    apply (rngl_le_add_r Hor).
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply angle_eucl_dist_nonneg.
+    apply angle_eucl_dist_nonneg.
+  }
+  rewrite <- rngl_add_assoc.
+  eapply (rngl_le_trans Hor); [ apply angle_eucl_dist_bound | ].
+  apply (rngl_le_add_r Hor).
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply angle_eucl_dist_nonneg.
+  destruct ss21; [ apply angle_eucl_dist_nonneg | ].
+  destruct t21s; [ apply angle_eucl_dist_nonneg | ].
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
+  apply angle_eucl_dist_nonneg.
+}
+destruct ss32. {
+  destruct ss21. {
+    progress unfold angle_same_side in Hss31.
+    progress unfold angle_same_side in Hss21.
+    progress unfold angle_same_side in Hss32.
+    apply -> Bool.eqb_false_iff in Hss31.
+    apply -> Bool.eqb_true_iff in Hss32.
+    apply -> Bool.eqb_true_iff in Hss21.
+    congruence.
+  }
+  destruct t21s. {
+    apply angle_leb_gt in Ht31s.
+(* chuis pas sûr, là *)
 ...
 
 Theorem angle_dist_triangular :
