@@ -2854,22 +2854,6 @@ apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
 now apply rngl_sin_sub_nonneg.
 Qed.
 
-Theorem rngl_cos_angle_dist :
-  ∀ θ, (θ ≤ angle_straight)%A → rngl_cos θ = (1 - (angle_dist θ 0)² / 2)%L.
-Proof.
-intros * Hts.
-progress unfold angle_dist.
-remember (angle_same_side θ 0) as tz eqn:Htz.
-symmetry in Htz.
-destruct tz; [ apply rngl_cos_angle_eucl_dist | ].
-exfalso.
-progress unfold angle_same_side in Htz.
-apply Bool.not_true_iff_false in Htz.
-apply Htz; clear Htz.
-apply Bool.eqb_true_iff.
-now rewrite angle_straight_nonneg.
-Qed.
-
 Theorem angle_le_straight_same_side_0_iff :
   ∀ θ, angle_same_side θ 0 = true ↔ (θ ≤ angle_straight)%A.
 Proof.
@@ -2920,6 +2904,124 @@ split; intros Hss. {
 }
 apply angle_leb_gt in Hss.
 now rewrite Hss.
+Qed.
+
+Theorem angle_eucl_dist_to_0_to_straight :
+  ∀ θ, ((angle_eucl_dist θ 0)² + (angle_eucl_dist θ angle_straight)² = 2²)%L.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_eucl_dist.
+cbn.
+rewrite (rngl_sub_0_l Hop).
+progress unfold rl_modl.
+rewrite <- (rngl_opp_add_distr Hop).
+do 2 rewrite (rngl_squ_opp Hop).
+rewrite (rngl_add_comm _ 1).
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_squ_nonneg Hos Hor).
+  apply (rngl_squ_nonneg Hos Hor).
+}
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_squ_nonneg Hos Hor).
+  apply (rngl_squ_nonneg Hos Hor).
+}
+rewrite rngl_add_assoc.
+rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_add Hic Hon).
+rewrite (rngl_squ_1 Hon).
+rewrite (rngl_mul_1_r Hon).
+do 2 rewrite rngl_add_assoc.
+rewrite <- (rngl_add_assoc (_ - _)).
+rewrite <- rngl_add_assoc.
+rewrite cos2_sin2_1.
+do 2 rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_add Hop).
+rewrite <- rngl_add_assoc.
+symmetry.
+apply (rngl_mul_2_l Hon).
+Qed.
+
+Theorem angle_dist_angle_eucl_dist :
+  ∀ θ1 θ2,
+  angle_same_side θ1 θ2 = true
+  → angle_dist θ1 θ2 = angle_eucl_dist θ1 θ2.
+Proof.
+intros * Hss.
+progress unfold angle_dist.
+now rewrite Hss.
+Qed.
+
+Theorem angle_dist_to_0_to_straight :
+  ∀ θ,
+  (θ ≤ angle_straight)%A
+  → ((angle_dist θ 0)² + (angle_dist θ angle_straight)² = 2²)%L.
+Proof.
+destruct_ac.
+intros.
+rewrite angle_dist_angle_eucl_dist. 2: {
+  now apply angle_le_straight_same_side_0_iff.
+}
+rewrite angle_dist_angle_eucl_dist. 2: {
+  now apply angle_le_straight_same_side_straight_iff.
+}
+apply angle_eucl_dist_to_0_to_straight.
+Qed.
+
+Theorem rngl_cos_angle_dist :
+  ∀ θ, (θ ≤ angle_straight)%A → rngl_cos θ = (1 - (angle_dist θ 0)² / 2)%L.
+Proof.
+intros * Hts.
+progress unfold angle_dist.
+remember (angle_same_side θ 0) as tz eqn:Htz.
+symmetry in Htz.
+destruct tz; [ apply rngl_cos_angle_eucl_dist | ].
+exfalso.
+progress unfold angle_same_side in Htz.
+apply Bool.not_true_iff_false in Htz.
+apply Htz; clear Htz.
+apply Bool.eqb_true_iff.
+now rewrite angle_straight_nonneg.
+Qed.
+
+Theorem rngl_cos_angle_dist' :
+  ∀ θ,
+  (angle_straight < θ)%A
+  → rngl_cos θ = ((angle_dist θ angle_straight)² / 2 - 1)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ - _)%L).
+  apply H1.
+}
+intros * Hst.
+progress unfold angle_dist.
+remember (angle_same_side θ angle_straight) as ts eqn:Hts.
+symmetry in Hts.
+destruct ts. {
+  exfalso.
+  apply angle_le_straight_same_side_straight_iff in Hts.
+  now apply angle_nlt_ge in Hts.
+}
+rewrite angle_eucl_dist_diag.
+rewrite rngl_add_0_r.
+specialize (angle_eucl_dist_to_0_to_straight θ) as H1.
+rewrite rngl_add_comm in H1.
+apply (rngl_add_move_r Hop) in H1.
+rewrite H1.
+rewrite (rngl_div_sub_distr_r Hop Hiv).
+progress unfold rngl_squ at 1.
+rewrite (rngl_mul_div Hi1). 2: {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+rewrite (rngl_sub_sub_swap Hop).
+rewrite (rngl_add_sub Hos).
+apply rngl_cos_angle_eucl_dist.
 Qed.
 
 Theorem angle_sub_straight_le_straight :
@@ -3197,16 +3299,6 @@ apply angle_eucl_dist_nonneg.
 apply angle_eucl_dist_nonneg.
 Qed.
 
-Theorem angle_dist_angle_eucl_dist :
-  ∀ θ1 θ2,
-  angle_same_side θ1 θ2 = true
-  → angle_dist θ1 θ2 = angle_eucl_dist θ1 θ2.
-Proof.
-intros * Hss.
-progress unfold angle_dist.
-now rewrite Hss.
-Qed.
-
 Theorem angle_le_straight_dist_angle_eucl_dist :
   ∀ θ1 θ2,
   (θ1 ≤ angle_straight)%A
@@ -3237,54 +3329,6 @@ rewrite angle_dist_angle_eucl_dist. {
   apply angle_0_right_same_side.
 }
 Qed.
-
-(*
-Require Import Reals.
-Check of_number.
-Check to_number.
-Print IR.
-Check IRZ.
-
-Inductive IT : Set :=
-  | ITZ : QArith_base.IZ → IT
-  | ITQ : QArith_base.Q → IT
-  | ITmult : IT → IT → IT
-  | ITdiv : IT → IT → IT.
-
-Print of_decimal.
-
-Definition rngl_of_decimal d :=
-...
-
-Definition rngl_of_number (n : Number.number) :=
-  match n with
-  | Number.Decimal d => rngl_of_decimal d
-  | Number.Hexadecimal h => rngl_of_hexadecimal h
-  end.
-Check of_number.
-Print Number.number.
-
-Number Notation T of_number to_number (via IR
-
-Number Notation R of_number to_number (via IR
-mapping [IZR => IRZ]) : R_scope.
-
-Z.pow_pos => IZpow_pos, Z0 => IZ0, Zpos => IZpos, Zneg => IZneg])
-: R_scope.
-...
-
-Number Notation R of_number to_number (via IR
-mapping [IZR => IRZ, Q2R => IRQ, Rmult => IRmult, Rdiv => IRdiv,
-Z.pow_pos => IZpow_pos, Z0 => IZ0, Zpos => IZpos, Zneg => IZneg])
-: R_scope.
-
-Number Notation T rngl_to_nat rngl_of_nat : rngl_scope.
-
-Definition bool_of_uint : Number.uint -> option bool := (* ... *)
-Definition uint_of_bool : bool -> Number.uint := (* ... *)
-
-Number Notation T rngl_zero Zpos rngl_add : rngl_scope.
-*)
 
 (* to be completed
 Theorem rngl_cos_derivative :
@@ -3374,185 +3418,48 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   rewrite (rngl_opp_0 Hop).
   destruct (angle_le_dec dθ angle_straight) as [Hts| Hts]. {
     rewrite rngl_cos_angle_dist; [ | easy ].
-Theorem angle_eucl_dist_to_0_to_straight :
-  ∀ θ, ((angle_eucl_dist θ 0)² + (angle_eucl_dist θ angle_straight)² = 2²)%L.
-Proof.
-destruct_ac.
-intros.
-progress unfold angle_eucl_dist.
-cbn.
-rewrite (rngl_sub_0_l Hop).
-progress unfold rl_modl.
-rewrite <- (rngl_opp_add_distr Hop).
-do 2 rewrite (rngl_squ_opp Hop).
-rewrite (rngl_add_comm _ 1).
-rewrite (rngl_squ_sqrt Hon). 2: {
-  apply (rngl_add_nonneg_nonneg Hor).
-  apply (rngl_squ_nonneg Hos Hor).
-  apply (rngl_squ_nonneg Hos Hor).
-}
-rewrite (rngl_squ_sqrt Hon). 2: {
-  apply (rngl_add_nonneg_nonneg Hor).
-  apply (rngl_squ_nonneg Hos Hor).
-  apply (rngl_squ_nonneg Hos Hor).
-}
-rewrite rngl_add_assoc.
-rewrite (rngl_squ_sub Hop Hic Hon).
-rewrite (rngl_squ_add Hic Hon).
-rewrite (rngl_squ_1 Hon).
-rewrite (rngl_mul_1_r Hon).
-do 2 rewrite rngl_add_assoc.
-rewrite <- (rngl_add_assoc (_ - _)).
-rewrite <- rngl_add_assoc.
-rewrite cos2_sin2_1.
-do 2 rewrite <- (rngl_add_sub_swap Hop).
-rewrite (rngl_sub_add Hop).
-rewrite <- rngl_add_assoc.
-symmetry.
-apply (rngl_mul_2_l Hon).
-Qed.
-
-Theorem angle_dist_to_0_to_straight :
-  ∀ θ, ((angle_dist θ 0)² + (angle_dist θ angle_straight)² = 2²)%L.
-Proof.
-destruct_ac.
-intros.
-remember (angle_same_side θ 0) as ssz eqn:Hssz.
-remember (angle_same_side θ angle_straight) as sss eqn:Hsss.
-symmetry in Hssz, Hsss.
-destruct ssz. {
-  progress unfold angle_dist.
-  rewrite Hssz, Hsss.
-  destruct sss; [ apply angle_eucl_dist_to_0_to_straight | ].
-  apply angle_le_straight_same_side_0_iff in Hssz.
-  apply angle_gt_straight_not_same_side_straight_iff in Hsss.
-  now apply angle_nle_gt in Hsss.
-}
-destruct sss. {
-  progress unfold angle_dist.
-  rewrite Hssz, Hsss.
-  apply angle_gt_straight_not_same_side_0_iff in Hssz.
-  apply angle_le_straight_same_side_straight_iff in Hsss.
-  now apply angle_nle_gt in Hsss.
-}
-progress unfold angle_dist.
-rewrite Hssz, Hsss.
-rewrite angle_eucl_dist_0_straight.
-rewrite (proj2 (angle_eucl_dist_separation angle_straight _)); [ | easy ].
-rewrite rngl_add_0_r.
-rewrite (rngl_squ_add Hic Hon).
-rewrite rngl_add_add_swap.
-rewrite (rngl_add_add_swap _²).
-rewrite <- (rngl_mul_2_l Hon).
-rewrite <- rngl_mul_assoc.
-progress unfold rngl_squ at 2 3.
-do 2 rewrite <- rngl_mul_add_distr_l.
-f_equal.
-specialize (rngl_squ_add Hic Hon) as H1.
-specialize (H1 (angle_eucl_dist θ angle_straight) 1)%L.
-rewrite (rngl_mul_1_r Hon) in H1.
-rewrite (rngl_squ_1 Hon) in H1.
-symmetry in H1.
-rewrite (rngl_mul_comm Hic) in H1.
-apply (rngl_add_sub_eq_r Hos) in H1.
-rewrite <- H1; clear H1.
-rewrite rngl_add_assoc.
-rewrite (rngl_sub_add Hop).
-f_equal.
-rewrite <- (rngl_squ_1 Hon) at 2.
-f_equal.
-rewrite <- (rngl_add_0_l 1%L) at 2.
-f_equal.
-...
-Arguments rngl_add_cancel_r {T ro rp} Hos (a b c)%_L.
-Arguments rngl_mul_2_l {T ro rp} Hon a%_L.
-apply (rngl_add_cancel_r Hos _ _ 2).
-rewrite <- rngl_add_assoc.
-rewrite <- (rngl_mul_2_l Hon 2) at 1.
-rewrite fold_rngl_squ.
-rewrite (rngl_mul_comm Hic _ 2).
-rewrite <- rngl_squ_add.
-
-
-Search (_ + _ = _ + _)%L.
-Search 
-apply (rngl_sub_move_0_r Hop).
-Search (_ - _ = _)%L.
-...
-apply (rngl_add_move_l Hop).
-rewrite rngl_
-
-About angle_le_straight_same_side_0_iff.
-Search angle_same_side.
-...
-    destruct Hdθ as (H1, H2).
-    apply (rngl_min_glb_lt_iff Hor) in H2.
-    destruct H2 as (H2, H3).
-    rewrite angle_dist_angle_eucl_dist in H3; [ | easy | ]. 2: {
-      apply angle_le_refl.
+    specialize (angle_dist_to_0_to_straight dθ Hts) as H1.
+    apply (rngl_add_move_r Hop) in H1.
+    rewrite H1; clear H1.
+    rewrite (rngl_div_sub_distr_r Hop Hiv).
+    progress unfold rngl_squ at 1.
+    rewrite (rngl_mul_div Hi1). 2: {
+      apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
     }
-    rewrite angle_dist_angle_eucl_dist in H3; cycle 1. {
-      apply angle_straight_nonneg.
-    } {
-      apply angle_right_le_straight.
+    rewrite (rngl_sub_sub_distr Hop).
+    rewrite rngl_add_add_swap.
+    rewrite <- (rngl_add_sub_swap Hop).
+    rewrite (rngl_sub_diag Hos).
+    rewrite rngl_add_0_l.
+    rewrite (rngl_div_div_swap Hic Hiv).
+    progress unfold rngl_squ.
+    rewrite (rngl_mul_div Hi1). 2: {
+      intros H; rewrite H in Hdθ.
+      destruct Hdθ as (H1, _).
+      now apply (rngl_lt_irrefl Hor) in H1.
     }
-...
-    exfalso.
-    apply angle_eucl_dist_lt_angle_eucl_dist in H3.
-    apply rngl_nle_gt in H3.
-    apply H3; clear H3.
-    rewrite angle_sub_0_l.
-    rewrite rngl_cos_sub_straight_r; cbn.
-    apply (rngl_opp_nonpos_nonneg Hop Hor).
-(* ah merde *)
-...
-    apply rngl_le_0_cos.
-
-    cbn in H3.
-Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
-...
-Check rngl_cos_angle_dist.
-Theorem rngl_cos_angle_dist' :
-  ∀ θ,
-  (angle_straight < θ)%A
-  → rngl_cos θ = (1 - (angle_dist θ angle_straight)² / 2)%L.
-...
-rewrite rngl_cos_angle_dist'.
-
-About rngl_cos_angle_eucl_dist.
-...
-Search (angle_dist _ _ = _).
-Search (angle_eucl_dist _ _ = _).
-Check angle_eucl_dist_is_sqrt.
-...
-  rewrite rngl_cos_angle_dist. 2: {
-    destruct Hdθ as (H1, H2).
-    apply angle_le_angle_eucl_dist_le; cycle 1. {
-      apply angle_le_refl.
-    } {
-      apply rngl_cos_le_iff_angle_eucl_le.
-      apply rngl_cos_bound.
+    progress unfold rngl_dist.
+    rewrite (rngl_sub_0_r Hos).
+    rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+      apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+        apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      }
+      apply angle_dist_nonneg.
     }
-    apply (rngl_min_glb_lt_iff Hor) in H2.
-    destruct H2 as (H2, H3).
-    (* lemma *)
-...
-    apply rngl_sin_nonneg_angle_le_straight.
-    progress unfold angle_dist
-Search (angle_dist _ _ ≤ _ _)%L.
-...
-    apply (rngl_lt_le_incl Hor) in H3.
-    apply angle_le_angle_dist_le.
-    rewrite (angle_dist_symmetry angle_straight).
-    now rewrite angle_dist_0_straight.
+    apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    rewrite angle_dist_0_right in Hdθ.
+    apply (rngl_lt_le_trans Hor _ (rngl_min ε √2)); [ easy | ].
+    apply (rngl_le_trans Hor _ ε).
+    apply (rngl_le_min_l Hor).
+    rewrite (rngl_mul_2_r Hon).
+    apply (rngl_le_add_l Hor).
+    now apply (rngl_lt_le_incl Hor) in Hε.
   }
-  rewrite (rngl_sub_sub_swap Hop).
-  rewrite (rngl_sub_diag Hos).
-  rewrite (rngl_sub_0_l Hop).
-  progress unfold rngl_dist.
-  rewrite (rngl_sub_0_r Hos).
-  rewrite (rngl_div_opp_l Hop Hiv).
-  rewrite (rngl_abs_opp Hop Hor).
+  apply angle_nle_gt in Hts.
+  rewrite rngl_cos_angle_dist'; [ | easy ].
+  rewrite (rngl_sub_add Hop).
   rewrite (rngl_div_div_swap Hic Hiv).
   progress unfold rngl_squ.
   rewrite (rngl_mul_div Hi1). 2: {
@@ -3560,6 +3467,8 @@ Search (angle_dist _ _ ≤ _ _)%L.
     destruct Hdθ as (H1, _).
     now apply (rngl_lt_irrefl Hor) in H1.
   }
+  progress unfold rngl_dist.
+  rewrite (rngl_sub_0_r Hos).
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
       apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
@@ -3569,7 +3478,8 @@ Search (angle_dist _ _ ≤ _ _)%L.
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   }
-  apply (rngl_lt_le_trans Hor _ (rngl_min ε 2)); [ easy | ].
+  rewrite angle_dist_0_right in Hdθ.
+  apply (rngl_lt_le_trans Hor _ (rngl_min ε √2)); [ easy | ].
   apply (rngl_le_trans Hor _ ε).
   apply (rngl_le_min_l Hor).
   rewrite (rngl_mul_2_r Hon).
@@ -3595,11 +3505,8 @@ enough (H :
       apply neq_angle_neq; intros H.
       injection H; clear H; intros H1 H2.
       apply eq_rngl_sin_0 in H1.
-      destruct H1 as [H1| H1]; [ easy | ].
-      subst θ₀.
-      cbn in H2.
-...
-      now apply (rngl_1_neq_0_iff Hon) in H1.
+      now destruct H1.
+    }
 ...
     apply rngl_min_glb_lt; [ easy | ].
     apply (rngl_lt_iff Hor).
