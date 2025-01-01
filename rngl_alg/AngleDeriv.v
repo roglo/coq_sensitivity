@@ -2983,6 +2983,93 @@ rewrite (rngl_sub_0_r Hos).
 now rewrite (rngl_mul_1_r Hon).
 Qed.
 
+Theorem angle_dist_greater_smaller_move_0_r :
+  ∀ θ1 θ2,
+  (θ2 ≤ θ1)%A
+  → angle_same_side θ1 θ2 = true
+  → angle_dist_greater_smaller θ1 θ2 = angle_dist_greater_smaller (θ1 - θ2) 0.
+Proof.
+destruct_ac.
+intros  * Ht21 Hb12.
+progress unfold angle_dist_greater_smaller.
+rewrite Hb12.
+remember (angle_same_side (θ1 - θ2) 0) as b12z eqn:Hb12z.
+symmetry in Hb12z.
+destruct b12z; [ apply angle_eucl_dist_move_0_r | ].
+exfalso.
+progress unfold angle_same_side in Hb12.
+progress unfold angle_same_side in Hb12z.
+apply -> Bool.eqb_true_iff in Hb12.
+apply Bool.eqb_false_iff in Hb12z.
+rewrite angle_straight_nonneg in Hb12z.
+apply Bool.not_true_iff_false in Hb12z.
+apply angle_leb_gt in Hb12z.
+apply angle_nle_gt in Hb12z.
+apply Hb12z; clear Hb12z.
+(* lemma *)
+progress unfold angle_leb in Ht21.
+progress unfold angle_leb in Hb12.
+progress unfold angle_leb.
+cbn in Hb12.
+cbn - [ angle_sub ].
+rewrite (rngl_leb_refl Hor) in Hb12 |-*.
+remember (0 ≤? rngl_sin (θ1 - θ2))%L as zs12 eqn:Hzs12.
+symmetry in Hzs12.
+destruct zs12; [ apply rngl_leb_le, rngl_cos_bound | ].
+exfalso.
+apply Bool.not_true_iff_false in Hzs12.
+apply Hzs12; clear Hzs12.
+apply rngl_leb_le.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs1, Hzs2.
+destruct zs1. {
+  destruct zs2; [ | easy ].
+  apply rngl_leb_le in Hzs1, Hzs2, Ht21.
+  now apply rngl_sin_sub_nonneg.
+}
+symmetry in Hb12.
+destruct zs2. {
+  exfalso.
+  apply Bool.not_true_iff_false in Hb12.
+  apply Hb12, rngl_leb_le, rngl_cos_bound.
+}
+apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
+apply rngl_leb_le in Ht21.
+change_angle_opp θ1.
+progress sin_cos_opp_hyp T Hzs1.
+progress sin_cos_opp_hyp T Ht21.
+change_angle_opp θ2.
+progress sin_cos_opp_hyp T Ht21.
+progress sin_cos_opp_hyp T Hzs2.
+rewrite angle_sub_opp_r.
+rewrite angle_add_opp_l.
+apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
+now apply rngl_sin_sub_nonneg.
+Qed.
+
+Theorem angle_dist_move_0_r :
+  ∀ θ1 θ2,
+  (θ2 ≤ θ1)%A
+  → angle_same_side θ1 θ2 = true
+  → angle_dist θ1 θ2 = angle_dist (θ1 - θ2) 0.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (angle_dist _ 0)).
+  apply H1.
+}
+intros * Ht21 Hb12.
+progress unfold angle_dist.
+rewrite (proj2 (angle_max_l_iff _ _) Ht21).
+rewrite (proj2 (angle_min_r_iff _ _) Ht21).
+rewrite (proj2 (angle_max_l_iff _ _)); [ | apply angle_nonneg ].
+rewrite (proj2 (angle_min_r_iff _ _)); [ | apply angle_nonneg ].
+now apply angle_dist_greater_smaller_move_0_r.
+Qed.
+
 (* to be completed
 Theorem angle_dist_greater_smaller_triangular :
   ∀ θ1 θ2 θ3,
