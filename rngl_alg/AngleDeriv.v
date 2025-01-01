@@ -2957,6 +2957,31 @@ destruct ss32. {
     apply (rngl_le_opp_r Hop Hor) in Ht21s.
     apply (rngl_lt_opp_l Hop Hor) in Ht31s.
     move Hs1z after Hzs2.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+      change_angle_add_r θ2 angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hzs2.
+      progress sin_cos_add_sub_straight_hyp T Ht21s.
+      progress sin_cos_add_sub_straight_hyp T H23.
+      rewrite (rngl_add_opp_l Hop) in Ht21s.
+      apply -> (rngl_le_sub_0 Hop Hor) in Ht21s.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hzc3]. {
+        change_angle_opp θ3.
+        progress sin_cos_opp_hyp T Hzs3.
+        progress sin_cos_opp_hyp T Ht31s.
+        progress sin_cos_opp_hyp T H23.
+        progress sin_cos_opp_hyp T Hzc3.
+        clear H23.
+        move θ2 before θ1.
+        move θ3 before θ2.
+        move Hzc1 before Hzs3.
+        move Hzc3 before Hzc1.
+        rewrite <- angle_eucl_dist_opp_opp.
+        rewrite angle_opp_involutive.
+        rewrite angle_opp_add_distr.
+        rewrite angle_opp_straight.
+        rewrite <- (angle_eucl_dist_opp_opp (- θ3)).
+        rewrite angle_opp_involutive.
+        rewrite angle_opp_sub_distr.
 ...
     rewrite angle_eucl_dist_move_0_l.
     rewrite angle_add_sub_swap.
