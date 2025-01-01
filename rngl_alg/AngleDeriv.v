@@ -2873,43 +2873,44 @@ destruct ss32. {
   }
   destruct t21s. {
     apply angle_leb_gt in Ht31s.
+    progress unfold angle_same_side in Hss31.
+    progress unfold angle_same_side in Hss21.
+    progress unfold angle_same_side in Hss32.
+    apply -> Bool.eqb_false_iff in Hss31.
+    apply -> Bool.eqb_true_iff in Hss32.
+    apply -> Bool.eqb_false_iff in Hss21.
+    remember (θ1 ≤? angle_straight)%A as t1s eqn:Ht1s.
+    symmetry in Ht1s.
+    destruct t1s. 2: {
+      exfalso.
+      apply Bool.not_false_iff_true in Hss21.
+      apply Bool.not_true_iff_false in Ht1s.
+      apply Ht1s; clear Ht1s.
+      now apply (angle_le_trans _ θ2).
+    }
+    apply angle_nle_gt in Hss31, Hss21.
+    clear Hss32 H12.
+    progress unfold angle_leb in H23.
+    progress unfold angle_leb in Ht1s.
+    progress unfold angle_leb in Ht21s.
+    progress unfold angle_leb in Ht32s.
+    progress unfold angle_ltb in Hss31.
+    progress unfold angle_ltb in Hss21.
+    progress unfold angle_ltb in Ht31s.
+    cbn - [ angle_add ] in Ht1s, Hss31, Hss21, Ht21s, Ht32s, Ht31s.
+    rewrite (rngl_leb_refl Hor) in Ht1s, Hss31, Hss21.
+    rewrite rngl_sin_add_straight_r in Ht21s, Ht32s, Ht31s.
+    rewrite rngl_cos_add_straight_r in Ht21s, Ht32s, Ht31s.
+    rewrite (rngl_leb_0_opp Hop Hor) in Ht31s, Ht21s, Ht32s.
+    remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+    remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+    remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+    remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
+    remember (rngl_sin θ2 ≤? 0)%L as s2z eqn:Hs2z.
+    symmetry in Hzs1, Hzs2, Hzs3, Hs1z, Hs2z.
+    destruct zs1; [ clear Ht1s | easy ].
     destruct t32s. {
       exfalso.
-      progress unfold angle_same_side in Hss31.
-      progress unfold angle_same_side in Hss21.
-      progress unfold angle_same_side in Hss32.
-      apply -> Bool.eqb_false_iff in Hss31.
-      apply -> Bool.eqb_true_iff in Hss32.
-      apply -> Bool.eqb_false_iff in Hss21.
-      remember (θ1 ≤? angle_straight)%A as t1s eqn:Ht1s.
-      symmetry in Ht1s.
-      destruct t1s. 2: {
-        apply Bool.not_false_iff_true in Hss21.
-        apply Bool.not_true_iff_false in Ht1s.
-        apply Ht1s; clear Ht1s.
-        now apply (angle_le_trans _ θ2).
-      }
-      apply angle_nle_gt in Hss31, Hss21.
-      clear Hss32 H12.
-      progress unfold angle_leb in H23.
-      progress unfold angle_leb in Ht1s.
-      progress unfold angle_leb in Ht21s.
-      progress unfold angle_leb in Ht32s.
-      progress unfold angle_ltb in Hss31.
-      progress unfold angle_ltb in Hss21.
-      progress unfold angle_ltb in Ht31s.
-      cbn - [ angle_add ] in Ht1s, Hss31, Hss21, Ht21s, Ht32s, Ht31s.
-      rewrite (rngl_leb_refl Hor) in Ht1s, Hss31, Hss21.
-      rewrite rngl_sin_add_straight_r in Ht21s, Ht32s, Ht31s.
-      rewrite rngl_cos_add_straight_r in Ht21s, Ht32s, Ht31s.
-      rewrite (rngl_leb_0_opp Hop Hor) in Ht31s, Ht21s, Ht32s.
-      remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-      remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-      remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
-      remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
-      remember (rngl_sin θ2 ≤? 0)%L as s2z eqn:Hs2z.
-      symmetry in Hzs1, Hzs2, Hzs3, Hs1z, Hs2z.
-      destruct zs1; [ clear Ht1s | easy ].
       destruct zs2. {
         apply rngl_ltb_lt in Hss21.
         apply rngl_nle_gt in Hss21.
@@ -2929,6 +2930,15 @@ destruct ss32. {
       apply (rngl_le_opp_r Hop Hor) in Ht21s, Ht32s.
       apply (rngl_lt_opp_l Hop Hor) in Ht31s.
       now apply (rngl_lt_asymm Hor) in Hzs2.
+    }
+    destruct zs3. {
+      exfalso.
+      destruct s2z; [ | easy ].
+      destruct s1z; [ | easy ].
+      destruct zs2; [ | easy ].
+      apply rngl_ltb_lt in Hss21.
+      apply rngl_nle_gt in Hss21.
+      apply Hss21, rngl_cos_bound.
     }
 ...
       apply rngl_leb_le in Hzs1.
