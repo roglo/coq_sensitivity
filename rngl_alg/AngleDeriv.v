@@ -2931,22 +2931,32 @@ destruct ss32. {
       apply (rngl_lt_opp_l Hop Hor) in Ht31s.
       now apply (rngl_lt_asymm Hor) in Hzs2.
     }
-    destruct zs3. {
+    destruct zs2. {
       exfalso.
-      destruct s2z; [ | easy ].
-      destruct s1z; [ | easy ].
-      destruct zs2; [ | easy ].
       apply rngl_ltb_lt in Hss21.
       apply rngl_nle_gt in Hss21.
       apply Hss21, rngl_cos_bound.
     }
-...
-      apply rngl_leb_le in Hzs1.
-      destruct s1z. {
-        apply rngl_leb_le in Hs1z.
-        apply (rngl_le_antisymm Hor) in Hzs1; [ clear Hs1z | easy ].
-        apply eq_rngl_sin_0 in Hzs1.
-        destruct Hzs1; subst θ1. {
+    destruct zs3. {
+      exfalso.
+      apply rngl_ltb_lt in Hss31.
+      apply rngl_nle_gt in Hss31.
+      apply Hss31, rngl_cos_bound.
+    }
+    destruct s1z; [ easy | ].
+    clear Hss31 Hss21.
+    apply rngl_leb_le in H23, Hzs1, Ht21s.
+    apply (rngl_leb_gt Hor) in Hzs2, Hzs3, Hs1z.
+    apply rngl_ltb_lt in Ht31s.
+    clear Hzs1.
+    destruct s2z. 2: {
+      apply (rngl_leb_gt Hor) in Hs2z.
+      now apply (rngl_lt_asymm Hor) in Hs2z.
+    }
+    clear Hs2z Ht32s.
+    apply (rngl_le_opp_r Hop Hor) in Ht21s.
+    apply (rngl_lt_opp_l Hop Hor) in Ht31s.
+    move Hs1z after Hzs2.
 ...
     rewrite angle_eucl_dist_move_0_l.
     rewrite angle_add_sub_swap.
