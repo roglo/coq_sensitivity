@@ -3195,17 +3195,17 @@ destruct ss32. {
         rewrite <- (angle_eucl_dist_opp_opp (- θ3)).
         rewrite angle_opp_involutive.
         rewrite angle_opp_sub_distr.
-...
-    rewrite angle_eucl_dist_move_0_l.
-    rewrite angle_add_sub_swap.
-    rewrite <- angle_sub_straight_eq_add_straight.
-    rewrite <- angle_eucl_dist_move_0_r.
-Search (angle_eucl_dist _ (_ + _)).
-...
-    do 3 rewrite angle_eucl_dist_is_sqrt.
-    rewrite angle_add_sub_swap.
-    rewrite rngl_cos_add_straight_r.
-    rewrite (rngl_sub_opp_r Hop).
+        rewrite angle_eucl_dist_move_0_l.
+        rewrite <- angle_sub_add_distr.
+        rewrite <- angle_eucl_dist_move_0_l.
+        rewrite (angle_eucl_dist_move_0_l θ3).
+        rewrite <- angle_sub_add_distr.
+        rewrite <- angle_eucl_dist_move_0_l.
+        rewrite (angle_eucl_dist_move_0_l _ θ1).
+        rewrite angle_sub_sub_distr.
+        rewrite <- angle_sub_straight_eq_add_straight.
+        rewrite <- angle_eucl_dist_move_0_l.
+        rewrite (angle_eucl_dist_symmetry angle_straight).
 ...
 
 Theorem angle_dist_triangular :
