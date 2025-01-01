@@ -2681,6 +2681,73 @@ Definition angle_dist_greater_smaller θ1 θ2 :=
 Definition angle_dist θ1 θ2 :=
   angle_dist_greater_smaller (angle_max θ1 θ2) (angle_min θ1 θ2).
 
+Theorem angle_same_side_symmetry :
+  ∀ θ1 θ2, angle_same_side θ1 θ2 = angle_same_side θ2 θ1.
+Proof.
+intros.
+progress unfold angle_same_side.
+apply bool_eqb_sym.
+Qed.
+
+Theorem angle_le_straight_same_side_straight_iff :
+  ∀ θ, angle_same_side θ angle_straight = true ↔ (θ ≤ angle_straight)%A.
+Proof.
+intros.
+progress unfold angle_same_side.
+rewrite angle_le_refl.
+split; intros Hss. {
+  now apply -> Bool.eqb_true_iff in Hss.
+}
+now rewrite Hss.
+Qed.
+
+Theorem angle_gt_straight_not_same_side_0_iff :
+  ∀ θ, angle_same_side θ 0 = false ↔ (angle_straight < θ)%A.
+Proof.
+intros.
+progress unfold angle_same_side.
+rewrite angle_straight_nonneg.
+split; intros Hss. {
+  apply Bool.eqb_false_iff in Hss.
+  now apply angle_nle_gt in Hss.
+}
+apply angle_leb_gt in Hss.
+now rewrite Hss.
+Qed.
+
+Theorem angle_same_side_id : ∀ θ, angle_same_side θ θ = true.
+Proof.
+intros.
+progress unfold angle_same_side.
+apply Bool.eqb_reflx.
+Qed.
+
+Theorem angle_le_straight_same_side_0_iff :
+  ∀ θ, angle_same_side θ 0 = true ↔ (θ ≤ angle_straight)%A.
+Proof.
+intros.
+progress unfold angle_same_side.
+rewrite angle_straight_nonneg.
+split; intros Hss. {
+  now apply -> Bool.eqb_true_iff in Hss.
+}
+now rewrite Hss.
+Qed.
+
+Theorem angle_gt_straight_not_same_side_straight_iff :
+  ∀ θ, angle_same_side θ angle_straight = false ↔ (angle_straight < θ)%A.
+Proof.
+intros.
+progress unfold angle_same_side.
+rewrite angle_le_refl.
+split; intros Hss. {
+  apply Bool.eqb_false_iff in Hss.
+  now apply angle_nle_gt in Hss.
+}
+apply angle_leb_gt in Hss.
+now rewrite Hss.
+Qed.
+
 Theorem angle_dist_symmetry :
   ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist θ2 θ1.
 Proof.
@@ -2768,58 +2835,6 @@ progress unfold angle_dist_greater_smaller.
 progress unfold angle_same_side.
 rewrite Bool.eqb_reflx.
 apply angle_eucl_dist_diag.
-Qed.
-
-Theorem angle_le_straight_same_side_0_iff :
-  ∀ θ, angle_same_side θ 0 = true ↔ (θ ≤ angle_straight)%A.
-Proof.
-intros.
-progress unfold angle_same_side.
-rewrite angle_straight_nonneg.
-split; intros Hss. {
-  now apply -> Bool.eqb_true_iff in Hss.
-}
-now rewrite Hss.
-Qed.
-
-Theorem angle_le_straight_same_side_straight_iff :
-  ∀ θ, angle_same_side θ angle_straight = true ↔ (θ ≤ angle_straight)%A.
-Proof.
-intros.
-progress unfold angle_same_side.
-rewrite angle_le_refl.
-split; intros Hss. {
-  now apply -> Bool.eqb_true_iff in Hss.
-}
-now rewrite Hss.
-Qed.
-
-Theorem angle_gt_straight_not_same_side_0_iff :
-  ∀ θ, angle_same_side θ 0 = false ↔ (angle_straight < θ)%A.
-Proof.
-intros.
-progress unfold angle_same_side.
-rewrite angle_straight_nonneg.
-split; intros Hss. {
-  apply Bool.eqb_false_iff in Hss.
-  now apply angle_nle_gt in Hss.
-}
-apply angle_leb_gt in Hss.
-now rewrite Hss.
-Qed.
-
-Theorem angle_gt_straight_not_same_side_straight_iff :
-  ∀ θ, angle_same_side θ angle_straight = false ↔ (angle_straight < θ)%A.
-Proof.
-intros.
-progress unfold angle_same_side.
-rewrite angle_le_refl.
-split; intros Hss. {
-  apply Bool.eqb_false_iff in Hss.
-  now apply angle_nle_gt in Hss.
-}
-apply angle_leb_gt in Hss.
-now rewrite Hss.
 Qed.
 
 Theorem angle_eucl_dist_to_0_to_straight :
@@ -3024,7 +3039,12 @@ remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
 symmetry in Hzs1, Hzs2.
 destruct zs1. {
-  destruct zs2; [ | easy ].
+  destruct zs2. 2: {
+    apply (rngl_leb_gt Hor) in Hb12.
+    exfalso.
+    apply rngl_nle_gt in Hb12.
+    apply Hb12, rngl_cos_bound.
+  }
   apply rngl_leb_le in Hzs1, Hzs2, Ht21.
   now apply rngl_sin_sub_nonneg.
 }
