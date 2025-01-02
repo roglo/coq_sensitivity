@@ -1756,7 +1756,7 @@ Qed.
 
 (* end min max on angles *)
 
-Definition angle_lt_sub θ1 θ2 θ3 := (θ1 - θ2 < θ3)%A.
+Definition angle_lt_sub θ1 θ2 θ3 := (0 < θ1 - θ2 < θ3)%A.
 
 (* to be completed
 Theorem glop :
@@ -1767,19 +1767,50 @@ Theorem glop :
       angle_lt_sub θ θ₀ η
       → (dist ((f θ - f θ₀) / angle_eucl_dist θ θ₀) (f' θ₀) < ε)%L.
 Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
 progress unfold angle_lt_sub.
 split; intros Hff. {
   intros * Hε.
   specialize (Hff θ₀ ε Hε).
   destruct Hff as (η & ζ & Hζ & Hff).
-  exists (angle_min η (rngl_acos ζ)).
+  exists (angle_min η (rngl_acos (1 - ζ² / 2))).
   intros θ Hθ.
   apply Hff. {
+    split; [ apply Hθ | ].
     eapply angle_lt_le_trans; [ apply Hθ | ].
     apply angle_le_min_l.
   }
   rewrite angle_eucl_dist_move_0_r.
+  split. {
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_eucl_dist_nonneg | ].
+    intros H; symmetry in H.
+    apply angle_eucl_dist_separation in H.
+    rewrite H in Hθ.
+    destruct Hθ as (H1, H2).
+    now apply angle_lt_irrefl in H1.
+  }
+  destruct Hθ as (H1, H2).
+  apply rngl_cos_lt_angle_eucl_dist_lt. {
+    now apply (rngl_lt_le_incl Hor) in Hζ.
+  }
+  rewrite angle_sub_0_l.
+  rewrite rngl_cos_opp.
+  destruct (rngl_le_dec Hor (1 - ζ² / 2)² 1) as [Hz1| Hz1]. {
+    rewrite <- (rngl_cos_acos (1 - _))%L. 2: {
+      now apply (rngl_squ_le_1_if Hon Hop Hor Hii).
+    }
+apply (rngl_lt_iff Hor).
+split. {
+  apply rngl_cos_decr.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+Search (rngl_cos _ < rngl_cos _)%L.
+...
+    apply rngl_squ_le_1.
+Print rngl_acos.
 ...
 *)
 
@@ -1801,6 +1832,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   progress unfold angle_lt_sub.
   intros θ2 H Hθ2.
   rewrite (Hc (_ - _)%A), (Hc η) in H.
+  destruct H as (H, _).
   now apply angle_lt_irrefl in H.
 }
 progress unfold angle_lt_sub.

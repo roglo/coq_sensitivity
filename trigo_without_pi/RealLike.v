@@ -395,6 +395,22 @@ rewrite (rngl_abs_1 Hon Hos Hor).
 now apply -> (rngl_abs_le Hop Hor).
 Qed.
 
+Theorem rngl_squ_le_1_if :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a, (a² ≤ 1)%L → (-1 ≤ a ≤ 1)%L.
+Proof.
+intros Hon Hop Hor Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Ha.
+rewrite <- (rngl_squ_1 Hon) in Ha.
+apply (rngl_squ_le_abs_le Hop Hor Hii) in Ha.
+rewrite (rngl_abs_1 Hon Hos Hor) in Ha.
+now apply (rngl_abs_le Hop Hor).
+Qed.
+
 End a.
 
 Arguments rl_modl {T ro rp rl} (x y)%_L.
