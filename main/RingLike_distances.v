@@ -67,8 +67,14 @@ Definition is_limit_when_tending_to {A B} da db
 
 Definition is_limit_when_tending_to_neighbourhood {A B} da db lt_suba
      (f : A → B) (x₀ : A) (L : B) :=
-  (∀ ε, 0 < ε → ∃ η, 0 < η ∧ ∃ ζ : A,
-   ∀ x : A, 0 < da x x₀ < η → lt_suba x x₀ ζ → db (f x) L < ε)%L.
+  (∀ ε, 0 < ε → ∃ (η : A) ζ, 0 < ζ ∧
+   ∀ x : A, lt_suba x x₀ η → 0 < da x x₀ < ζ → db (f x) L < ε)%L.
+
+(*
+Definition is_limit_when_tending_to_neighbourhood {A B} lt_suba db
+     (f : A → B) (x₀ : A) (L : B) :=
+  (∀ ε, 0 < ε → ∃ η : A, ∀ x : A, lt_suba x x₀ η → db (f x) L < ε)%L.
+*)
 
 Definition is_limit_when_tending_to_inf {A} dist (f : nat → A) (L : A) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) L < ε)%L.

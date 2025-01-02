@@ -1752,23 +1752,21 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * Hfg Hfg' Hff.
   intros θ ε Hε.
   specialize (Hff θ ε Hε).
-  destruct Hff as (η & Hη & ζ & Hff).
-  exists η.
+  destruct Hff as (η & ζ & Hζ & Hff).
+  exists η, ζ.
   split; [ easy | ].
-  exists ζ.
   progress unfold angle_lt_sub.
-  intros θ2 Hθ2 H.
-  rewrite (Hc (_ - _)%A), (Hc ζ) in H.
+  intros θ2 H Hθ2.
+  rewrite (Hc (_ - _)%A), (Hc η) in H.
   now apply angle_lt_irrefl in H.
 }
 progress unfold angle_lt_sub.
 intros * Hfg Hfg' Hff.
 intros θ ε Hε.
 specialize (Hff θ ε Hε).
-destruct Hff as (η & Hη & ζ & Hff).
-exists η.
+destruct Hff as (η & ζ & Hζ & Hff).
+exists η, ζ.
 split; [ easy | ].
-exists ζ.
 intros θ' Hθ' Hzθ.
 do 2 rewrite <- Hfg.
 rewrite <- Hfg'.
@@ -4189,11 +4187,10 @@ intros θ₀ ε Hε.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
   cbn.
-  exists ε.
+  exists angle_right, ε.
   split; [ easy | ].
-  exists angle_right.
   progress unfold angle_lt_sub.
-  intros dθ Hdθ Hzθ.
+  intros dθ Hzθ Hdθ.
   rewrite angle_sub_0_r in Hzθ.
   rewrite (rngl_opp_0 Hop).
   rewrite rngl_cos_angle_eucl_dist.
@@ -4226,26 +4223,24 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   apply (rngl_le_add_l Hor).
   apply (rngl_0_le_1 Hon Hos Hor).
 }
+progress unfold angle_lt_sub.
 enough (H :
-  ∃ η, (0 < η)%L ∧ ∃ ζ,
+  ∃ η ζ, (0 < ζ)%L ∧
   ∀ dθ,
-  (0 < angle_eucl_dist dθ 0 < η)%L
-  → (dθ < ζ)%A
+  (dθ < η)%A
+  → (0 < angle_eucl_dist dθ 0 < ζ)%L
   → (rngl_dist
         ((rngl_cos (θ₀ + dθ) - rngl_cos θ₀) / angle_eucl_dist dθ 0)
         (- rngl_sin θ₀) < ε)%L). {
-  destruct H as (η & Hη & ζ & Hd).
-  exists η.
-  move η before ε.
+  destruct H as (η & ζ & Hζ & Hd).
+  exists η, ζ.
   split; [ easy | ].
-  exists ζ.
-  progress unfold angle_lt_sub.
-  intros θ Hθ Hζ.
+  intros θ Hη Hθ.
   remember (θ - θ₀)%A as dθ eqn:H.
   symmetry in H.
   apply angle_sub_move_r in H.
   subst θ.
-  specialize (Hd dθ).
+  specialize (Hd dθ Hη).
   rewrite angle_eucl_dist_move_0_r in Hθ |-*.
   rewrite angle_add_sub in Hθ |-*.
   rewrite angle_add_comm.
@@ -4256,13 +4251,14 @@ progress unfold continuous in Hsc.
 progress unfold continuous_at in Hsc.
 progress unfold is_limit_when_tending_to in Hsc.
 specialize (Hsc θ₀ ε Hε).
-destruct Hsc as (η1 & Hη1 & Hsc).
+destruct Hsc as (ζ1 & Hζ1 & Hsc).
 progress unfold rngl_dist in Hsc.
-move η1 before ε.
+move ζ1 before ε.
 destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
   remember (angle_eucl_dist angle_right 0) as x.
   remember (angle_eucl_dist θ₀ 0) as y.
-  exists (rngl_min4 x y (angle_eucl_dist θ₀ angle_straight) η1).
+  exists angle_right.
+  exists (rngl_min4 x y (angle_eucl_dist θ₀ angle_straight) ζ1).
   subst x y.
   split. {
     apply rngl_min_glb_lt; [ | easy ].
@@ -4280,9 +4276,8 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
     rewrite H in Hts.
     now apply angle_lt_irrefl in Hts.
   }
-  exists angle_right.
   intros dθ Hdθ Hζ.
-  destruct Hdθ as (H1, H2).
+  destruct Hζ as (H1, H2).
   apply (rngl_min_glb_lt_iff Hor) in H2.
   destruct H2 as (H2, H4).
   apply (rngl_min_glb_lt_iff Hor) in H2.
@@ -4405,7 +4400,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
   destruct ovt. {
     rewrite rngl_sin_add_straight_r.
     subst tt.
-    now apply (rngl_cos_derivative_lemma_3 ε η1).
+    now apply (rngl_cos_derivative_lemma_3 ε ζ1).
   }
   move dθ before θ₀.
   move Htds before Hts.
@@ -4414,7 +4409,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
   rewrite angle_mul_2_div_2; [ | easy ].
   destruct tt. {
     move Hts at bottom.
-    move Hζ at bottom.
+    move Hdθ at bottom.
     (* contradiction entre les 3 dernières hypothèses *)
 ...
 rewrite fold_angle_add_overflow2 in Htt.
