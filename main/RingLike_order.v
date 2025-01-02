@@ -632,6 +632,28 @@ apply (rngl_leb_gt Hor) in Hab.
 now apply (rngl_lt_trans Hor _ a).
 Qed.
 
+Theorem rngl_max_lt_iff :
+  rngl_is_ordered T = true →
+  ∀ a b c, (a < rngl_max b c ↔ a < b ∨ a < c)%L.
+Proof.
+intros Hor.
+intros.
+progress unfold rngl_max.
+remember (b ≤? c)%L as bc eqn:Hbc.
+symmetry in Hbc.
+destruct bc. {
+  split; intros Ha; [ now right | ].
+  destruct Ha as [Ha| Ha]; [ | easy ].
+  apply rngl_leb_le in Hbc.
+  now apply (rngl_lt_le_trans Hor _ b).
+} {
+  split; intros Ha; [ now left | ].
+  destruct Ha as [Ha| Ha]; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hbc.
+  now apply (rngl_lt_trans Hor _ c).
+}
+Qed.
+
 Theorem rngl_le_min_l :
   rngl_is_ordered T = true →
   ∀ a b, (rngl_min a b ≤ a)%L.
