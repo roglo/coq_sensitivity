@@ -1738,7 +1738,50 @@ apply angle_eqb_neq in Htz, Hts.
 now apply rngl_sin_of_param.
 Qed.
 
+(* min max on angles *)
+
+Definition angle_min θ1 θ2 := if (θ1 ≤? θ2)%A then θ1 else θ2.
+Definition angle_max θ1 θ2 := if (θ1 ≤? θ2)%A then θ2 else θ1.
+
+Theorem angle_le_min_l : ∀ θ1 θ2, (angle_min θ1 θ2 ≤ θ1)%A.
+Proof.
+intros.
+progress unfold angle_min.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+destruct t12; [ apply angle_le_refl | ].
+apply angle_leb_gt in Ht12.
+now apply angle_lt_le_incl in Ht12.
+Qed.
+
+(* end min max on angles *)
+
 Definition angle_lt_sub θ1 θ2 θ3 := (θ1 - θ2 < θ3)%A.
+
+(* to be completed
+Theorem glop :
+  ∀ f f' dist,
+  is_derivative angle_eucl_dist dist angle_lt_sub f f'
+  ↔ ∀ (θ₀ : angle T) (ε : T), (0 < ε)%L
+    → ∃ (η : angle T), ∀ θ : angle T,
+      angle_lt_sub θ θ₀ η
+      → (dist ((f θ - f θ₀) / angle_eucl_dist θ θ₀) (f' θ₀) < ε)%L.
+Proof.
+intros.
+progress unfold angle_lt_sub.
+split; intros Hff. {
+  intros * Hε.
+  specialize (Hff θ₀ ε Hε).
+  destruct Hff as (η & ζ & Hζ & Hff).
+  exists (angle_min η (rngl_acos ζ)).
+  intros θ Hθ.
+  apply Hff. {
+    eapply angle_lt_le_trans; [ apply Hθ | ].
+    apply angle_le_min_l.
+  }
+  rewrite angle_eucl_dist_move_0_r.
+...
+*)
 
 Theorem rngl_eq_is_derivative_is_derivative :
   ∀ f f' g g' dist,
@@ -2602,9 +2645,6 @@ intros * H12.
 apply angle_lt_le_incl in H12.
 now apply angle_nlt_ge in H12.
 Qed.
-
-Definition angle_min θ1 θ2 := if (θ1 ≤? θ2)%A then θ1 else θ2.
-Definition angle_max θ1 θ2 := if (θ1 ≤? θ2)%A then θ2 else θ1.
 
 Theorem angle_min_l_iff :
   ∀ θ1 θ2, angle_min θ1 θ2 = θ1 ↔ (θ1 ≤ θ2)%A.
