@@ -1800,16 +1800,21 @@ Definition angle_lt_sub θ1 θ2 θ3 := (0 < θ1 - θ2 < θ3)%A.
 
 Theorem is_derivative_iff :
   ∀ f (f' : angle T → T) dist,
+(*
   (∀ (θ₀ : angle T) (ε : T), (0 < ε)%L
-   → ∃ (η : angle T) (ζ : T), (0 < ζ)%L ∧
-      ∀ θ : angle T,
-      angle_lt_sub θ θ₀ η
-      → (0 < angle_eucl_dist θ θ₀ < ζ)%L
-      → (dist ((f θ - f θ₀) / angle_eucl_dist θ θ₀) (f' θ₀) < ε)%L)
-  ↔ ∀ (θ₀ : angle T) (ε : T), (0 < ε)%L
-    → ∃ (η : angle T), ∀ θ : angle T,
-      angle_lt_sub θ θ₀ η
-      → (dist ((f θ - f θ₀) / angle_eucl_dist θ θ₀) (f' θ₀) < ε)%L.
+    → ∃ (η : angle T) (ζ : T), (0 < ζ)%L ∧
+       ∀ θ : angle T,
+       angle_lt_sub θ θ₀ η
+       → (0 < angle_eucl_dist θ θ₀ < ζ)%L
+       → (dist ((f θ - f θ₀) / angle_eucl_dist θ θ₀) (f' θ₀) < ε)%L)
+*)
+   old_is_derivative angle_eucl_dist dist angle_lt_sub f f'
+(**)
+   ↔ ∀ (θ₀ : angle T) (ε : T), (0 < ε)%L
+     → ∃ (η : angle T), ∀ θ : angle T,
+       angle_lt_sub θ θ₀ η
+       → (dist ((f θ - f θ₀) / angle_eucl_dist θ θ₀) (f' θ₀) < ε)%L.
+(**)
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1950,8 +1955,8 @@ Theorem rngl_eq_is_derivative_is_derivative :
   ∀ f f' g g' dist,
   (∀ x, f x = g x)
   → (∀ x, f' x = g' x)
-  → is_derivative angle_eucl_dist dist angle_lt_sub f f'
-  → is_derivative angle_eucl_dist dist angle_lt_sub g g'.
+  → old_is_derivative angle_eucl_dist dist angle_lt_sub f f'
+  → old_is_derivative angle_eucl_dist dist angle_lt_sub g g'.
 Proof.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as Hc.
@@ -4343,7 +4348,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
 
 (* to be completed
 Theorem rngl_cos_derivative :
-  is_derivative angle_eucl_dist rngl_dist angle_lt_sub
+  old_is_derivative angle_eucl_dist rngl_dist angle_lt_sub
     rngl_cos (λ θ, (- rngl_sin θ)%L).
 Proof.
 destruct_ac.
@@ -4356,12 +4361,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-progress unfold is_derivative.
-progress unfold derivative_at.
-progress unfold is_limit_when_tending_to_neighbourhood.
-apply is_derivative_iff.
-...
-apply is_derivative_iff.
 intros θ₀ ε Hε.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
@@ -4406,7 +4405,7 @@ progress unfold angle_lt_sub.
 enough (H :
   ∃ η ζ, (0 < ζ)%L ∧
   ∀ dθ,
-  (dθ < η)%A
+  (0 < dθ < η)%A
   → (0 < angle_eucl_dist dθ 0 < ζ)%L
   → (rngl_dist
         ((rngl_cos (θ₀ + dθ) - rngl_cos θ₀) / angle_eucl_dist dθ 0)

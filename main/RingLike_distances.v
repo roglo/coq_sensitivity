@@ -65,16 +65,14 @@ Definition is_limit_when_tending_to {A B} da db
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
    ∀ x : A, da x x₀ < η → db (f x) L < ε)%L.
 
-Definition is_limit_when_tending_to_neighbourhood {A B} da db lt_suba
+Definition old_is_limit_when_tending_to_neighbourhood {A B} da db lt_suba
      (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε, 0 < ε → ∃ (η : A) ζ, 0 < ζ ∧
    ∀ x : A, lt_suba x x₀ η → 0 < da x x₀ < ζ → db (f x) L < ε)%L.
 
-(*
-Definition is_limit_when_tending_to_neighbourhood {A B} lt_suba db
+Definition new_is_limit_when_tending_to_neighbourhood {A B} lt_suba db
      (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε, 0 < ε → ∃ η : A, ∀ x : A, lt_suba x x₀ η → db (f x) L < ε)%L.
-*)
 
 Definition is_limit_when_tending_to_inf {A} dist (f : nat → A) (L : A) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) L < ε)%L.
@@ -83,12 +81,19 @@ Definition is_complete A (dist : A → A → T) :=
   ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
 
-Definition derivative_at {A} (da : A → A → T) (db : T → T → T) lt_suba f f' a :=
+Definition old_derivative_at {A} (da : A → A → T) (db : T → T → T) lt_suba f f' a :=
   let g x := ((f x - f a) / da x a)%L in
-  is_limit_when_tending_to_neighbourhood da db lt_suba g a (f' a).
+  old_is_limit_when_tending_to_neighbourhood da db lt_suba g a (f' a).
 
-Definition is_derivative {A} (da : A → A → T) (db : T → T → T) lt_suba f f' :=
-  ∀ a, derivative_at da db lt_suba f f' a.
+Definition new_derivative_at {A} (da : A → A → T) (db : T → T → T) lt_suba f f' a :=
+  let g x := ((f x - f a) / da x a)%L in
+  new_is_limit_when_tending_to_neighbourhood lt_suba db g a (f' a).
+
+Definition old_is_derivative {A} (da : A → A → T) (db : T → T → T) lt_suba f f' :=
+  ∀ a, old_derivative_at da db lt_suba f f' a.
+
+Definition new_is_derivative {A} (da : A → A → T) (db : T → T → T) lt_suba f f' :=
+  ∀ a, new_derivative_at da db lt_suba f f' a.
 
 Definition continuous_at {A B} da db (f : A → B) a :=
   is_limit_when_tending_to da db f a (f a).
@@ -108,7 +113,7 @@ Definition rngl_is_limit_when_tending_to_inf :=
   is_limit_when_tending_to_inf rngl_dist.
 
 Definition rngl_is_derivative :=
-  is_derivative rngl_dist.
+  new_is_derivative rngl_dist.
 
 Definition rngl_is_complete :=
   is_complete T rngl_dist.
