@@ -1799,8 +1799,13 @@ Qed.
 Definition angle_lt_sub θ1 θ2 θ3 := (0 < θ1 - θ2 < θ3)%A.
 
 Theorem is_derivative_iff :
-  ∀ f f' dist,
-  is_derivative angle_eucl_dist dist angle_lt_sub f f'
+  ∀ f (f' : angle T → T) dist,
+  (∀ (θ₀ : angle T) (ε : T), (0 < ε)%L
+   → ∃ (η : angle T) (ζ : T), (0 < ζ)%L ∧
+      ∀ θ : angle T,
+      angle_lt_sub θ θ₀ η
+      → (0 < angle_eucl_dist θ θ₀ < ζ)%L
+      → (dist ((f θ - f θ₀) / angle_eucl_dist θ θ₀) (f' θ₀) < ε)%L)
   ↔ ∀ (θ₀ : angle T) (ε : T), (0 < ε)%L
     → ∃ (η : angle T), ∀ θ : angle T,
       angle_lt_sub θ θ₀ η
