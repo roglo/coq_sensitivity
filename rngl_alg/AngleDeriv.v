@@ -1738,14 +1738,14 @@ apply angle_eqb_neq in Htz, Hts.
 now apply rngl_sin_of_param.
 Qed.
 
-Definition angle_lt θ1 θ2 := (θ1 < θ2)%A.
+Definition angle_lt_sub θ1 θ2 θ3 := (θ1 - θ2 < θ3)%A.
 
 Theorem rngl_eq_is_derivative_is_derivative :
   ∀ f f' g g' dist,
   (∀ x, f x = g x)
   → (∀ x, f' x = g' x)
-  → is_derivative angle_eucl_dist dist angle_sub angle_lt f f'
-  → is_derivative angle_eucl_dist dist angle_sub angle_lt g g'.
+  → is_derivative angle_eucl_dist dist angle_lt_sub f f'
+  → is_derivative angle_eucl_dist dist angle_lt_sub g g'.
 Proof.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as Hc.
@@ -1756,12 +1756,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   exists η.
   split; [ easy | ].
   exists ζ.
-  progress unfold angle_lt.
+  progress unfold angle_lt_sub.
   intros θ2 Hθ2 H.
   rewrite (Hc (_ - _)%A), (Hc ζ) in H.
   now apply angle_lt_irrefl in H.
 }
-progress unfold angle_lt.
+progress unfold angle_lt_sub.
 intros * Hfg Hfg' Hff.
 intros θ ε Hε.
 specialize (Hff θ ε Hε).
@@ -4172,7 +4172,7 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
 
 (* to be completed
 Theorem rngl_cos_derivative :
-  is_derivative angle_eucl_dist rngl_dist angle_sub angle_lt
+  is_derivative angle_eucl_dist rngl_dist angle_lt_sub
     rngl_cos (λ θ, (- rngl_sin θ)%L).
 Proof.
 destruct_ac.
@@ -4192,7 +4192,7 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   exists ε.
   split; [ easy | ].
   exists angle_right.
-  progress unfold angle_lt.
+  progress unfold angle_lt_sub.
   intros dθ Hdθ Hzθ.
   rewrite angle_sub_0_r in Hzθ.
   rewrite (rngl_opp_0 Hop).
@@ -4239,7 +4239,7 @@ enough (H :
   move η before ε.
   split; [ easy | ].
   exists ζ.
-  progress unfold angle_lt.
+  progress unfold angle_lt_sub.
   intros θ Hθ Hζ.
   remember (θ - θ₀)%A as dθ eqn:H.
   symmetry in H.
