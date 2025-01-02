@@ -1798,6 +1798,18 @@ Qed.
 
 Definition angle_lt_sub θ1 θ2 θ3 := (0 < θ1 - θ2 < θ3)%A.
 
+Definition old_is_limit_when_tending_to_neighbourhood {A B} da db lt_suba
+     (f : A → B) (x₀ : A) (L : B) :=
+  (∀ ε, 0 < ε → ∃ (η : A) ζ, 0 < ζ ∧
+   ∀ x : A, lt_suba x x₀ η → 0 < da x x₀ < ζ → db (f x) L < ε)%L.
+
+Definition old_derivative_at {A} (da : A → A → T) (db : T → T → T) lt_suba f f' a :=
+  let g x := ((f x - f a) / da x a)%L in
+  old_is_limit_when_tending_to_neighbourhood da db lt_suba g a (f' a).
+
+Definition old_is_derivative {A} (da : A → A → T) (db : T → T → T) lt_suba f f' :=
+  ∀ a, old_derivative_at da db lt_suba f f' a.
+
 Theorem is_derivative_iff :
   ∀ f (f' : angle T → T) dist,
    old_is_derivative angle_eucl_dist dist angle_lt_sub f f'
