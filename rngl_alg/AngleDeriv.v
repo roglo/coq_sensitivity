@@ -1763,12 +1763,42 @@ symmetry in Ht12.
 destruct t12; [ easy | apply angle_le_refl ].
 Qed.
 
+Theorem angle_min_l_iff :
+  ∀ θ1 θ2, angle_min θ1 θ2 = θ1 ↔ (θ1 ≤ θ2)%A.
+Proof.
+intros.
+progress unfold angle_min.
+split; intros H12; [ | now rewrite H12 ].
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+destruct t12; [ easy | ].
+subst θ2.
+apply angle_leb_gt in Ht12.
+now apply angle_lt_irrefl in Ht12.
+Qed.
+
+Theorem angle_min_r_iff :
+  ∀ θ1 θ2, angle_min θ1 θ2 = θ2 ↔ (θ2 ≤ θ1)%A.
+Proof.
+intros.
+progress unfold angle_min.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+split; intros H12. {
+  destruct t12; [ now subst θ2 | ].
+  apply angle_leb_gt in Ht12.
+  now apply angle_lt_le_incl in Ht12.
+} {
+  destruct t12; [ | easy ].
+  now apply angle_le_antisymm.
+}
+Qed.
+
 (* end min max *)
 
 Definition angle_lt_sub θ1 θ2 θ3 := (0 < θ1 - θ2 < θ3)%A.
 
-(* to be completed
-Theorem glop :
+Theorem is_derivative_iff :
   ∀ f f' dist,
   is_derivative angle_eucl_dist dist angle_lt_sub f f'
   ↔ ∀ (θ₀ : angle T) (ε : T), (0 < ε)%L
@@ -1777,6 +1807,7 @@ Theorem glop :
       → (dist ((f θ - f θ₀) / angle_eucl_dist θ θ₀) (f' θ₀) < ε)%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as Hc.
@@ -1881,43 +1912,34 @@ split; intros Hff. {
       apply (rngl_0_le_2 Hon Hos Hor).
     }
     apply (rngl_le_0_sub Hop Hor).
-...
-Search (_² < _²)%L.
-    apply (rngl_lt_lt_squ Hop Hor Hii).
-3: {
-Search rngl_acos.
-...
-Search (_² ≤ _²)%L.
-Search (- _ ≤ _)%L.
-...
-Search (_² ≤ 1)%L.
-  rewrite <- (rngl_squ_1 Hon) at 4.
-Search (_² ≤ _²)%L.
-...
-Check rngl_cos_decr.
-apply (rngl_lt_iff Hor).
-split. {
-  apply rngl_cos_decr.
-  split. {
-    eapply angle_le_trans; [ apply angle_lt_le_incl, H2 | ].
-    apply angle_le_min_r.
+    apply (rngl_le_div_r Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_le_trans Hor _ 2²). {
+      apply (rngl_le_div_l Hon Hop Hiv Hor).
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      rewrite (rngl_div_diag Hon Hiq).
+      apply (rngl_le_add_l Hor).
+      apply (rngl_0_le_1 Hon Hos Hor).
+      apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_le_le_squ Hop Hor Hii).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    now apply (rngl_lt_le_incl Hor) in H2.
   }
-  apply rngl_sin_nonneg_angle_le_straight.
-  rewrite rngl_sin_acos. {
-    apply rl_sqrt_nonneg.
-    now apply (rngl_le_0_sub Hop Hor).
-  }
-  now apply (rngl_squ_le_1_if Hon Hop Hor Hii).
+  exfalso.
+  apply angle_nle_gt in H2.
+  apply H2; clear H2.
+  rewrite (proj2 (angle_min_r_iff _ _)); apply angle_nonneg.
 }
-...
-Search (_² ≤ _²)%L.
-Search (rngl_cos _ ≤ rngl_cos _)%L.
-Search (rngl_cos _ < rngl_cos _)%L.
-...
-    apply rngl_squ_le_1.
-Print rngl_acos.
-...
-*)
+intros θ₀ ε Hε.
+specialize (Hff θ₀ ε Hε).
+destruct Hff as (η & Hff).
+exists η, 1%L.
+split; [ apply (rngl_0_lt_1 Hon Hos Hc1 Hor) | ].
+intros θ Hθ Hd.
+now apply Hff.
+Qed.
 
 Theorem rngl_eq_is_derivative_is_derivative :
   ∀ f f' g g' dist,
@@ -2781,37 +2803,6 @@ Proof.
 intros * H12.
 apply angle_lt_le_incl in H12.
 now apply angle_nlt_ge in H12.
-Qed.
-
-Theorem angle_min_l_iff :
-  ∀ θ1 θ2, angle_min θ1 θ2 = θ1 ↔ (θ1 ≤ θ2)%A.
-Proof.
-intros.
-progress unfold angle_min.
-split; intros H12; [ | now rewrite H12 ].
-remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
-symmetry in Ht12.
-destruct t12; [ easy | ].
-subst θ2.
-apply angle_leb_gt in Ht12.
-now apply angle_lt_irrefl in Ht12.
-Qed.
-
-Theorem angle_min_r_iff :
-  ∀ θ1 θ2, angle_min θ1 θ2 = θ2 ↔ (θ2 ≤ θ1)%A.
-Proof.
-intros.
-progress unfold angle_min.
-remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
-symmetry in Ht12.
-split; intros H12. {
-  destruct t12; [ now subst θ2 | ].
-  apply angle_leb_gt in Ht12.
-  now apply angle_lt_le_incl in Ht12.
-} {
-  destruct t12; [ | easy ].
-  now apply angle_le_antisymm.
-}
 Qed.
 
 Theorem angle_min_id : ∀ θ, angle_min θ θ = θ.
@@ -4360,6 +4351,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
+progress unfold is_derivative.
+progress unfold derivative_at.
+progress unfold is_limit_when_tending_to_neighbourhood.
+apply is_derivative_iff.
+...
+apply is_derivative_iff.
 intros θ₀ ε Hε.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
