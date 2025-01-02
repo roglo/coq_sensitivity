@@ -2274,8 +2274,8 @@ Qed.
 Theorem rngl_cos_decr :
   ∀ θ1 θ2, (θ1 ≤ θ2 ≤ angle_straight)%A → (rngl_cos θ2 ≤ rngl_cos θ1)%L.
 Proof.
-intros * (H12, H2s).
 destruct_ac.
+intros * (H12, H2s).
 progress unfold angle_leb in H12, H2s.
 cbn in H2s.
 rewrite (rngl_leb_refl Hor) in H2s.
@@ -2284,6 +2284,22 @@ symmetry in Hzs2.
 destruct zs2; [ | easy ].
 destruct (0 ≤? rngl_sin θ1)%L; [ | easy ].
 now apply rngl_leb_le in H12.
+Qed.
+
+Theorem rngl_cos_decr_lt :
+  ∀ θ1 θ2, (θ1 < θ2 ≤ angle_straight)%A → (rngl_cos θ2 < rngl_cos θ1)%L.
+Proof.
+destruct_ac.
+intros * (H12, H2s).
+progress unfold angle_ltb in H12.
+progress unfold angle_leb in H2s.
+cbn in H2s.
+rewrite (rngl_leb_refl Hor) in H2s.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs2.
+destruct zs2; [ | easy ].
+destruct (0 ≤? rngl_sin θ1)%L; [ | easy ].
+now apply rngl_ltb_lt in H12.
 Qed.
 
 Theorem rngl_cos_acos :

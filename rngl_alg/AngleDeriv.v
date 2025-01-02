@@ -1754,7 +1754,16 @@ apply angle_leb_gt in Ht12.
 now apply angle_lt_le_incl in Ht12.
 Qed.
 
-(* end min max on angles *)
+Theorem angle_le_min_r : ∀ θ1 θ2, (angle_min θ1 θ2 ≤ θ2)%A.
+Proof.
+intros.
+progress unfold angle_min.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+destruct t12; [ easy | apply angle_le_refl ].
+Qed.
+
+(* end min max *)
 
 Definition angle_lt_sub θ1 θ2 θ3 := (0 < θ1 - θ2 < θ3)%A.
 
@@ -1769,6 +1778,18 @@ Theorem glop :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as Hc.
+  intros.
+  split. {
+    intros H * Hε.
+    rewrite (Hc ε) in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  intros H η ζ Hζ.
+  rewrite (Hc ζ) in Hζ.
+  now apply (rngl_lt_irrefl Hor) in Hζ.
+}
 intros.
 progress unfold angle_lt_sub.
 split; intros Hff. {
@@ -1802,10 +1823,94 @@ split; intros Hff. {
     rewrite <- (rngl_cos_acos (1 - _))%L. 2: {
       now apply (rngl_squ_le_1_if Hon Hop Hor Hii).
     }
+    apply rngl_cos_decr_lt.
+    split. {
+      eapply angle_lt_le_trans; [ apply H2 | ].
+      apply angle_le_min_r.
+    }
+    apply rngl_sin_nonneg_angle_le_straight.
+    rewrite rngl_sin_acos. {
+      apply rl_sqrt_nonneg.
+      now apply (rngl_le_0_sub Hop Hor).
+    }
+    now apply (rngl_squ_le_1_if Hon Hop Hor Hii).
+  }
+  exfalso.
+  apply Hz1; clear Hz1.
+  apply (rngl_squ_le_1 Hon Hop Hor).
+  split. 2: {
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    apply (rngl_le_add_l Hor).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+      apply (rngl_squ_nonneg Hos Hor).
+    }
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_le_opp_l Hop Hor).
+  rewrite (rngl_add_sub_assoc Hop).
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  rewrite fold_rngl_squ.
+  apply (rngl_le_le_squ Hop Hor Hii). {
+    now apply (rngl_lt_le_incl Hor) in Hζ.
+  }
+  progress unfold rngl_acos in H2.
+  fold Hor in H2.
+  destruct (rngl_le_dec Hor _ _) as [Hz1| Hz1]. {
+    clear H2.
+    apply (rngl_nlt_ge_iff Hor).
+    intros H2.
+    apply rngl_nlt_ge in Hz1.
+    apply Hz1; clear Hz1.
+    rewrite <- (rngl_squ_1 Hon) at 1.
+    apply (rngl_abs_lt_squ_lt Hop Hor Hii).
+    apply (rngl_mul_comm Hic).
+    rewrite (rngl_abs_1 Hon Hos Hor).
+    rewrite <- (rngl_abs_opp Hop Hor).
+    rewrite (rngl_opp_sub_distr Hop).
+    rewrite (rngl_abs_nonneg_eq Hop Hor). {
+      apply (rngl_lt_add_lt_sub_r Hop Hor).
+      apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+        apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      }
+      rewrite fold_rngl_squ.
+      apply (rngl_lt_lt_squ Hop Hor Hii); [ | | easy ].
+      apply (rngl_mul_comm Hic).
+      apply (rngl_0_le_2 Hon Hos Hor).
+    }
+    apply (rngl_le_0_sub Hop Hor).
+...
+Search (_² < _²)%L.
+    apply (rngl_lt_lt_squ Hop Hor Hii).
+3: {
+Search rngl_acos.
+...
+Search (_² ≤ _²)%L.
+Search (- _ ≤ _)%L.
+...
+Search (_² ≤ 1)%L.
+  rewrite <- (rngl_squ_1 Hon) at 4.
+Search (_² ≤ _²)%L.
+...
+Check rngl_cos_decr.
 apply (rngl_lt_iff Hor).
 split. {
   apply rngl_cos_decr.
+  split. {
+    eapply angle_le_trans; [ apply angle_lt_le_incl, H2 | ].
+    apply angle_le_min_r.
+  }
+  apply rngl_sin_nonneg_angle_le_straight.
+  rewrite rngl_sin_acos. {
+    apply rl_sqrt_nonneg.
+    now apply (rngl_le_0_sub Hop Hor).
+  }
+  now apply (rngl_squ_le_1_if Hon Hop Hor Hii).
+}
 ...
+Search (_² ≤ _²)%L.
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 Search (rngl_cos _ < rngl_cos _)%L.
 ...
