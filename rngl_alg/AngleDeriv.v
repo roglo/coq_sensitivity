@@ -4592,7 +4592,16 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
   destruct tt. {
     move Hts at bottom.
     move Hdθ at bottom.
-    (* contradiction entre les 3 dernières hypothèses *)
+    exfalso.
+    apply angle_nle_gt in Htt.
+    apply Htt; clear Htt.
+    rewrite <- (angle_add_0_r θ₀) at 1.
+    apply angle_add_le_mono_l; [ | apply angle_nonneg ].
+    apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
+    apply (angle_le_trans _  angle_right).
+    now apply angle_lt_le_incl.
+    apply angle_right_le_straight.
+  }
 ...
 rewrite fold_angle_add_overflow2 in Htt.
 rewrite angle_add_overflow_equiv2 in Htt.
