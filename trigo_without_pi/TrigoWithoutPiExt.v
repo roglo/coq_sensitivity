@@ -1894,6 +1894,24 @@ apply (rngl_add_nonneg_nonneg Hor);
 apply (rngl_squ_nonneg Hos Hor).
 Qed.
 
+Theorem angle_eucl_dist_straight_r_cos_sin :
+  ∀ θ,
+  ((angle_eucl_dist θ angle_straight)² = (1 + rngl_cos θ)² + (rngl_sin θ)²)%L.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_eucl_dist.
+progress unfold rl_modl; cbn.
+rewrite (rngl_sub_0_l Hop).
+rewrite (rngl_squ_opp Hop).
+rewrite <- (rngl_opp_add_distr Hop).
+rewrite (rngl_squ_opp Hop).
+rewrite (rngl_add_comm 1).
+apply (rngl_squ_sqrt Hon).
+apply (rngl_add_nonneg_nonneg Hor);
+apply (rngl_squ_nonneg Hos Hor).
+Qed.
+
 Theorem rngl_cos_angle_eucl_dist_0_r :
   ∀ θ, (rngl_cos θ = 1 - (angle_eucl_dist θ 0)² / 2)%L.
 Proof.
@@ -1918,6 +1936,32 @@ apply (rngl_mul_move_l Hic Hi1) in H1. 2: {
   apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 }
 now apply (rngl_sub_move_l Hop) in H1.
+Qed.
+
+Theorem rngl_cos_angle_eucl_dist_straight_r :
+  ∀ θ, (rngl_cos θ = (angle_eucl_dist θ angle_straight)² / 2 - 1)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite H1; apply H1.
+}
+intros.
+specialize (angle_eucl_dist_straight_r_cos_sin θ) as H1.
+rewrite (rngl_squ_add Hic Hon) in H1.
+rewrite (rngl_squ_1 Hon) in H1.
+rewrite (rngl_mul_1_r Hon) in H1.
+rewrite <- rngl_add_assoc in H1.
+rewrite cos2_sin2_1 in H1.
+rewrite <- rngl_add_add_swap in H1.
+rewrite (rngl_add_mul_r_diag_l Hon) in H1.
+symmetry in H1.
+apply (rngl_mul_move_l Hic Hi1) in H1. 2: {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+now apply (rngl_add_move_l Hop) in H1.
 Qed.
 
 Theorem rngl_cos_le_iff_angle_eucl_le :
