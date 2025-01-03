@@ -4574,38 +4574,13 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Hts| Hts]. {
     }
     apply angle_div_2_le_straight.
   }
-  apply angle_nle_gt in Htds.
-  rewrite (angle_add_comm θ₀).
-  rewrite angle_add_sub.
-  rewrite <- angle_add_assoc.
-  rewrite <- angle_mul_2_l.
-  destruct ovt. {
-    rewrite rngl_sin_add_straight_r.
-    subst tt.
-    now apply (rngl_cos_derivative_lemma_3 ε ζ1).
-  }
-  move dθ before θ₀.
-  move Htds before Hts.
-  rewrite angle_add_0_r.
-  rewrite angle_div_2_add.
-  rewrite angle_mul_2_div_2; [ | easy ].
-  destruct tt. {
-    move Hts at bottom.
-    move Hdθ at bottom.
-    exfalso.
-    apply angle_nle_gt in Htt.
-    apply Htt; clear Htt.
-    rewrite <- (angle_add_0_r θ₀) at 1.
-    apply angle_add_le_mono_l; [ | apply angle_nonneg ].
-    apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
-    apply (angle_le_trans _  angle_right).
-    now apply angle_lt_le_incl.
-    apply angle_right_le_straight.
-  }
-...
-rewrite fold_angle_add_overflow2 in Htt.
-rewrite angle_add_overflow_equiv2 in Htt.
-progress unfold angle_add_overflow in Htt.
+  exfalso.
+  apply Htds; clear Htds.
+  apply (angle_le_trans _ angle_right).
+  now apply angle_lt_le_incl.
+  apply angle_right_le_straight.
+}
+apply angle_nlt_ge in Hts.
 ...
     remember (angle_add_overflow dθ (2 * θ₀)) as ovd eqn:Hovd.
     symmetry in Hovd.
