@@ -321,6 +321,39 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Htls| Htls]. {
   apply angle_nlt_ge in Htls.
   change_angle_sub_r θ₀ angle_straight.
   apply (rngl_cos_derivative_lemma_4 _ _ Hε).
+  split. {
+    apply angle_lt_iff.
+    split; [ apply angle_nonneg | easy ].
+  }
+  (* lemma *)
+  progress unfold angle_leb in Htls.
+  progress unfold angle_ltb.
+  rewrite rngl_cos_add_straight_r in Htls |-*.
+  rewrite rngl_sin_add_straight_r in Htls |-*.
+  cbn in Htls |-*.
+  rewrite (rngl_leb_refl Hor) in Htls |-*.
+  rewrite (rngl_leb_0_opp Hop Hor) in Htls |-*.
+  remember (rngl_sin θ₀ ≤? 0)%L as sz eqn:Hsz.
+  symmetry in Hsz.
+  destruct sz. {
+    rewrite (rngl_leb_opp_r Hop Hor) in Htls.
+    rewrite (rngl_opp_involutive Hop) in Htls.
+    apply rngl_leb_le in Htls.
+    apply rngl_ltb_lt.
+    apply -> (rngl_opp_lt_compat Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H.
+    apply eq_rngl_cos_1 in H.
+    subst θ₀.
+    now rewrite angle_add_0_l in Hts.
+  }
+  exfalso.
+  clear Htls.
+  apply (rngl_leb_gt Hor) in Hsz.
+  (* ah bin merde alors *)
+...
+les feux sauvages
 ...
 *)
 
