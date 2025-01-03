@@ -380,4 +380,22 @@ apply (rngl_leb_gt Hor) in Hzs.
 now apply rngl_nle_gt in Hzs.
 Qed.
 
+Theorem rngl_sin_neg_angle_gt_straight :
+  ∀ θ, (rngl_sin θ < 0)%L ↔ (angle_straight < θ)%A.
+Proof.
+destruct_ac.
+intros.
+split; intros H. {
+  apply rngl_nle_gt in H.
+  apply angle_nle_gt.
+  intros H1; apply H; clear H.
+  now apply rngl_sin_nonneg_angle_le_straight.
+} {
+  apply angle_nle_gt in H.
+  apply (rngl_nle_gt_iff Hor).
+  intros H1; apply H; clear H.
+  now apply rngl_sin_nonneg_angle_le_straight.
+}
+Qed.
+
 End a.
