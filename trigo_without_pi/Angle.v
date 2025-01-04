@@ -2628,6 +2628,19 @@ destruct tt. {
 }
 Qed.
 
+Theorem angle_mul_add_distr_l :
+  ∀ n θ1 θ2, (n * (θ1 + θ2) = n * θ1 + n * θ2)%A.
+Proof.
+intros.
+induction n; cbn; [ symmetry; apply angle_add_0_l | ].
+rewrite IHn.
+do 2 rewrite angle_add_assoc.
+f_equal.
+do 2 rewrite <- angle_add_assoc.
+f_equal.
+apply angle_add_comm.
+Qed.
+
 Theorem angle_mul_add_distr_r :
   ∀ a b θ, ((a + b) * θ = a * θ + b * θ)%A.
 Proof.

@@ -222,6 +222,43 @@ rewrite H; clear H.
 now apply rngl_ltb_lt.
 Qed.
 
+Theorem angle_straight_lt_add_straight_r :
+  ∀ θ,
+  (angle_straight < θ + angle_straight)%A
+  → (θ < angle_straight)%A.
+Proof.
+destruct_ac.
+intros * Hs.
+progress unfold angle_ltb in Hs.
+progress unfold angle_ltb.
+rewrite rngl_sin_add_straight_r in Hs.
+rewrite rngl_cos_add_straight_r in Hs.
+rewrite (rngl_leb_0_opp Hop Hor) in Hs.
+cbn in Hs |-*.
+rewrite (rngl_leb_refl Hor) in Hs |-*.
+remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hsz, Hzs.
+destruct sz. {
+  exfalso.
+  apply rngl_ltb_lt in Hs.
+  apply (rngl_opp_lt_compat Hop Hor) in Hs.
+  apply rngl_nle_gt in Hs.
+  apply Hs, rngl_cos_bound.
+}
+apply (rngl_leb_gt Hor) in Hsz.
+destruct zs. {
+  apply rngl_ltb_lt.
+  apply (rngl_lt_iff Hor).
+  split; [ apply rngl_cos_bound | ].
+  intros H; symmetry in H.
+  apply eq_rngl_cos_opp_1 in H; subst θ.
+  now apply (rngl_lt_irrefl Hor) in Hsz.
+}
+apply (rngl_leb_gt Hor) in Hzs.
+now apply (rngl_lt_asymm Hor) in Hzs.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative_lemma_5 :
   ∀ θ₀ ε,
@@ -321,11 +358,13 @@ destruct (angle_le_dec dθ angle_straight) as [Htds| Htds]. {
     rewrite (rngl_sin_angle_eucl_dist' (dθ/₂)). 2: {
       apply angle_div_2_le_straight.
     }
-About angle_mul_2_div_2.
-Check angle_div_2_add_overflow.
-Search ((_ * _) /₂)%A.
-About angle_mul_nat_div_2.
-...
+    change_angle_sub_r θ₀ angle_straight.
+    rewrite angle_mul_add_distr_l.
+    (* lemma *)
+    rewrite (angle_mul_2_l angle_straight).
+    rewrite angle_straight_add_straight.
+    rewrite angle_add_0_r.
+    apply angle_straight_lt_add_straight_r in Htls.
     rewrite angle_mul_2_div_2; [ | easy ].
     rewrite angle_div_2_mul_2.
     rewrite (rngl_mul_div_assoc Hiv).
@@ -349,9 +388,12 @@ About angle_mul_nat_div_2.
     rewrite angle_add_comm.
     specialize (Hsc (θ₀ + dθ /₂))%A.
     rewrite angle_eucl_dist_move_0_r in Hsc.
-    rewrite angle_add_comm, angle_add_sub in Hsc.
-    rewrite angle_add_comm.
+    rewrite angle_sub_add_distr in Hsc.
+    rewrite angle_add_sub_swap in Hsc.
+    rewrite angle_sub_diag in Hsc.
+    rewrite angle_add_0_l in Hsc.
     apply Hsc.
+...
     apply (rngl_le_lt_trans Hor _ (angle_eucl_dist dθ 0)); [ | easy ].
     apply angle_le_angle_eucl_dist_le; [ | easy | ]. 2: {
       apply angle_div_2_le.
