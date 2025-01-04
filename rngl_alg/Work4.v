@@ -2319,6 +2319,25 @@ split. {
 }
 Qed.
 
+(* to be completed
+Theorem angle_mul_2_div_2 :
+  ∀ θ,
+  ((2 * θ) /₂ = θ + if θ <? angle_straight then 0 else angle_straight)%A.
+Proof.
+intros.
+remember (θ <? angle_straight)%A as ts eqn:Hts.
+symmetry in Hts.
+destruct ts. {
+  rewrite angle_add_0_r.
+  rewrite <- angle_mul_nat_div_2; [ apply angle_div_2_mul_2 | cbn ].
+  rewrite angle_add_0_r.
+  rewrite Bool.orb_false_r.
+  now apply angle_lt_straight_add_same_not_overflow.
+} {
+...
+Qed.
+*)
+
 Theorem angle_mul_2_div_2 :
   ∀ θ, (θ < angle_straight → (2 * θ) /₂ = θ)%A.
 Proof.
