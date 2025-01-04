@@ -23,31 +23,6 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Theorem angle_add_opposite_sin_not_overflow :
-  ∀ θ1 θ2,
-  (θ2 ≤ angle_straight < θ1)%A
-  → (rngl_cos θ1 < rngl_cos θ2)%L
-  → angle_add_overflow θ1 θ2 = false.
-Proof.
-destruct_ac.
-intros * (Ht2, Ht1) Hcc.
-apply rngl_sin_neg_angle_gt_straight in Ht1.
-apply rngl_sin_nonneg_angle_le_straight in Ht2.
-apply angle_add_not_overflow_iff.
-right.
-progress unfold angle_ltb.
-cbn.
-rewrite (rngl_leb_0_opp Hop Hor).
-generalize Ht2; intros H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-generalize Ht1; intros H.
-apply (rngl_lt_le_incl Hor) in H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-now apply rngl_ltb_lt.
-Qed.
-
 Theorem angle_straight_lt_add_straight_r :
   ∀ θ,
   (angle_straight < θ + angle_straight)%A
