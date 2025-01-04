@@ -358,7 +358,7 @@ destruct (angle_le_dec dθ angle_straight) as [Htds| Htds]. {
     rewrite (rngl_sin_angle_eucl_dist' (dθ/₂)). 2: {
       apply angle_div_2_le_straight.
     }
-(**)
+(*
     rewrite angle_mul_2_div_2.
     generalize Htls; intros H.
     apply angle_lt_le_incl in H.
@@ -412,6 +412,7 @@ destruct (angle_le_dec dθ angle_straight) as [Htds| Htds]. {
     rewrite angle_add_0_l in Hsc.
     apply Hsc.
 ...
+*)
     change_angle_sub_r θ₀ angle_straight.
     rewrite angle_mul_add_distr_l.
     (* lemma *)
@@ -419,7 +420,7 @@ destruct (angle_le_dec dθ angle_straight) as [Htds| Htds]. {
     rewrite angle_straight_add_straight.
     rewrite angle_add_0_r.
     apply angle_straight_lt_add_straight_r in Htls.
-    rewrite angle_mul_2_div_2; [ | easy ].
+    rewrite angle_mul_2_div_2, Htls, angle_add_0_r.
     rewrite angle_div_2_mul_2.
     rewrite (rngl_mul_div_assoc Hiv).
     rewrite (rngl_div_opp_l Hop Hiv).
@@ -440,6 +441,19 @@ destruct (angle_le_dec dθ angle_straight) as [Htds| Htds]. {
     rewrite (rngl_sub_opp_r Hop).
     rewrite (rngl_add_opp_l Hop).
     rewrite angle_add_comm.
+(* aïe aïe aïe, ça va pas... *)
+(* cette différence de sinus n'est pas petite *)
+(* c'est donc normalement un "exfalso", cette histoire *)
+(* mais quelle contradiction y a-t-il dans les hypothèses ? *)
+...
+    apply Hsc.
+    rewrite angle_eucl_dist_move_0_r.
+    rewrite angle_sub_add_distr.
+    rewrite angle_add_sub_swap.
+    rewrite angle_sub_diag.
+    rewrite angle_add_0_l.
+    rewrite <- angle_eucl_dist_move_0_r.
+...
     specialize (Hsc (θ₀ + dθ /₂))%A.
     rewrite angle_eucl_dist_move_0_r in Hsc.
     rewrite angle_sub_add_distr in Hsc.
