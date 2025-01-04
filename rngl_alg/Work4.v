@@ -2319,11 +2319,12 @@ split. {
 }
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem angle_mul_2_div_2 :
   ∀ θ,
   ((2 * θ) /₂ = θ + if θ <? angle_straight then 0 else angle_straight)%A.
 Proof.
+destruct_ac.
 intros.
 remember (θ <? angle_straight)%A as ts eqn:Hts.
 symmetry in Hts.
@@ -2334,18 +2335,42 @@ destruct ts. {
   rewrite Bool.orb_false_r.
   now apply angle_lt_straight_add_same_not_overflow.
 } {
-...
-Qed.
-*)
-
-Theorem angle_mul_2_div_2 :
-  ∀ θ, (θ < angle_straight → (2 * θ) /₂ = θ)%A.
-Proof.
-intros * Hts.
-rewrite <- angle_mul_nat_div_2; [ apply angle_div_2_mul_2 | cbn ].
-rewrite angle_add_0_r.
-rewrite Bool.orb_false_r.
-now apply angle_lt_straight_add_same_not_overflow.
+  progress unfold angle_ltb in Hts.
+  change_angle_add_r θ angle_straight.
+  progress sin_cos_add_sub_straight_hyp T Hts.
+  cbn in Hts.
+  rewrite (rngl_leb_0_opp Hop Hor) in Hts.
+  rewrite (rngl_leb_refl Hor) in Hts.
+  rewrite angle_mul_sub_distr_l.
+  rewrite (angle_mul_2_l angle_straight).
+  rewrite angle_straight_add_straight.
+  rewrite angle_sub_0_r.
+  remember (rngl_sin θ ≤? 0)%L as tz eqn:Htz.
+  symmetry in Htz.
+  destruct tz. {
+    apply rngl_leb_le in Htz.
+    apply (rngl_ltb_ge_iff Hor) in Hts.
+    apply (rngl_opp_le_compat Hop Hor) in Hts.
+    apply (rngl_lt_eq_cases Hor) in Hts.
+    destruct Hts as [Hts| Hts]. {
+      exfalso.
+      apply rngl_nle_gt in Hts.
+      apply Hts, rngl_cos_bound.
+    }
+    symmetry in Hts.
+    apply eq_rngl_cos_1 in Hts.
+    subst θ.
+    rewrite angle_mul_0_r.
+    apply angle_0_div_2.
+  }
+  clear Hts.
+  apply (rngl_leb_gt Hor) in Htz.
+  rewrite <- angle_mul_nat_div_2; [ apply angle_div_2_mul_2 | cbn ].
+  rewrite angle_add_0_r.
+  rewrite Bool.orb_false_r.
+  apply angle_lt_straight_add_same_not_overflow.
+  now apply rngl_sin_pos_lt_straight.
+}
 Qed.
 
 Theorem angle_sub_le_mono_l :
@@ -2656,7 +2681,7 @@ rewrite <- angle_mul_2_l in Hovt.
 rewrite angle_div_2_add. {
   rewrite Hovt.
   rewrite rngl_sin_add_straight_r.
-  rewrite angle_mul_2_div_2; [ | easy ].
+  rewrite angle_mul_2_div_2, Hts, angle_add_0_r.
   rewrite (rngl_opp_involutive Hop).
   destruct tt. {
     now apply (rngl_cos_derivative_lemma_1 ε η1).
