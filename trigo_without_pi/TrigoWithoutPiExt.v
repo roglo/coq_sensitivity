@@ -2162,6 +2162,10 @@ rewrite (rngl_sub_0_r Hos).
 now rewrite rngl_add_0_l.
 Qed.
 
+Theorem angle_mul_nat_overflow_0_l :
+  ∀ θ, angle_mul_nat_overflow 0 θ = false.
+Proof. easy. Qed.
+
 Theorem angle_mul_nat_overflow_0_r :
   ∀ n, angle_mul_nat_overflow n 0 = false.
 Proof.

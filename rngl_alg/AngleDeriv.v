@@ -321,6 +321,10 @@ destruct (angle_le_dec dθ angle_straight) as [Htds| Htds]. {
     rewrite (rngl_sin_angle_eucl_dist' (dθ/₂)). 2: {
       apply angle_div_2_le_straight.
     }
+About angle_mul_2_div_2.
+Check angle_div_2_add_overflow.
+Search ((_ * _) /₂)%A.
+About angle_mul_nat_div_2.
 ...
     rewrite angle_mul_2_div_2; [ | easy ].
     rewrite angle_div_2_mul_2.
