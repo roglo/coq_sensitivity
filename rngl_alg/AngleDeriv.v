@@ -12,6 +12,7 @@ Require Import Trigo.TrigoWithoutPiExt.
 Require Import Trigo.Angle_order.
 Require Import Trigo.AngleDivNat.
 Require Import Trigo.AngleAddLeMonoL.
+Require Import Trigo.AngleDiv2.
 Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.SeqAngleIsCauchy.
 Require Import Trigo.AngleTypeIsComplete.
@@ -1018,6 +1019,60 @@ split; intros H1. {
 now destruct t23.
 Qed.
 
+Theorem angle_eucl_dist_eq_diag_r :
+  ∀ θ1 θ2 θ3,
+  angle_eucl_dist θ1 θ3 = angle_eucl_dist θ2 θ3 ↔
+  θ1 = θ2 ∨ (θ1 - θ3 = θ3 - θ2)%A.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros.
+  rewrite angle_eucl_dist_move_0_r.
+  rewrite (angle_eucl_dist_move_0_r θ2).
+  rewrite (H1 (θ1 - θ3))%A.
+  rewrite (H1 (θ2 - θ3))%A.
+  rewrite (H1 (θ3 - θ2))%A.
+  rewrite (H1 θ1), (H1 θ2).
+  rewrite angle_eucl_dist_diag.
+  split; intros; [ now left | easy ].
+}
+intros.
+split; intros H12. {
+  do 2 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2 in H12.
+  apply (f_equal (rngl_mul 2⁻¹)) in H12.
+  do 2 rewrite rngl_mul_assoc in H12.
+  rewrite (rngl_mul_inv_diag_l Hon Hiv) in H12. 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  do 2 rewrite (rngl_mul_1_l Hon) in H12.
+  apply rngl_sin_eq in H12.
+  destruct H12 as [H12| H12]. {
+    apply (f_equal (λ a, angle_mul_nat a 2)) in H12.
+    do 2 rewrite angle_div_2_mul_2 in H12.
+    apply -> angle_sub_move_r in H12.
+    rewrite angle_sub_add in H12.
+    now left.
+  }
+  apply (f_equal (λ a, angle_mul_nat a 2)) in H12.
+  rewrite angle_mul_sub_distr_l in H12.
+  (* lemma *)
+  rewrite (angle_mul_2_l angle_straight) in H12.
+  rewrite angle_straight_add_straight in H12.
+  rewrite angle_sub_0_l in H12.
+  do 2 rewrite angle_div_2_mul_2 in H12.
+  rewrite angle_opp_sub_distr in H12.
+  now right.
+}
+destruct H12 as [H12| H12]; [ now subst θ2 | ].
+rewrite angle_eucl_dist_move_0_r.
+rewrite (angle_eucl_dist_move_0_r θ2).
+rewrite H12.
+rewrite <- angle_eucl_dist_move_0_r.
+rewrite <- (angle_eucl_dist_move_0_r θ2).
+apply angle_eucl_dist_symmetry.
+Qed.
+
 (* to be completed
 Print is_derivative.
 Print derivative_at.
@@ -1090,7 +1145,28 @@ split; intros H1. {
   }
   intros Hab.
   rewrite angle_eucl_dist_move_0_r in Hab.
+  apply angle_eucl_dist_eq_diag_r in Hab.
+  rewrite angle_sub_0_r in Hab.
+  rewrite angle_sub_0_l in Hab.
+  destruct (angle_le_dec a b) as [Hab'| Hab']. {
+    rewrite (proj2 (angle_max_r_iff _ _) Hab') in H1.
+    rewrite (proj2 (angle_min_l_iff _ _) Hab') in H1.
+    destruct Hab as [Hab| Hab]. {
+...
 Search (angle_eucl_dist _ _ = angle_eucl_dist _ _).
+...
+  do 2 rewrite angle_div_2_sub in H12.
+  remember (θ3 ≤? θ1)%A as t31 eqn:Ht31.
+  remember (θ3 ≤? θ2)%A as t32 eqn:Ht32.
+  symmetry in Ht31, Ht32.
+  destruct t31. {
+    destruct t32. {
+Search (rngl_sin _ = rngl_sin _).
+Search (rngl_sin (_ - _) = rngl_sin (_ - _)).
+...
+Search (rngl_sin (_ /₂)).
+About rngl_sin_angle_div_2_add_not_overflow.
+Search (rngl_sin_angle_div_2).
 ...
 
 Theorem rngl_cos_derivative :
