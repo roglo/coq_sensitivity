@@ -1019,6 +1019,80 @@ now destruct t23.
 Qed.
 
 (* to be completed
+Print is_derivative.
+Print derivative_at.
+Print is_limit_when_tending_to_neighbourhood.
+(*
+Il faut que lt_suba soit du genre
+  lt_suba a b c ↔ 0 < |a-b] < c
+
+Il faut que da soit tel que
+    0 < |a-b| < c ↔ d(a,b) < d(c,0)
+*)
+Theorem glop :
+  ∀ a b c,
+  (c ≤ angle_straight)%A
+  → angle_lt_sub a b c ↔ (angle_eucl_dist a b < angle_eucl_dist c 0)%L.
+Proof.
+destruct_ac.
+intros * Hcs.
+progress unfold angle_lt_sub.
+progress unfold angle_diff.
+split; intros H1. {
+  apply (rngl_lt_iff Hor).
+  split. {
+    rewrite angle_eucl_dist_move_0_r.
+    apply rngl_cos_le_iff_angle_eucl_le.
+    destruct (angle_le_dec a b) as [Hab| Hab]. {
+      rewrite (proj2 (angle_max_r_iff _ _) Hab) in H1.
+      rewrite (proj2 (angle_min_l_iff _ _) Hab) in H1.
+      progress unfold angle_ltb in H1.
+      progress unfold angle_leb in Hab.
+      cbn - [ angle_sub ] in H1.
+      rewrite (rngl_leb_refl Hor) in H1.
+      destruct H1 as (H1, H2).
+      rewrite rngl_cos_sub_comm.
+      apply rngl_sin_nonneg_angle_le_straight in Hcs.
+      generalize Hcs; intros H.
+      apply rngl_leb_le in H.
+      rewrite H in H2; clear H.
+      remember (0 ≤? rngl_sin a)%L as zsa eqn:Hzsa.
+      remember (0 ≤? rngl_sin b)%L as zsb eqn:Hzsb.
+      remember (0 ≤? rngl_sin (b - a))%L as zba eqn:Hzba.
+      symmetry in Hzsa, Hzsb, Hzba.
+      destruct zba; [ | easy ].
+      apply rngl_ltb_lt in H2.
+      now apply (rngl_lt_le_incl Hor) in H2.
+    }
+    rewrite rngl_cos_sub_comm.
+    apply angle_nle_gt in Hab.
+    generalize Hab; intros H.
+    apply angle_lt_le_incl in H.
+    rewrite (proj2 (angle_max_l_iff _ _) H) in H1.
+    rewrite (proj2 (angle_min_r_iff _ _) H) in H1.
+    clear H.
+    progress unfold angle_ltb in H1, Hab.
+    cbn - [ angle_sub ] in H1.
+    rewrite (rngl_leb_refl Hor) in H1.
+    destruct H1 as (H1, H2).
+    rewrite rngl_cos_sub_comm.
+    apply rngl_sin_nonneg_angle_le_straight in Hcs.
+    generalize Hcs; intros H.
+    apply rngl_leb_le in H.
+    rewrite H in H2; clear H.
+    remember (0 ≤? rngl_sin a)%L as zsa eqn:Hzsa.
+    remember (0 ≤? rngl_sin b)%L as zsb eqn:Hzsb.
+    remember (0 ≤? rngl_sin (a - b))%L as zab eqn:Hzab.
+    symmetry in Hzsa, Hzsb, Hzab.
+    destruct zab; [ | easy ].
+    apply rngl_ltb_lt in H2.
+    now apply (rngl_lt_le_incl Hor) in H2.
+  }
+  intros Hab.
+  rewrite angle_eucl_dist_move_0_r in Hab.
+Search (angle_eucl_dist _ _ = angle_eucl_dist _ _).
+...
+
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist angle_lt_sub
     rngl_cos (λ θ, (- rngl_sin θ)%L).
