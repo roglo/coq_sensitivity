@@ -379,6 +379,22 @@ apply (rngl_mul_div Hi1).
 apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 Qed.
 
+Theorem angle_lt_asymm : ∀ a b, (a < b)%A → ¬ (b < a)%A.
+Proof.
+destruct_ac.
+intros * Hab Hba.
+progress unfold angle_ltb in Hab.
+progress unfold angle_ltb in Hba.
+remember (0 ≤? rngl_sin a)%L as za eqn:Hza.
+remember (0 ≤? rngl_sin b)%L as zb eqn:Hzb.
+symmetry in Hza, Hzb.
+destruct za, zb; [ | easy | easy | ].
+apply rngl_ltb_lt in Hab, Hba.
+now apply (rngl_lt_asymm Hor) in Hab.
+apply rngl_ltb_lt in Hab, Hba.
+now apply (rngl_lt_asymm Hor) in Hab.
+Qed.
+
 (* min max on angles *)
 
 Definition angle_min θ1 θ2 := if (θ1 ≤? θ2)%A then θ1 else θ2.
@@ -465,10 +481,51 @@ subst θ2.
 now rewrite angle_le_refl in Ht12.
 Qed.
 
+Theorem angle_min_comm : ∀ a b, angle_min a b = angle_min b a.
+Proof.
+intros.
+progress unfold angle_min.
+remember (a ≤? b)%A as ab eqn:Hab.
+remember (b ≤? a)%A as ba eqn:Hba.
+symmetry in Hab, Hba.
+destruct ab, ba; [ | easy | easy | ].
+now apply angle_le_antisymm.
+apply angle_leb_gt in Hab, Hba.
+now apply angle_lt_asymm in Hab.
+Qed.
+
+Theorem angle_max_comm : ∀ a b, angle_max a b = angle_max b a.
+Proof.
+intros.
+progress unfold angle_max.
+remember (a ≤? b)%A as ab eqn:Hab.
+remember (b ≤? a)%A as ba eqn:Hba.
+symmetry in Hab, Hba.
+destruct ab, ba; [ | easy | easy | ].
+now apply angle_le_antisymm.
+apply angle_leb_gt in Hab, Hba.
+now apply angle_lt_asymm in Hab.
+Qed.
+
 (* end min max *)
 
 Definition angle_diff θ1 θ2 := (angle_max θ1 θ2 - angle_min θ1 θ2)%A.
 Definition angle_lt_sub θ1 θ2 θ3 := (0 < angle_diff θ1 θ2 < θ3)%A.
+
+Theorem angle_diff_comm : ∀ θ1 θ2, angle_diff θ1 θ2 = angle_diff θ2 θ1.
+Proof.
+intros.
+progress unfold angle_diff.
+now rewrite angle_max_comm, angle_min_comm.
+Qed.
+
+Theorem angle_lt_sub_comm_iff :
+  ∀ θ1 θ2 θ3, angle_lt_sub θ1 θ2 θ3 ↔ angle_lt_sub θ2 θ1 θ3.
+Proof.
+intros.
+progress unfold angle_lt_sub.
+now rewrite angle_diff_comm.
+Qed.
 
 Definition old_is_limit_when_tending_to_neighbourhood {A B} da db lt_suba
      (f : A → B) (x₀ : A) (L : B) :=
@@ -1073,6 +1130,48 @@ rewrite <- (angle_eucl_dist_move_0_r θ2).
 apply angle_eucl_dist_symmetry.
 Qed.
 
+Theorem angle_lt_sub_prop :
+  ∀ θ1 θ2 θ3,
+  angle_lt_sub θ1 θ2 θ3
+  → (θ3 ≤ angle_straight)%A
+  → (θ1 - θ2)%A = θ3 ∨ (θ1 - θ2)%A = (- θ3)%A
+  → (θ1 ≤ θ2)%A
+  → False.
+Proof.
+destruct_ac.
+intros a b c H1 Hcs Hab Hab'.
+progress unfold angle_lt_sub in H1.
+progress unfold angle_diff in H1.
+rewrite (proj2 (angle_max_r_iff _ _) Hab') in H1.
+rewrite (proj2 (angle_min_l_iff _ _) Hab') in H1.
+destruct Hab as [Hab| Hab]. {
+  apply angle_sub_move_r in Hab.
+  subst a.
+  rewrite angle_sub_add_distr in H1.
+  rewrite angle_sub_sub_swap in H1.
+  rewrite angle_sub_diag in H1.
+  rewrite angle_sub_0_l in H1.
+  progress unfold angle_ltb in H1.
+  cbn in H1.
+  rewrite (rngl_leb_refl Hor) in H1.
+  rewrite (rngl_leb_0_opp Hop Hor) in H1.
+  generalize Hcs; intros H.
+  apply rngl_sin_nonneg_angle_le_straight in H.
+  apply rngl_leb_le in H.
+  rewrite H in H1.
+  destruct H1 as (H1, H2).
+  destruct (rngl_sin c ≤? 0)%L; [ | easy ].
+  apply rngl_ltb_lt in H2.
+  now apply (rngl_lt_irrefl Hor) in H2.
+}
+apply (f_equal angle_opp) in Hab.
+rewrite angle_opp_sub_distr in Hab.
+rewrite angle_opp_involutive in Hab.
+subst c.
+destruct H1 as (H1, H2).
+now apply angle_lt_irrefl in H2.
+Qed.
+
 (* to be completed
 Print is_derivative.
 Print derivative_at.
@@ -1091,14 +1190,14 @@ Theorem glop :
 Proof.
 destruct_ac.
 intros * Hcs.
-progress unfold angle_lt_sub.
-progress unfold angle_diff.
 split; intros H1. {
   apply (rngl_lt_iff Hor).
   split. {
     rewrite angle_eucl_dist_move_0_r.
     apply rngl_cos_le_iff_angle_eucl_le.
     destruct (angle_le_dec a b) as [Hab| Hab]. {
+      progress unfold angle_lt_sub in H1.
+      progress unfold angle_diff in H1.
       rewrite (proj2 (angle_max_r_iff _ _) Hab) in H1.
       rewrite (proj2 (angle_min_l_iff _ _) Hab) in H1.
       progress unfold angle_ltb in H1.
@@ -1123,6 +1222,8 @@ split; intros H1. {
     apply angle_nle_gt in Hab.
     generalize Hab; intros H.
     apply angle_lt_le_incl in H.
+    progress unfold angle_lt_sub in H1.
+    progress unfold angle_diff in H1.
     rewrite (proj2 (angle_max_l_iff _ _) H) in H1.
     rewrite (proj2 (angle_min_r_iff _ _) H) in H1.
     clear H.
@@ -1149,11 +1250,30 @@ split; intros H1. {
   rewrite angle_sub_0_r in Hab.
   rewrite angle_sub_0_l in Hab.
   destruct (angle_le_dec a b) as [Hab'| Hab']. {
-    rewrite (proj2 (angle_max_r_iff _ _) Hab') in H1.
-    rewrite (proj2 (angle_min_l_iff _ _) Hab') in H1.
-    destruct Hab as [Hab| Hab]. {
-...
-Search (angle_eucl_dist _ _ = angle_eucl_dist _ _).
+    now apply angle_lt_sub_prop in H1.
+  } {
+    rename a into d; rename b into a; rename d into b.
+    apply angle_nle_gt in Hab'.
+    apply angle_lt_le_incl in Hab'.
+    apply angle_lt_sub_comm_iff in H1.
+    assert (H : (a - b)%A = c ∨ (a - b)%A = (- c)%A). {
+      destruct Hab as [Hab| Hab]. {
+        right; subst c.
+        symmetry.
+        apply angle_opp_sub_distr.
+      }  {
+        left.
+        apply (f_equal angle_opp) in Hab.
+        rewrite angle_opp_involutive in Hab.
+        subst c.
+        symmetry.
+        apply angle_opp_sub_distr.
+      }
+    }
+    move H before Hab; clear Hab; rename H into Hab.
+    now apply angle_lt_sub_prop in H1.
+  }
+}
 ...
   do 2 rewrite angle_div_2_sub in H12.
   remember (θ3 ≤? θ1)%A as t31 eqn:Ht31.
