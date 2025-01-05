@@ -1096,15 +1096,20 @@ enough (H :
         ((rngl_cos (θ₀ + dθ) - rngl_cos θ₀) / angle_eucl_dist dθ 0)
         (- rngl_sin θ₀) < ε)%L). {
   destruct H as (η & ζ & Hζ & Hd).
-  exists η.
-  exists (rngl_min ζ 2).
-  split; [ admit | ].
+  exists (angle_min η angle_straight).
+  exists ζ.
+  split; [ easy | ].
   intros θ Hη Hθ.
   remember (θ - θ₀)%A as dθ eqn:H.
   symmetry in H.
   apply angle_sub_move_r in H.
   subst θ.
   assert (H : (0 < dθ < η)%A). {
+    destruct Hη as (H1, H2).
+Check rngl_min_glb_lt_iff.
+...
+    apply angle_min_glb_lt_iff in H2.
+...
     progress unfold angle_diff in Hη.
     destruct (angle_le_dec θ₀ (dθ + θ₀)) as [Htt| Htt]. {
       rewrite (proj2 (angle_max_l_iff _ _) Htt) in Hη.
