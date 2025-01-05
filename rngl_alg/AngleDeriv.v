@@ -1357,7 +1357,6 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply (rngl_le_add_l Hor).
   apply (rngl_0_le_1 Hon Hos Hor).
 }
-progress unfold angle_lt_sub.
 enough (H :
   ∃ η ζ, (0 < ζ)%L ∧
   ∀ dθ,
@@ -1371,6 +1370,15 @@ enough (H :
   exists ζ.
   split; [ easy | ].
   intros θ Hη Hθ.
+(*
+Inspect 1.
+apply angle_lt_sub_eucl_dist in Hη; [ | apply angle_le_min_r ].
+apply (rngl_lt_iff Hor) in Hη.
+destruct Hη as (H1, H2).
+rewrite angle_eucl_dist_move_0_r in H1.
+apply rngl_cos_le_iff_angle_eucl_le in H1.
+...
+*)
   remember (θ - θ₀)%A as dθ eqn:H.
   symmetry in H.
   apply angle_sub_move_r in H.
