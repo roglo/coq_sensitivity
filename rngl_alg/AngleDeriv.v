@@ -381,6 +381,7 @@ Qed.
 (* min max on angles *)
 
 Definition angle_min θ1 θ2 := if (θ1 ≤? θ2)%A then θ1 else θ2.
+Definition angle_max θ1 θ2 := if (θ1 ≤? θ2)%A then θ2 else θ1.
 
 Theorem angle_le_min_l : ∀ θ1 θ2, (angle_min θ1 θ2 ≤ θ1)%A.
 Proof.
@@ -402,6 +403,20 @@ symmetry in Ht12.
 destruct t12; [ easy | apply angle_le_refl ].
 Qed.
 
+Theorem angle_min_l_iff :
+  ∀ θ1 θ2, angle_min θ1 θ2 = θ1 ↔ (θ1 ≤ θ2)%A.
+Proof.
+intros.
+progress unfold angle_min.
+split; intros H12; [ | now rewrite H12 ].
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+destruct t12; [ easy | ].
+subst θ2.
+apply angle_leb_gt in Ht12.
+now apply angle_lt_irrefl in Ht12.
+Qed.
+
 Theorem angle_min_r_iff :
   ∀ θ1 θ2, angle_min θ1 θ2 = θ2 ↔ (θ2 ≤ θ1)%A.
 Proof.
@@ -419,9 +434,40 @@ split; intros H12. {
 }
 Qed.
 
+Theorem angle_max_l_iff :
+  ∀ θ1 θ2, angle_max θ1 θ2 = θ1 ↔ (θ2 ≤ θ1)%A.
+Proof.
+intros.
+progress unfold angle_max.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+split; intros H12. {
+  destruct t12; [ now subst θ2 | ].
+  apply angle_leb_gt in Ht12.
+  now apply angle_lt_le_incl in Ht12.
+} {
+  destruct t12; [ | easy ].
+  now apply angle_le_antisymm.
+}
+Qed.
+
+Theorem angle_max_r_iff :
+  ∀ θ1 θ2, angle_max θ1 θ2 = θ2 ↔ (θ1 ≤ θ2)%A.
+Proof.
+intros.
+progress unfold angle_max.
+remember (θ1 ≤? θ2)%A as t12 eqn:Ht12.
+symmetry in Ht12.
+destruct t12; [ easy | ].
+split; [ | easy ]; intros H12.
+subst θ2.
+now rewrite angle_le_refl in Ht12.
+Qed.
+
 (* end min max *)
 
-Definition angle_lt_sub θ1 θ2 θ3 := (0 < θ1 - θ2 < θ3)%A.
+Definition angle_diff θ1 θ2 := (angle_max θ1 θ2 - angle_min θ1 θ2)%A.
+Definition angle_lt_sub θ1 θ2 θ3 := (0 < angle_diff θ1 θ2 < θ3)%A.
 
 Definition old_is_limit_when_tending_to_neighbourhood {A B} da db lt_suba
      (f : A → B) (x₀ : A) (L : B) :=
@@ -470,13 +516,14 @@ split; intros Hff. {
     eapply angle_lt_le_trans; [ apply Hθ | ].
     apply angle_le_min_l.
   }
-  rewrite angle_eucl_dist_move_0_r.
   split. {
     apply (rngl_lt_iff Hor).
     split; [ apply angle_eucl_dist_nonneg | ].
     intros H; symmetry in H.
     apply angle_eucl_dist_separation in H.
-    rewrite H in Hθ.
+    subst θ.
+    progress unfold angle_diff in Hθ.
+    rewrite angle_sub_diag in Hθ.
     destruct Hθ as (H1, H2).
     now apply angle_lt_irrefl in H1.
   }
@@ -484,8 +531,20 @@ split; intros Hff. {
   apply rngl_cos_lt_angle_eucl_dist_lt. {
     now apply (rngl_lt_le_incl Hor) in Hζ.
   }
-  rewrite angle_sub_0_l.
-  rewrite rngl_cos_opp.
+  replace (rngl_cos (θ₀ - θ)) with (rngl_cos (angle_diff θ θ₀)). 2: {
+    progress unfold angle_diff.
+    destruct (angle_le_dec θ θ₀) as [Htt| Htt]. {
+      rewrite (proj2 (angle_min_l_iff _ _) Htt).
+      rewrite (proj2 (angle_max_r_iff _ _) Htt).
+      easy.
+    }
+    apply angle_nle_gt in Htt.
+    apply angle_lt_le_incl in Htt.
+    rewrite rngl_cos_sub_comm.
+    rewrite (proj2 (angle_min_r_iff _ _) Htt).
+    rewrite (proj2 (angle_max_l_iff _ _) Htt).
+    easy.
+  }
   destruct (rngl_le_dec Hor (1 - ζ² / 2)² 1) as [Hz1| Hz1]. {
     rewrite <- (rngl_cos_acos (1 - _))%L. 2: {
       now apply (rngl_squ_le_1_if Hon Hop Hor Hii).
@@ -933,6 +992,7 @@ rewrite (rngl_add_opp_l Hop).
 now apply H1.
 Qed.
 
+(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist angle_lt_sub
     rngl_cos (λ θ, (- rngl_sin θ)%L).
@@ -955,7 +1015,10 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   exists angle_right, ε.
   split; [ easy | ].
   progress unfold angle_lt_sub.
+  progress unfold angle_diff.
   intros dθ Hzθ Hdθ.
+  rewrite (proj2 (angle_max_l_iff _ _)) in Hzθ; [ | apply angle_nonneg ].
+  rewrite (proj2 (angle_min_r_iff _ _)) in Hzθ; [ | apply angle_nonneg ].
   rewrite angle_sub_0_r in Hzθ.
   rewrite (rngl_opp_0 Hop).
   rewrite rngl_cos_angle_eucl_dist_0_r.
@@ -1040,11 +1103,30 @@ enough (H :
   symmetry in H.
   apply angle_sub_move_r in H.
   subst θ.
+  assert (H : (0 < dθ < η)%A). {
+    progress unfold angle_diff in Hη.
+    destruct (angle_le_dec θ₀ (dθ + θ₀)) as [Htt| Htt]. {
+      rewrite (proj2 (angle_max_l_iff _ _) Htt) in Hη.
+      rewrite (proj2 (angle_min_r_iff _ _) Htt) in Hη.
+      now rewrite angle_add_sub in Hη.
+    }
+    apply angle_nle_gt in Htt.
+    generalize Htt; intros H.
+    apply angle_lt_le_incl in H.
+    rewrite (proj2 (angle_max_r_iff _ _) H) in Hη.
+    rewrite (proj2 (angle_min_l_iff _ _) H) in Hη.
+    clear H.
+    rewrite angle_sub_add_distr in Hη.
+    rewrite angle_sub_sub_swap in Hη.
+    rewrite angle_sub_diag in Hη.
+    rewrite angle_sub_0_l in Hη.
+...
   specialize (Hd dθ Hη).
   rewrite angle_eucl_dist_move_0_r in Hθ |-*.
   rewrite angle_add_sub in Hθ |-*.
   rewrite angle_add_comm.
   now apply Hd.
+...
 }
 destruct (angle_lt_dec θ₀ angle_straight) as [Htls| Htls]. {
   apply (rngl_cos_derivative_lemma_4 _ _ Hε).
@@ -1096,5 +1178,6 @@ rewrite (rngl_sub_opp_r Hop) in H1.
 rewrite (rngl_add_opp_l Hop) in H1.
 easy.
 Qed.
+*)
 
 End a.
