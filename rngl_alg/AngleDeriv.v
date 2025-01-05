@@ -1357,6 +1357,7 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply (rngl_le_add_l Hor).
   apply (rngl_0_le_1 Hon Hos Hor).
 }
+
 enough (H :
   ∃ η ζ, (0 < ζ)%L ∧
   ∀ dθ,
@@ -1370,32 +1371,77 @@ enough (H :
   exists ζ.
   split; [ easy | ].
   intros θ Hη Hθ.
-(*
-Inspect 1.
-apply angle_lt_sub_eucl_dist in Hη; [ | apply angle_le_min_r ].
-apply (rngl_lt_iff Hor) in Hη.
-destruct Hη as (H1, H2).
-rewrite angle_eucl_dist_move_0_r in H1.
-apply rngl_cos_le_iff_angle_eucl_le in H1.
-...
-*)
   remember (θ - θ₀)%A as dθ eqn:H.
   symmetry in H.
   apply angle_sub_move_r in H.
   subst θ.
-  assert (H : (0 < dθ < η)%A). {
-    destruct Hη as (H1, H2).
-    apply angle_min_glb_lt_iff in H2.
-    destruct H2 as (H2, H3).
-    progress unfold angle_diff in H3.
-...
-    progress unfold angle_diff in Hη.
-    destruct (angle_le_dec θ₀ (dθ + θ₀)) as [Htt| Htt]. {
-      rewrite (proj2 (angle_max_l_iff _ _) Htt) in Hη.
-      rewrite (proj2 (angle_min_r_iff _ _) Htt) in Hη.
-      now rewrite angle_add_sub in Hη.
+  rewrite angle_eucl_dist_move_0_r.
+  rewrite angle_add_sub.
+  rewrite angle_add_comm.
+  rewrite angle_eucl_dist_move_0_r in Hθ.
+  rewrite angle_add_sub in Hθ.
+  apply Hd; [ | easy ].
+  destruct Hη as (H1, H2).
+  apply angle_min_glb_lt_iff in H2.
+  destruct H2 as (H2, H3).
+  progress unfold angle_diff in H1.
+  progress unfold angle_diff in H2.
+  progress unfold angle_diff in H3.
+  destruct (angle_le_dec θ₀ (dθ + θ₀)) as [Htt| Htt]. {
+    rewrite (proj2 (angle_max_l_iff _ _) Htt) in H1, H2, H3.
+    rewrite (proj2 (angle_min_r_iff _ _) Htt) in H1, H2, H3.
+    now rewrite angle_add_sub in H1, H2, H3.
+  }
+  apply angle_nle_gt in Htt.
+  generalize Htt; intros H.
+  apply angle_lt_le_incl in H.
+  rewrite (proj2 (angle_max_r_iff _ _) H) in H1, H2, H3.
+  rewrite (proj2 (angle_min_l_iff _ _) H) in H1, H2, H3.
+  clear H.
+  rewrite angle_sub_add_distr in H1, H2, H3.
+  rewrite angle_sub_sub_swap in H1, H2, H3.
+  rewrite angle_sub_diag in H1, H2, H3.
+  rewrite angle_sub_0_l in H1, H2, H3.
+  apply angle_opp_lt_compat_if in H3. 2: {
+    intros H.
+    rewrite H in H1.
+    now apply angle_lt_irrefl in H1.
+  }
+  rewrite angle_opp_straight in H3.
+  rewrite angle_opp_involutive in H3.
+  assert (Hdd : (- dθ ≤ dθ)%A). {
+    progress unfold angle_ltb in H3.
+    progress unfold angle_leb.
+    cbn in H3 |-*.
+    rewrite (rngl_leb_refl Hor) in H3.
+    rewrite (rngl_leb_0_opp Hop Hor).
+    remember (0 ≤? rngl_sin dθ)%L as zs eqn:Hzs.
+    symmetry in Hzs.
+    destruct zs. {
+      exfalso.
+      apply rngl_ltb_lt in H3.
+      apply rngl_nle_gt in H3.
+      apply H3, rngl_cos_bound.
     }
-    apply angle_nle_gt in Htt.
+    clear H3.
+    apply (rngl_leb_gt Hor) in Hzs.
+    generalize Hzs; intros H.
+    apply (rngl_lt_le_incl Hor) in H.
+    apply rngl_leb_le in H.
+    now rewrite H.
+  }
+...
+  split; [ now apply (angle_lt_le_trans _ (- dθ)) | ].
+  apply (angle_le_lt_trans _ (- dθ)); [ | easy ].
+...
+  apply angle_opp_le_compat_if in Hdd. 2: {
+    intros H; rewrite H in H1.
+    now apply angle_lt_irrefl in H1.
+  }
+
+...
+Search (- _ < - _)%A.
+...
 exfalso.
 rewrite angle_eucl_dist_move_0_r in Hθ.
 rewrite angle_add_sub in Hθ.
