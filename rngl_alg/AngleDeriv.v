@@ -1060,4 +1060,41 @@ destruct (angle_lt_dec θ₀ angle_straight) as [Htls| Htls]. {
 }
 Qed.
 
+Theorem rngl_sin_derivative :
+  is_derivative angle_eucl_dist rngl_dist angle_lt_sub rngl_sin rngl_cos.
+Proof.
+destruct_ac.
+intros θ₀.
+specialize (rngl_cos_derivative (θ₀ + angle_right))%A as H1.
+intros ε Hε.
+specialize (H1 ε Hε).
+rewrite rngl_cos_add_right_r in H1.
+rewrite rngl_sin_add_right_r in H1.
+destruct H1 as (η & H1).
+exists η.
+progress unfold rngl_dist in H1 |-*.
+progress unfold angle_lt_sub in H1 |-*.
+intros θ Hθ.
+specialize (H1 (θ + angle_right))%A.
+rewrite rngl_cos_add_right_r in H1.
+rewrite angle_sub_add_distr in H1.
+rewrite angle_sub_sub_swap in H1.
+rewrite angle_add_sub in H1.
+specialize (H1 Hθ).
+do 2 rewrite (rngl_sub_opp_r Hop) in H1.
+rewrite angle_eucl_dist_move_0_r in H1.
+rewrite angle_sub_add_distr in H1.
+rewrite angle_sub_sub_swap in H1.
+rewrite angle_add_sub in H1.
+rewrite <- angle_eucl_dist_move_0_r in H1.
+rewrite <- (rngl_abs_opp Hop Hor) in H1.
+rewrite (rngl_opp_add_distr Hop) in H1.
+rewrite (rngl_opp_sub_swap Hop) in H1.
+rewrite <- (rngl_div_opp_l Hop Hiv) in H1.
+rewrite (rngl_opp_add_distr Hop) in H1.
+rewrite (rngl_sub_opp_r Hop) in H1.
+rewrite (rngl_add_opp_l Hop) in H1.
+easy.
+Qed.
+
 End a.
