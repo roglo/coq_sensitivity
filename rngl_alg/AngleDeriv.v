@@ -1172,62 +1172,25 @@ destruct H1 as (H1, H2).
 now apply angle_lt_irrefl in H2.
 Qed.
 
-(* to be completed
-Print is_derivative.
-Print derivative_at.
-Print is_limit_when_tending_to_neighbourhood.
-(*
-Il faut que lt_suba soit du genre
-  lt_suba a b c ↔ 0 < |a-b] < c
-
-Il faut que da soit tel que
-    0 < |a-b| < c ↔ d(a,b) < d(c,0)
-*)
-Theorem glop :
+Theorem angle_lt_sub_eucl_dist :
   ∀ a b c,
   (c ≤ angle_straight)%A
-  → angle_lt_sub a b c ↔ (angle_eucl_dist a b < angle_eucl_dist c 0)%L.
+  → angle_lt_sub a b c
+  → (angle_eucl_dist a b < angle_eucl_dist c 0)%L.
 Proof.
 destruct_ac.
-intros * Hcs.
-split; intros H1. {
-  apply (rngl_lt_iff Hor).
-  split. {
-    rewrite angle_eucl_dist_move_0_r.
-    apply rngl_cos_le_iff_angle_eucl_le.
-    destruct (angle_le_dec a b) as [Hab| Hab]. {
-      progress unfold angle_lt_sub in H1.
-      progress unfold angle_diff in H1.
-      rewrite (proj2 (angle_max_r_iff _ _) Hab) in H1.
-      rewrite (proj2 (angle_min_l_iff _ _) Hab) in H1.
-      progress unfold angle_ltb in H1.
-      progress unfold angle_leb in Hab.
-      cbn - [ angle_sub ] in H1.
-      rewrite (rngl_leb_refl Hor) in H1.
-      destruct H1 as (H1, H2).
-      rewrite rngl_cos_sub_comm.
-      apply rngl_sin_nonneg_angle_le_straight in Hcs.
-      generalize Hcs; intros H.
-      apply rngl_leb_le in H.
-      rewrite H in H2; clear H.
-      remember (0 ≤? rngl_sin a)%L as zsa eqn:Hzsa.
-      remember (0 ≤? rngl_sin b)%L as zsb eqn:Hzsb.
-      remember (0 ≤? rngl_sin (b - a))%L as zba eqn:Hzba.
-      symmetry in Hzsa, Hzsb, Hzba.
-      destruct zba; [ | easy ].
-      apply rngl_ltb_lt in H2.
-      now apply (rngl_lt_le_incl Hor) in H2.
-    }
-    rewrite rngl_cos_sub_comm.
-    apply angle_nle_gt in Hab.
-    generalize Hab; intros H.
-    apply angle_lt_le_incl in H.
+intros * Hcs H1.
+apply (rngl_lt_iff Hor).
+split. {
+  rewrite angle_eucl_dist_move_0_r.
+  apply rngl_cos_le_iff_angle_eucl_le.
+  destruct (angle_le_dec a b) as [Hab| Hab]. {
     progress unfold angle_lt_sub in H1.
     progress unfold angle_diff in H1.
-    rewrite (proj2 (angle_max_l_iff _ _) H) in H1.
-    rewrite (proj2 (angle_min_r_iff _ _) H) in H1.
-    clear H.
-    progress unfold angle_ltb in H1, Hab.
+    rewrite (proj2 (angle_max_r_iff _ _) Hab) in H1.
+    rewrite (proj2 (angle_min_l_iff _ _) Hab) in H1.
+    progress unfold angle_ltb in H1.
+    progress unfold angle_leb in Hab.
     cbn - [ angle_sub ] in H1.
     rewrite (rngl_leb_refl Hor) in H1.
     destruct H1 as (H1, H2).
@@ -1238,57 +1201,69 @@ split; intros H1. {
     rewrite H in H2; clear H.
     remember (0 ≤? rngl_sin a)%L as zsa eqn:Hzsa.
     remember (0 ≤? rngl_sin b)%L as zsb eqn:Hzsb.
-    remember (0 ≤? rngl_sin (a - b))%L as zab eqn:Hzab.
-    symmetry in Hzsa, Hzsb, Hzab.
-    destruct zab; [ | easy ].
+    remember (0 ≤? rngl_sin (b - a))%L as zba eqn:Hzba.
+    symmetry in Hzsa, Hzsb, Hzba.
+    destruct zba; [ | easy ].
     apply rngl_ltb_lt in H2.
     now apply (rngl_lt_le_incl Hor) in H2.
   }
-  intros Hab.
-  rewrite angle_eucl_dist_move_0_r in Hab.
-  apply angle_eucl_dist_eq_diag_r in Hab.
-  rewrite angle_sub_0_r in Hab.
-  rewrite angle_sub_0_l in Hab.
-  destruct (angle_le_dec a b) as [Hab'| Hab']. {
-    now apply angle_lt_sub_prop in H1.
-  } {
-    rename a into d; rename b into a; rename d into b.
-    apply angle_nle_gt in Hab'.
-    apply angle_lt_le_incl in Hab'.
-    apply angle_lt_sub_comm_iff in H1.
-    assert (H : (a - b)%A = c ∨ (a - b)%A = (- c)%A). {
-      destruct Hab as [Hab| Hab]. {
-        right; subst c.
-        symmetry.
-        apply angle_opp_sub_distr.
-      }  {
-        left.
-        apply (f_equal angle_opp) in Hab.
-        rewrite angle_opp_involutive in Hab.
-        subst c.
-        symmetry.
-        apply angle_opp_sub_distr.
-      }
-    }
-    move H before Hab; clear Hab; rename H into Hab.
-    now apply angle_lt_sub_prop in H1.
+  rewrite rngl_cos_sub_comm.
+  apply angle_nle_gt in Hab.
+  generalize Hab; intros H.
+  apply angle_lt_le_incl in H.
+  progress unfold angle_lt_sub in H1.
+  progress unfold angle_diff in H1.
+  rewrite (proj2 (angle_max_l_iff _ _) H) in H1.
+  rewrite (proj2 (angle_min_r_iff _ _) H) in H1.
+  clear H.
+  progress unfold angle_ltb in H1, Hab.
+  cbn - [ angle_sub ] in H1.
+  rewrite (rngl_leb_refl Hor) in H1.
+  destruct H1 as (H1, H2).
+  rewrite rngl_cos_sub_comm.
+  apply rngl_sin_nonneg_angle_le_straight in Hcs.
+  generalize Hcs; intros H.
+  apply rngl_leb_le in H.
+  rewrite H in H2; clear H.
+  remember (0 ≤? rngl_sin a)%L as zsa eqn:Hzsa.
+  remember (0 ≤? rngl_sin b)%L as zsb eqn:Hzsb.
+  remember (0 ≤? rngl_sin (a - b))%L as zab eqn:Hzab.
+  symmetry in Hzsa, Hzsb, Hzab.
+  destruct zab; [ | easy ].
+  apply rngl_ltb_lt in H2.
+  now apply (rngl_lt_le_incl Hor) in H2.
+}
+intros Hab.
+rewrite angle_eucl_dist_move_0_r in Hab.
+apply angle_eucl_dist_eq_diag_r in Hab.
+rewrite angle_sub_0_r in Hab.
+rewrite angle_sub_0_l in Hab.
+destruct (angle_le_dec a b) as [Hab'| Hab']. {
+  now apply angle_lt_sub_prop in H1.
+}
+rename a into d; rename b into a; rename d into b.
+apply angle_nle_gt in Hab'.
+apply angle_lt_le_incl in Hab'.
+apply angle_lt_sub_comm_iff in H1.
+assert (H : (a - b)%A = c ∨ (a - b)%A = (- c)%A). {
+  destruct Hab as [Hab| Hab]. {
+    right; subst c.
+    symmetry.
+    apply angle_opp_sub_distr.
+  }  {
+    left.
+    apply (f_equal angle_opp) in Hab.
+    rewrite angle_opp_involutive in Hab.
+    subst c.
+    symmetry.
+    apply angle_opp_sub_distr.
   }
 }
-...
-  do 2 rewrite angle_div_2_sub in H12.
-  remember (θ3 ≤? θ1)%A as t31 eqn:Ht31.
-  remember (θ3 ≤? θ2)%A as t32 eqn:Ht32.
-  symmetry in Ht31, Ht32.
-  destruct t31. {
-    destruct t32. {
-Search (rngl_sin _ = rngl_sin _).
-Search (rngl_sin (_ - _) = rngl_sin (_ - _)).
-...
-Search (rngl_sin (_ /₂)).
-About rngl_sin_angle_div_2_add_not_overflow.
-Search (rngl_sin_angle_div_2).
-...
+move H before Hab; clear Hab; rename H into Hab.
+now apply angle_lt_sub_prop in H1.
+Qed.
 
+(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist angle_lt_sub
     rngl_cos (λ θ, (- rngl_sin θ)%L).
