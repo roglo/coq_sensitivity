@@ -1096,8 +1096,9 @@ enough (H :
         ((rngl_cos (θ₀ + dθ) - rngl_cos θ₀) / angle_eucl_dist dθ 0)
         (- rngl_sin θ₀) < ε)%L). {
   destruct H as (η & ζ & Hζ & Hd).
-  exists η, ζ.
-  split; [ easy | ].
+  exists η.
+  exists (rngl_min ζ 2).
+  split; [ admit | ].
   intros θ Hη Hθ.
   remember (θ - θ₀)%A as dθ eqn:H.
   symmetry in H.
@@ -1111,6 +1112,35 @@ enough (H :
       now rewrite angle_add_sub in Hη.
     }
     apply angle_nle_gt in Htt.
+exfalso.
+rewrite angle_eucl_dist_move_0_r in Hθ.
+rewrite angle_add_sub in Hθ.
+destruct Hθ as (H1, H2).
+apply (rngl_min_glb_lt_iff Hor) in H2.
+destruct H2 as (H2, H3).
+apply angle_nle_gt in Htt.
+apply Htt; clear Htt.
+progress unfold angle_leb.
+rewrite angle_add_comm.
+remember (0 ≤? rngl_sin θ₀)%L as zs eqn:Hzs.
+symmetry in Hzs.
+remember (0 ≤? rngl_sin (θ₀ + dθ))%L as zsd eqn:Hzsd.
+symmetry in Hzsd.
+destruct zs. {
+  destruct zsd; [ | easy ].
+  apply rngl_leb_le in Hzs, Hzsd.
+  apply rngl_leb_le.
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+apply rngl_cos_add_le_cos; try easy.
+now left.
+Search (angle_eucl_dist
+...
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
+...
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
+...
     generalize Htt; intros H.
     apply angle_lt_le_incl in H.
     rewrite (proj2 (angle_max_r_iff _ _) H) in Hη.
