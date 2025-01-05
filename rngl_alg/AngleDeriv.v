@@ -992,6 +992,32 @@ rewrite (rngl_add_opp_l Hop).
 now apply H1.
 Qed.
 
+Theorem angle_lt_trans : ∀ θ1 θ2 θ3, (θ1 < θ2 → θ2 < θ3 → θ1 < θ3)%A.
+Proof.
+intros * H12 H23.
+apply (angle_le_lt_trans _ θ2); [ | easy ].
+now apply angle_lt_le_incl in H12.
+Qed.
+
+Theorem angle_min_glb_lt_iff :
+  ∀ θ1 θ2 θ3, (θ1 < angle_min θ2 θ3)%A ↔ (θ1 < θ2)%A ∧ (θ1 < θ3)%A.
+Proof.
+intros.
+progress unfold angle_min.
+remember (θ2 ≤? θ3)%A as t23 eqn:Ht23.
+symmetry in Ht23.
+split; intros H1. {
+  destruct t23. {
+    split; [ easy | ].
+    now apply (angle_lt_le_trans _ θ2).
+  }
+  split; [ | easy ].
+  apply angle_leb_gt in Ht23.
+  now apply (angle_lt_trans _ θ3).
+}
+now destruct t23.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist angle_lt_sub
@@ -1106,9 +1132,9 @@ enough (H :
   subst θ.
   assert (H : (0 < dθ < η)%A). {
     destruct Hη as (H1, H2).
-Check rngl_min_glb_lt_iff.
-...
     apply angle_min_glb_lt_iff in H2.
+    destruct H2 as (H2, H3).
+    progress unfold angle_diff in H3.
 ...
     progress unfold angle_diff in Hη.
     destruct (angle_le_dec θ₀ (dθ + θ₀)) as [Htt| Htt]. {
