@@ -1674,7 +1674,9 @@ destruct tt. {
     rewrite rngl_sin_add_straight_r.
     rewrite (rngl_mul_opp_r Hop).
     rewrite (rngl_opp_involutive Hop).
+(*
     rewrite angle_div_2_add_not_overflow; [ | easy ].
+*)
     rewrite (rngl_sin_angle_eucl_dist' ((θ - θ₀)/₂)). 2: {
       apply angle_div_2_le_straight.
     }
@@ -1696,7 +1698,20 @@ destruct tt. {
     rewrite (rngl_opp_sub_swap Hop).
     rewrite <- rngl_sin_opp.
     apply Hsc.
+    rewrite angle_opp_div_2.
+    remember (θ + θ₀ =? 0)%A as ttz eqn:Httz.
+    symmetry in Httz.
+    destruct ttz. {
+      apply angle_eqb_eq in Httz.
+      rewrite Httz.
+      rewrite angle_opp_0.
+      rewrite angle_0_div_2.
+      rewrite angle_add_0_l.
+...
+rewrite angle_opp_div_2.
+(*
     rewrite angle_opp_add_distr.
+*)
     rewrite angle_eucl_dist_move_0_r.
     rewrite angle_sub_sub_swap.
     do 2 rewrite <- angle_opp_add_distr.

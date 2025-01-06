@@ -500,7 +500,7 @@ destruct zs. {
 }
 Qed.
 
-Theorem angle_opp_div_2 :
+Theorem angle_opp_div_2' :
   ∀ θ, ((- θ) /₂ = - (θ /₂) + if (θ =? 0)%A then 0 else angle_straight)%A.
 Proof.
 destruct_ac.
@@ -759,7 +759,7 @@ split; intros H12. {
         progress sin_cos_opp_hyp T Hzc2.
         progress sin_cos_opp_goal T.
         rewrite angle_add_opp_r in H12z.
-        rewrite angle_opp_div_2 in Hzs12d.
+        rewrite angle_opp_div_2' in Hzs12d.
         remember (θ2 =? 0)%A as t2z eqn:Ht2z.
         symmetry in Ht2z.
         destruct t2z. {
