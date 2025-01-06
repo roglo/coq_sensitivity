@@ -1702,6 +1702,11 @@ destruct tt. {
     do 2 rewrite <- angle_opp_add_distr.
     rewrite <- angle_opp_0.
     rewrite angle_eucl_dist_opp_opp.
+    rewrite <- (angle_div_2_mul_2 θ₀) at 1.
+    (* lemma angle_add_mul_l_diag_r *)
+    rewrite <- (angle_mul_1_l (θ₀ /₂)) at 2.
+    rewrite <- angle_mul_add_distr_r.
+    cbn - [ angle_mul_nat ].
 ...
     rewrite (rngl_sub_opp_r Hop).
     rewrite (rngl_add_opp_l Hop).
