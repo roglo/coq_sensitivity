@@ -1366,6 +1366,16 @@ enough (H :
         ((rngl_cos (θ₀ + dθ) - rngl_cos θ₀) / angle_eucl_dist dθ 0)
         (- rngl_sin θ₀) < ε)%L). {
   destruct H as (η & ζ & Hζ & Hd).
+  progress unfold angle_lt_sub.
+  progress unfold angle_diff.
+(* problème : angle_diff et angle_eucl_dist ont le même problème :
+   on ne sait pas dans quelle direction se trouve dθ ;
+   la solution par angle_lt_sub ne permet pas de résoudre
+   la question *)
+Inspect 1.
+(* mais alors pourquoi angle_lt_sub_eucl_dist est une implication
+   et pas une équivalence, alors ? *)
+...
   exists (angle_min η angle_right).
   exists ζ.
   split; [ easy | ].
