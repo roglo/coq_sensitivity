@@ -1678,25 +1678,31 @@ destruct tt. {
     rewrite (rngl_sin_angle_eucl_dist' ((θ - θ₀)/₂)). 2: {
       apply angle_div_2_le_straight.
     }
-...
-    rewrite angle_mul_2_div_2, Htls, angle_add_0_r.
     rewrite angle_div_2_mul_2.
     rewrite (rngl_mul_div_assoc Hiv).
-    rewrite (rngl_div_opp_l Hop Hiv).
     rewrite (rngl_div_div_swap Hic Hiv).
+    rewrite <- (angle_eucl_dist_move_0_r θ).
     rewrite (rngl_mul_div Hi1). 2: {
       intros H.
       rewrite H in H1.
       now apply (rngl_lt_irrefl Hor) in H1.
     }
-    rewrite <- (rngl_div_opp_l Hop Hiv).
     rewrite (rngl_mul_comm Hic).
-    rewrite <- (rngl_mul_opp_l Hop).
     rewrite (rngl_mul_div Hi1). 2: {
       apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
     }
     rewrite <- (rngl_abs_opp Hop Hor).
     rewrite (rngl_opp_add_distr Hop).
+    rewrite (rngl_opp_sub_swap Hop).
+    rewrite <- rngl_sin_opp.
+    apply Hsc.
+    rewrite angle_opp_add_distr.
+    rewrite angle_eucl_dist_move_0_r.
+    rewrite angle_sub_sub_swap.
+    do 2 rewrite <- angle_opp_add_distr.
+    rewrite <- angle_opp_0.
+    rewrite angle_eucl_dist_opp_opp.
+...
     rewrite (rngl_sub_opp_r Hop).
     rewrite (rngl_add_opp_l Hop).
     rewrite angle_add_comm.
