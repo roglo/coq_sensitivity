@@ -1703,10 +1703,13 @@ destruct tt. {
     symmetry in Httz.
     destruct ttz. {
       apply angle_eqb_eq in Httz.
-      rewrite Httz.
-      rewrite angle_opp_0.
-      rewrite angle_0_div_2.
-      rewrite angle_add_0_l.
+      apply angle_add_move_0_r in Httz.
+      subst θ.
+      rewrite angle_add_overflow_comm in Hovt.
+      now rewrite angle_add_overflow_opp in Hovt.
+    }
+    apply angle_eqb_neq in Httz.
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
 ...
 rewrite angle_opp_div_2.
 (*
