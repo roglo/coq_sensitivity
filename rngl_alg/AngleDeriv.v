@@ -1698,6 +1698,7 @@ destruct tt. {
     rewrite (rngl_opp_sub_swap Hop).
     rewrite <- rngl_sin_opp.
     apply Hsc.
+(*
     rewrite angle_opp_div_2.
     remember (θ + θ₀ =? 0)%A as ttz eqn:Httz.
     symmetry in Httz.
@@ -1709,14 +1710,16 @@ destruct tt. {
       now rewrite angle_add_overflow_opp in Hovt.
     }
     apply angle_eqb_neq in Httz.
+*)
     eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
     rewrite angle_eucl_dist_move_0_r.
     rewrite (angle_eucl_dist_move_0_r θ).
+(*
     rewrite angle_add_sub_swap.
+*)
     apply rngl_cos_le_iff_angle_eucl_le.
-...
-    rewrite rngl_cos_add_straight_r.
-Search (- rngl_cos _)%L.
+    rewrite <- angle_opp_add_distr.
+    rewrite rngl_cos_opp.
 ...
 rewrite angle_opp_div_2.
 (*
