@@ -1721,6 +1721,21 @@ rewrite (rngl_mul_div Hi1). 2: {
 remember (angle_add_overflow θ θ₀) as ovt eqn:Hovt.
 remember (θ <? θ₀)%A as tt eqn:Htt.
 symmetry in Hovt, Htt.
+Check rngl_cos_sub_cos.
+...
+-Theorem rngl_sin_add_sin :
+-  ∀ p q,
+-  let c₁ := if angle_add_overflow p q then angle_straight else 0%A in
+-  let c₂ := if (p <? q)%A then angle_straight else 0%A in
+-  (rngl_sin p + rngl_sin q =
+-      2 * rngl_sin ((p + q) /₂ + c₁) * rngl_cos ((p - q) /₂ + c₂))%L.
+-Theorem rngl_sin_sub_sin :
+-  ∀ p q,
+-  let c₁ := if angle_add_overflow p q then angle_straight else 0%A in
+-  let c₂ := if (p <? q)%A then angle_straight else 0%A in
+-  (rngl_sin p - rngl_sin q =
+-      2 * rngl_cos ((p + q) /₂ + c₁) * rngl_sin ((p - q) /₂ + c₂))%L.
+...
 (*
 (* qu'est-ce que ça donne pour θ₀ < θ ? *)
 destruct tt. 2: {
