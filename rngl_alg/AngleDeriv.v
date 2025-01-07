@@ -1684,22 +1684,27 @@ destruct tt. {
     rewrite H in H1.
     now apply (rngl_lt_irrefl Hor) in H1.
   }
+  rewrite (rngl_mul_comm Hic).
+  rewrite (rngl_mul_div Hi1). 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
 (*
   (* voyons voir si on commence avec ovt = true... *)
   destruct ovt. {
     rewrite rngl_sin_add_straight_r.
-    rewrite (rngl_mul_opp_r Hop).
-    rewrite (rngl_div_opp_l Hop Hiv).
     rewrite <- (rngl_sub_opp_r Hop).
     rewrite <- (rngl_opp_add_distr Hop).
     rewrite (rngl_abs_opp Hop Hor).
     rewrite (rngl_add_opp_l Hop).
-    rewrite (rngl_mul_comm Hic).
-    rewrite (rngl_mul_div Hi1). 2: {
-      apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-    }
+(*
+  Hovt : angle_add_overflow θ θ₀ = true
+  Htt : (θ < θ₀)%A
+  ============================
+  (rngl_abs (rngl_sin ((θ + θ₀) /₂) - rngl_sin θ₀) < ε)%L
+*)
     apply Hsc.
 (*
+  Hovt : angle_add_overflow θ θ₀ = true
   Htt : (θ < θ₀)%A
   ============================
   (angle_eucl_dist ((θ + θ₀) /₂) θ₀ < η)%L
@@ -1708,19 +1713,21 @@ destruct tt. {
 *)
   destruct ovt. 2: {
     rewrite angle_add_0_r.
-    rewrite (rngl_mul_comm Hic).
-    rewrite (rngl_mul_div Hi1). 2: {
-      apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-    }
+(*
+  Hovt : angle_add_overflow θ θ₀ = false
+  Htt : (θ < θ₀)%A
+  ============================
+  (rngl_abs (rngl_sin ((θ + θ₀) /₂) + rngl_sin θ₀) < ε)%L
+*)
     rewrite <- (rngl_abs_opp Hop Hor).
     rewrite (rngl_opp_add_distr Hop).
     rewrite (rngl_opp_sub_swap Hop).
     rewrite <- rngl_sin_opp.
     apply Hsc.
-(**)
     rewrite <- (angle_opp_involutive θ₀) at 2.
     rewrite angle_eucl_dist_opp_opp.
 (*
+  Hovt : angle_add_overflow θ θ₀ = false
   Htt : (θ < θ₀)%A
   ============================
   (angle_eucl_dist ((θ + θ₀) /₂) (- θ₀) < η)%L
