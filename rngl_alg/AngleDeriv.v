@@ -1669,9 +1669,46 @@ remember (angle_add_overflow θ θ₀) as ovt eqn:Hovt.
 remember (θ <? θ₀)%A as tt eqn:Htt.
 symmetry in Hovt, Htt.
 destruct tt. {
+  rewrite rngl_sin_add_straight_r.
+(*
+  (* voyons voir si on commence avec ovt = true... *)
+  destruct ovt. {
+    rewrite rngl_sin_add_straight_r.
+    do 2 rewrite (rngl_mul_opp_r Hop).
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_opp_involutive Hop).
+    rewrite (rngl_div_opp_l Hop Hiv).
+    rewrite <- (rngl_sub_opp_r Hop).
+    rewrite <- (rngl_opp_add_distr Hop).
+    rewrite (rngl_abs_opp Hop Hor).
+    rewrite rngl_add_comm.
+    rewrite (rngl_add_opp_r Hop).
+    rewrite (rngl_sin_angle_eucl_dist' ((θ - θ₀)/₂)). 2: {
+      apply angle_div_2_le_straight.
+    }
+    rewrite angle_div_2_mul_2.
+    rewrite (rngl_mul_div_assoc Hiv).
+    rewrite (rngl_div_div_swap Hic Hiv).
+    rewrite <- (angle_eucl_dist_move_0_r θ).
+    rewrite (rngl_mul_div Hi1). 2: {
+      intros H.
+      rewrite H in H1.
+      now apply (rngl_lt_irrefl Hor) in H1.
+    }
+    rewrite (rngl_mul_comm Hic).
+    rewrite (rngl_mul_div Hi1). 2: {
+      apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+    }
+    apply Hsc.
+(*
+  Htt : (θ < θ₀)%A
+  ============================
+  (angle_eucl_dist ((θ + θ₀) /₂) θ₀ < η)%L
+*)
+...
+*)
   destruct ovt. 2: {
     rewrite angle_add_0_r.
-    rewrite rngl_sin_add_straight_r.
     rewrite (rngl_mul_opp_r Hop).
     rewrite (rngl_opp_involutive Hop).
 (*
@@ -1697,16 +1734,16 @@ destruct tt. {
     rewrite (rngl_opp_add_distr Hop).
     rewrite (rngl_opp_sub_swap Hop).
     rewrite <- rngl_sin_opp.
-specialize (rngl_sin_is_continuous θ₀) as H.
-progress unfold continuous_at in H.
-progress unfold is_limit_when_tending_to in H.
-progress unfold rngl_dist in H.
-specialize (H ε Hε).
-destruct H as (η' & Hη' & H).
-apply H.
-(* bon, c'est le bordel *)
-...
     apply Hsc.
+(**)
+    rewrite <- (angle_opp_involutive θ₀) at 2.
+    rewrite angle_eucl_dist_opp_opp.
+(*
+  Htt : (θ < θ₀)%A
+  ============================
+  (angle_eucl_dist ((θ + θ₀) /₂) (- θ₀) < η)%L
+*)
+...
     rewrite angle_eucl_dist_move_0_r.
     rewrite <- angle_opp_add_distr.
     rewrite <- angle_opp_0.
