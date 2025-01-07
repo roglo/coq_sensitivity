@@ -1545,6 +1545,44 @@ easy.
 Qed.
 *)
 
+Theorem rngl_sin_add_div_2_if_angle_eucl_dist :
+  ∀ θ1 θ2,
+  rngl_sin ((θ1 - θ2) /₂ + if (θ1 <? θ2)%A then angle_straight else 0) =
+  ((if (θ1 <? θ2)%A then -1 else 1) * angle_eucl_dist θ1 θ2 / 2)%L.
+Proof.
+destruct_ac.
+intros.
+remember (θ1 <? θ2)%A as b eqn:Hb.
+symmetry in Hb.
+symmetry.
+destruct b. {
+  rewrite rngl_sin_add_straight_r.
+  rewrite rngl_sin_angle_eucl_dist'. 2: {
+    apply angle_div_2_le_straight.
+  }
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_div_opp_l Hop Hiv).
+  f_equal; f_equal.
+  rewrite angle_div_2_mul_2.
+  apply angle_eucl_dist_move_0_r.
+} {
+  rewrite angle_add_0_r.
+  rewrite rngl_sin_angle_eucl_dist'. 2: {
+    apply angle_div_2_le_straight.
+  }
+  rewrite (rngl_mul_1_l Hon).
+  f_equal.
+  rewrite angle_div_2_mul_2.
+  apply angle_eucl_dist_move_0_r.
+}
+Qed.
+
+Theorem angle_add_if_distr_r :
+  ∀ (u : bool) a b c,
+  ((if u then a else b) + c = if u then a + c else b + c)%A.
+Proof. now intros; destruct u. Qed.
+
 Definition new_is_limit_when_tending_to_neighbourhood {A B} da db
      (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε : T, 0 < ε → ∃ η : T, ∀ x : A, 0 < da x x₀ < η → db (f x) L < ε)%L.
@@ -1665,98 +1703,73 @@ destruct H2 as (H2, H5).
 progress unfold rngl_dist.
 rewrite (rngl_sub_opp_r Hop).
 rewrite rngl_cos_sub_cos.
+(**)
+rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
+rewrite (rngl_mul_div_assoc Hiv).
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_comm Hic 2).
+rewrite (rngl_mul_div Hi1). 2: {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+rewrite (rngl_div_opp_l Hop Hiv).
+rewrite rngl_mul_assoc.
+rewrite (rngl_mul_div Hi1). 2: {
+  intros H.
+  rewrite H in H1.
+  now apply (rngl_lt_irrefl Hor) in H1.
+}
 remember (angle_add_overflow θ θ₀) as ovt eqn:Hovt.
 remember (θ <? θ₀)%A as tt eqn:Htt.
 symmetry in Hovt, Htt.
+(*
 (* qu'est-ce que ça donne pour θ₀ < θ ? *)
 destruct tt. 2: {
   apply angle_ltb_ge in Htt.
-  rewrite angle_add_0_r.
-  rewrite (rngl_sin_angle_eucl_dist' ((θ - θ₀)/₂)). 2: {
-    apply angle_div_2_le_straight.
-  }
-  rewrite angle_div_2_mul_2.
-  rewrite <- (angle_eucl_dist_move_0_r θ).
-  rewrite (rngl_mul_div_assoc Hiv).
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic).
-  rewrite (rngl_mul_div Hi1). 2: {
-    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-  }
-  rewrite (rngl_div_opp_l Hop Hiv).
-  rewrite (rngl_mul_div Hi1). 2: {
-    intros H.
-    rewrite H in H1.
-    now apply (rngl_lt_irrefl Hor) in H1.
-  }
+  rewrite (rngl_mul_1_r Hon).
   rewrite (rngl_add_opp_l Hop).
   rewrite <- (rngl_abs_opp Hop Hor).
   rewrite (rngl_opp_sub_distr Hop).
+  remember (_ + _)%A as x eqn:Hx.
+(*
+  Htt : (θ₀ ≤ θ)%A
+  Hx : x = ((θ + θ₀) /₂ + (if ovt then angle_straight else 0))%A
+  ============================
+  (rngl_abs (rngl_sin x - rngl_sin θ₀) < ε)%L
+*)
   apply Hsc.
+(*
+  Htt : (θ₀ ≤ θ)%A
+  Hx : x = ((θ + θ₀) /₂ + (if ovt then angle_straight else 0))%A
+  ============================
+  (angle_eucl_dist x θ₀ < η)%L
+*)
 ...
+*)
 destruct tt. {
-  rewrite rngl_sin_add_straight_r.
-  rewrite (rngl_sin_angle_eucl_dist' ((θ - θ₀)/₂)). 2: {
-    apply angle_div_2_le_straight.
-  }
-  rewrite angle_div_2_mul_2.
-  rewrite <- (angle_eucl_dist_move_0_r θ).
   rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_mul_1_r Hon).
   rewrite (rngl_opp_involutive Hop).
-  rewrite (rngl_mul_div_assoc Hiv).
-  rewrite (rngl_div_div_swap Hic Hiv).
-  rewrite (rngl_mul_div Hi1). 2: {
-    intros H.
-    rewrite H in H1.
-    now apply (rngl_lt_irrefl Hor) in H1.
-  }
-  rewrite (rngl_mul_comm Hic).
-  rewrite (rngl_mul_div Hi1). 2: {
-    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-  }
+  rewrite <- (rngl_abs_opp Hop Hor).
+  rewrite rngl_add_comm.
+  rewrite (rngl_opp_add_distr Hop).
+  rewrite <- rngl_sin_add_straight_r.
+  rewrite <- angle_add_assoc.
+  rewrite angle_add_if_distr_r.
+  rewrite angle_straight_add_straight.
+  rewrite angle_add_0_l.
+  remember (_ + _)%A as x eqn:Hx.
 (*
-  (* voyons voir si on commence avec ovt = true... *)
-  destruct ovt. {
-    rewrite rngl_sin_add_straight_r.
-    rewrite <- (rngl_sub_opp_r Hop).
-    rewrite <- (rngl_opp_add_distr Hop).
-    rewrite (rngl_abs_opp Hop Hor).
-    rewrite (rngl_add_opp_l Hop).
-(*
-  Hovt : angle_add_overflow θ θ₀ = true
   Htt : (θ < θ₀)%A
+  Hx : x = ((θ + θ₀) /₂ + (if ovt then 0 else angle_straight))%A
   ============================
-  (rngl_abs (rngl_sin ((θ + θ₀) /₂) - rngl_sin θ₀) < ε)%L
+  (rngl_abs (rngl_sin x - rngl_sin θ₀) < ε)%L
 *)
-    apply Hsc.
+  apply Hsc.
 (*
-  Hovt : angle_add_overflow θ θ₀ = true
   Htt : (θ < θ₀)%A
+  Hx : x = ((θ + θ₀) /₂ + (if ovt then 0 else angle_straight))%A
   ============================
-  (angle_eucl_dist ((θ + θ₀) /₂) θ₀ < η)%L
-*)
-...
-*)
-  destruct ovt. 2: {
-    rewrite angle_add_0_r.
-(*
-  Hovt : angle_add_overflow θ θ₀ = false
-  Htt : (θ < θ₀)%A
-  ============================
-  (rngl_abs (rngl_sin ((θ + θ₀) /₂) + rngl_sin θ₀) < ε)%L
-*)
-    rewrite <- (rngl_abs_opp Hop Hor).
-    rewrite (rngl_opp_add_distr Hop).
-    rewrite (rngl_opp_sub_swap Hop).
-    rewrite <- rngl_sin_opp.
-    apply Hsc.
-    rewrite <- (angle_opp_involutive θ₀) at 2.
-    rewrite angle_eucl_dist_opp_opp.
-(*
-  Hovt : angle_add_overflow θ θ₀ = false
-  Htt : (θ < θ₀)%A
-  ============================
-  (angle_eucl_dist ((θ + θ₀) /₂) (- θ₀) < η)%L
+  (angle_eucl_dist x θ₀ < η)%L
 *)
 ...
 *)
