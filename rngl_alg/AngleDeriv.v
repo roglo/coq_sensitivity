@@ -1697,11 +1697,21 @@ destruct tt. {
     rewrite (rngl_opp_add_distr Hop).
     rewrite (rngl_opp_sub_swap Hop).
     rewrite <- rngl_sin_opp.
+specialize (rngl_sin_is_continuous θ₀) as H.
+progress unfold continuous_at in H.
+progress unfold is_limit_when_tending_to in H.
+progress unfold rngl_dist in H.
+specialize (H ε Hε).
+destruct H as (η' & Hη' & H).
+apply H.
+(* bon, c'est le bordel *)
+...
     apply Hsc.
     rewrite angle_eucl_dist_move_0_r.
     rewrite <- angle_opp_add_distr.
     rewrite <- angle_opp_0.
     rewrite angle_eucl_dist_opp_opp.
+(* mais si θ et θ₀ sont petits, cette condition ne marcherait pas ! *)
 ...
     rewrite (angle_eucl_dist_move_0_r θ).
 (*
