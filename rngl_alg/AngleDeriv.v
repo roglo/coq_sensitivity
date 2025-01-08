@@ -1824,7 +1824,16 @@ destruct tt. {
       rewrite <- angle_add_assoc.
       rewrite angle_straight_add_straight.
       rewrite angle_add_0_r.
-Search (angle_eucl_dist (_ /₂)).
+      eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
+      rewrite (angle_eucl_dist_move_0_r θ).
+      apply angle_le_angle_eucl_dist_le; cycle 2. {
+        apply angle_div_2_le.
+      } {
+        apply angle_div_2_le_straight.
+      }
+(* je pense que c'est faux *)
+Check angle_le_angle_eucl_dist_le.
+(* conditions trop fortes *)
 ...
 *)
 
