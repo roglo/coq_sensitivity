@@ -4,6 +4,8 @@ Require Import Main.RingLike.
 Require Import RealLike.
 Require Import Angle.
 
+Class angle_base T {ro : ring_like_op T} := { ab_val : angle T }.
+
 Section a.
 
 Context {T : Type}.
@@ -12,7 +14,9 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Definition angle_leb θ1 θ2 :=
+Definition angle_leb {av : angle_base T} θ1 θ2 :=
+  let θ1 := (θ1 - ab_val)%A in
+  let θ2 := (θ2 - ab_val)%A in
   if (0 ≤? rngl_sin θ1)%L then
     if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 ≤? rngl_cos θ1)%L
     else true
@@ -20,7 +24,9 @@ Definition angle_leb θ1 θ2 :=
     if (0 ≤? rngl_sin θ2)%L then false
     else (rngl_cos θ1 ≤? rngl_cos θ2)%L.
 
-Definition angle_ltb θ1 θ2 :=
+Definition angle_ltb {av : angle_base T} θ1 θ2 :=
+  let θ1 := (θ1 - ab_val)%A in
+  let θ2 := (θ2 - ab_val)%A in
   if (0 ≤? rngl_sin θ1)%L then
     if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 <? rngl_cos θ1)%L
     else true
@@ -50,6 +56,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
+Context {av : angle_base T}.
 
 Theorem angle_nlt_ge : ∀ θ1 θ2, ¬ (θ1 < θ2)%A ↔ (θ2 ≤ θ1)%A.
 Proof.
@@ -57,6 +64,10 @@ destruct_ac.
 intros.
 progress unfold angle_ltb.
 progress unfold angle_leb.
+rename θ1 into θ3.
+rename θ2 into θ4.
+set (θ1 := (θ3 - ab_val)%A).
+set (θ2 := (θ4 - ab_val)%A).
 destruct (0 ≤? rngl_sin θ1)%L. {
   destruct (0 ≤? rngl_sin θ2)%L; [ | easy ].
   split; intros H. {
@@ -85,6 +96,10 @@ destruct_ac.
 intros.
 progress unfold angle_ltb.
 progress unfold angle_leb.
+rename θ1 into θ3.
+rename θ2 into θ4.
+set (θ1 := (θ3 - ab_val)%A).
+set (θ2 := (θ4 - ab_val)%A).
 destruct (0 ≤? rngl_sin θ1)%L. {
   destruct (0 ≤? rngl_sin θ2)%L; [ | easy ].
   split; intros H. {
@@ -113,6 +128,7 @@ Proof.
 destruct_ac.
 intros Hc1.
 progress unfold angle_ltb.
+...
 cbn.
 rewrite (rngl_leb_refl Hor).
 apply rngl_ltb_lt.
