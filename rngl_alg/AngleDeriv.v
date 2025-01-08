@@ -1824,8 +1824,66 @@ destruct tt. {
       rewrite <- angle_add_assoc.
       rewrite angle_straight_add_straight.
       rewrite angle_add_0_r.
+(**)
+      rewrite <- angle_eucl_dist_opp_opp.
+      rewrite angle_opp_0.
+      rewrite angle_opp_div_2.
+      remember (θ - θ₀ =? 0)%A as ttz eqn:Httz.
+      symmetry in Httz.
+      destruct ttz. {
+        apply angle_eqb_eq in Httz.
+        apply -> angle_sub_move_0_r in Httz.
+        rewrite Httz in Htt.
+        now apply angle_lt_irrefl in Htt.
+      }
+      rewrite angle_opp_sub_distr.
+      rewrite <- angle_sub_straight_eq_add_straight.
+      rewrite <- angle_eucl_dist_move_0_r
+(* je le sens moyen, tout ça... *)
+...
       eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
       rewrite (angle_eucl_dist_move_0_r θ).
+(**)
+      rewrite <- angle_eucl_dist_opp_opp.
+      rewrite <- (angle_eucl_dist_opp_opp _ 0).
+      rewrite angle_opp_0.
+      rewrite angle_opp_div_2.
+      rewrite angle_opp_sub_distr.
+      remember (θ - θ₀ =? 0)%A as ttz eqn:Httz.
+      symmetry in Httz.
+      destruct ttz. {
+        apply angle_eqb_eq in Httz.
+        apply -> angle_sub_move_0_r in Httz.
+        rewrite Httz in Htt.
+        now apply angle_lt_irrefl in Htt.
+      }
+      rewrite <- angle_sub_straight_eq_add_straight.
+      do 2 rewrite <- angle_eucl_dist_move_0_r
+...
+rewrite <- angle_opp_0.
+rewrite <- (angle_opp_involutive (_ /₂)).
+rewrite <- (angle_opp_involutive (_ - _)).
+Search (angle_eucl_dist (- _) (- _)).
+do 2 rewrite -> angle_eucl_dist_opp_opp.
+...
+(**)
+      (* theorem to be renamed *)
+      apply rngl_cos_le_iff_angle_eucl_le.
+      rewrite rngl_cos_sub_comm.
+      rewrite <- (rngl_cos_opp (_ /₂)).
+      rewrite angle_opp_div_2.
+      remember (θ - θ₀ =? 0)%A as ttz eqn:Httz.
+      symmetry in Httz.
+      destruct ttz. {
+        apply angle_eqb_eq in Httz.
+        apply -> angle_sub_move_0_r in Httz.
+        rewrite Httz in Htt.
+        now apply angle_lt_irrefl in Htt.
+      }
+      rewrite angle_opp_sub_distr.
+      rewrite rngl_cos_add_straight_r.
+(* putain ça marche pas *)
+...
       apply angle_le_angle_eucl_dist_le; cycle 2. {
         apply angle_div_2_le.
       } {
