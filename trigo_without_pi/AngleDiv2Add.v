@@ -1116,6 +1116,25 @@ symmetry.
 apply angle_add_0_r.
 Qed.
 
+Theorem angle_div_2_sub' :
+  ∀ θ1 θ2,
+    (θ1 /₂ - θ2 /₂)%A =
+    if (θ2 ≤? θ1)%A then
+      ((θ1 - θ2) /₂)%A
+    else
+      ((θ1 - θ2) /₂ + angle_straight)%A.
+Proof.
+intros.
+rewrite angle_div_2_sub.
+remember (θ2 ≤? θ1)%A as tt eqn:Htt.
+symmetry in Htt.
+destruct tt; [ easy | ].
+rewrite <- angle_add_assoc.
+rewrite angle_straight_add_straight.
+symmetry.
+apply angle_add_0_r.
+Qed.
+
 Theorem angle_div_2_add_not_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false

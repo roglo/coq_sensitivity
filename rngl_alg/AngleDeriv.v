@@ -1785,6 +1785,46 @@ destruct tt. {
   ============================
   (angle_eucl_dist x θ₀ < η)%L
 *)
+  subst x.
+  destruct (angle_lt_dec θ₀ angle_straight) as [Htzs| Htzs]. {
+    destruct ovt. 2: {
+      rewrite angle_eucl_dist_move_0_r.
+      rewrite <- (angle_div_2_mul_2 θ₀) at 2.
+      rewrite angle_mul_nat_div_2. 2: {
+        cbn.
+        rewrite angle_add_0_r.
+        rewrite Bool.orb_false_r.
+        now apply angle_lt_straight_add_same_not_overflow.
+      }
+      rewrite angle_add_sub_swap.
+      rewrite angle_div_2_sub'.
+      rewrite angle_mul_2_l.
+      rewrite angle_sub_add_distr.
+      rewrite angle_add_sub.
+      (* lemma *)
+      rewrite (angle_add_comm θ).
+      remember (_ + _ ≤? _ + _)%A as b eqn:Hb.
+      symmetry in Hb.
+      destruct b. {
+        exfalso.
+        apply angle_nlt_ge in Hb.
+        apply Hb; clear Hb.
+        apply angle_lt_iff.
+        split. {
+          apply angle_lt_le_incl in Htt.
+          apply angle_add_le_mono_l; [ | easy ].
+          now apply angle_lt_straight_add_same_not_overflow.
+        }
+        intros H.
+        apply angle_add_move_l in H.
+        rewrite angle_add_sub in H.
+        rewrite H in Htt.
+        now apply angle_lt_irrefl in Htt.
+      }
+      rewrite <- angle_add_assoc.
+      rewrite angle_straight_add_straight.
+      rewrite angle_add_0_r.
+Search (angle_eucl_dist (_ /₂)).
 ...
 *)
 
