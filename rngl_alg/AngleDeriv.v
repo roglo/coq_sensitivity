@@ -1765,6 +1765,24 @@ destruct tt. 2: {
   destruct ovt. 2: {
     rewrite angle_add_0_r.
     eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
+    rewrite angle_eucl_dist_move_0_r.
+    rewrite (angle_eucl_dist_move_0_r θ).
+    rewrite <- (angle_div_2_mul_2 θ₀) at 2.
+    rewrite angle_mul_nat_div_2. 2: {
+      cbn.
+      rewrite angle_add_0_r.
+      rewrite Bool.orb_false_r.
+      apply angle_lt_straight_add_same_not_overflow.
+      apply (angle_le_lt_trans _ θ);[ easy | ].
+(* mouais... peut-être en utilisant H3 ? *)
+...
+    apply angle_le_angle_eucl_dist_le; cycle 2. {
+
+        apply angle_div_2_le.
+      } {
+        apply angle_div_2_le_straight.
+      }
+    apply angle_le_angle_eucl_dist_le.
 ...
 (**)
 destruct tt. {
