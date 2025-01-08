@@ -1742,7 +1742,7 @@ Theorem rngl_sin_sub_sin :
       2 * rngl_cos ((p + q) /₂ + c₁) * rngl_sin ((p - q) /₂ + c₂))%L.
 ...
 *)
-(*
+(**)
 (* qu'est-ce que ça donne pour θ₀ < θ ? *)
 destruct tt. 2: {
   apply angle_ltb_ge in Htt.
@@ -1761,8 +1761,12 @@ destruct tt. 2: {
   ============================
   (angle_eucl_dist x θ₀ < η)%L
 *)
+  subst x.
+  destruct ovt. 2: {
+    rewrite angle_add_0_r.
+    eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 ...
-*)
+(**)
 destruct tt. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_mul_1_r Hon).
@@ -1838,7 +1842,7 @@ destruct tt. {
       }
       rewrite angle_opp_sub_distr.
       rewrite <- angle_sub_straight_eq_add_straight.
-      rewrite <- angle_eucl_dist_move_0_r
+      rewrite <- angle_eucl_dist_move_0_r.
 (* je le sens moyen, tout ça... *)
 ...
       eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
