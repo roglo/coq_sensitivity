@@ -1725,7 +1725,7 @@ rewrite <- (rngl_abs_opp Hop Hor).
 rewrite (rngl_opp_add_distr Hop).
 rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_opp_l Hop).
-(**)
+(*
 ...
 Theorem rngl_sin_add_sin :
   ∀ p q,
@@ -1741,21 +1741,12 @@ Theorem rngl_sin_sub_sin :
   (rngl_sin p - rngl_sin q =
       2 * rngl_cos ((p + q) /₂ + c₁) * rngl_sin ((p - q) /₂ + c₂))%L.
 ...
+*)
 (*
 (* qu'est-ce que ça donne pour θ₀ < θ ? *)
 destruct tt. 2: {
   apply angle_ltb_ge in Htt.
   rewrite (rngl_mul_1_r Hon).
-  rewrite rngl_sin_sub_sin.
-  remember
-    (angle_add_overflow
-       ((θ + θ₀) /₂ + (if ovt then angle_straight else 0%A)) θ₀)
-    as ov eqn:Hov.
-  symmetry in Hov.
-  move ov before ovt; move Hov before Hovt.
-  destruct ovt. {
-    destruct ov. {
-...
   remember (_ + _)%A as x eqn:Hx.
 (*
   Htt : (θ₀ ≤ θ)%A
@@ -1775,10 +1766,6 @@ destruct tt. 2: {
 destruct tt. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_mul_1_r Hon).
-  rewrite (rngl_opp_involutive Hop).
-  rewrite <- (rngl_abs_opp Hop Hor).
-  rewrite rngl_add_comm.
-  rewrite (rngl_opp_add_distr Hop).
   rewrite <- rngl_sin_add_straight_r.
   rewrite <- angle_add_assoc.
   rewrite angle_add_if_distr_r.
