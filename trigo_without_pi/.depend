@@ -7,7 +7,7 @@ AngleAddLeMonoL_sin_lb_nonneg.vo AngleAddLeMonoL_sin_lb_nonneg.glob AngleAddLeMo
 AngleAddOverflowLe.vo AngleAddOverflowLe.glob AngleAddOverflowLe.v.beautified AngleAddOverflowLe.required_vo: AngleAddOverflowLe.v ../main/RingLike.vo Angle.vo TrigoWithoutPiExt.vo Angle_order.vo TacChangeAngle.vo
 AngleDiv2.vo AngleDiv2.glob AngleDiv2.v.beautified AngleDiv2.required_vo: AngleDiv2.v ../main/Misc1.vo ../main/RingLike.vo RealLike.vo Angle.vo TrigoWithoutPiExt.vo Angle_order.vo
 AngleDiv2Add.vo AngleDiv2Add.glob AngleDiv2Add.v.beautified AngleDiv2Add.required_vo: AngleDiv2Add.v ../main/Misc1.vo ../main/RingLike.vo RealLike.vo Angle.vo TrigoWithoutPiExt.vo Angle_order.vo AngleAddOverflowLe.vo AngleAddLeMonoL.vo AngleDiv2.vo TacChangeAngle.vo
-AngleDivNat.vo AngleDivNat.glob AngleDivNat.v.beautified AngleDivNat.required_vo: AngleDivNat.v ../main/Misc1.vo ../main/RingLike.vo RealLike.vo Angle.vo TrigoWithoutPiExt.vo Angle_order.vo AngleDiv2.vo AngleAddLeMonoL.vo AngleTypeIsComplete.vo SeqAngleIsCauchy.vo
+AngleDivNat.vo AngleDivNat.glob AngleDivNat.v.beautified AngleDivNat.required_vo: AngleDivNat.v ../main/Misc1.vo ../main/RingLike.vo RealLike.vo Angle.vo TrigoWithoutPiExt.vo Angle_order.vo AngleDiv2.vo AngleDiv2Add.vo AngleAddLeMonoL.vo AngleTypeIsComplete.vo SeqAngleIsCauchy.vo TacChangeAngle.vo
 AngleTypeIsComplete.vo AngleTypeIsComplete.glob AngleTypeIsComplete.v.beautified AngleTypeIsComplete.required_vo: AngleTypeIsComplete.v ../main/Misc1.vo ../main/RingLike.vo RealLike.vo Angle.vo TrigoWithoutPiExt.vo
 Angle_order.vo Angle_order.glob Angle_order.v.beautified Angle_order.required_vo: Angle_order.v ../main/RingLike.vo RealLike.vo Angle.vo
 RealLike.vo RealLike.glob RealLike.v.beautified RealLike.required_vo: RealLike.v ../main/RingLike.vo

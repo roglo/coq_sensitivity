@@ -1887,46 +1887,10 @@ apply (rngl_mul_move_l Hic Hi1) in H1. 2: {
 now apply (rngl_add_move_l Hop) in H1.
 Qed.
 
-Theorem rngl_cos_le_iff_angle_eucl_le :
-  ∀ θ θ',
-  (rngl_cos θ ≤ rngl_cos θ' ↔ angle_eucl_dist θ' 0 ≤ angle_eucl_dist θ 0)%L.
+Theorem angle_eucl_dist_diag : ∀ θ, angle_eucl_dist θ θ = 0%L.
 Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  split; intros. {
-    rewrite H1, (H1 (angle_eucl_dist _ _)).
-    apply (rngl_le_refl Hor).
-  } {
-    rewrite H1, (H1 (rngl_cos _)).
-    apply (rngl_le_refl Hor).
-  }
-}
 intros.
-rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist _ _)). 2: {
-  apply (dist_nonneg Hon Hop Hiv Hor).
-  apply angle_eucl_dist_is_dist.
-}
-rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist θ _)). 2: {
-  apply (dist_nonneg Hon Hop Hiv Hor).
-  apply angle_eucl_dist_is_dist.
-}
-do 2 rewrite rngl_cos_angle_eucl_dist_0_r.
-split; intros H1. {
-  apply (rngl_sub_le_mono_l Hop Hor) in H1.
-  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii) in H1. 2: {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-  }
-  now apply (rngl_squ_le_abs_le Hop Hor Hii) in H1.
-} {
-  apply (rngl_sub_le_mono_l Hop Hor).
-  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-  }
-  now apply (rngl_abs_le_squ_le Hop Hor).
-}
+now apply angle_eucl_dist_separation.
 Qed.
 
 Theorem angle_eucl_dist_nonneg : ∀ θ1 θ2, (0 ≤ angle_eucl_dist θ1 θ2)%L.

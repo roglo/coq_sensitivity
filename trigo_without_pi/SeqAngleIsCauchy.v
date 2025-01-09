@@ -18,12 +18,6 @@ Context {ac : angle_ctx T}.
 
 Definition seq_angle_to_div_nat θ (n i : nat) := (2 ^ i / n * (θ /₂^i))%A.
 
-Theorem angle_eucl_dist_diag : ∀ θ, angle_eucl_dist θ θ = 0%L.
-Proof.
-intros.
-now apply angle_eucl_dist_separation.
-Qed.
-
 Theorem angle_le_pow2_log2 :
   ∀ n θ1 θ2,
   n ≠ 0
