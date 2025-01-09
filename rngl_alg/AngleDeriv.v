@@ -1808,7 +1808,7 @@ symmetry in Hzstt.
 destruct zstt; [ easy | ].
 cbn - [ angle_sub ] in H2.
 rewrite rngl_cos_sub_straight_r in H3.
-apply rngl_leb_gt in Hzst, Hzstt.
+apply (rngl_leb_gt Hor) in Hzst, Hzstt.
 apply rngl_leb_le in Hovt.
 remember (0 ≤? rngl_sin θ₀)%L as zstz eqn:Hzstz.
 symmetry in Hzstz.
@@ -1926,6 +1926,44 @@ destruct zstz. {
     apply (rngl_opp_pos_neg Hop Hor) in Hzst.
     now apply rngl_nle_gt in Hzst.
   }
+  apply (rngl_nle_gt_iff Hor) in Hzcz.
+  change_angle_sub_l θ₀ angle_straight.
+  rewrite angle_sub_sub_distr in H2, H5, H3.
+  progress sin_cos_add_sub_straight_hyp T Hzstt.
+  progress sin_cos_add_sub_straight_hyp T Hovt.
+  progress sin_cos_add_sub_straight_hyp T Hzstz.
+  progress sin_cos_add_sub_straight_hyp T Hzcz.
+  progress sin_cos_add_sub_straight_hyp T H3.
+  progress sin_cos_add_sub_straight_hyp T H2.
+  progress sin_cos_add_sub_straight_hyp T H5.
+  rewrite (rngl_add_opp_r Hop) in H3.
+  apply -> (rngl_le_sub_0 Hop Hor) in H3.
+  apply rngl_nlt_ge in H3.
+  apply H3; clear H3.
+  apply (rngl_lt_iff Hor).
+  split. {
+    rewrite angle_add_comm.
+    apply (rngl_lt_le_incl Hor) in Hzst, Hzcz, Hzc.
+    now apply quadrant_1_rngl_cos_add_le_cos_l.
+  }
+  intros H.
+  apply rngl_cos_eq in H.
+  destruct H as [H| H]. {
+    apply angle_add_move_r in H.
+    rewrite angle_sub_diag in H.
+    subst θ.
+    now apply (rngl_lt_irrefl Hor) in Hzst.
+  }
+  apply angle_add_move_r in H.
+  rewrite <- angle_opp_add_distr in H.
+  subst θ.
+  rewrite rngl_sin_opp in Hzst.
+  apply -> (rngl_opp_pos_neg Hop Hor) in Hzst.
+  apply rngl_nle_gt in Hzst.
+  apply Hzst; clear Hzst.
+  apply (rngl_lt_le_incl Hor) in Hzcz.
+  now apply rngl_sin_add_nonneg.
+}
 ...
     apply angle_le_angle_eucl_dist_le; cycle 2. {
 
