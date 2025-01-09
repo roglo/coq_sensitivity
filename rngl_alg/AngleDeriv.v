@@ -1914,14 +1914,26 @@ destruct tt. 2: {
       apply (rngl_lt_le_incl Hor) in Hzst, Hzstz, Hzc, Hzcz.
       now apply rngl_sin_add_nonneg.
     }
-...
+    rewrite angle_div_2_sub'.
+    rewrite angle_mul_2_l.
+    rewrite angle_sub_add_distr.
+    rewrite angle_add_sub.
+    generalize Htt; intros H.
+    rewrite angle_add_overflow_comm in Hovt.
+    apply (angle_add_le_mono_l θ₀) in H; [ | easy ].
+    rewrite (angle_add_comm _ θ) in H.
+    rewrite H; clear H.
     apply angle_le_angle_eucl_dist_le; cycle 2. {
-
-        apply angle_div_2_le.
-      } {
-        apply angle_div_2_le_straight.
-      }
-    apply angle_le_angle_eucl_dist_le.
+      apply angle_div_2_le.
+    } {
+      apply angle_div_2_le_straight.
+    }
+...
+    rewrite angle_eucl_dist_move_0_r in H3.
+    rewrite (angle_eucl_dist_move_0_r θ₀) in H3.
+    apply rngl_cos_lt_iff_angle_eucl_lt in H3.
+    rewrite rngl_cos_sub_straight_r in H3.
+    apply rngl_sin_nonneg_angle_le_straight.
 ...
 (**)
 destruct tt. {
