@@ -356,27 +356,19 @@ destruct zs. {
 }
 Qed.
 
-Theorem angle_nonneg : ∀ θ, (0 ≤ θ)%A.
+Theorem angle_nonneg : ab_val = 0%A → ∀ θ, (0 ≤ θ)%A.
 Proof.
-(* ah oui, mais ça, c'est faux, ça *)
-...
-destruct_ac; intros θ1.
+destruct_ac.
+intros Hav.
+intros.
 progress unfold angle_leb.
-set (θ := (θ1 - ab_val)%A).
-rewrite angle_sub_0_l.
-cbn - [ angle_sub ].
-rewrite (rngl_leb_0_opp Hop Hor).
-remember (rngl_sin ab_val ≤? 0)%L as bz eqn:Hbz.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hbz, Hzs.
-destruct bz. {
-  destruct zs; [ | easy ].
-  subst θ.
-  apply rngl_leb_le in Hbz, Hzs.
-  apply rngl_leb_le.
-...
-  destruct (0 ≤? rngl_sin θ)%L; [ | easy ].
-  apply rngl_leb_le.
+rewrite Hav.
+rewrite angle_sub_diag.
+rewrite angle_sub_0_r.
+cbn.
+rewrite (rngl_leb_refl Hor).
+destruct (0 ≤? rngl_sin θ)%L; [ | easy ].
+apply rngl_leb_le.
 apply rngl_cos_bound.
 Qed.
 
@@ -395,6 +387,7 @@ apply H21; clear H21.
 apply angle_leb_gt.
 progress unfold angle_ltb.
 apply rngl_leb_le in Hzs1.
+...
 rewrite Hzs1.
 apply (rngl_leb_gt Hor) in Hs2z.
 now rewrite Hs2z.
