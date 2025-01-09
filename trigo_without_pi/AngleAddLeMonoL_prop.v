@@ -13,40 +13,6 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Theorem rngl_sin_add_pos_1 :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 < rngl_sin θ2)%L
-  → (0 < rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 < rngl_sin (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros  * Hs1z Hs2z Hc1z Hc2z.
-cbn.
-apply (rngl_add_nonneg_pos Hor).
-now apply (rngl_mul_nonneg_nonneg Hos Hor).
-now apply (rngl_mul_pos_pos Hos Hor Hii).
-Qed.
-
-Theorem rngl_sin_add_pos_2 :
-  ∀ θ1 θ2,
-  (0 < rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 < rngl_cos θ2)%L
-  → (0 < rngl_sin (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros  * Hs1z Hs2z Hc1z Hc2z.
-cbn.
-apply (rngl_add_pos_nonneg Hor).
-now apply (rngl_mul_pos_pos Hos Hor Hii).
-now apply (rngl_mul_nonneg_nonneg Hos Hor).
-Qed.
-
 Theorem angle_add_le_mono_l_lemma_11 :
   ∀ θ1 θ2,
   (rngl_sin θ2 < 0)%L

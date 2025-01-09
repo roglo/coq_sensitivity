@@ -2002,8 +2002,23 @@ destruct tt. 2: {
         }
         apply (rngl_nle_gt_iff Hor) in Hzcz.
         change_angle_add_r θ₀ angle_straight.
-        rewrite angle_sub_sub_distr in Hzstt.
+        rewrite angle_sub_sub_distr in Hzstt, Hovt.
         progress sin_cos_add_sub_straight_hyp T Hzstt.
+        progress sin_cos_add_sub_straight_hyp T Hovt.
+        progress sin_cos_add_sub_straight_hyp T Hzstz.
+        progress sin_cos_add_sub_straight_hyp T H2.
+        progress sin_cos_add_sub_straight_hyp T H5.
+        progress sin_cos_add_sub_straight_hyp T H3.
+        progress sin_cos_add_sub_straight_hyp T Hzcz.
+        progress sin_cos_add_sub_straight_hyp T Htt.
+        apply rngl_nlt_ge in Hovt.
+        apply Hovt; clear Hovt.
+        apply (rngl_add_nonneg_pos Hor); [ easy | ].
+        apply (rngl_lt_le_incl Hor) in Hzcz.
+        now apply rngl_cos_sub_pos_2.
+      }
+...
+        apply rngl_pos_sub_pos.
 ...
     apply angle_le_angle_eucl_dist_le; cycle 2. {
 
