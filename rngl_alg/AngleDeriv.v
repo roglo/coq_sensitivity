@@ -1862,6 +1862,10 @@ split; intros Htt. {
     subst θ'.
     now apply (rngl_lt_irrefl Hor) in Htt.
   }
+  apply angle_add_move_0_r in H.
+  subst θ'.
+  now apply (rngl_lt_irrefl Hor) in Htt.
+} {
 ...
 About angle_eucl_dist_eq_diag_r.
 Check angle_eucl_dist_eq_angle_eucl_dist.
