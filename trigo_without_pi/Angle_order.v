@@ -132,6 +132,97 @@ symmetry in Hzs.
 destruct zs; apply (rngl_leb_refl Hor).
 Qed.
 
+Theorem angle_lt_iff : ∀ θ1 θ2, (θ1 < θ2 ↔ θ1 ≤ θ2 ∧ θ1 ≠ θ2)%A.
+Proof.
+destruct_ac; intros.
+apply iff_trans with (B := (θ1 ≤ θ2)%A ∧ (θ1 - ab_val ≠ θ2 - ab_val)%A). 2: {
+  split; intros (H1, H2). {
+    split; [ easy | ].
+    now intros H; apply H2; subst θ1.
+  }
+  split; [ easy | ].
+  intros H; apply H2; clear H2.
+  apply (f_equal (λ θ, (θ + ab_val)%A)) in H.
+  now do 2 rewrite angle_sub_add in H.
+}
+progress unfold angle_ltb.
+progress unfold angle_leb.
+rename θ1 into θ3.
+rename θ2 into θ4.
+remember (θ3 - ab_val)%A as θ1; clear θ3 Heqθ1.
+remember (θ4 - ab_val)%A as θ2; clear θ4 Heqθ2.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs1, Hzs2.
+destruct zs1. {
+  apply rngl_leb_le in Hzs1.
+  destruct zs2. {
+    apply rngl_leb_le in Hzs2.
+    split; intros H12. {
+      apply rngl_ltb_lt in H12.
+      split. {
+        apply rngl_leb_le.
+        now apply (rngl_lt_le_incl Hor).
+      }
+      intros H; subst θ1.
+      now apply (rngl_lt_irrefl Hor) in H12.
+    } {
+      destruct H12 as (Hc12, H12).
+      apply rngl_leb_le in Hc12.
+      apply rngl_ltb_lt.
+      apply (rngl_lt_iff Hor).
+      split; [ easy | ].
+      intros H; symmetry in H.
+      apply rngl_cos_eq in H.
+      destruct H as [H| H]; [ easy | ].
+      subst θ1.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs1.
+      apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
+      apply eq_rngl_sin_0 in Hzs2.
+      destruct Hzs2; subst θ2. {
+        apply H12.
+        apply eq_angle_eq; cbn.
+        now rewrite rngl_opp_0.
+      } {
+        apply H12.
+        apply eq_angle_eq; cbn.
+        now rewrite rngl_opp_0.
+      }
+    }
+  }
+  split; [ | easy ].
+  intros _.
+  split; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs2.
+  apply rngl_nle_gt in Hzs2.
+  now intros H; subst θ2.
+} {
+  apply (rngl_leb_gt Hor) in Hzs1.
+  destruct zs2; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs2.
+  split; intros H12. {
+    apply rngl_ltb_lt in H12.
+    split. {
+      apply rngl_leb_le.
+      now apply (rngl_lt_le_incl Hor).
+    }
+    intros H; subst θ2.
+    now apply (rngl_lt_irrefl Hor) in H12.
+  }
+  destruct H12 as (Hc12, H12).
+  apply rngl_leb_le in Hc12.
+  apply rngl_ltb_lt.
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  intros H; apply H12; clear H12.
+  apply rngl_cos_eq in H.
+  destruct H; subst θ1; [ easy | ].
+  cbn in Hzs1.
+  apply (rngl_opp_neg_pos Hop Hor) in Hzs1.
+  now apply (rngl_lt_le_incl Hor), rngl_nlt_ge in Hzs1.
+}
+Qed.
+
 Theorem angle_straight_nonneg :
   ab_val = 0%A ∨ (rngl_sin ab_val < 0)%L
   → (0 ≤ angle_straight)%A.
@@ -198,53 +289,16 @@ Theorem angle_straight_pos :
 Proof.
 destruct_ac.
 intros Hc1 Hbs.
-(* if angle_lt_iff was accessible here, it would perhaps
-   simplify this proof *)
-progress unfold angle_ltb.
-rewrite angle_sub_0_l.
-rewrite rngl_sin_sub_straight_l.
-rewrite rngl_cos_sub_straight_l.
-cbn.
-rewrite (rngl_leb_0_opp Hop Hor).
-remember (0 ≤? rngl_sin ab_val)%L as zsb eqn:Hzsb.
-remember (rngl_sin ab_val ≤? 0)%L as sbz eqn:Hsbz.
-symmetry in Hzsb, Hsbz.
-destruct sbz. {
-  destruct zsb; [ | easy ].
-  apply rngl_ltb_lt.
-  apply rngl_leb_le in Hzsb, Hsbz.
-  apply (rngl_le_antisymm Hor) in Hzsb; [ | easy ].
-  apply eq_rngl_sin_0 in Hzsb.
-  destruct Hzsb as [H| H]; rewrite H. {
-    apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
-  }
-  exfalso.
-  rewrite H in Hbs.
-  destruct Hbs as [Hbs| Hbs]. {
-    apply eq_angle_eq in Hbs.
-    cbn in Hbs.
-    injection Hbs; clear Hbs; intros H1.
-    apply (f_equal (rngl_add 1)) in H1.
-    rewrite (rngl_add_opp_r Hop) in H1.
-    rewrite (rngl_sub_diag Hos) in H1.
-    symmetry in H1.
-    now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H1.
-  }
-  cbn in Hbs.
-  now apply (rngl_lt_irrefl Hor) in Hbs.
-}
-destruct zsb. 2: {
-  apply (rngl_leb_gt Hor) in Hzsb, Hsbz.
-  now apply (rngl_lt_asymm Hor) in Hzsb.
-}
-apply rngl_leb_le in Hzsb.
-apply (rngl_leb_gt Hor) in Hsbz.
-destruct Hbs as [Hbs| Hbs]. {
-  rewrite Hbs in Hsbz.
-  now apply (rngl_lt_irrefl Hor) in Hsbz.
-}
-apply rngl_nle_gt in Hbs.
-easy.
+apply angle_lt_iff.
+split; [ now apply angle_straight_nonneg | ].
+intros H; symmetry in H.
+apply eq_angle_eq in H.
+injection H; clear H; intros H.
+apply (f_equal (rngl_add 1)) in H.
+rewrite (rngl_add_opp_r Hop) in H.
+rewrite (rngl_sub_diag Hos) in H.
+symmetry in H.
+now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H.
 Qed.
 
 Theorem angle_leb_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ (θ2 < θ1)%A.
@@ -304,6 +358,8 @@ Qed.
 
 Theorem angle_nonneg : ∀ θ, (0 ≤ θ)%A.
 Proof.
+(* ah oui, mais ça, c'est faux, ça *)
+...
 destruct_ac; intros θ1.
 progress unfold angle_leb.
 set (θ := (θ1 - ab_val)%A).
