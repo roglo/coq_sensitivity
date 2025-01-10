@@ -1161,8 +1161,8 @@ Theorem angle_lt_sub_eucl_dist :
 Proof.
 destruct_ac.
 intros * Hcs H1.
-rewrite angle_eucl_dist_move_0_r.
 apply rngl_cos_lt_iff_angle_eucl_lt.
+rewrite angle_sub_0_r.
 destruct (angle_le_dec a b) as [Hab| Hab]. {
   progress unfold angle_lt_sub in H1.
   progress unfold angle_diff in H1.
@@ -1724,9 +1724,9 @@ destruct tt. 2: {
       apply (angle_le_lt_trans _ θ);[ easy | ].
       clear η Hη Hsc H4.
       clear - Hor Hop H2 H3 H5 Hovt Htt Hts Htz.
-      rewrite angle_eucl_dist_move_0_r in H2, H3, H5.
-      rewrite (angle_eucl_dist_move_0_r θ₀) in H3.
       apply rngl_cos_lt_iff_angle_eucl_lt in H2, H3, H5.
+      rewrite angle_sub_0_r in H2, H5.
+      rewrite rngl_cos_sub_straight_r in H3.
       rewrite <- angle_add_overflow_equiv2 in Hovt.
       progress unfold angle_add_overflow2 in Hovt.
       apply angle_ltb_ge in Hovt.
@@ -1744,7 +1744,6 @@ destruct tt. 2: {
         intros H; symmetry in H.
         apply eq_rngl_cos_opp_1 in H.
         subst θ.
-        rewrite rngl_cos_sub_straight_r in H3.
         rewrite rngl_cos_sub_straight_l in H3.
         now apply (rngl_lt_irrefl Hor) in H3.
       }
@@ -1753,7 +1752,6 @@ destruct tt. 2: {
       symmetry in Hzstt.
       destruct zstt; [ easy | ].
       cbn - [ angle_sub ] in H2.
-      rewrite rngl_cos_sub_straight_r in H3.
       apply (rngl_leb_gt Hor) in Hzst, Hzstt.
       apply rngl_leb_le in Hovt.
       remember (0 ≤? rngl_sin θ₀)%L as zstz eqn:Hzstz.

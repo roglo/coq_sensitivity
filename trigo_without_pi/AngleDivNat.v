@@ -490,31 +490,30 @@ now rewrite angle_opp_0.
 Qed.
 
 Theorem rngl_cos_le_iff_angle_eucl_le :
-  ∀ θ θ',
-  (rngl_cos θ ≤ rngl_cos θ' ↔ angle_eucl_dist θ' 0 ≤ angle_eucl_dist θ 0)%L.
+  ∀ θ1 θ2 θ3 θ4,
+  (rngl_cos (θ1 - θ2) ≤ rngl_cos (θ3 - θ4)
+   ↔ angle_eucl_dist θ3 θ4 ≤ angle_eucl_dist θ1 θ2)%L.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
-  split; intros. {
-    rewrite H1, (H1 (angle_eucl_dist _ _)).
-    apply (rngl_le_refl Hor).
-  } {
-    rewrite H1, (H1 (rngl_cos _)).
-    apply (rngl_le_refl Hor).
-  }
+  do 2 rewrite (H1 (angle_eucl_dist _ _)).
+  do 2 rewrite (H1 (rngl_cos _)).
+  easy.
 }
 intros.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist _ _)). 2: {
   apply (dist_nonneg Hon Hop Hiv Hor).
   apply angle_eucl_dist_is_dist.
 }
-rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist θ _)). 2: {
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist θ1 _)). 2: {
   apply (dist_nonneg Hon Hop Hiv Hor).
   apply angle_eucl_dist_is_dist.
 }
+rewrite angle_eucl_dist_move_0_r.
+rewrite (angle_eucl_dist_move_0_r θ1).
 do 2 rewrite rngl_cos_angle_eucl_dist_0_r.
 split; intros H1. {
   apply (rngl_sub_le_mono_l Hop Hor) in H1.
@@ -532,9 +531,9 @@ split; intros H1. {
 Qed.
 
 Theorem rngl_cos_lt_iff_angle_eucl_lt :
-  ∀ θ θ' : angle T,
-  (rngl_cos θ < rngl_cos θ')%L
-  ↔ (angle_eucl_dist θ' 0 < angle_eucl_dist θ 0)%L.
+  ∀ θ1 θ2 θ3 θ4,
+  (rngl_cos (θ1 - θ2) < rngl_cos (θ3 - θ4)
+   ↔ angle_eucl_dist θ3 θ4 < angle_eucl_dist θ1 θ2)%L.
 Proof.
 destruct_ac.
 intros.
@@ -545,15 +544,17 @@ split; intros Htt. {
     now apply rngl_cos_le_iff_angle_eucl_le.
   }
   intros H.
+  rewrite angle_eucl_dist_move_0_r in H.
+  rewrite (angle_eucl_dist_move_0_r θ1) in H.
   apply angle_eucl_dist_eq_angle_eucl_dist in H.
   do 2 rewrite angle_add_0_l in H.
   rewrite angle_add_0_r in H.
   destruct H as [H| H]. {
-    subst θ'.
+    rewrite H in Htt.
     now apply (rngl_lt_irrefl Hor) in Htt.
   }
   apply angle_add_move_0_r in H.
-  subst θ'.
+  rewrite H in Htt.
   now apply (rngl_lt_irrefl Hor) in Htt.
 } {
   apply (rngl_lt_iff Hor).
@@ -562,8 +563,10 @@ split; intros Htt. {
     now apply rngl_cos_le_iff_angle_eucl_le.
   }
   intros H.
+  rewrite angle_eucl_dist_move_0_r in Htt.
+  rewrite (angle_eucl_dist_move_0_r θ1) in Htt.
   apply rngl_cos_eq in H.
-  destruct H; subst θ. {
+  destruct H; rewrite H in Htt. {
     now apply (rngl_lt_irrefl Hor) in Htt.
   }
   rewrite <- angle_eucl_dist_opp_opp in Htt.
@@ -585,10 +588,12 @@ apply rngl_leb_le in Ht1, Ht2.
 rewrite Ht1, Ht2.
 split; intros H12. {
   apply rngl_leb_le in H12.
-  now apply rngl_cos_le_iff_angle_eucl_le.
+  apply rngl_cos_le_iff_angle_eucl_le.
+  now do 2 rewrite angle_sub_0_r.
 } {
   apply rngl_leb_le.
-  now apply rngl_cos_le_iff_angle_eucl_le in H12.
+  apply rngl_cos_le_iff_angle_eucl_le in H12.
+  now do 2 rewrite angle_sub_0_r in H12.
 }
 Qed.
 
