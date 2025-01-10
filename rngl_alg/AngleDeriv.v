@@ -2171,68 +2171,36 @@ destruct tt. 2: {
       now apply quadrant_1_sin_sub_nonneg_cos_le.
     }
     apply (rngl_nle_gt_iff Hor) in Hzc.
-...
-Search (rngl_cos _ ≤ rngl_cos (_ - _))%L.
-apply rngl_
-...
-        apply Bool.not_true_iff_false in Hzstt.
-        apply Hzstt; clear Hzstt.
-        apply rngl_leb_le.
-Search (0 ≤ rngl_sin (_ - _))%L.
-...
-        apply (rngl_leb_gt Hor).
-          rewrite rngl_cos_sub_comm.
-          apply rngl_leb_le in Hzstt.
-          apply rngl_cos_lt_rngl_cos_sub; try easy.
-...
-      change_angle_sub_r θ₀ angle_right.
-      progress sin_cos_add_sub_right_hyp T Hzstz.
-      progress sin_cos_add_sub_right_hyp T H2.
-      progress sin_cos_add_sub_right_hyp T H5.
-      progress sin_cos_add_sub_right_hyp T H3.
-      progress sin_cos_add_sub_right_hyp T Htt.
-      progress sin_cos_add_sub_right_hyp T Hovt.
-        progress sin_cos_add_sub_right_hyp T Hzstt.
-        progress sin_cos_add_sub_right_hyp T Hzstst.
-        progress sin_cos_add_sub_right_hyp T Hzcz.
-...
-      change_angle_opp θ₀.
-      rewrite angle_sub_opp_r in H2, H5, H3.
-      progress sin_cos_opp_hyp T Hzstt.
-      progress sin_cos_opp_hyp T Hovt.
-      progress sin_cos_opp_hyp T H5.
-      progress sin_cos_opp_hyp T H3.
-      progress sin_cos_opp_hyp T Hzcz.
-      progress sin_cos_opp_hyp T Htt.
-      rewrite rngl_cos_sub_straight_r in Htt.
-      apply (rngl_le_opp_r Hop Hor) in Htt.
-      apply rngl_nlt_ge in Htt.
-      apply Htt; clear Htt.
-      now apply (rngl_add_nonneg_pos Hor).
+    change_angle_add_r θ angle_straight.
+    progress sin_cos_add_sub_straight_hyp T H3.
+    progress sin_cos_add_sub_straight_hyp T H5.
+    progress sin_cos_add_sub_straight_hyp T H2.
+    progress sin_cos_add_sub_straight_hyp T Hzc.
+    progress sin_cos_add_sub_straight_hyp T Hzstst.
+    progress sin_cos_add_sub_straight_hyp T Hzst.
+    progress sin_cos_add_sub_straight_hyp T Hovt.
+    progress sin_cos_add_sub_straight_hyp T Hzstt.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
+      apply rngl_nle_gt in H2.
+      apply H2; clear H2.
+      apply (rngl_lt_le_incl Hor) in Hzst, Hzc.
+      now apply rngl_cos_sub_nonneg.
     }
     apply (rngl_nle_gt_iff Hor) in Hzcz.
-    change_angle_add_r θ₀ angle_straight.
-    rewrite angle_sub_sub_distr in H2, H5, H3.
-    progress sin_cos_add_sub_straight_hyp T Hzstt.
-    progress sin_cos_add_sub_straight_hyp T Hovt.
-    progress sin_cos_add_sub_straight_hyp T Hzstz.
-    progress sin_cos_add_sub_straight_hyp T H2.
-    progress sin_cos_add_sub_straight_hyp T H5.
-    progress sin_cos_add_sub_straight_hyp T H3.
-    progress sin_cos_add_sub_straight_hyp T Hzcz.
-    progress sin_cos_add_sub_straight_hyp T Htt.
-    apply rngl_nle_gt in Hzstt.
-    apply Hzstt; clear Hzstt.
-    apply (rngl_lt_le_incl Hor) in Hzst, Hzstz, Hzc, Hzcz.
-    now apply rngl_sin_add_nonneg.
+    change_angle_sub_r θ₀ angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzstz.
+    progress sin_cos_add_sub_right_hyp T H2.
+    progress sin_cos_add_sub_right_hyp T H5.
+    progress sin_cos_add_sub_right_hyp T H3.
+    progress sin_cos_add_sub_right_hyp T Hzstst.
+    progress sin_cos_add_sub_right_hyp T Hzcz.
+    progress sin_cos_add_sub_right_hyp T Hzstt.
+    progress sin_cos_add_sub_right_hyp T Hovt.
+    apply rngl_nle_gt in Hzstst.
+    apply Hzstst; clear Hzstst.
+    apply (rngl_lt_le_incl Hor) in Hzst, Hzc, Hzcz.
+    now apply rngl_cos_sub_nonneg.
   }
-...
-    rewrite angle_eucl_dist_move_0_r in H3.
-    rewrite (angle_eucl_dist_move_0_r θ₀) in H3.
-
-    apply rngl_cos_lt_iff_angle_eucl_lt in H3.
-    rewrite rngl_cos_sub_straight_r in H3.
-    apply rngl_sin_nonneg_angle_le_straight.
 ...
 (**)
 destruct tt. {
