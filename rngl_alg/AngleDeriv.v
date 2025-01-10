@@ -2135,10 +2135,33 @@ destruct tt. 2: {
     clear Htt.
     apply (rngl_leb_gt Hor) in Hzst.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+      change_angle_opp θ.
+      rewrite <- angle_opp_add_distr in H3, H5, H2, Hzstst.
+      progress sin_cos_opp_hyp T H3.
+      progress sin_cos_opp_hyp T H5.
+      progress sin_cos_opp_hyp T H2.
+      progress sin_cos_opp_hyp T Hzc.
+      progress sin_cos_opp_hyp T Hzstst.
+      progress sin_cos_opp_hyp T Hzst.
+      progress sin_cos_opp_hyp T Hovt.
+      progress sin_cos_opp_hyp T Hzstt.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
+        apply rngl_nle_gt in H5.
+        apply H5; clear H5.
+        apply (rngl_lt_le_incl Hor) in Hzst.
+        now apply quadrant_1_rngl_cos_add_le_cos_l.
+      }
+      apply (rngl_nle_gt_iff Hor) in Hzcz.
 ...
-        destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
-Search (rngl_sin (_ - _) ≤ 0)%L.
-Search (- _ + _ ≤ 0)%L.
+        apply Bool.not_true_iff_false in Hzstt.
+        apply Hzstt; clear Hzstt.
+        apply rngl_leb_le.
+Search (0 ≤ rngl_sin (_ - _))%L.
+...
+        apply (rngl_leb_gt Hor).
+          rewrite rngl_cos_sub_comm.
+          apply rngl_leb_le in Hzstt.
+          apply rngl_cos_lt_rngl_cos_sub; try easy.
 ...
       change_angle_sub_r θ₀ angle_right.
       progress sin_cos_add_sub_right_hyp T Hzstz.
