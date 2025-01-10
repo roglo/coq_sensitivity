@@ -2152,6 +2152,28 @@ destruct tt. 2: {
         now apply quadrant_1_rngl_cos_add_le_cos_l.
       }
       apply (rngl_nle_gt_iff Hor) in Hzcz.
+      change_angle_sub_l θ₀ angle_straight.
+      rewrite <- angle_sub_add_distr in Hzstt, Hovt.
+      progress sin_cos_add_sub_straight_hyp T Hzstz.
+      progress sin_cos_add_sub_straight_hyp T H2.
+      progress sin_cos_add_sub_straight_hyp T H5.
+      progress sin_cos_add_sub_straight_hyp T H3.
+      progress sin_cos_add_sub_straight_hyp T Hzstst.
+      progress sin_cos_add_sub_straight_hyp T Hzcz.
+      progress sin_cos_add_sub_straight_hyp T Hzstt.
+      progress sin_cos_add_sub_straight_hyp T Hovt.
+      apply rngl_nle_gt in H5.
+      apply H5; clear H5.
+      apply (rngl_lt_le_incl Hor).
+      rewrite rngl_cos_sub_comm.
+      apply rngl_cos_lt_rngl_cos_sub; [ easy | easy | ].
+      apply (rngl_lt_le_incl Hor) in Hzst, Hzcz, Hzstst.
+      now apply quadrant_1_sin_sub_nonneg_cos_le.
+    }
+    apply (rngl_nle_gt_iff Hor) in Hzc.
+...
+Search (rngl_cos _ ≤ rngl_cos (_ - _))%L.
+apply rngl_
 ...
         apply Bool.not_true_iff_false in Hzstt.
         apply Hzstt; clear Hzstt.
