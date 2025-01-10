@@ -2134,7 +2134,9 @@ destruct tt. 2: {
     }
     clear Htt.
     apply (rngl_leb_gt Hor) in Hzst.
-2: {
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+...
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
 Search (rngl_sin (_ - _) ≤ 0)%L.
 Search (- _ + _ ≤ 0)%L.
 ...
