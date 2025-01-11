@@ -2307,6 +2307,18 @@ apply rngl_cos_le_iff_angle_eucl_le.
             apply (rngl_lt_le_incl Hor) in Hzcz, Hzt.
             now apply quadrant_1_sin_sub_nonneg_cos_le.
           }
+          exfalso.
+          apply (rngl_nle_gt_iff Hor) in Hzc.
+          change_angle_add_r θ angle_straight.
+          progress sin_cos_add_sub_straight_hyp T Hzt.
+          progress sin_cos_add_sub_straight_hyp T Hztt.
+          progress sin_cos_add_sub_straight_hyp T Hzc.
+          apply rngl_nlt_ge in Hztt.
+          apply Hztt; clear Hztt.
+          apply (rngl_lt_le_incl Hor) in Hzc.
+          now apply rngl_sin_add_pos_2.
+        }
+        apply (rngl_nlt_ge_iff Hor) in Hzcz.
 ...
 (**)
 destruct tt. {
