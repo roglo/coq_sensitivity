@@ -2282,47 +2282,31 @@ apply rngl_cos_le_iff_angle_eucl_le.
         clear Hovt Htt Hst.
         apply rngl_leb_le in Hztt.
         apply (rngl_leb_gt Hor) in Hzt.
-Search (rngl_cos (_ + _) < rngl_cos (_ + _))%L.
-...
-          clear Hzt.
-          rewrite rngl_cos_add_straight_l in Hovt.
-          cbn in Hovt.
-          cbn in Hzt.
-...
-  progress unfold angle_ltb in Hovt.
-  progress unfold angle_leb in Htt.
-    rewrite (angle_add_comm θ).
-apply angle_lt_iff.
-split. {
-  apply angle_add_le_mono_l; [ | ].
-2: {
-...
-remember (θ <? angle_straight)%A as ts eqn:Hts.
-symmetry in Hts.
-destruct ts. {
-  rewrite angle_add_0_r.
-  rewrite angle_mul_2_div_2.
-  rewrite Hts.
-  symmetry.
-  apply angle_add_0_r.
-}
-apply angle_ltb_ge in Hts.
-Search ((2 * _) /₂)%A.
-...
-  apply (rngl_nlt_ge_iff Hor).
-  intros Hcc.
-  apply rngl_cos_lt_iff_angle_eucl_lt in H2, H3, H5.
-  rewrite angle_sub_0_r in H2, H5.
-  rewrite rngl_cos_sub_straight_r in H3.
-  cbn - [ angle_sub ] in H2.
-  rewrite <- angle_add_overflow_equiv2 in Hovt.
-  progress unfold angle_add_overflow2 in Hovt.
-  progress unfold angle_ltb in Hovt.
-  progress unfold angle_leb in Htt.
-  remember (0 ≤? rngl_sin θ₀)%L as zstz eqn:Hzstz.
-  remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
-  symmetry in Hzstz, Hzst.
-  destruct zstz. {
+        destruct (rngl_lt_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+            change_angle_opp θ.
+            rewrite angle_add_opp_l in Hztt |-*.
+            progress sin_cos_opp_hyp T Hzt.
+            progress sin_cos_opp_hyp T Hzc.
+            rewrite rngl_cos_add, rngl_cos_sub.
+            apply (rngl_lt_sub_lt_add_r Hop Hor).
+            rewrite <- rngl_add_assoc.
+            eapply (rngl_le_lt_trans Hor). 2: {
+              apply (rngl_lt_add_r Hos Hor).
+              apply (rngl_add_pos_nonneg Hor). {
+                apply (rngl_mul_pos_pos Hos Hor Hii); [ | easy ].
+                apply (rngl_lt_iff Hor).
+                split; [ easy | ].
+                intros H; symmetry in H.
+                apply eq_rngl_sin_0 in H.
+                now destruct H.
+              }
+              now apply (rngl_mul_nonneg_nonneg Hos Hor).
+            }
+            apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+            apply (rngl_lt_le_incl Hor) in Hzcz, Hzt.
+            now apply quadrant_1_sin_sub_nonneg_cos_le.
+          }
 ...
 (**)
 destruct tt. {
