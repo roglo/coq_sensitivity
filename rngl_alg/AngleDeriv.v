@@ -1694,9 +1694,17 @@ destruct tt. 2: {
   destruct ovt. 2: {
     rewrite angle_add_0_r.
     eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
+clear η Hη Hsc H4 H1.
+(*
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+apply rngl_cos_le_iff_angle_eucl_le.
+    rewrite <- (angle_div_2_mul_2 θ₀) at 3.
+...
+*)
     rewrite angle_eucl_dist_move_0_r.
     rewrite (angle_eucl_dist_move_0_r θ).
     rewrite <- (angle_div_2_mul_2 θ₀) at 2.
+(**)
     rewrite angle_mul_nat_div_2. 2: {
       cbn.
       rewrite angle_add_0_r.
@@ -1791,7 +1799,7 @@ destruct tt. 2: {
       }
       apply (rngl_leb_gt Hor) in Hzstz.
       apply rngl_leb_le in Htt.
-clear - Hop Hor Hovt Hzst Hzstz Hzstt Htt.
+      clear - Hop Hor Hovt Hzst Hzstz Hzstt Htt.
       destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
         clear - Hop Hor Hovt Hzst Hzc Hzstz.
         change_angle_opp θ.
@@ -2110,6 +2118,26 @@ clear - Hop Hor Hovt Hzst Hzstz Hzstt Htt.
     apply (rngl_lt_le_incl Hor) in Hzst, Hzc, Hzcz.
     now apply rngl_cos_sub_nonneg.
   }
+  eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
+  clear η Hη Hsc H4.
+  apply rngl_cos_le_iff_angle_eucl_le.
+  rewrite angle_add_sub_swap.
+  rewrite rngl_cos_add_straight_r.
+  apply (rngl_le_opp_r Hop Hor).
+  apply (rngl_nlt_ge_iff Hor).
+  intros Hcc.
+  apply rngl_cos_lt_iff_angle_eucl_lt in H2, H3, H5.
+  rewrite angle_sub_0_r in H2, H5.
+  rewrite rngl_cos_sub_straight_r in H3.
+  cbn - [ angle_sub ] in H2.
+  rewrite <- angle_add_overflow_equiv2 in Hovt.
+  progress unfold angle_add_overflow2 in Hovt.
+  progress unfold angle_ltb in Hovt.
+  progress unfold angle_leb in Htt.
+...
+  remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
+  symmetry in Hzst.
+  destruct zst. {
 ...
 (**)
 destruct tt. {
