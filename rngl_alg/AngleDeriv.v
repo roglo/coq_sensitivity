@@ -775,6 +775,18 @@ destruct ts. {
 }
 Qed.
 
+Theorem angle_is_mul_2_div_2 :
+  ∀ θ, θ = ((2 * θ) /₂ + if θ <? angle_straight then 0 else angle_straight)%A.
+Proof.
+intros.
+rewrite angle_mul_2_div_2.
+destruct (θ <? angle_straight)%A; [ now do 2 rewrite angle_add_0_r | ].
+rewrite <- angle_add_assoc.
+rewrite angle_straight_add_straight.
+symmetry.
+apply angle_add_0_r.
+Qed.
+
 Definition rngl_min4 a b c d :=
   rngl_min (rngl_min (rngl_min a b) c) d.
 
@@ -2151,10 +2163,95 @@ apply rngl_cos_le_iff_angle_eucl_le.
   rewrite angle_add_sub_swap.
   rewrite rngl_cos_add_straight_r.
   apply (rngl_le_opp_r Hop Hor).
-  rewrite <- (angle_div_2_mul_2 θ₀) at 3.
-Check angle_mul_nat_div_2.
-Search (_ * (_ /₂))%A.
-(* search for a case when twice is overflow *)
+  rewrite (angle_is_mul_2_div_2 θ₀) at 3.
+  rewrite angle_sub_add_distr.
+  rewrite angle_div_2_sub'.
+  rewrite angle_mul_2_l.
+  rewrite angle_sub_add_distr.
+  rewrite angle_add_sub.
+  remember (θ₀ + θ₀ ≤? θ + θ₀)%A as t2t eqn:Ht2t.
+  symmetry in Ht2t.
+  destruct t2t. {
+    remember (θ₀ <? angle_straight)%A as tzs eqn:Htzs.
+    symmetry in Htzs.
+    destruct tzs. {
+      exfalso.
+      apply Bool.not_false_iff_true in Ht2t.
+      apply Ht2t; clear Ht2t.
+      apply angle_leb_gt.
+assert (Hst : (angle_straight ≤ θ)%A). {
+  (* lemma *)
+  rewrite <- angle_add_overflow_equiv2 in Hovt.
+  progress unfold angle_add_overflow2 in Hovt.
+  progress unfold angle_ltb in Hovt.
+  progress unfold angle_leb in Htt.
+  progress unfold angle_ltb in Htzs.
+  progress unfold angle_leb.
+  cbn in Htzs |-*.
+  rewrite (rngl_leb_refl Hor) in Htzs |-*.
+  remember (0 ≤? rngl_sin θ₀)%L as ztz eqn:Hztz.
+  remember (0 ≤? rngl_sin θ)%L as zt eqn:Hzt.
+  remember (0 ≤? rngl_sin (θ + θ₀))%L as ztt eqn:Hztt.
+  symmetry in Hztz, Hzt, Hztt.
+  destruct zt; [ | easy ].
+  destruct ztz; [ | easy ].
+  destruct ztt; [ | easy ].
+  apply rngl_leb_le in Hzt, Hztt, Hztz, Htt.
+  apply rngl_ltb_lt in Hovt, Htzs.
+  apply rngl_leb_le.
+(* mmm... faut voir... *)
+...
+(* lemma *)
+rewrite <- angle_add_overflow_equiv2 in Hovt.
+progress unfold angle_add_overflow2 in Hovt.
+progress unfold angle_ltb in Hovt.
+progress unfold angle_leb in Htt.
+progress unfold angle_ltb in Htzs.
+progress unfold angle_ltb.
+cbn in Htzs.
+rewrite (rngl_leb_refl Hor) in Htzs.
+remember (0 ≤? rngl_sin θ₀)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs; [ | easy ].
+apply rngl_leb_le in Hzs.
+remember (0 ≤? rngl_sin θ)%L as zt eqn:Hzt.
+symmetry in Hzt.
+destruct zt. {
+...
+remember (0 ≤? rngl_sin (θ + θ₀))%L as ztt eqn:Hztt.
+symmetry in Hzt, Hztt.
+destruct ztt. 2: {
+  destruct zt; [ easy | ].
+  clear Htt.
+...
+      apply angle_lt_iff.
+      split. {
+        rewrite angle_add_comm.
+        apply angle_add_le_mono_l. 2: {
+...
+      rewrite <- angle_add_overflow_equiv2 in Hovt.
+      progress unfold angle_add_overflow2 in Hovt.
+(* tout dépend si θ₀ est inférieur ou supérieur à π *)
+...
+  progress unfold angle_ltb in Hovt.
+  progress unfold angle_leb in Htt.
+    rewrite (angle_add_comm θ).
+apply angle_lt_iff.
+split. {
+  apply angle_add_le_mono_l; [ | ].
+2: {
+...
+remember (θ <? angle_straight)%A as ts eqn:Hts.
+symmetry in Hts.
+destruct ts. {
+  rewrite angle_add_0_r.
+  rewrite angle_mul_2_div_2.
+  rewrite Hts.
+  symmetry.
+  apply angle_add_0_r.
+}
+apply angle_ltb_ge in Hts.
+Search ((2 * _) /₂)%A.
 ...
   apply (rngl_nlt_ge_iff Hor).
   intros Hcc.
