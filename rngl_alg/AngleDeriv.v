@@ -2223,37 +2223,71 @@ apply rngl_cos_le_iff_angle_eucl_le.
         rewrite angle_add_overflow_comm in Hovt.
         now apply (angle_add_overflow_lt_straight_le_straight θ₀).
       }
-(* lemma *)
-rewrite <- angle_add_overflow_equiv2 in Hovt.
-progress unfold angle_add_overflow2 in Hovt.
-progress unfold angle_ltb in Hovt.
-progress unfold angle_leb in Htt.
-progress unfold angle_ltb in Htzs.
-progress unfold angle_ltb.
-cbn in Htzs.
-rewrite (rngl_leb_refl Hor) in Htzs.
-remember (0 ≤? rngl_sin θ₀)%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs; [ | easy ].
-apply rngl_leb_le in Hzs.
-remember (0 ≤? rngl_sin θ)%L as zt eqn:Hzt.
-symmetry in Hzt.
-destruct zt. {
-...
-remember (0 ≤? rngl_sin (θ + θ₀))%L as ztt eqn:Hztt.
-symmetry in Hzt, Hztt.
-destruct ztt. 2: {
-  destruct zt; [ easy | ].
-  clear Htt.
-...
-      apply angle_lt_iff.
-      split. {
-        rewrite angle_add_comm.
-        apply angle_add_le_mono_l. 2: {
-...
       rewrite <- angle_add_overflow_equiv2 in Hovt.
       progress unfold angle_add_overflow2 in Hovt.
-(* tout dépend si θ₀ est inférieur ou supérieur à π *)
+      progress unfold angle_ltb in Hovt.
+      progress unfold angle_leb in Htt.
+      progress unfold angle_ltb in Htzs.
+      progress unfold angle_leb in Hst.
+      progress unfold angle_ltb.
+      cbn in Hst, Htzs.
+      rewrite (rngl_leb_refl Hor) in Htzs, Hst.
+(*
+      remember (0 ≤? rngl_sin θ)%L as zt eqn:Hzt.
+      symmetry in Hzt.
+      destruct zt. {
+        exfalso.
+        apply rngl_leb_le in Hst.
+        apply rngl_nlt_ge in Hst.
+        apply Hst; clear Hst.
+        apply (rngl_lt_iff Hor).
+        split ; [ apply rngl_cos_bound | ].
+        intros H; symmetry in H.
+        apply eq_rngl_cos_opp_1 in H.
+        subst θ.
+...
+*)
+      remember (0 ≤? rngl_sin θ₀)%L as zs eqn:Hzs.
+      symmetry in Hzs.
+      destruct zs; [ | easy ].
+      apply rngl_leb_le in Hzs.
+      remember (0 ≤? rngl_sin (θ + θ₀))%L as ztt eqn:Hztt.
+      remember (0 ≤? rngl_sin (θ₀ + θ₀))%L as ztztz eqn:Hztztz.
+      remember (0 ≤? rngl_sin θ)%L as zt eqn:Hzt.
+      symmetry in Hztt, Hztztz, Hzt.
+      destruct ztt. {
+        destruct ztztz; [ | easy ].
+        apply rngl_ltb_lt in Htzs.
+        apply rngl_leb_le in Hztztz.
+        apply rngl_ltb_lt.
+        destruct zt. {
+          apply rngl_leb_le in Hztt, Hzt, Htt, Hst.
+          apply rngl_ltb_lt in Hovt.
+          apply (rngl_nle_gt_iff Hor).
+          intros Hcc.
+          apply rngl_nlt_ge in Hst.
+          apply Hst; clear Hst.
+          apply (rngl_lt_iff Hor).
+          split ; [ apply rngl_cos_bound | ].
+          intros H; symmetry in H.
+          apply eq_rngl_cos_opp_1 in H.
+          subst θ.
+          rewrite rngl_sin_add_straight_l in Hztt.
+          apply (rngl_opp_nonneg_nonpos Hop Hor) in Hztt.
+          apply (rngl_le_antisymm Hor) in Hzs; [ | easy ].
+          clear Hztt.
+          apply eq_rngl_sin_0 in Hzs.
+          now destruct Hzs.
+        }
+        clear Hovt Htt Hst.
+        apply rngl_leb_le in Hztt.
+        apply (rngl_leb_gt Hor) in Hzt.
+Search (rngl_cos (_ + _) < rngl_cos (_ + _))%L.
+...
+          clear Hzt.
+          rewrite rngl_cos_add_straight_l in Hovt.
+          cbn in Hovt.
+          cbn in Hzt.
 ...
   progress unfold angle_ltb in Hovt.
   progress unfold angle_leb in Htt.
