@@ -1651,7 +1651,6 @@ destruct H2 as (H2, H5).
 progress unfold rngl_dist.
 rewrite (rngl_sub_opp_r Hop).
 rewrite rngl_cos_sub_cos.
-(**)
 rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
 rewrite (rngl_mul_div_assoc Hiv).
 rewrite <- rngl_mul_assoc.
@@ -2055,20 +2054,16 @@ clear - Hop Hor Hovt Hzst Hzstz Hzstt Htt.
       apply (rngl_opp_nonpos_nonneg Hop Hor).
       now apply rngl_sin_sub_nonneg.
     }
-(*****)
-    clear Htt.
     apply (rngl_leb_gt Hor) in Hzst.
+    clear - Hor Hzst H5 H2 Hzstst Hzstz.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
       change_angle_opp θ.
-      rewrite <- angle_opp_add_distr in H3, H5, H2, Hzstst.
-      progress sin_cos_opp_hyp T H3.
+      rewrite <- angle_opp_add_distr in H5, H2, Hzstst.
       progress sin_cos_opp_hyp T H5.
       progress sin_cos_opp_hyp T H2.
       progress sin_cos_opp_hyp T Hzc.
       progress sin_cos_opp_hyp T Hzstst.
       progress sin_cos_opp_hyp T Hzst.
-      progress sin_cos_opp_hyp T Hovt.
-      progress sin_cos_opp_hyp T Hzstt.
       destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
         apply rngl_nle_gt in H5.
         apply H5; clear H5.
@@ -2077,15 +2072,11 @@ clear - Hop Hor Hovt Hzst Hzstz Hzstt Htt.
       }
       apply (rngl_nle_gt_iff Hor) in Hzcz.
       change_angle_sub_l θ₀ angle_straight.
-      rewrite <- angle_sub_add_distr in Hzstt, Hovt.
       progress sin_cos_add_sub_straight_hyp T Hzstz.
       progress sin_cos_add_sub_straight_hyp T H2.
       progress sin_cos_add_sub_straight_hyp T H5.
-      progress sin_cos_add_sub_straight_hyp T H3.
       progress sin_cos_add_sub_straight_hyp T Hzstst.
       progress sin_cos_add_sub_straight_hyp T Hzcz.
-      progress sin_cos_add_sub_straight_hyp T Hzstt.
-      progress sin_cos_add_sub_straight_hyp T Hovt.
       apply rngl_nle_gt in H5.
       apply H5; clear H5.
       apply (rngl_lt_le_incl Hor).
@@ -2096,14 +2087,11 @@ clear - Hop Hor Hovt Hzst Hzstz Hzstt Htt.
     }
     apply (rngl_nle_gt_iff Hor) in Hzc.
     change_angle_add_r θ angle_straight.
-    progress sin_cos_add_sub_straight_hyp T H3.
     progress sin_cos_add_sub_straight_hyp T H5.
     progress sin_cos_add_sub_straight_hyp T H2.
     progress sin_cos_add_sub_straight_hyp T Hzc.
     progress sin_cos_add_sub_straight_hyp T Hzstst.
     progress sin_cos_add_sub_straight_hyp T Hzst.
-    progress sin_cos_add_sub_straight_hyp T Hovt.
-    progress sin_cos_add_sub_straight_hyp T Hzstt.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
       apply rngl_nle_gt in H2.
       apply H2; clear H2.
@@ -2115,11 +2103,8 @@ clear - Hop Hor Hovt Hzst Hzstz Hzstt Htt.
     progress sin_cos_add_sub_right_hyp T Hzstz.
     progress sin_cos_add_sub_right_hyp T H2.
     progress sin_cos_add_sub_right_hyp T H5.
-    progress sin_cos_add_sub_right_hyp T H3.
     progress sin_cos_add_sub_right_hyp T Hzstst.
     progress sin_cos_add_sub_right_hyp T Hzcz.
-    progress sin_cos_add_sub_right_hyp T Hzstt.
-    progress sin_cos_add_sub_right_hyp T Hovt.
     apply rngl_nle_gt in Hzstst.
     apply Hzstst; clear Hzstst.
     apply (rngl_lt_le_incl Hor) in Hzst, Hzc, Hzcz.
