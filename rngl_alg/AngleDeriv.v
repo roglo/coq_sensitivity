@@ -1908,7 +1908,6 @@ clear - Hop Hor Hovt Hzst Hzstz Hzstt Htt.
     remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
     remember (0 ≤? rngl_sin (θ₀ + θ))%L as zstt eqn:Hzstt.
     symmetry in Hzstz, Hzst, Hzstt.
-    clear - Hor Hop Hzstst Htt Hzst Hovt Hzstt Hzstz.
     destruct zstz. 2: {
       destruct zst; [ easy | ].
       destruct zstt; [ easy | ].
@@ -1994,10 +1993,10 @@ clear - Hop Hor Hovt Hzst Hzstz Hzstt Htt.
       apply (rngl_lt_le_incl Hor) in Hzstz, Hzst, Hzcz, Hzc.
       now apply rngl_sin_add_nonneg.
     }
-    clear - Hop Hor Hzstz Hzstst Hzst Htt Hzstt.
     apply rngl_leb_le in Hzstz.
     apply (rngl_leb_gt Hor) in Hzstst.
     destruct zst. {
+      clear - Hop Hor Hzstz Hzstst Hzst Htt Hzstt.
       apply rngl_leb_le in Hzst, Htt.
       destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
         destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
