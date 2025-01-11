@@ -2319,6 +2319,55 @@ apply rngl_cos_le_iff_angle_eucl_le.
           now apply rngl_sin_add_pos_2.
         }
         apply (rngl_nlt_ge_iff Hor) in Hzcz.
+        change_angle_sub_l θ₀ angle_straight.
+        progress sin_cos_add_sub_straight_hyp T Hztt.
+        progress sin_cos_add_sub_straight_hyp T Hzcz.
+        progress sin_cos_add_sub_straight_hyp T Hztztz.
+        progress sin_cos_add_sub_straight_hyp T Htzs.
+        progress sin_cos_add_sub_straight_hyp T Hzs.
+        progress sin_cos_add_sub_straight_goal T.
+        progress sin_cos_add_sub_straight_goal T.
+        rewrite <- angle_sub_add_distr in Hztztz |-*.
+        progress sin_cos_add_sub_straight_goal T.
+        progress sin_cos_add_sub_straight_hyp T Hztztz.
+        rewrite <- (rngl_opp_add_distr Hop).
+        apply (rngl_opp_pos_neg Hop Hor).
+        apply (rngl_nle_gt_iff Hor).
+        intros Hcc.
+        apply rngl_nlt_ge in Hztztz.
+        apply Hztztz; clear Hztztz.
+        apply rngl_sin_add_pos_2; [ | easy | easy | ]. {
+          apply (rngl_lt_iff Hor).
+          split; [ easy | ].
+          intros H; symmetry in H.
+          apply eq_rngl_sin_0 in H.
+          destruct H; subst θ₀; [ now rewrite angle_sub_0_r in Hts | ].
+          now rewrite angle_sub_diag in Htz.
+        } {
+          apply (rngl_lt_iff Hor).
+          split; [ easy | ].
+          intros H; symmetry in H.
+          apply eq_rngl_cos_0 in H.
+          destruct H; subst θ₀. {
+            rewrite rngl_sin_sub_right_r in Hztt.
+            clear Hzs Htzs Hzcz.
+            rewrite rngl_cos_sub_right_r in Hcc.
+            rewrite angle_right_add_right in Hcc.
+            cbn in Hcc.
+            rewrite (rngl_add_opp_r Hop) in Hcc.
+            apply -> (rngl_le_0_sub Hop Hor) in Hcc.
+            apply rngl_nlt_ge in Hcc.
+            apply Hcc; clear Hcc.
+            apply (rngl_lt_le_trans Hor _ 0); [ easy |].
+            apply (rngl_0_le_1 Hon Hos Hor).
+          }
+          apply rngl_nlt_ge in Hzs.
+          apply Hzs; clear Hzs.
+          apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+        }
+      }
+      destruct zt; [ easy | ].
+      clear Htt Hst.
 ...
 (**)
 destruct tt. {
