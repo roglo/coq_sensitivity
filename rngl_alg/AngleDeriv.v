@@ -2539,6 +2539,34 @@ apply rngl_cos_le_iff_angle_eucl_le.
         apply Hzs; clear Htz.
         apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
       }
+      apply (rngl_leb_gt Hor) in Hztt, Hztztz, Hzt.
+      apply rngl_ltb_lt in Hovt, Htzs.
+      apply rngl_ltb_lt.
+      destruct (rngl_lt_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
+        exfalso.
+        apply rngl_nle_gt in Hztztz.
+        apply Hztztz; clear Hztztz.
+        apply (rngl_lt_le_incl Hor) in Hzcz.
+        now apply rngl_sin_add_nonneg.
+      }
+      apply (rngl_nlt_ge_iff Hor) in Hzcz.
+...
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+          change_angle_opp θ.
+          rewrite angle_add_opp_l in Hovt, Hztt |-*.
+          rewrite <- angle_opp_sub_distr in Hovt, Hztt |-*.
+          progress sin_cos_opp_hyp T Hovt.
+          progress sin_cos_opp_hyp T Hzt.
+          progress sin_cos_opp_hyp T Hztt.
+          progress sin_cos_opp_hyp T Hzc.
+          cbn - [ angle_sub angle_add ].
+...
+          change_angle_add_r θ angle_right.
+          progress sin_cos_add_sub_right_hyp T Hovt.
+          progress sin_cos_add_sub_right_hyp T Hzt.
+          progress sin_cos_add_sub_right_hyp T Hztt.
+          progress sin_cos_add_sub_right_hyp T Hzc.
+          progress sin_cos_add_sub_right_goal T.
 ...
 (**)
 destruct tt. {
