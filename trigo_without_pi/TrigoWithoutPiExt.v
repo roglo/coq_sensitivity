@@ -2675,6 +2675,32 @@ now apply (rngl_mul_nonneg_nonneg Hos Hor).
 now apply (rngl_mul_pos_pos Hos Hor Hii).
 Qed.
 
+Theorem rngl_sin_mul_2_l :
+  ∀ θ, rngl_sin (2 * θ) = (2 * rngl_sin θ * rngl_cos θ)%L.
+Proof.
+destruct_ac.
+intros; cbn.
+do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_r.
+rewrite (rngl_mul_comm Hic (rngl_cos θ)).
+rewrite <- rngl_mul_assoc; symmetry.
+apply (rngl_mul_2_l Hon).
+Qed.
+
+Theorem rngl_cos_mul_2_l :
+  ∀ θ, rngl_cos (2 * θ) = ((rngl_cos θ)² - (rngl_sin θ)²)%L.
+Proof.
+destruct_ac.
+intros; cbn.
+do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_r.
+now do 2 rewrite fold_rngl_squ.
+Qed.
+
 End a.
 
 Arguments rngl_acos {T ro rp ac rl} x%_L.
