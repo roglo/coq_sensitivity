@@ -2578,7 +2578,69 @@ apply rngl_cos_le_iff_angle_eucl_le.
         apply (rngl_lt_le_incl Hor) in Hzt.
         now apply rngl_sin_add_nonneg.
       }
+      exfalso.
       apply (rngl_nle_gt_iff Hor) in Hzc.
+      change_angle_add_r θ angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hzt.
+      progress sin_cos_add_sub_straight_hyp T Hzc.
+      progress sin_cos_add_sub_straight_hyp T Hovt.
+      apply rngl_nle_gt in Hovt.
+      apply Hovt; clear Hovt.
+      apply (rngl_le_opp_l Hop Hor).
+      apply (rngl_lt_le_incl Hor) in Hzt, Hzc.
+      apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
+      now apply rngl_cos_sub_nonneg.
+    }
+    apply angle_ltb_ge in Htzs.
+    rewrite rngl_cos_sub_straight_r.
+    rewrite (rngl_add_opp_r Hop).
+    apply (rngl_le_sub_0 Hop Hor).
+    destruct (rngl_le_dec Hor 0 (rngl_sin (θ - θ₀))) as [Hztt| Hztt]. {
+      now apply rngl_cos_le_cos_div_2.
+    }
+    apply (rngl_nle_gt_iff Hor) in Hztt.
+    exfalso.
+    apply rngl_nle_gt in Hztt.
+    apply Hztt; clear Hztt.
+    move Htt at bottom.
+    progress unfold angle_leb in Htzs.
+    progress unfold angle_leb in Htt.
+    cbn in Htzs.
+    rewrite (rngl_leb_refl Hor) in Htzs.
+    remember (0 ≤? rngl_sin θ₀)%L as zst eqn:Hzst.
+    remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+    symmetry in Hzst, Hzs.
+    destruct zst. {
+      exfalso.
+      apply rngl_leb_le in Htzs.
+      apply rngl_nlt_ge in Htzs.
+      apply Htzs; clear Htzs.
+      apply (rngl_lt_iff Hor).
+      split; [ apply rngl_cos_bound | ].
+      intros H; symmetry in H.
+      now apply eq_rngl_cos_opp_1 in H.
+    }
+    clear Htzs.
+    destruct zs; [ easy | ].
+    apply (rngl_leb_gt Hor) in Hzst, Hzs.
+    apply rngl_leb_le in Htt.
+    change_angle_add_r θ₀ angle_straight.
+    change_angle_add_r θ angle_straight.
+    move Hzst at bottom.
+    move Hzs at bottom.
+    move Htt at bottom.
+    progress sin_cos_add_sub_straight_hyp T Hzst.
+    progress sin_cos_add_sub_straight_hyp T Hzs.
+    progress sin_cos_add_sub_straight_hyp T Htt.
+    progress sin_cos_add_sub_straight_goal T.
+    rewrite angle_sub_sub_distr.
+    progress sin_cos_add_sub_straight_goal T.
+    rewrite (rngl_add_opp_l Hop) in Htt.
+    apply -> (rngl_le_sub_0 Hop Hor) in Htt.
+    apply (rngl_lt_le_incl Hor) in Hzst, Hzs.
+    now apply rngl_sin_sub_nonneg.
+  }
+  apply angle_leb_gt in Ht2t.
 ...
 (**)
 destruct tt. {
