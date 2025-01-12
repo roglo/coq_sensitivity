@@ -2550,23 +2550,21 @@ apply rngl_cos_le_iff_angle_eucl_le.
         now apply rngl_sin_add_nonneg.
       }
       apply (rngl_nlt_ge_iff Hor) in Hzcz.
-...
-        destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
-          change_angle_opp θ.
-          rewrite angle_add_opp_l in Hovt, Hztt |-*.
-          rewrite <- angle_opp_sub_distr in Hovt, Hztt |-*.
-          progress sin_cos_opp_hyp T Hovt.
-          progress sin_cos_opp_hyp T Hzt.
-          progress sin_cos_opp_hyp T Hztt.
-          progress sin_cos_opp_hyp T Hzc.
-          cbn - [ angle_sub angle_add ].
-...
-          change_angle_add_r θ angle_right.
-          progress sin_cos_add_sub_right_hyp T Hovt.
-          progress sin_cos_add_sub_right_hyp T Hzt.
-          progress sin_cos_add_sub_right_hyp T Hztt.
-          progress sin_cos_add_sub_right_hyp T Hzc.
-          progress sin_cos_add_sub_right_goal T.
+      change_angle_sub_l θ₀ angle_straight.
+      rewrite angle_add_sub_assoc in Hztztz.
+      do 2 rewrite angle_add_sub_assoc.
+      rewrite <- angle_add_sub_swap in Hztztz |-*.
+      rewrite angle_straight_add_straight in Hztztz |-*.
+      rewrite angle_sub_0_l in Hztztz |-*.
+      rewrite <- angle_opp_add_distr in Hztztz |-*.
+      progress sin_cos_add_sub_straight_hyp T Hztt.
+      progress sin_cos_add_sub_straight_hyp T Hzcz.
+      progress sin_cos_add_sub_straight_hyp T Hztztz.
+      progress sin_cos_add_sub_straight_hyp T Htzs.
+      progress sin_cos_add_sub_straight_hyp T Hzs.
+      progress sin_cos_add_sub_straight_hyp T Hovt.
+      progress sin_cos_add_sub_straight_goal T.
+      rewrite rngl_cos_opp.
 ...
 (**)
 destruct tt. {
