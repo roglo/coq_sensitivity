@@ -2565,6 +2565,20 @@ apply rngl_cos_le_iff_angle_eucl_le.
       progress sin_cos_add_sub_straight_hyp T Hovt.
       progress sin_cos_add_sub_straight_goal T.
       rewrite rngl_cos_opp.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+        exfalso.
+        change_angle_opp θ.
+        rewrite <- angle_opp_add_distr in Hztt.
+        progress sin_cos_opp_hyp T Hzt.
+        progress sin_cos_opp_hyp T Hztt.
+        progress sin_cos_opp_hyp T Hzc.
+        apply rngl_nle_gt in Hztt.
+        apply Hztt; clear Hztt.
+        apply (rngl_opp_nonpos_nonneg Hop Hor).
+        apply (rngl_lt_le_incl Hor) in Hzt.
+        now apply rngl_sin_add_nonneg.
+      }
+      apply (rngl_nle_gt_iff Hor) in Hzc.
 ...
 (**)
 destruct tt. {
