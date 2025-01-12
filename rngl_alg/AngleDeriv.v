@@ -2368,6 +2368,35 @@ apply rngl_cos_le_iff_angle_eucl_le.
       }
       destruct zt; [ easy | ].
       clear Htt Hst.
+      destruct ztztz. {
+        exfalso.
+        apply (rngl_leb_gt Hor) in Hztt, Hzt.
+        apply rngl_ltb_lt in Hovt, Htzs.
+        apply rngl_leb_le in Hztztz.
+        destruct (rngl_lt_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+            change_angle_opp θ.
+            rewrite angle_add_opp_l in Hovt, Hztt.
+            progress sin_cos_opp_hyp T Hovt.
+            progress sin_cos_opp_hyp T Hzt.
+            progress sin_cos_opp_hyp T Hzc.
+            rewrite rngl_sin_sub_anticomm in Hztt.
+            apply (rngl_opp_neg_pos Hop Hor) in Hztt.
+            apply rngl_nle_gt in Hovt.
+            apply Hovt; clear Hovt.
+            apply (rngl_lt_eq_cases Hor).
+            left.
+            apply (rngl_lt_le_incl Hor) in Hzt, Hzcz, Hztt.
+            apply rngl_cos_lt_rngl_cos_sub; [ easy | | ]. {
+              apply (rngl_lt_iff Hor).
+              split; [ easy | ].
+              intros H; symmetry in H.
+              apply eq_rngl_sin_0 in H.
+              now destruct H.
+            }
+            now apply quadrant_1_sin_sub_nonneg_cos_le.
+          }
+          apply (rngl_nle_gt_iff Hor) in Hzc.
 ...
 (**)
 destruct tt. {
