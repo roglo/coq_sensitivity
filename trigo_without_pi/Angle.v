@@ -43,6 +43,7 @@ End a.
 Arguments angle T {ro}.
 Arguments mk_angle {T ro} (rngl_cos rngl_sin)%_L.
 Arguments angle_ctx T {ro rp}.
+Arguments cos2_sin2_prop {T ro} (x y)%_L.
 
 Ltac destruct_ac :=
   set (Hic := ac_ic);
@@ -84,7 +85,7 @@ split; intros Hab H; [ now subst θ2 | ].
 now apply eq_angle_eq in H.
 Qed.
 
-Theorem angle_zero_prop : (cos2_sin2_prop 1 0)%L.
+Theorem angle_zero_prop : cos2_sin2_prop 1 0.
 Proof.
 destruct_ac.
 progress unfold cos2_sin2_prop.
@@ -95,7 +96,7 @@ rewrite rngl_add_0_r.
 apply (rngl_eqb_refl Hed).
 Qed.
 
-Theorem angle_right_prop : cos2_sin2_prop 0%L 1%L.
+Theorem angle_right_prop : cos2_sin2_prop 0 1.
 Proof.
 destruct_ac.
 progress unfold cos2_sin2_prop.
@@ -105,7 +106,7 @@ rewrite rngl_add_0_l.
 apply (rngl_eqb_refl Hed).
 Qed.
 
-Theorem angle_straight_prop : (cos2_sin2_prop (-1) 0)%L.
+Theorem angle_straight_prop : cos2_sin2_prop (-1) 0.
 Proof.
 destruct_ac.
 progress unfold cos2_sin2_prop.
@@ -120,8 +121,8 @@ Qed.
 Theorem angle_add_prop :
   ∀ a b,
   cos2_sin2_prop
-    (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)%L
-    (rngl_sin a * rngl_cos b + rngl_cos a * rngl_sin b)%L.
+    (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)
+    (rngl_sin a * rngl_cos b + rngl_cos a * rngl_sin b).
 Proof.
 destruct_ac.
 intros.
@@ -149,7 +150,7 @@ rewrite Hxy'.
 now do 2 rewrite (rngl_mul_1_r Hon).
 Qed.
 
-Theorem angle_opp_prop : ∀ a, cos2_sin2_prop (rngl_cos a) (- rngl_sin a)%L.
+Theorem angle_opp_prop : ∀ a, cos2_sin2_prop (rngl_cos a) (- rngl_sin a).
 Proof.
 destruct_ac.
 intros.
