@@ -2641,6 +2641,17 @@ apply rngl_cos_le_iff_angle_eucl_le.
     now apply rngl_sin_sub_nonneg.
   }
   apply angle_leb_gt in Ht2t.
+  remember (θ₀ <? angle_straight)%A as tzs eqn:Htzs.
+  symmetry in Htzs.
+  rewrite angle_add_sub_swap, rngl_cos_add_straight_r.
+  rewrite (rngl_add_opp_r Hop).
+  apply (rngl_le_sub_0 Hop Hor).
+  destruct tzs. {
+    rewrite angle_sub_0_r.
+    destruct (rngl_le_dec Hor 0 (rngl_sin (θ - θ₀))) as [Hzstt| Hzstt]. {
+      now apply rngl_cos_le_cos_div_2.
+    }
+    apply (rngl_nle_gt_iff Hor) in Hzstt.
 ...
 (**)
 destruct tt. {
