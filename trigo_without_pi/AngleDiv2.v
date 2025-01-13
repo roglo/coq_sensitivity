@@ -585,6 +585,15 @@ Theorem rngl_cos_le_cos_div_2 :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -651,7 +660,26 @@ rewrite (rngl_squ_sqrt Hon) in Hs. 2: {
   apply (rngl_0_le_1 Hon Hos Hor).
 }
 specialize (cos2_sin2_1 θ) as H1.
-(* probablement faisable, mais ça reste assez compliqué, tout de même *)
+apply (rngl_add_move_l Hop) in H1.
+rewrite H1 in Hs.
+apply (rngl_le_sub_le_add_l Hop Hor) in Hs.
+rewrite rngl_add_comm in Hs.
+apply <- (rngl_le_sub_le_add_l Hop Hor) in Hs.
+rewrite <- (rngl_mul_div Hi1 1 2²) in Hs at 1. 2: {
+  intros H.
+  apply (eq_rngl_squ_0 Hos Hio) in H.
+  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H.
+}
+rewrite (rngl_mul_1_l Hon) in Hs.
+rewrite <- (rngl_div_sub_distr_r Hop Hiv) in Hs.
+replace (2² - 3)%L with 1%L in Hs. 2: {
+  symmetry.
+  apply (rngl_add_sub_eq_r Hos).
+  progress unfold rngl_squ.
+  rewrite rngl_mul_add_distr_l.
+  rewrite (rngl_mul_1_r Hon).
+  now do 2 rewrite <- rngl_add_assoc.
+}
 ...
 Search (_ < √((1 + _) / 2))%L.
 Search √((1 + _) / 2)%L.
