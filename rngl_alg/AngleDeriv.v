@@ -2652,6 +2652,7 @@ apply rngl_cos_le_iff_angle_eucl_le.
       now apply rngl_cos_le_cos_div_2.
     }
     apply (rngl_nle_gt_iff Hor) in Hzstt.
+About rngl_cos_le_cos_div_2.
 ...
 (**)
 destruct tt. {

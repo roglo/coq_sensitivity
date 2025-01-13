@@ -577,6 +577,93 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
 apply rngl_cos_bound.
 Qed.
 
+(* to be completed
+Theorem rngl_cos_le_cos_div_2 :
+  ∀ θ,
+  (0 ≤ rngl_sin θ ∨ rngl_cos θ ≤ 0 ∧ - (rl_sqrt 3 / 2) ≤ rngl_sin θ)%L
+  → (rngl_cos θ ≤ rngl_cos (θ /₂))%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  do 2 rewrite (H1 (rngl_cos _)).
+  apply (rngl_le_refl Hor).
+}
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+intros * Hss.
+remember (θ =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
+destruct tz. {
+  apply angle_eqb_eq in Htz.
+  subst θ.
+  rewrite angle_0_div_2.
+  apply (rngl_le_refl Hor).
+}
+apply angle_eqb_neq in Htz.
+cbn.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  apply (rngl_lt_le_incl Hor).
+  rewrite (rngl_mul_1_l Hon).
+  now apply (rngl_cos_lt_sqrt_1_add_cos_div_2 Hc1).
+}
+apply (rngl_leb_gt Hor) in Hzs.
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+destruct Hss as [Hss| Hss]; [ now apply rngl_nle_gt in Hss | ].
+destruct Hss as (Hzc, Hs).
+remember (θ - angle_straight)%A as θ' eqn:Hθ';
+apply angle_add_move_r in Hθ';
+subst θ; rename θ' into θ.
+rewrite rngl_cos_add_straight_r in Hzc |-*.
+rewrite rngl_sin_add_straight_r in Hzs, Hs.
+apply (rngl_opp_le_compat Hop Hor) in Hs.
+apply -> (rngl_opp_le_compat Hop Hor).
+apply (rngl_opp_neg_pos Hop Hor) in Hzs.
+apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzc.
+rewrite (rngl_add_opp_r Hop).
+apply (rngl_le_squ_le Hop Hor Hii); [ | easy | ]. {
+  apply rl_sqrt_nonneg.
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+apply -> (rngl_le_div_l Hon Hop Hiv Hor); [ | easy ].
+apply (rngl_le_sub_le_add_r Hop Hor).
+apply (rngl_le_le_squ Hop Hor Hii) in Hs; [ | now apply rngl_lt_le_incl ].
+rewrite (rngl_squ_div Hic Hon Hos Hiv) in Hs. 2: {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+rewrite (rngl_squ_sqrt Hon) in Hs. 2: {
+  apply (rngl_le_trans Hor _ 2); [ now apply rngl_lt_le_incl | ].
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_le_add_l Hor).
+  apply (rngl_0_le_1 Hon Hos Hor).
+}
+specialize (cos2_sin2_1 θ) as H1.
+(* probablement faisable, mais ça reste assez compliqué, tout de même *)
+...
+Search (_ < √((1 + _) / 2))%L.
+Search √((1 + _) / 2)%L.
+Search (_ < √((1 + _) / 2))%L.
+Search (_ < √((1 + _) / 2))%L.
+Search (√(1 - _) / 2)%L.
+Check rngl_cos_lt_sqrt_1_add_cos_div_2.
+...
+Qed.
+...
+*)
+
 Theorem rngl_cos_le_cos_div_2 :
   ∀ θ, (0 ≤ rngl_sin θ)%L → (rngl_cos θ ≤ rngl_cos (θ /₂))%L.
 Proof.
