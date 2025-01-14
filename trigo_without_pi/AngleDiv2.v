@@ -800,6 +800,7 @@ Theorem rngl_cos_le_cos_div_2 :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   specialize (rngl_characteristic_1_angle_0 Hc1) as H2.
@@ -885,6 +886,7 @@ split; intros Hs3. {
     apply (rngl_le_add_l Hor).
     apply (rngl_0_le_1 Hon Hos Hor).
   }
+  clear Hzs32.
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
   symmetry in Hzs.
   destruct zs; [ easy | ].
@@ -893,6 +895,49 @@ split; intros Hs3. {
   rewrite Hzs in Hs3.
   rewrite (rngl_mul_opp_l Hop) in Hs3.
   rewrite (rngl_mul_1_l Hon) in Hs3.
+(**)
+  remember (θ - angle_straight)%A as θ' eqn:Hθ';
+  apply angle_add_move_r in Hθ';
+  subst θ; rename θ' into θ.
+  rewrite rngl_cos_add_straight_r in Hs3 |-*.
+  rewrite rngl_sin_add_straight_r in Hzs.
+  apply (rngl_opp_le_compat Hop Hor) in Hs3.
+  apply -> (rngl_opp_le_compat Hop Hor).
+  rewrite (rngl_add_opp_r Hop) in Hs3.
+  apply (rngl_le_le_squ Hop Hor Hii) in Hs3. 2: {
+    apply rl_sqrt_nonneg.
+    apply rngl_1_sub_cos_div_2_nonneg.
+  }
+  rewrite (rngl_squ_sqrt Hon) in Hs3. 2: {
+    apply rngl_1_sub_cos_div_2_nonneg.
+  }
+  apply (rngl_le_div_l Hon Hop Hiv Hor) in Hs3; [ | easy ].
+  apply (rngl_leb_gt Hor) in Hzs.
+  apply (rngl_opp_neg_pos Hop Hor) in Hzs.
+...
+  eapply (rngl_le_trans Hor); [ | apply Hs3 ].
+  apply (rngl_le_squ_le Hop Hor Hii). {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+    apply (rngl_0_le_1 Hon Hos Hor).
+  } {
+    apply (rl_sqrt_nonneg).
+    apply rngl_1_sub_cos_div_2_nonneg.
+  }
+  rewrite (rngl_squ_sqrt Hon). 2: {
+    apply rngl_1_sub_cos_div_2_nonneg.
+  }
+  rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+  rewrite (rngl_squ_1 Hon).
+  progress unfold rngl_squ.
+  rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii); [ easy | ].
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite rngl_add_comm.
+  apply <- (rngl_le_add_le_sub_r Hop Hor).
+  rewrite <- (rngl_div_diag Hon Hiq 2) at 1; [ | easy ].
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  rewrite (rngl_add_sub Hos).
+...
   eapply (rngl_le_trans Hor); [ apply Hs3 | ].
   apply -> (rngl_opp_le_compat Hop Hor).
   apply (rngl_le_squ_le Hop Hor Hii). {
@@ -911,6 +956,47 @@ split; intros Hs3. {
   rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
   apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii); [ easy | ].
   apply (rngl_le_sub_le_add_l Hop Hor).
+  rewrite <- (rngl_div_diag Hon Hiq 2) at 4; [ | easy ].
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  rewrite (rngl_sub_add_distr Hos).
+  rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_sub_0_l Hop).
+  rewrite (rngl_div_opp_l Hop Hiv).
+(*
+  apply (rngl_nlt_ge_iff Hor).
+  intros H12c.
+  apply rngl_nlt_ge in Hs3.
+  apply Hs3; clear Hs3.
+  apply (rngl_opp_lt_compat Hop Hor) in H12c.
+  eapply (rngl_lt_trans Hor).
+...
+*)
+...
+  remember (θ - angle_straight)%A as θ' eqn:Hθ';
+  apply angle_add_move_r in Hθ';
+  subst θ; rename θ' into θ.
+  rewrite rngl_cos_add_straight_r in Hs3 |-*.
+  rewrite rngl_sin_add_straight_r in Hzs.
+  apply (rngl_opp_le_compat Hop Hor) in Hs3.
+  apply -> (rngl_opp_le_compat Hop Hor).
+  rewrite (rngl_add_opp_r Hop) in Hs3.
+(*
+  apply (rngl_nlt_ge_iff Hor).
+  intros H12c.
+  apply rngl_nlt_ge in Hs3.
+  apply Hs3; clear Hs3.
+...
+*)
+  apply (rngl_le_le_squ Hop Hor Hii) in Hs3. 2: {
+    apply rl_sqrt_nonneg.
+    apply rngl_1_sub_cos_div_2_nonneg.
+  }
+  rewrite (rngl_squ_sqrt Hon) in Hs3. 2: {
+    apply rngl_1_sub_cos_div_2_nonneg.
+  }
+  apply (rngl_le_div_l Hon Hop Hiv Hor) in Hs3; [ | easy ].
+  apply (rngl_leb_gt Hor) in Hzs.
+  apply (rngl_opp_neg_pos Hop Hor) in Hzs.
 ...
     rewrite (rngl_div_1_l Hon Hiv).
 Search (_ ≤ _⁻¹)%L.
