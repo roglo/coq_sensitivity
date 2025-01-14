@@ -792,7 +792,6 @@ rewrite (rngl_div_diag Hon Hiq); [ | easy ].
 apply (rngl_mul_1_l Hon).
 Qed.
 
-(* to be completed
 Theorem rngl_cos_le_cos_div_2 :
   ∀ θ,
   (θ ≤ 4 * angle_straight_div_3)%A
@@ -951,8 +950,8 @@ split; intros Hs3. {
   now apply (rngl_lt_irrefl Hor) in Hzs.
 }
 Qed.
-*)
 
+(*
 Theorem rngl_cos_le_cos_div_2 :
   ∀ θ, (0 ≤ rngl_sin θ)%L → (rngl_cos θ ≤ rngl_cos (θ /₂))%L.
 Proof.
@@ -980,6 +979,7 @@ apply (rngl_lt_le_incl Hor).
 rewrite (rngl_mul_1_l Hon).
 now apply (rngl_cos_lt_sqrt_1_add_cos_div_2 Hc1).
 Qed.
+*)
 
 Fixpoint angle_div_2_pow θ i :=
   match i with

@@ -2596,6 +2596,8 @@ apply rngl_cos_le_iff_angle_eucl_le.
     rewrite (rngl_add_opp_r Hop).
     apply (rngl_le_sub_0 Hop Hor).
     destruct (rngl_le_dec Hor 0 (rngl_sin (θ - θ₀))) as [Hztt| Hztt]. {
+      apply rngl_cos_le_cos_div_2.
+...
       now apply rngl_cos_le_cos_div_2.
     }
     apply (rngl_nle_gt_iff Hor) in Hztt.
