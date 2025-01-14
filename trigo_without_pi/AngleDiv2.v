@@ -792,6 +792,30 @@ rewrite (rngl_div_diag Hon Hiq); [ | easy ].
 apply (rngl_mul_1_l Hon).
 Qed.
 
+Theorem rngl_0_leb_opp_sqrt_3_div_2 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  rngl_characteristic T ≠ 1 →
+  (0 ≤? - (√3 / 2))%L = false.
+Proof.
+intros Hon Hop Hiv Hor Hc1.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite (rngl_leb_0_opp Hop Hor).
+apply (rngl_leb_gt Hor).
+apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+apply (rl_sqrt_pos Hon Hos Hor).
+apply (rngl_lt_le_trans Hor _ 2). {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+apply (rngl_add_le_mono_r Hop Hor).
+apply (rngl_le_add_l Hor).
+apply (rngl_0_le_1 Hon Hos Hor).
+Qed.
+
 Theorem angle_straight_le_4_angle_straight_div_3 :
   (angle_straight ≤ 4 * angle_straight_div_3)%A.
 Proof.
@@ -809,20 +833,7 @@ rewrite angle_mul_4_angle_straight_div_3.
 rewrite rngl_cos_add_straight_r.
 rewrite rngl_sin_add_straight_r.
 cbn.
-rewrite (rngl_leb_0_opp Hop Hor).
-remember (√3 / 2 ≤? 0)%L as s32 eqn:Hs32.
-symmetry in Hs32.
-destruct s32; [ | easy ].
-exfalso.
-apply Bool.not_false_iff_true in Hs32.
-apply Hs32; clear Hs32.
-apply (rngl_leb_gt Hor).
-apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
-apply (rl_sqrt_pos Hon Hos Hor).
-apply (rngl_lt_le_trans Hor _ 2); [ easy | ].
-apply (rngl_add_le_mono_r Hop Hor).
-apply (rngl_le_add_l Hor).
-apply (rngl_0_le_1 Hon Hos Hor).
+now rewrite (rngl_0_leb_opp_sqrt_3_div_2 Hon Hop Hiv Hor Hc1).
 Qed.
 
 Theorem rngl_cos_le_cos_div_2 :
@@ -868,7 +879,7 @@ split; intros Hs3. {
     rewrite (rngl_mul_1_l Hon).
     now apply (rngl_cos_lt_sqrt_1_add_cos_div_2 Hc1).
   }
-  destruct (0 ≤? - (√3 / 2))%L; [ easy | ].
+  rewrite (rngl_0_leb_opp_sqrt_3_div_2 Hon Hop Hiv Hor Hc1) in Hs3.
   apply rngl_leb_le in Hs3.
   cbn.
   rewrite Hzs.
@@ -902,23 +913,7 @@ split; intros Hs3. {
   rewrite rngl_cos_add_straight_r.
   rewrite rngl_sin_add_straight_r.
   cbn.
-  remember (0 ≤? - (√3 / 2))%L as zs32 eqn:Hzs32.
-  symmetry in Hzs32.
-  destruct zs32. {
-    exfalso.
-    apply Bool.not_false_iff_true in Hzs32.
-    apply Hzs32; clear Hzs32.
-    apply (rngl_leb_gt Hor).
-    rewrite <- (rngl_opp_0 Hop).
-    apply -> (rngl_opp_lt_compat Hop Hor).
-    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
-    apply (rl_sqrt_pos Hon Hos Hor).
-    apply (rngl_lt_le_trans Hor _ 2); [ easy | ].
-    apply (rngl_add_le_mono_r Hop Hor).
-    apply (rngl_le_add_l Hor).
-    apply (rngl_0_le_1 Hon Hos Hor).
-  }
-  clear Hzs32.
+  rewrite (rngl_0_leb_opp_sqrt_3_div_2 Hon Hop Hiv Hor Hc1).
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
   symmetry in Hzs.
   destruct zs; [ easy | ].

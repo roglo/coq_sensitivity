@@ -2091,6 +2091,20 @@ rewrite angle_right_add_right in Htt.
 now rewrite angle_opp_straight in Htt.
 Qed.
 
+Theorem rngl_cos_4_angle_straight_div_3 :
+  rngl_cos (4 * angle_straight_div_3) = (- (1 / 2))%L.
+Proof.
+rewrite angle_mul_4_angle_straight_div_3.
+now rewrite rngl_cos_add_straight_r.
+Qed.
+
+Theorem rngl_sin_4_angle_straight_div_3 :
+  rngl_sin (4 * angle_straight_div_3) = (- (√3 / 2))%L.
+Proof.
+rewrite angle_mul_4_angle_straight_div_3.
+now rewrite rngl_sin_add_straight_r.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   new_is_derivative angle_eucl_dist rngl_dist
@@ -2628,13 +2642,20 @@ apply rngl_cos_le_iff_angle_eucl_le.
     destruct tzs. {
       apply (rngl_le_sub_0 Hop Hor).
       rewrite angle_sub_0_r.
-...
-    destruct (rngl_le_dec Hor 0 (rngl_sin (θ - θ₀))) as [Hzstt| Hzstt]. {
-...
       now apply rngl_cos_le_cos_div_2.
     }
-    apply (rngl_nle_gt_iff Hor) in Hzstt.
-About rngl_cos_le_cos_div_2.
+    apply angle_ltb_ge in Htzs.
+    rewrite rngl_cos_sub_straight_r.
+    rewrite (rngl_sub_opp_r Hop).
+    progress unfold angle_leb in Htt.
+    progress unfold angle_ltb in Ht2t.
+    progress unfold angle_leb in Hztt.
+    progress unfold angle_leb in Htzs.
+    rewrite rngl_cos_4_angle_straight_div_3 in Hztt.
+    rewrite rngl_sin_4_angle_straight_div_3 in Hztt.
+    rewrite rngl_0_leb_opp_sqrt_3_div_2 in Hztt.
+    cbn in Htzs.
+    rewrite (rngl_leb_refl Hor) in Htzs.
 ...
 (**)
 destruct tt. {
