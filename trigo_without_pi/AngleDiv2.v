@@ -889,11 +889,11 @@ split; intros Hs3. {
   symmetry in Hzs.
   destruct zs; [ easy | ].
   apply rngl_leb_le.
+  cbn in Hs3.
+  rewrite Hzs in Hs3.
+  rewrite (rngl_mul_opp_l Hop) in Hs3.
+  rewrite (rngl_mul_1_l Hon) in Hs3.
   eapply (rngl_le_trans Hor); [ apply Hs3 | ].
-  cbn.
-  rewrite Hzs.
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_mul_1_l Hon).
   apply -> (rngl_opp_le_compat Hop Hor).
   apply (rngl_le_squ_le Hop Hor Hii). {
     apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
@@ -905,6 +905,12 @@ split; intros Hs3. {
   rewrite (rngl_squ_sqrt Hon). 2: {
     apply rngl_1_add_cos_div_2_nonneg.
   }
+  rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+  rewrite (rngl_squ_1 Hon).
+  progress unfold rngl_squ.
+  rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii); [ easy | ].
+  apply (rngl_le_sub_le_add_l Hop Hor).
 ...
     rewrite (rngl_div_1_l Hon Hiv).
 Search (_ ≤ _⁻¹)%L.
