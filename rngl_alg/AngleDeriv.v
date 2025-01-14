@@ -2570,40 +2570,11 @@ apply rngl_cos_le_iff_angle_eucl_le.
     rewrite rngl_cos_sub_straight_r.
     rewrite (rngl_add_opp_r Hop).
     apply (rngl_le_sub_0 Hop Hor).
-    destruct (rngl_le_dec Hor 0 (rngl_sin (θ - θ₀))) as [Hztt| Hztt]. {
-      apply rngl_cos_le_cos_div_2.
-(**)
-      apply (angle_le_trans _ angle_straight). {
-        now apply rngl_sin_nonneg_angle_le_straight.
-      }
-      progress unfold angle_leb.
-      cbn - [ angle_mul_nat ].
-      rewrite (rngl_leb_refl Hor).
-      rewrite angle_mul_4_angle_straight_div_3.
-      rewrite rngl_cos_add_straight_r.
-      rewrite rngl_sin_add_straight_r.
-      cbn.
-      rewrite (rngl_leb_0_opp Hop Hor).
-      remember (√3 / 2 ≤? 0)%L as s32 eqn:Hs32.
-      symmetry in Hs32.
-      destruct s32; [ | easy ].
-      exfalso.
-      apply Bool.not_false_iff_true in Hs32.
-      apply Hs32; clear Hs32.
-      apply (rngl_leb_gt Hor).
-      apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
-      apply (rl_sqrt_pos Hon Hos Hor).
-      apply (rngl_lt_le_trans Hor _ 2); [ easy | ].
-      apply (rngl_add_le_mono_r Hop Hor).
-      apply (rngl_le_add_l Hor).
-      apply (rngl_0_le_1 Hon Hos Hor).
-(*
+    destruct (angle_le_dec (θ - θ₀) (4 * angle_straight_div_3))
+        as [Hztt| Hztt]. {
       now apply rngl_cos_le_cos_div_2.
-*)
     }
-    apply (rngl_nle_gt_iff Hor) in Hztt.
     exfalso.
-    apply rngl_nle_gt in Hztt.
     apply Hztt; clear Hztt.
     move Htt at bottom.
     progress unfold angle_leb in Htzs.
@@ -2637,20 +2608,27 @@ apply rngl_cos_le_iff_angle_eucl_le.
     progress sin_cos_add_sub_straight_hyp T Htt.
     progress sin_cos_add_sub_straight_goal T.
     rewrite angle_sub_sub_distr.
-    progress sin_cos_add_sub_straight_goal T.
+    rewrite angle_add_sub.
     rewrite (rngl_add_opp_l Hop) in Htt.
     apply -> (rngl_le_sub_0 Hop Hor) in Htt.
     apply (rngl_lt_le_incl Hor) in Hzst, Hzs.
+    apply (angle_le_trans _ angle_straight). 2: {
+      apply angle_straight_le_4_angle_straight_div_3.
+    }
+    apply rngl_sin_nonneg_angle_le_straight.
     now apply rngl_sin_sub_nonneg.
   }
   apply angle_leb_gt in Ht2t.
-  remember (θ₀ <? angle_straight)%A as tzs eqn:Htzs.
-  symmetry in Htzs.
   rewrite angle_add_sub_swap, rngl_cos_add_straight_r.
   rewrite (rngl_add_opp_r Hop).
-  apply (rngl_le_sub_0 Hop Hor).
-  destruct tzs. {
-    rewrite angle_sub_0_r.
+  destruct (angle_le_dec (θ - θ₀) (4 * angle_straight_div_3))
+      as [Hztt| Hztt]. {
+    remember (θ₀ <? angle_straight)%A as tzs eqn:Htzs.
+    symmetry in Htzs.
+    destruct tzs. {
+      apply (rngl_le_sub_0 Hop Hor).
+      rewrite angle_sub_0_r.
+...
     destruct (rngl_le_dec Hor 0 (rngl_sin (θ - θ₀))) as [Hzstt| Hzstt]. {
 ...
       now apply rngl_cos_le_cos_div_2.

@@ -792,6 +792,39 @@ rewrite (rngl_div_diag Hon Hiq); [ | easy ].
 apply (rngl_mul_1_l Hon).
 Qed.
 
+Theorem angle_straight_le_4_angle_straight_div_3 :
+  (angle_straight ≤ 4 * angle_straight_div_3)%A.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  rewrite (H1 angle_straight).
+  apply angle_nonneg.
+}
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+progress unfold angle_leb.
+cbn - [ angle_mul_nat ].
+rewrite (rngl_leb_refl Hor).
+rewrite angle_mul_4_angle_straight_div_3.
+rewrite rngl_cos_add_straight_r.
+rewrite rngl_sin_add_straight_r.
+cbn.
+rewrite (rngl_leb_0_opp Hop Hor).
+remember (√3 / 2 ≤? 0)%L as s32 eqn:Hs32.
+symmetry in Hs32.
+destruct s32; [ | easy ].
+exfalso.
+apply Bool.not_false_iff_true in Hs32.
+apply Hs32; clear Hs32.
+apply (rngl_leb_gt Hor).
+apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+apply (rl_sqrt_pos Hon Hos Hor).
+apply (rngl_lt_le_trans Hor _ 2); [ easy | ].
+apply (rngl_add_le_mono_r Hop Hor).
+apply (rngl_le_add_l Hor).
+apply (rngl_0_le_1 Hon Hos Hor).
+Qed.
+
 Theorem rngl_cos_le_cos_div_2 :
   ∀ θ,
   (θ ≤ 4 * angle_straight_div_3)%A
