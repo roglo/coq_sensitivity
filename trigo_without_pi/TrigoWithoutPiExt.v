@@ -805,7 +805,6 @@ destruct s1z. {
       progress sin_cos_add_sub_straight_hyp T Hzs12.
       progress sin_cos_add_sub_straight_hyp T Hs2z.
       progress sin_cos_add_sub_straight_hyp T Hc21.
-      rewrite (rngl_add_opp_l Hop) in Hc21.
       apply -> (rngl_le_sub_0 Hop Hor) in Hc21.
       apply rngl_nle_gt in Hzs12.
       apply Hzs12; clear Hzs12.

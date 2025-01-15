@@ -490,9 +490,6 @@ progress sin_cos_add_sub_straight_hyp T Haov13.
 progress sin_cos_add_sub_straight_hyp T Hs1z.
 progress sin_cos_add_sub_straight_hyp T Hzs13.
 progress sin_cos_add_sub_straight_hyp T Hc1z.
-rewrite (rngl_add_opp_r Hop) in Haov13.
-rewrite <- (rngl_opp_add_distr Hop) in Haov13.
-apply (rngl_opp_nonpos_nonneg Hop Hor) in Haov13.
 move Hs1z at bottom.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
   exfalso.

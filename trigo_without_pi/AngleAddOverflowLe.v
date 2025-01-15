@@ -397,8 +397,6 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
   progress sin_cos_add_sub_straight_hyp T Hzs13.
   progress sin_cos_add_sub_straight_hyp T Hc3z.
   progress sin_cos_add_sub_straight_hyp T H32.
-  rewrite rngl_add_comm in H32.
-  rewrite (rngl_add_opp_r Hop) in H32.
   apply -> (rngl_le_sub_0 Hop Hor) in H32.
   destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
     apply rngl_nlt_ge in Hzs13.
