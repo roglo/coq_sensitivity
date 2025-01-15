@@ -2223,33 +2223,16 @@ rewrite <- (rngl_abs_opp Hop Hor).
 rewrite (rngl_opp_add_distr Hop).
 rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_opp_l Hop).
-...
-(* je pense que le problème vient de quand θ+θ₀ ≥ 2π ; il faudrait donc
-   commencer par le test "ovt = false", voir s'il peut se traiter
-   complètement, et donc faire le cas "tt" comme un sous cas *)
-...
-(* qu'est-ce que ça donne pour θ₀ < θ ? *)
-destruct tt. 2: {
-  apply angle_ltb_ge in Htt.
-  rewrite (rngl_mul_1_r Hon).
-  remember (_ + _)%A as x eqn:Hx.
-(*
-  Htt : (θ₀ ≤ θ)%A
-  Hx : x = ((θ + θ₀) /₂ + (if ovt then angle_straight else 0))%A
-  ============================
-  (rngl_abs (rngl_sin x - rngl_sin θ₀) < ε)%L
-*)
-  apply Hsc.
-(*
-  Htt : (θ₀ ≤ θ)%A
-  Hx : x = ((θ + θ₀) /₂ + (if ovt then angle_straight else 0))%A
-  ============================
-  (angle_eucl_dist x θ₀ < η)%L
-*)
-  subst x.
-  eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
-  clear η Hη Hsc H4 H1.
-  destruct ovt. 2: {
+(**)
+destruct ovt. 2: {
+  destruct tt. 2: {
+    apply angle_ltb_ge in Htt.
+    rewrite (rngl_mul_1_r Hon).
+    remember (_ + _)%A as x eqn:Hx.
+    apply Hsc.
+    subst x.
+    eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
+    clear η Hη Hsc H4 H1.
     rewrite angle_add_0_r.
     rewrite angle_eucl_dist_move_0_r.
     rewrite (angle_eucl_dist_move_0_r θ).
@@ -2291,9 +2274,8 @@ destruct tt. 2: {
     clear - Hor Hop Hovt Htt H3 H5 H2.
     now apply rngl_cos_derivative_lemma_2.
   }
-...
-(* c'est peut-être à partir de là que ça déconne *)
-(* avec θ+θ₀ > 2π *)
+  (* super... maintenant, il y a le cas θ<θ₀ avec
+     overflow θ θ₀ restant false *)
 ...
   apply rngl_cos_le_iff_angle_eucl_le.
   rewrite angle_add_sub_swap.
