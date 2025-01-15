@@ -1543,18 +1543,6 @@ Theorem angle_add_if_distr_r :
   ((if u then a else b) + c = if u then a + c else b + c)%A.
 Proof. now intros; destruct u. Qed.
 
-Definition new_is_limit_when_tending_to_neighbourhood {A B} da db
-     (f : A → B) (x₀ : A) (L : B) :=
-  (∀ ε : T, 0 < ε → ∃ η : T, ∀ x : A, 0 < da x x₀ < η → db (f x) L < ε)%L.
-
-Definition new_derivative_at {A} (da : A → A → T) (db : T → T → T)
-    f f' a :=
-  let g x := ((f x - f a) / da x a)%L in
-  new_is_limit_when_tending_to_neighbourhood da db g a (f' a).
-
-Definition new_is_derivative {A} (da : A → A → T) (db : T → T → T) f f' :=
-  ∀ a, new_derivative_at da db f f' a.
-
 Theorem rngl_cos_derivative_lemma_1 :
   ∀ θ₀ θ,
   θ₀ ≠ 0%A
@@ -2101,10 +2089,37 @@ rewrite angle_mul_4_angle_straight_div_3.
 now rewrite rngl_sin_add_straight_r.
 Qed.
 
+Definition is_gen_limit_when_tending_to_neighbourhood A B lta da db
+  (f : A → B) (x₀ : A) (L : B) :=
+  (∀ ε : T, 0 < ε →
+   ∃ η : T, ∀ x : A, lta x x₀ → da x x₀ < η → db (f x) L < ε)%L.
+
+Definition is_left_limit_when_tending_to_neighbourhood {A B} lta :=
+  is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lta a b).
+
+Definition is_right_limit_when_tending_to_neighbourhood {A B} lta :=
+  is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lta b a).
+
+Definition new_is_limit_when_tending_to_neighbourhood {A B} lta da db
+  f (x₀ : A) (L : B) :=
+  is_left_limit_when_tending_to_neighbourhood lta da db f x₀ L ∧
+  is_right_limit_when_tending_to_neighbourhood lta da db f x₀ L.
+
+Definition new_derivative_at {A} lta (da : A → A → T) (db : T → T → T)
+    f f' a :=
+  let g x := ((f x - f a) / da x a)%L in
+  new_is_limit_when_tending_to_neighbourhood lta da db g a (f' a).
+
+Definition new_is_derivative {A} lta (da : A → A → T) (db : T → T → T) f f' :=
+  ∀ a, new_derivative_at lta da db f f' a.
+
+Definition angle_lt_for_deriv θ1 θ2 :=
+  (θ1 < θ2)%A ∧ angle_add_overflow θ1 θ2 = false.
+
 (* to be completed
 Theorem rngl_cos_derivative :
-  new_is_derivative angle_eucl_dist rngl_dist
-    rngl_cos (λ θ, (- rngl_sin θ)%L).
+  new_is_derivative angle_lt_for_deriv
+    angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -2112,6 +2127,12 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+progress unfold new_is_derivative.
+intros θ₀.
+progress unfold new_derivative_at.
+remember (λ θ, _) as g eqn:Hg.
+progress unfold new_is_limit_when_tending_to_neighbourhood.
+...
   intros θ₀ ε Hε.
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
@@ -2182,19 +2203,23 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply (rngl_le_add_l Hor).
   apply (rngl_0_le_1 Hon Hos Hor).
 }
-intros ε Hε.
 enough (H :
-  (∃ η1 : T, ∀ θ : angle T,
+  (∀ ε, (0 < ε)%L → ∃ η1 : T, ∀ θ : angle T,
    (θ₀ < θ)%A
    → (angle_eucl_dist θ θ₀ < η1)%L
    → (rngl_dist ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀)
        (- rngl_sin θ₀) < ε)%L) ∧
-  (∃ η2 : T, ∀ θ : angle T,
+  (∀ ε, (0 < ε)%L → ∃ η2 : T, ∀ θ : angle T,
    (θ < θ₀)%A
    → (angle_eucl_dist θ θ₀ < η2)%L
-   → (rngl_dist ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀)
+   → (rngl_dist ((rngl_cos θ₀ - rngl_cos θ) / angle_eucl_dist θ θ₀)
        (- rngl_sin θ₀) < ε)%L)). {
+
+...
+  intros ε Hε.
   destruct H as (H1, H2).
+  specialize (H1 ε Hε).
+  specialize (H2 ε Hε).
   destruct H1 as (η1 & H1).
   destruct H2 as (η2 & H2).
   exists (rngl_min η1 η2).
@@ -2204,6 +2229,7 @@ enough (H :
     eapply (rngl_lt_le_trans Hor); [ apply H4 | ].
     apply (rngl_le_min_l Hor).
   } {
+...
     apply angle_nlt_ge in Htt.
     assert (H : (θ < θ₀)%A). {
       apply angle_lt_iff.
