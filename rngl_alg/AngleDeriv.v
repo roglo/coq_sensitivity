@@ -2118,8 +2118,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 assert (H20 : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-intros θ₀ ε Hε.
+intros θ₀.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
+  intros ε Hε.
   subst θ₀.
   cbn.
   exists ε.
@@ -2152,6 +2153,7 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   apply (rngl_0_le_1 Hon Hos Hor).
 }
 destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
+  intros ε Hε.
   subst θ₀.
   cbn.
   exists ε.
@@ -2180,6 +2182,7 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply (rngl_le_add_l Hor).
   apply (rngl_0_le_1 Hon Hos Hor).
 }
+intros ε Hε.
 specialize rngl_sin_is_continuous as Hsc.
 progress unfold continuous in Hsc.
 progress unfold continuous_at in Hsc.
@@ -2274,8 +2277,14 @@ destruct ovt. 2: {
     clear - Hor Hop Hovt Htt H3 H5 H2.
     now apply rngl_cos_derivative_lemma_2.
   }
-  (* super... maintenant, il y a le cas θ<θ₀ avec
-     overflow θ θ₀ restant false *)
+  rewrite angle_add_0_r.
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_mul_1_r Hon).
+  rewrite <- rngl_sin_opp.
+...
+  apply Hsc.
+  eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
+  clear η Hη Hsc H4 H1.
 ...
   apply rngl_cos_le_iff_angle_eucl_le.
   rewrite angle_add_sub_swap.
