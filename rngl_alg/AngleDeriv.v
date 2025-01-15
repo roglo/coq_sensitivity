@@ -2123,7 +2123,7 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
   cbn.
   exists ε.
-  intros dθ Hdθ.
+  intros θ Hθ.
   rewrite (rngl_opp_0 Hop).
   rewrite rngl_cos_angle_eucl_dist_0_r.
   rewrite (rngl_sub_sub_swap Hop).
@@ -2136,8 +2136,8 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   rewrite (rngl_div_div_swap Hic Hiv).
   progress unfold rngl_squ.
   rewrite (rngl_mul_div Hi1). 2: {
-    intros H; rewrite H in Hdθ.
-    destruct Hdθ as (H1, _).
+    intros H; rewrite H in Hθ.
+    destruct Hθ as (H1, _).
     now apply (rngl_lt_irrefl Hor) in H1.
   }
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
@@ -2155,7 +2155,7 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   subst θ₀.
   cbn.
   exists ε.
-  intros dθ Hdθ.
+  intros θ Hθ.
   rewrite (rngl_sub_opp_r Hop).
   rewrite (rngl_opp_0 Hop).
   rewrite rngl_cos_angle_eucl_dist_straight_r.
@@ -2163,8 +2163,8 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   rewrite (rngl_div_div_swap Hic Hiv).
   progress unfold rngl_squ.
   rewrite (rngl_mul_div Hi1). 2: {
-    intros H; rewrite H in Hdθ.
-    destruct Hdθ as (H1, _).
+    intros H; rewrite H in Hθ.
+    destruct Hθ as (H1, _).
     now apply (rngl_lt_irrefl Hor) in H1.
   }
   progress unfold rngl_dist.
@@ -2193,6 +2193,7 @@ remember (angle_eucl_dist θ₀ 0) as y.
 exists (rngl_min4 x y (angle_eucl_dist θ₀ angle_straight) η).
 subst x y.
 intros θ Hdθ.
+move θ before θ₀.
 destruct Hdθ as (H1, H2).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
@@ -2668,11 +2669,22 @@ apply rngl_cos_le_iff_angle_eucl_le.
     destruct zs; [ easy | ].
     apply (rngl_leb_gt Hor) in Hzst, Hzs.
     apply rngl_leb_le in Htt.
-    destruct (rngl_lt_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
       change_angle_opp θ₀.
+      progress sin_cos_opp_hyp T Hzst.
       progress sin_cos_opp_hyp T Hzcz.
+      progress sin_cos_opp_hyp T Hztt.
+      progress sin_cos_opp_hyp T Ht2t.
       progress sin_cos_opp_hyp T Htt.
       progress sin_cos_opp_goal T.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+        change_angle_opp θ.
+        progress sin_cos_opp_hyp T Hzs.
+        progress sin_cos_opp_hyp T Hzc.
+        progress sin_cos_opp_hyp T Htt.
+        progress sin_cos_opp_hyp T Ht2t.
+        progress sin_cos_opp_hyp T Hztt.
+        progress sin_cos_opp_goal T.
 ...
     change_angle_add_r θ₀ angle_straight.
     change_angle_add_r θ angle_straight.
