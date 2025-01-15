@@ -2653,9 +2653,44 @@ apply rngl_cos_le_iff_angle_eucl_le.
     progress unfold angle_leb in Htzs.
     rewrite rngl_cos_4_angle_straight_div_3 in Hztt.
     rewrite rngl_sin_4_angle_straight_div_3 in Hztt.
-    rewrite rngl_0_leb_opp_sqrt_3_div_2 in Hztt.
+    rewrite (rngl_0_leb_opp_sqrt_3_div_2 Hon Hop Hiv Hor Hc1) in Hztt.
     cbn in Htzs.
     rewrite (rngl_leb_refl Hor) in Htzs.
+    remember (0 ≤? rngl_sin θ₀)%L as zst eqn:Hzst.
+    remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+    symmetry in Hzst, Hzs.
+    destruct zst. {
+      apply (rngl_nlt_ge_iff Hor).
+      intros Hcc.
+      apply Bool.not_false_iff_true in Htzs.
+      apply Htzs; clear Htzs.
+      apply (rngl_leb_gt Hor).
+      apply (rngl_lt_iff Hor).
+      split; [ apply rngl_cos_bound | ].
+      intros H; symmetry in H.
+      now apply eq_rngl_cos_opp_1 in H.
+    }
+    clear Htzs.
+    destruct zs; [ easy | ].
+    apply (rngl_leb_gt Hor) in Hzst, Hzs.
+    apply rngl_leb_le in Htt.
+    change_angle_add_r θ₀ angle_straight.
+    change_angle_add_r θ angle_straight.
+    rewrite angle_sub_sub_distr in Hztt |-*.
+    progress sin_cos_add_sub_straight_hyp T Hzst.
+    progress sin_cos_add_sub_straight_hyp T Htt.
+    progress sin_cos_add_sub_straight_hyp T Ht2t.
+    progress sin_cos_add_sub_straight_hyp T Hztt.
+    progress sin_cos_add_sub_straight_hyp T Hzs.
+    progress sin_cos_add_sub_straight_goal T.
+    rewrite angle_sub_add.
+    rewrite (rngl_add_opp_l Hop) in Htt.
+    apply -> (rngl_le_sub_0 Hop Hor) in Htt.
+    remember (0 ≤? rngl_sin (θ + θ₀))%L as zstt eqn:Hzstt.
+    remember (0 ≤? rngl_sin (θ₀ + θ₀))%L as zsttz eqn:Hzsttz.
+    symmetry in Hzstt, Hzsttz.
+    destruct zstt. {
+      apply rngl_leb_le in Hzstt.
 ...
 (**)
 destruct tt. {
