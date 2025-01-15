@@ -2223,6 +2223,11 @@ rewrite <- (rngl_abs_opp Hop Hor).
 rewrite (rngl_opp_add_distr Hop).
 rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_opp_l Hop).
+...
+(* je pense que le problème vient de quand θ+θ₀ ≥ 2π ; il faudrait donc
+   commencer par le test "ovt = false", voir s'il peut se traiter
+   complètement, et donc faire le cas "tt" comme un sous cas *)
+...
 (* qu'est-ce que ça donne pour θ₀ < θ ? *)
 destruct tt. 2: {
   apply angle_ltb_ge in Htt.
