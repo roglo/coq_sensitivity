@@ -2691,6 +2691,8 @@ apply rngl_cos_le_iff_angle_eucl_le.
     symmetry in Hzstt, Hzsttz.
     destruct zstt. {
       apply rngl_leb_le in Hzstt.
+      destruct (rngl_le_dec Hor (rngl_cos θ₀) 0) as [Hczz| Hczz]. {
+(* bon, chais pas, faut voir... *)
 ...
 (**)
 destruct tt. {
