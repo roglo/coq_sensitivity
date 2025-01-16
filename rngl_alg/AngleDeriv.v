@@ -2262,12 +2262,8 @@ rewrite (angle_eucl_dist_symmetry θ).
 rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_eucl_dist_move_0_r θ₀).
 rewrite <- (angle_div_2_mul_2 θ₀) at 2.
-rewrite angle_mul_nat_div_2. 2: {
-  cbn.
-  rewrite angle_add_0_r.
-  rewrite Bool.orb_false_r.
-  apply angle_lt_straight_add_same_not_overflow.
-(**)
+assert (Hzs : (θ₀ < angle_straight)%A). {
+  (* lemma *)
   apply rngl_cos_lt_iff_angle_eucl_lt in H2, H3, H5.
   rewrite angle_sub_0_r in H2, H5.
   rewrite rngl_cos_sub_straight_r in H3.
@@ -2360,19 +2356,26 @@ rewrite angle_mul_nat_div_2. 2: {
   apply (rngl_lt_le_incl Hor) in Hzstz, Hzcz, Hzc.
   now apply quadrant_1_rngl_cos_add_le_cos_l.
 }
+rewrite angle_mul_nat_div_2. 2: {
+  cbn.
+  rewrite angle_add_0_r.
+  rewrite Bool.orb_false_r.
+  now apply angle_lt_straight_add_same_not_overflow.
+}
 rewrite angle_div_2_sub'.
 rewrite angle_mul_2_l.
 rewrite angle_sub_add_distr.
 rewrite (angle_add_comm θ₀ θ).
 rewrite angle_add_sub.
-..
 generalize Htt; intros H.
 rewrite angle_add_overflow_comm in Hovt.
-apply angle_lt_le_incl in H.
-apply (angle_add_le_mono_l θ₀) in H; [ | ].
-...
+apply (angle_add_lt_mono_l θ₀) in H. 2: {
+  now apply angle_lt_straight_add_same_not_overflow.
+}
 rewrite (angle_add_comm _ θ) in H.
+apply angle_leb_gt in H.
 rewrite H; clear H.
+...
 apply angle_le_angle_eucl_dist_le; cycle 2. {
   apply angle_div_2_le.
 } {

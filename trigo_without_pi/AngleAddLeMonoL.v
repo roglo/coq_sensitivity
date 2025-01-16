@@ -198,4 +198,22 @@ eapply angle_add_overflow_le; [ | apply H2n2 ].
 now apply angle_mul_le_mono_l.
 Qed.
 
+Theorem angle_add_lt_mono_l :
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ1 θ3 = false
+  → (θ2 < θ3)%A → (θ1 + θ2 < θ1 + θ3)%A.
+Proof.
+intros * H13 H23.
+apply angle_lt_iff.
+split. {
+  apply angle_add_le_mono_l; [ easy | ].
+  now apply angle_lt_le_incl in H23.
+}
+intros H.
+apply (f_equal (λ θ, (θ - θ1)%A)) in H.
+do 2 rewrite angle_add_comm, angle_add_sub in H.
+subst θ3.
+now apply angle_lt_irrefl in H23.
+Qed.
+
 End a.
