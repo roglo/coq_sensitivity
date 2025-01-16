@@ -16,6 +16,7 @@ Require Import Trigo.AngleDiv2.
 Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.SeqAngleIsCauchy.
 Require Import Trigo.AngleTypeIsComplete.
+Require Import Trigo.AngleAddOverflowLe.
 Require Import AngleAddOverflowEquiv.
 
 Section a.
@@ -2266,6 +2267,72 @@ rewrite angle_mul_nat_div_2. 2: {
   rewrite angle_add_0_r.
   rewrite Bool.orb_false_r.
   apply angle_lt_straight_add_same_not_overflow.
+(**)
+  apply rngl_cos_lt_iff_angle_eucl_lt in H2, H3, H5.
+  rewrite angle_sub_0_r in H2, H5.
+  rewrite rngl_cos_sub_straight_r in H3.
+  rewrite rngl_cos_sub_comm in H2, H3, H5.
+  rewrite <- angle_add_overflow_equiv2 in Hovt.
+  progress unfold angle_add_overflow2 in Hovt.
+  apply angle_ltb_ge in Hovt.
+  progress unfold angle_ltb in Htt.
+  progress unfold angle_leb in Hovt.
+  cbn - [ angle_sub ] in H2.
+  progress unfold angle_ltb.
+  cbn.
+  rewrite (rngl_leb_refl Hor).
+  remember (0 ≤? rngl_sin θ₀)%L as zstz eqn:Hzstz.
+  symmetry in Hzstz.
+  destruct zstz. {
+    apply rngl_ltb_lt.
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H; symmetry in H.
+    now apply eq_rngl_cos_opp_1 in H.
+  }
+  exfalso.
+  remember (0 ≤? rngl_sin (θ₀ + θ))%L as zstt eqn:Hzstt.
+  symmetry in Hzstt.
+  destruct zstt; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzstz, Hzstt.
+  apply rngl_leb_le in Hovt.
+  remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
+  symmetry in Hzst.
+  destruct zst. 2: {
+    apply (rngl_leb_gt Hor) in Hzst.
+    apply rngl_ltb_lt in Htt.
+    now apply angle_add_overflow_le_lemma_10 in Hovt.
+  }
+  clear Htt.
+  apply rngl_leb_le in Hzst.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ₀)) as [Hzcz| Hzcz]. {
+    change_angle_opp θ₀.
+    progress sin_cos_opp_hyp T Hzstz.
+    progress sin_cos_opp_hyp T Hzcz.
+    progress sin_cos_opp_hyp T H3.
+    progress sin_cos_opp_hyp T H5.
+    progress sin_cos_opp_hyp T H2.
+    progress sin_cos_opp_hyp T Hovt.
+    progress sin_cos_opp_hyp T Hzstt.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+      apply rngl_nle_gt in H5.
+      apply H5; clear H5.
+      rewrite angle_add_comm.
+      apply (rngl_lt_le_incl Hor) in Hzstz.
+      now apply quadrant_1_rngl_cos_add_le_cos_l.
+    }
+    apply (rngl_nle_gt_iff Hor) in Hzc.
+    change_angle_sub_r θ angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzst.
+    progress sin_cos_add_sub_right_hyp T Hzc.
+    progress sin_cos_add_sub_right_hyp T Hzstt.
+    progress sin_cos_add_sub_right_hyp T Hovt.
+...
+    progress sin_cos_add_sub_right_hyp T Hzstz.
+    progress sin_cos_add_sub_right_hyp T Hzstz.
+    progress sin_cos_add_sub_right_hyp T Hzstz.
+    progress sin_cos_add_sub_right_hyp T Hzstz.
+    progress sin_cos_add_sub_right_hyp T Hzstz.
 ...
   apply (angle_lt_trans _ θ); [ easy | ].
   apply rngl_cos_lt_iff_angle_eucl_lt in H2, H3, H5.
