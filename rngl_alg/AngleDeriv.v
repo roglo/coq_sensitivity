@@ -2380,6 +2380,19 @@ apply angle_le_angle_eucl_dist_le; cycle 2. {
 } {
   apply angle_div_2_le_straight.
 }
+eapply angle_le_trans. 2: {
+  apply angle_lt_le_incl, Hzs.
+}
+rewrite angle_add_overflow_comm in Hovt.
+rewrite <- angle_add_overflow_equiv2 in Hovt.
+progress unfold angle_add_overflow2 in Hovt.
+apply angle_ltb_ge in Hovt.
+...
+progress unfold angle_ltb in Htt.
+progress unfold angle_ltb in Hzs.
+progress unfold angle_leb.
+cbn - [ angle_sub ] in Hzs |-*.
+rewrite (rngl_leb_refl Hor) in Hzs |-*.
 ...
 apply rngl_cos_lt_iff_angle_eucl_lt in H2, H3, H5.
 rewrite angle_sub_0_r in H2, H5.
