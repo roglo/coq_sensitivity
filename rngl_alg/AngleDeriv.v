@@ -2118,7 +2118,7 @@ Definition new_is_derivative {A} lta (da : A → A → T) (db : T → T → T) f
 Definition angle_lt_for_deriv θ1 θ2 :=
   (θ1 < θ2)%A ∧ angle_add_overflow θ1 θ2 = false.
 
-(* to be completed
+(* to be completed *)
 Theorem rngl_cos_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
@@ -2380,32 +2380,22 @@ apply angle_le_angle_eucl_dist_le; cycle 2. {
 } {
   apply angle_div_2_le_straight.
 }
-eapply angle_le_trans. 2: {
-  apply angle_lt_le_incl, Hzs.
-}
-rewrite angle_add_overflow_comm in Hovt.
-rewrite <- angle_add_overflow_equiv2 in Hovt.
-progress unfold angle_add_overflow2 in Hovt.
-apply angle_ltb_ge in Hovt.
-...
+apply rngl_sin_nonneg_angle_le_straight.
+move Htt at bottom.
 progress unfold angle_ltb in Htt.
 progress unfold angle_ltb in Hzs.
-progress unfold angle_leb.
-cbn - [ angle_sub ] in Hzs |-*.
-rewrite (rngl_leb_refl Hor) in Hzs |-*.
-...
-apply rngl_cos_lt_iff_angle_eucl_lt in H2, H3, H5.
-rewrite angle_sub_0_r in H2, H5.
-rewrite rngl_cos_sub_straight_r in H3.
-cbn - [ angle_sub ] in H2.
-clear - Hor Hop Hovt Htt H3 H5 H2.
-Check rngl_cos_derivative_lemma_2.
-...
-apply angle_lt_le_incl in Htt.
-apply rngl_cos_derivative_lemma_2; try easy.
-now apply rngl_cos_derivative_lemma_2.
+cbn in Hzs.
+rewrite (rngl_leb_refl Hor) in Hzs.
+remember (0 ≤? rngl_sin θ₀)%L as zsz eqn:Hzsz.
+remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
+symmetry in Hzsz, Hzst.
+destruct zsz; [ | easy ].
+destruct zst; [ | easy ].
+apply rngl_leb_le in Hzsz, Hzst.
+apply rngl_ltb_lt in Hzs, Htt.
+apply (rngl_lt_le_incl Hor) in Htt.
+apply rngl_sin_sub_nonneg; try easy.
 Qed.
-*)
 
 Theorem rngl_cos_right_derivative :
   ∀ θ₀,
