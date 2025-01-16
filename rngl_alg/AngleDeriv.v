@@ -2118,6 +2118,29 @@ Definition angle_lt_for_deriv θ1 θ2 :=
   (θ1 < θ2)%A ∧ angle_add_overflow θ1 θ2 = false.
 
 (* to be completed
+Theorem rngl_cos_left_derivative :
+  ∀ θ₀,
+  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+    rngl_cos (λ θ, (- rngl_sin θ)%L) θ₀.
+... admitted.
+
+Theorem rngl_cos_right_derivative :
+  ∀ θ₀,
+  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+    rngl_cos (λ θ, (- rngl_sin θ)%L) θ₀.
+Proof.
+intros θ₀ ε Hε.
+specialize (rngl_cos_left_derivative θ₀) as H1.
+specialize (H1 ε Hε).
+destruct H1 as (η & H1).
+exists η.
+intros θ Hlt Hθ.
+specialize (H1 θ).
+progress unfold angle_lt_for_deriv in H1.
+progress unfold angle_lt_for_deriv in Hlt.
+(* ah, non, ça marche pas *)
+...
+
 Theorem rngl_cos_derivative :
   new_is_derivative angle_lt_for_deriv
     angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ)%L).
