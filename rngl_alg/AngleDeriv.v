@@ -2253,12 +2253,13 @@ apply angle_nlt_ge in H.
 apply Bool.not_true_iff_false in H.
 rewrite H; clear H.
 rewrite (rngl_mul_1_r Hon).
+rewrite angle_add_0_r.
 apply Hsc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hsc H4.
-rewrite angle_add_0_r.
+rewrite (angle_eucl_dist_symmetry θ).
 rewrite angle_eucl_dist_move_0_r.
-rewrite (angle_eucl_dist_move_0_r θ).
+rewrite (angle_eucl_dist_move_0_r θ₀).
 rewrite <- (angle_div_2_mul_2 θ₀) at 2.
 rewrite angle_mul_nat_div_2. 2: {
   cbn.
@@ -2437,12 +2438,10 @@ apply angle_nlt_ge in H.
 apply Bool.not_true_iff_false in H.
 rewrite H; clear H.
 rewrite (rngl_mul_1_r Hon).
-remember (_ + _)%A as x eqn:Hx.
+rewrite angle_add_0_r.
 apply Hsc.
-subst x.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hsc H4.
-rewrite angle_add_0_r.
 rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_eucl_dist_move_0_r θ).
 rewrite <- (angle_div_2_mul_2 θ₀) at 2.
