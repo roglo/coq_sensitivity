@@ -2118,7 +2118,6 @@ Definition new_is_derivative {A} lta (da : A → A → T) (db : T → T → T) f
 Definition angle_lt_for_deriv θ1 θ2 :=
   (θ1 < θ2)%A ∧ angle_add_overflow θ1 θ2 = false.
 
-(* to be completed *)
 Theorem rngl_cos_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
@@ -2577,6 +2576,16 @@ cbn - [ angle_sub ] in H2.
 clear - Hor Hop Hovt Htt H3 H5 H2.
 apply angle_lt_le_incl in Htt.
 now apply rngl_cos_derivative_lemma_2.
+Qed.
+
+Theorem rngl_cos_derivative :
+  new_is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
+    rngl_cos (λ θ, (- rngl_sin θ)%L).
+Proof.
+intros θ₀.
+split.
+apply rngl_cos_left_derivative.
+apply rngl_cos_right_derivative.
 Qed.
 
 End a.
