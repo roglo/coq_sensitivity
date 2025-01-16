@@ -2100,18 +2100,19 @@ Definition is_left_limit_when_tending_to_neighbourhood {A B} lta :=
 Definition is_right_limit_when_tending_to_neighbourhood {A B} lta :=
   is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lta b a).
 
-Definition new_is_limit_when_tending_to_neighbourhood {A B} lta da db
-  f (x₀ : A) (L : B) :=
-  is_left_limit_when_tending_to_neighbourhood lta da db f x₀ L ∧
-  is_right_limit_when_tending_to_neighbourhood lta da db f x₀ L.
-
-Definition new_derivative_at {A} lta (da : A → A → T) (db : T → T → T)
+Definition left_derivative_at {A} lta (da : A → A → T) (db : T → T → T)
     f f' a :=
   let g x := ((f x - f a) / da x a)%L in
-  new_is_limit_when_tending_to_neighbourhood lta da db g a (f' a).
+  is_left_limit_when_tending_to_neighbourhood lta da db g a (f' a).
+
+Definition right_derivative_at {A} lta (da : A → A → T) (db : T → T → T)
+    f f' a :=
+  let g x := ((f x - f a) / da x a)%L in
+  is_right_limit_when_tending_to_neighbourhood lta da db g a (f' a).
 
 Definition new_is_derivative {A} lta (da : A → A → T) (db : T → T → T) f f' :=
-  ∀ a, new_derivative_at lta da db f f' a.
+  ∀ a,
+  left_derivative_at lta da db f f' a ∧ right_derivative_at lta da db f f' a.
 
 Definition angle_lt_for_deriv θ1 θ2 :=
   (θ1 < θ2)%A ∧ angle_add_overflow θ1 θ2 = false.
@@ -2127,7 +2128,6 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  progress unfold new_is_derivative.
   intros θ₀.
   split; intros ε Hε; rewrite (H1 ε) in Hε. {
     now apply (rngl_lt_irrefl Hor) in Hε.
@@ -2140,7 +2140,7 @@ assert (H20 : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 intros θ₀.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
-  split; cbn; rewrite (rngl_opp_0 Hop); intros ε Hε; exists ε. {
+  split; intros ε Hε; cbn; rewrite (rngl_opp_0 Hop); exists ε. {
     intros θ Hlt Hθ.
     rewrite rngl_cos_angle_eucl_dist_0_r.
     rewrite (rngl_sub_sub_swap Hop).
