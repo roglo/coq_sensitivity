@@ -2127,32 +2127,30 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-progress unfold new_is_derivative.
-intros θ₀.
-progress unfold new_derivative_at.
-remember (λ θ, _) as g eqn:Hg.
-progress unfold new_is_limit_when_tending_to_neighbourhood.
-...
-  intros θ₀ ε Hε.
-  rewrite (H1 ε) in Hε.
-  now apply (rngl_lt_irrefl Hor) in Hε.
+  progress unfold new_is_derivative.
+  intros θ₀.
+  split; intros ε Hε; rewrite (H1 ε) in Hε. {
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  } {
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 assert (H20 : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 intros θ₀.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
-  intros ε Hε.
   subst θ₀.
-  cbn.
-  exists ε.
-  intros θ Hθ.
-  rewrite (rngl_opp_0 Hop).
-  rewrite rngl_cos_angle_eucl_dist_0_r.
-  rewrite (rngl_sub_sub_swap Hop).
-  rewrite (rngl_sub_diag Hos).
-  rewrite (rngl_sub_0_l Hop).
-  progress unfold rngl_dist.
-  rewrite (rngl_sub_0_r Hos).
+  split; cbn; rewrite (rngl_opp_0 Hop); intros ε Hε; exists ε. {
+    intros θ Hlt Hθ.
+    rewrite rngl_cos_angle_eucl_dist_0_r.
+    rewrite (rngl_sub_sub_swap Hop).
+    rewrite (rngl_sub_diag Hos).
+    rewrite (rngl_sub_0_l Hop).
+    progress unfold rngl_dist.
+    rewrite (rngl_sub_0_r Hos).
+(* bon, ça m'embête parce que pour la dérivée à gauche et la dérivée à
+   droite, ça risque d'être le même code, ou similaire *)
+...
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite (rngl_abs_opp Hop Hor).
   rewrite (rngl_div_div_swap Hic Hiv).
