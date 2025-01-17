@@ -937,30 +937,30 @@ apply (rngl_lt_le_incl Hor) in Hzstz, Hzcz, Hzc.
 now apply quadrant_1_rngl_cos_add_le_cos_l.
 Qed.
 
-Definition is_gen_limit_when_tending_to_neighbourhood A B lta da db
+Definition is_gen_limit_when_tending_to_neighbourhood A B lt da db
   (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε : T, 0 < ε →
-   ∃ η : T, ∀ x : A, lta x x₀ → da x x₀ < η → db (f x) L < ε)%L.
+   ∃ η : T, ∀ x : A, lt x x₀ → da x x₀ < η → db (f x) L < ε)%L.
 
-Definition is_left_limit_when_tending_to_neighbourhood {A B} lta :=
-  is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lta a b).
+Definition is_left_limit_when_tending_to_neighbourhood {A B} lt :=
+  is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lt a b).
 
-Definition is_right_limit_when_tending_to_neighbourhood {A B} lta :=
-  is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lta b a).
+Definition is_right_limit_when_tending_to_neighbourhood {A B} lt :=
+  is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lt b a).
 
-Definition left_derivative_at {A} lta (da : A → A → T) (db : T → T → T)
+Definition left_derivative_at {A} lt (da : A → A → T) (db : T → T → T)
     f f' a :=
   let g x := ((f a - f x) / da x a)%L in
-  is_left_limit_when_tending_to_neighbourhood lta da db g a (f' a).
+  is_left_limit_when_tending_to_neighbourhood lt da db g a (f' a).
 
-Definition right_derivative_at {A} lta (da : A → A → T) (db : T → T → T)
+Definition right_derivative_at {A} lt (da : A → A → T) (db : T → T → T)
     f f' a :=
   let g x := ((f x - f a) / da x a)%L in
-  is_right_limit_when_tending_to_neighbourhood lta da db g a (f' a).
+  is_right_limit_when_tending_to_neighbourhood lt da db g a (f' a).
 
-Definition new_is_derivative {A} lta (da : A → A → T) (db : T → T → T) f f' :=
+Definition new_is_derivative {A} lt (da : A → A → T) (db : T → T → T) f f' :=
   ∀ a,
-  left_derivative_at lta da db f f' a ∧ right_derivative_at lta da db f f' a.
+  left_derivative_at lt da db f f' a ∧ right_derivative_at lt da db f f' a.
 
 Definition angle_lt_for_deriv θ1 θ2 :=
   (θ1 < θ2)%A ∧ angle_add_overflow θ1 θ2 = false.
