@@ -65,9 +65,16 @@ Definition is_limit_when_tending_to {A B} da db
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
    ∀ x : A, da x x₀ < η → db (f x) L < ε)%L.
 
-Definition is_limit_when_tending_to_neighbourhood {A B} lt_suba db
-     (f : A → B) (x₀ : A) (L : B) :=
-  (∀ ε, 0 < ε → ∃ η : A, ∀ x : A, lt_suba x x₀ η → db (f x) L < ε)%L.
+Definition is_gen_limit_when_tending_to_neighbourhood A B lt da db
+  (f : A → B) (x₀ : A) (L : B) :=
+  (∀ ε : T, 0 < ε →
+   ∃ η : T, ∀ x : A, lt x x₀ → da x x₀ < η → db (f x) L < ε)%L.
+
+Definition is_left_limit_when_tending_to_neighbourhood {A B} lt :=
+  is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lt a b).
+
+Definition is_right_limit_when_tending_to_neighbourhood {A B} lt :=
+  is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lt b a).
 
 Definition is_limit_when_tending_to_inf {A} dist (f : nat → A) (L : A) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) L < ε)%L.
@@ -76,18 +83,26 @@ Definition is_complete A (dist : A → A → T) :=
   ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
 
-Definition derivative_at {A} (da : A → A → T) (db : T → T → T) lt_suba f f' a :=
-  let g x := ((f x - f a) / da x a)%L in
-  is_limit_when_tending_to_neighbourhood lt_suba db g a (f' a).
-
-Definition is_derivative {A} (da : A → A → T) (db : T → T → T) lt_suba f f' :=
-  ∀ a, derivative_at da db lt_suba f f' a.
-
 Definition continuous_at {A B} da db (f : A → B) a :=
   is_limit_when_tending_to da db f a (f a).
 
 Definition continuous {A B} da db (f : A → B) :=
   ∀ a, continuous_at da db f a.
+
+Definition left_derivative_at {A} lt (da : A → A → T) (db : T → T → T)
+    f f' a :=
+  let g x := ((f a - f x) / da x a)%L in
+  is_left_limit_when_tending_to_neighbourhood lt da db g a (f' a).
+
+Definition right_derivative_at {A} lt (da : A → A → T) (db : T → T → T)
+    f f' a :=
+  let g x := ((f x - f a) / da x a)%L in
+  is_right_limit_when_tending_to_neighbourhood lt da db g a (f' a).
+
+Definition is_derivative {A} lt (da : A → A → T) (db : T → T → T) f f' :=
+  ∀ a,
+  left_derivative_at lt da db f f' a ∧
+  right_derivative_at lt da db f f' a.
 
 (* limit with ring-like distance *)
 
@@ -101,7 +116,7 @@ Definition rngl_is_limit_when_tending_to_inf :=
   is_limit_when_tending_to_inf rngl_dist.
 
 Definition rngl_is_derivative :=
-  is_derivative rngl_dist.
+  is_derivative rngl_lt rngl_dist.
 
 Definition rngl_is_complete :=
   is_complete T rngl_dist.
