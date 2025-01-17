@@ -1973,35 +1973,13 @@ assert (H20 : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 intros θ₀.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
-  intros ε Hε; cbn.
-  rewrite (rngl_opp_0 Hop).
-  exists ε.
+  intros ε Hε.
+  exists 0%L.
   intros θ Hlt Hθ.
-  rewrite rngl_cos_angle_eucl_dist_0_r.
-  rewrite (rngl_sub_sub_distr Hop).
-  rewrite (rngl_sub_diag Hos).
-  rewrite rngl_add_0_l.
-  progress unfold rngl_dist.
-  rewrite (rngl_sub_0_r Hos).
-  rewrite (rngl_div_div_swap Hic Hiv).
-  progress unfold rngl_squ.
-  rewrite (rngl_mul_div Hi1). 2: {
-    destruct Hlt as (H1, H2).
-    intros H.
-    apply angle_eucl_dist_separation in H.
-    rewrite H in H1.
-    now apply angle_lt_irrefl in H1.
-  }
-  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
-    apply angle_eucl_dist_nonneg.
-  }
-  apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
-  eapply (rngl_lt_le_trans Hor _ ε); [ easy | ].
-  rewrite <- (rngl_mul_1_r Hon ε) at 1.
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-  apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  destruct Hlt as (Hlt, _).
+  apply angle_nle_gt in Hlt.
+  exfalso; apply Hlt.
+  apply angle_nonneg.
 }
 destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   intros ε Hε.
@@ -2046,10 +2024,9 @@ specialize (Hsc θ₀ ε Hε).
 destruct Hsc as (η & Hη & Hsc).
 progress unfold rngl_dist in Hsc.
 move η before ε.
-remember (angle_eucl_dist angle_right 0) as x.
 remember (angle_eucl_dist θ₀ 0) as y.
-exists (rngl_min4 x y (angle_eucl_dist θ₀ angle_straight) η).
-subst x y.
+exists (rngl_min3 y (angle_eucl_dist θ₀ angle_straight) η).
+subst y.
 intros θ Htt H2.
 destruct Htt as (Htt, Hovt).
 move θ before θ₀.
@@ -2057,8 +2034,7 @@ apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
-apply (rngl_min_glb_lt_iff Hor) in H2.
-destruct H2 as (H2, H5).
+rename H2 into H5.
 progress unfold rngl_dist.
 rewrite (rngl_sub_opp_r Hop).
 rewrite rngl_cos_sub_cos.
