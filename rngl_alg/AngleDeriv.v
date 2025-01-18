@@ -942,20 +942,34 @@ Definition angle_lt θ1 θ2 := (θ1 < θ2)%A.
 (* could be generalized, perhaps, to a ordered group which has
    a division by 2, not only my angles *)
 Theorem angle_limit_by_sequence :
+  rngl_is_archimedean T = true →
   ∀ db (f : angle T → T) θ₀ (L : T),
   is_limit_when_tending_to_neighbourhood _ _ angle_lt angle_eucl_dist db f θ₀ L ↔
   is_limit_when_tending_to_inf db (λ n : nat, f (θ₀ - θ₀ /₂^n))%A L.
 Proof.
+intros Har.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  split; intros H2 ε Hε; rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros.
 split; intros H1. {
   intros ε Hε.
   specialize (H1 ε Hε).
   destruct H1 as (η & H1).
   progress unfold angle_lt in H1.
+  specialize (int_part Hon Hop Hc1 Hor Har) as H2.
+...
+  specialize (H2 (1 / angle_eucl_dist (θ₀ /₂^n) 0)%L).
   exists 0. (* to be calculated *)
   intros n Hn.
   apply H1. 2: {
     rewrite angle_eucl_dist_sub_l_diag.
+Search (angle_eucl_dist (_ /₂^_)).
 ...
 *)
 
