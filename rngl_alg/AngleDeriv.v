@@ -936,6 +936,25 @@ Qed.
 
 (* *)
 
+Definition angle_lt θ1 θ2 := (θ1 < θ2)%A.
+
+(* to be completed
+Theorem angle_limit_by_sequence :
+  ∀ db (f : angle T → T) θ₀ (L : T),
+  is_limit_when_tending_to_neighbourhood _ _ angle_lt angle_eucl_dist db f θ₀ L ↔
+  is_limit_when_tending_to_inf db (λ n : nat, f (θ₀ + θ₀ /₂^n))%A L.
+Proof.
+intros.
+split; intros H1. {
+  intros ε Hε.
+  specialize (H1 ε Hε).
+  destruct H1 as (η & H1).
+  progress unfold angle_lt in H1.
+...
+*)
+
+(* *)
+
 Definition angle_lt_for_deriv θ1 θ2 :=
   (θ1 < θ2)%A ∧ angle_add_overflow θ1 θ2 = false.
 

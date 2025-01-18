@@ -65,19 +65,19 @@ Definition is_limit_when_tending_to {A B} da db
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
    ∀ x : A, da x x₀ < η → db (f x) L < ε)%L.
 
-Definition is_gen_limit_when_tending_to_neighbourhood A B lt da db
+Definition is_limit_when_tending_to_neighbourhood A B lt da db
   (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε : T, 0 < ε →
    ∃ η : T, ∀ x : A, lt x x₀ → da x x₀ < η → db (f x) L < ε)%L.
 
 Definition is_left_limit_when_tending_to_neighbourhood {A B} lt :=
-  is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lt a b).
+  is_limit_when_tending_to_neighbourhood A B (λ a b, lt a b).
 
 Definition is_right_limit_when_tending_to_neighbourhood {A B} lt :=
-  is_gen_limit_when_tending_to_neighbourhood A B (λ a b, lt b a).
+  is_limit_when_tending_to_neighbourhood A B (λ a b, lt b a).
 
-Definition is_limit_when_tending_to_inf {A} dist (f : nat → A) (L : A) :=
-  ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) L < ε)%L.
+Definition is_limit_when_tending_to_inf {A} dist (u : nat → A) (L : A) :=
+  ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (u n) L < ε)%L.
 
 Definition is_complete A (dist : A → A → T) :=
   ∀ u, is_Cauchy_sequence dist u
