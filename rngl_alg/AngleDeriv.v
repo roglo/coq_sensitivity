@@ -962,13 +962,14 @@ split; intros H1. {
   specialize (H1 ε Hε).
   destruct H1 as (η & H1).
   progress unfold angle_lt in H1.
-  specialize (int_part Hon Hop Hc1 Hor Har) as H2.
-...
-  specialize (H2 (1 / angle_eucl_dist (θ₀ /₂^n) 0)%L).
-  exists 0. (* to be calculated *)
+  specialize (int_part Hon Hop Hc1 Hor Har (2 / ε)%L) as H2.
+  destruct H2 as (N, HN).
+  exists N.
   intros n Hn.
   apply H1. 2: {
     rewrite angle_eucl_dist_sub_l_diag.
+Theorem glop :
+  ∀ θ n, (angle_eucl_dist (θ /₂^n) 0 < 4 / 2 ^ n)%L.
 Search (angle_eucl_dist (_ /₂^_)).
 ...
 *)

@@ -193,6 +193,7 @@ Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
 Notation "2" := (rngl_add 1 1) : ring_like_scope.
 Notation "3" := (rngl_add 2 1) : ring_like_scope.
+Notation "4" := (rngl_add 3 1) : ring_like_scope.
 Notation "a + b" := (rngl_add a b) : ring_like_scope.
 Notation "a - b" := (rngl_sub a b) : ring_like_scope.
 Notation "a * b" := (rngl_mul a b) : ring_like_scope.
