@@ -216,6 +216,69 @@ split. {
 }
 Qed.
 
+Theorem rngl_cos_le_angle_eucl_dist_le :
+  ∀ a θ1 θ2,
+  (0 ≤ a)%L
+  → (1 - a² / 2 ≤ rngl_cos (θ2 - θ1))%L
+  ↔ (angle_eucl_dist θ1 θ2 ≤ a)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ - _))%L.
+  rewrite (H1 (rngl_cos _)).
+  rewrite (H1 (angle_eucl_dist _ _)).
+  rewrite (H1 a).
+  easy.
+}
+intros * Hza.
+split; intros H12. {
+  apply (rngl_lt_eq_cases Hor) in H12.
+  apply (rngl_lt_eq_cases Hor).
+  destruct H12 as [H12| H12]. {
+    now left; apply rngl_cos_lt_angle_eucl_dist_lt.
+  }
+  right.
+  rewrite angle_eucl_dist_is_sqrt.
+  rewrite <- H12.
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite (rngl_sub_diag Hos).
+  rewrite rngl_add_0_l.
+  rewrite (rngl_mul_div_assoc Hiv).
+  rewrite (rngl_mul_comm Hic).
+  rewrite (rngl_mul_div Hi1). 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  rewrite (rl_sqrt_squ Hon Hop Hor).
+  now apply (rngl_abs_nonneg_eq Hop Hor).
+} {
+  apply (rngl_lt_eq_cases Hor) in H12.
+  apply (rngl_lt_eq_cases Hor).
+  destruct H12 as [H12| H12]. {
+    now left; apply rngl_cos_lt_angle_eucl_dist_lt.
+  }
+  right.
+  rewrite angle_eucl_dist_is_sqrt in H12.
+  rewrite <- H12.
+  rewrite (rngl_squ_sqrt Hon). 2: {
+    apply (rngl_mul_nonneg_nonneg Hos Hor). {
+      apply (rngl_0_le_2 Hon Hos Hor).
+    }
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rngl_mul_comm Hic).
+  rewrite (rngl_mul_div Hi1). 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite (rngl_sub_diag Hos).
+  apply rngl_add_0_l.
+}
+Qed.
+
 Theorem seq_angle_to_div_nat_sub :
   ∀ n θ p q,
   p ≤ q

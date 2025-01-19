@@ -15,6 +15,7 @@ Require Import Trigo.AngleAddLeMonoL.
 Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.AngleTypeIsComplete.
 Require Import Trigo.AngleAddOverflowLe.
+Require Import Trigo.SeqAngleIsCauchy.
 
 Section a.
 
@@ -1033,6 +1034,31 @@ rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
   now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
 }
 rewrite (rngl_mul_div Hi1); [ | easy ].
+(**)
+apply rngl_cos_le_angle_eucl_dist_le. {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor).
+  now apply (rngl_lt_le_incl Hor).
+  now apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+}
+rewrite angle_sub_0_l.
+rewrite rngl_cos_opp.
+rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
+  now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+}
+progress unfold rngl_squ at 1.
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_mul_div Hi1); [ | easy ].
+revert θ.
+induction n; intros. 2: {
+remember (S n) as sn.
+cbn; subst sn.
+remember (0 ≤? rngl_sin (θ /₂^S n))%L as zsn eqn:Hzsn.
+symmetry in Hzsn.
+destruct zsn. {
+  rewrite (rngl_mul_1_l Hon).
+(* ah oui, il y a une racine carrée de merde *)
+...
 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
 rewrite angle_sub_0_r.
 rewrite <- angle_div_2_pow_succ_r_1.
@@ -1047,15 +1073,10 @@ induction n; intros. {
   apply rngl_sin_bound.
 }
 Search (rngl_sin (_ /₂)).
-Search (rngl_sin (
+remember (S n) as sn.
+remember (S sn) as ssn; cbn; subst sn ssn.
 ...
 rewrite angle_div_2_pow_succ_r_2.
-rewrite angle_eucl_dist_is_sqrt.
-rewrite angle_sub_0_l.
-rewrite rngl_cos_opp.
-Search (_ < rngl_cos _)%L.
-rngl_cos_lt_iff_angle_eucl_lt:
-...
 *)
 
 (* *)
