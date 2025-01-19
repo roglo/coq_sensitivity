@@ -415,6 +415,34 @@ destruct b. {
 }
 Qed.
 
+Theorem rngl_4_eq_2_mul_2 : rngl_has_1 T = true → (2 * 2 = 4)%L.
+Proof.
+intros Hon.
+rewrite rngl_mul_add_distr_l.
+rewrite (rngl_mul_1_r Hon).
+apply rngl_add_assoc.
+Qed.
+
+Theorem rngl_4_div_2 :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  (4 / 2 = 2)%L.
+Proof.
+intros Hon Hos Hiv Hor.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (H1 2%L).
+  apply H1.
+}
+assert (H20 : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+rewrite <- rngl_add_assoc.
+rewrite (rngl_div_add_distr_r Hiv).
+now rewrite (rngl_div_diag Hon Hiq).
+Qed.
+
 Theorem rngl_cos_derivative_lemma_1 :
   ∀ θ₀ θ,
   θ₀ ≠ 0%A
@@ -968,9 +996,49 @@ split; intros H1. {
   intros n Hn.
   apply H1. 2: {
     rewrite angle_eucl_dist_sub_l_diag.
-Theorem glop :
-  ∀ θ n, (angle_eucl_dist (θ /₂^n) 0 < 4 / 2 ^ n)%L.
-Search (angle_eucl_dist (_ /₂^_)).
+Theorem angle_eucl_dist_div_2_pow_le :
+  ∀ θ n, (angle_eucl_dist (θ /₂^n) 0 ≤ 4 / 2 ^ n)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (angle_eucl_dist _ _)).
+  rewrite (H1 (_ / _)%L).
+  apply (rngl_le_refl Hor).
+}
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+intros.
+revert θ.
+induction n; intros. {
+  cbn.
+  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+  rewrite angle_sub_0_r.
+  rewrite (rngl_4_div_2 Hon Hos Hiv Hor).
+  apply (rngl_le_trans Hor _ 1).
+  apply rngl_sin_bound.
+  apply (rngl_le_add_r Hor).
+  apply (rngl_0_le_1 Hon Hos Hor).
+}
+rewrite angle_div_2_pow_succ_r_2.
+eapply (rngl_le_trans Hor); [ apply IHn | ].
+(* ah oui non, mais c'est faux, ça *)
+...
+rewrite angle_eucl_dist_is_sqrt.
+rewrite angle_sub_0_l.
+rewrite rngl_cos_opp.
+Search (_ < rngl_cos _)%L.
+rngl_cos_lt_iff_angle_eucl_lt:
+...
+Search (angle_eucl_dist _ _ = _).
+rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+rewrite angle_sub_0_r.
+Search (rngl_sin (_ /₂)).
+Search (rngl_sin (
 ...
 *)
 
