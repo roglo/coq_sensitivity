@@ -1001,6 +1001,8 @@ Theorem angle_eucl_dist_div_2_pow_le :
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -1009,6 +1011,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_le_refl Hor).
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+assert (H20 : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 intros.
 revert θ.
 induction n; intros. {
@@ -1024,6 +1027,14 @@ induction n; intros. {
   apply (rngl_le_add_r Hor).
   apply (rngl_0_le_1 Hon Hos Hor).
 }
+rewrite rngl_pow_succ_r.
+rewrite (rngl_mul_comm Hic 2).
+rewrite <- (rngl_4_eq_2_mul_2 Hon).
+rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
+  now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+}
+rewrite (rngl_mul_div Hi1); [ | easy ].
+...
 rewrite angle_div_2_pow_succ_r_2.
 eapply (rngl_le_trans Hor); [ apply IHn | ].
 (* ah oui non, mais c'est faux, ça *)
