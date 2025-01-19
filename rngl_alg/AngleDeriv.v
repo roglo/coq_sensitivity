@@ -1013,8 +1013,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 assert (H20 : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 intros.
-revert θ.
-induction n; intros. {
+destruct n. {
   cbn.
   rewrite (rngl_div_1_r Hon Hiq Hc1).
   rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
@@ -1034,22 +1033,28 @@ rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
   now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
 }
 rewrite (rngl_mul_div Hi1); [ | easy ].
+rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+rewrite angle_sub_0_r.
+rewrite <- angle_div_2_pow_succ_r_1.
+rewrite (rngl_mul_comm Hic).
+apply <- (rngl_le_div_r Hon Hop Hiv Hor); [ | easy ].
+rewrite (rngl_div_div_swap Hic Hiv).
+rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+revert θ.
+induction n; intros. {
+  rewrite rngl_pow_0_r.
+  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  apply rngl_sin_bound.
+}
+Search (rngl_sin (_ /₂)).
+Search (rngl_sin (
 ...
 rewrite angle_div_2_pow_succ_r_2.
-eapply (rngl_le_trans Hor); [ apply IHn | ].
-(* ah oui non, mais c'est faux, ça *)
-...
 rewrite angle_eucl_dist_is_sqrt.
 rewrite angle_sub_0_l.
 rewrite rngl_cos_opp.
 Search (_ < rngl_cos _)%L.
 rngl_cos_lt_iff_angle_eucl_lt:
-...
-Search (angle_eucl_dist _ _ = _).
-rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
-rewrite angle_sub_0_r.
-Search (rngl_sin (_ /₂)).
-Search (rngl_sin (
 ...
 *)
 
