@@ -1211,6 +1211,34 @@ destruct n. {
   rewrite (rngl_4_div_2 Hon Hos Hiv Hor).
   apply angle_eucl_dist_bound.
 }
+(**)
+destruct n. {
+  cbn.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_4_eq_2_mul_2 Hon).
+  rewrite (rngl_div_diag Hon Hiq). 2: {
+    intros H.
+    rewrite <- (rngl_4_eq_2_mul_2 Hon) in H.
+    now apply (rngl_eq_mul_0_l Hos Hii) in H.
+  }
+  apply rngl_cos_le_angle_eucl_dist_le. {
+    apply (rngl_0_le_1 Hon Hos Hor).
+  }
+  rewrite (rngl_squ_1 Hon).
+  rewrite (rngl_div_1_l Hon Hiv).
+  rewrite (rngl_one_sub_half Hon Hop Hiv Hor).
+  rewrite <- (rngl_div_1_l Hon Hiv).
+  rewrite angle_sub_0_l.
+  rewrite rngl_cos_opp.
+  rewrite <- angle_div_pow2_1.
+  rewrite <- angle_div_2_pow_succ_r_2.
+Search (rngl_cos (_ /₂^_)).
+Search rngl_cos_div_pow_2.
+...
+Search (angle_eucl_dist _ _ ≤ _)%L.
+Check angle_eucl_dist_div_2_pow_succ_le.
+...
+...
 eapply (rngl_le_trans Hor). {
   now apply angle_eucl_dist_div_2_pow_succ_le.
 }
