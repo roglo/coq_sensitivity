@@ -968,6 +968,52 @@ Qed.
 Definition angle_lt θ1 θ2 := (θ1 < θ2)%A.
 
 (* to be completed
+Theorem angle_eucl_dist_straight_div_2_pow_le :
+  ∀ n, (angle_eucl_dist (angle_straight /₂^n) 0 ≤ 4 / 2 ^ n)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (angle_eucl_dist _ _)).
+  rewrite (H1 (_ / _)%L).
+  apply (rngl_le_refl Hor).
+}
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+assert (Hzs2' : (0 ≤ 2)%L) by now apply (rngl_lt_le_incl Hor).
+assert (H20 : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+intros.
+destruct n. {
+  cbn.
+  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+  rewrite angle_sub_0_r.
+  rewrite angle_straight_div_2.
+  cbn.
+  rewrite (rngl_mul_1_r Hon).
+  apply (rngl_add_le_mono_r Hop Hor).
+  now apply (rngl_le_add_l Hor).
+}
+rewrite rngl_pow_succ_r.
+rewrite (rngl_mul_comm Hic 2).
+rewrite <- (rngl_4_eq_2_mul_2 Hon).
+rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
+  now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+}
+rewrite (rngl_mul_div Hi1); [ | easy ].
+rewrite angle_div_2_pow_succ_r_2.
+rewrite angle_straight_div_2.
+induction n. 2: {
+remember (S n) as sn.
+cbn; subst sn.
+remember (0 ≤? rngl_sin (angle_right /₂^S n))%L as zsn eqn:Hzsn.
+symmetry in Hzsn.
+destruct zsn. {
+...
+
 (* could be generalized, perhaps, to a ordered group which has
    a division by 2, not only my angles *)
 Theorem angle_limit_by_sequence :
