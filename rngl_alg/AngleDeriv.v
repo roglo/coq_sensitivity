@@ -1069,7 +1069,29 @@ apply IHn.
 apply angle_div_2_le_straight.
 Qed.
 
+Theorem angle_eucl_dist_bound : ∀ θ1 θ2, (angle_eucl_dist θ1 θ2 ≤ 2)%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (angle_eucl_dist _ _)).
+  rewrite (H1 2%L).
+  apply (rngl_le_refl Hor).
+}
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+intros.
+rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+rewrite (rngl_mul_comm Hic).
+apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+apply rngl_sin_bound.
+Qed.
+
 (* to be completed
+(*
 Theorem angle_eucl_dist_straight_div_2_pow_le :
   ∀ n, (angle_eucl_dist (angle_straight /₂^n) 0 ≤ 4 / 2 ^ n)%L.
 Proof.
@@ -1118,6 +1140,7 @@ eapply (rngl_le_trans Hor). {
 }
 (* euh... non, ça marche pas *)
 ...
+*)
 
 (* could be generalized, perhaps, to a ordered group which has
    a division by 2, not only my angles *)
@@ -1165,7 +1188,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_le_refl Hor).
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
-assert (H20 : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 intros * Hts.
 revert θ Hts.
 induction n; intros. {
@@ -1181,6 +1205,12 @@ induction n; intros. {
   apply (rngl_le_add_r Hor).
   apply (rngl_0_le_1 Hon Hos Hor).
 }
+destruct n. {
+  cbn.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_4_div_2 Hon Hos Hiv Hor).
+  apply angle_eucl_dist_bound.
+}
 eapply (rngl_le_trans Hor). {
   now apply angle_eucl_dist_div_2_pow_succ_le.
 }
@@ -1188,7 +1218,22 @@ apply (rngl_le_div_l Hon Hop Hiv Hor). {
   now apply (rl_sqrt_pos Hon Hos Hor).
 }
 eapply (rngl_le_trans Hor). {
-  now apply IHn.
+  now apply angle_eucl_dist_div_2_pow_succ_le.
+}
+apply -> (rngl_le_div_l Hon Hop Hiv Hor). 2: {
+  now apply (rl_sqrt_pos Hon Hos Hor).
+}
+rewrite <- rngl_mul_assoc.
+rewrite fold_rngl_squ.
+rewrite (rngl_squ_sqrt Hon); [ | easy ].
+rewrite rngl_pow_succ_r.
+rewrite <- (rngl_div_div Hos Hon Hiv); [ | | easy ]. 2: {
+  now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+}
+rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+eapply (rngl_le_trans Hor). 2: {
+  apply (IHn (2 * θ))%A.
+...
 }
 ...
 rewrite rngl_pow_succ_r.
