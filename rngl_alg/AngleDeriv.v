@@ -963,11 +963,95 @@ apply (rngl_lt_le_incl Hor) in Hzstz, Hzcz, Hzc.
 now apply quadrant_1_rngl_cos_add_le_cos_l.
 Qed.
 
+Theorem rngl_2_sub_1 : rngl_has_opp_or_subt T = true → (2 - 1 = 1)%L.
+Proof.
+intros Hos.
+apply (rngl_add_sub Hos).
+Qed.
+
 (* *)
 
 Definition angle_lt θ1 θ2 := (θ1 < θ2)%A.
 
 (* to be completed
+Theorem angle_eucl_dist_straight_div_2_pow_le :
+  ∀ n θ, (angle_eucl_dist (θ /₂^S n) 0 ≤ angle_eucl_dist (θ /₂^n ) 0 / √2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (angle_eucl_dist _ _)).
+  rewrite (H1 (_ / _)%L).
+  apply (rngl_le_refl Hor).
+}
+assert (H20 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hor).
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+assert (H20' : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+intros.
+revert θ.
+induction n; intros. {
+  cbn.
+  do 2 rewrite angle_eucl_dist_is_sqrt.
+  do 2 rewrite angle_sub_0_l.
+  do 2 rewrite rngl_cos_opp.
+  rewrite <- (rl_sqrt_div Hon Hop Hiv Hor); [ | | easy ]. 2: {
+    apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
+    apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rngl_mul_comm Hic _ (1 - rngl_cos θ)).
+  rewrite (rngl_mul_div Hi1); [ | easy ].
+  rewrite (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_sub_sub_distr Hop).
+  apply (rngl_sub_le_mono_l Hop Hor).
+  apply (rngl_le_add_le_sub_l Hop Hor).
+...
+  rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+  rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+  do 2 rewrite angle_sub_0_r.
+  rewrite <- (rngl_mul_div_assoc Hiv).
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+  cbn.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs. {
+    rewrite (rngl_mul_1_l Hon).
+    rewrite <- (rl_sqrt_div Hon Hop Hiv Hor); [ | | easy ]. 2: {
+    apply rngl_1_sub_cos_div_2_nonneg.
+  }
+  apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+    apply (rngl_le_0_sub Hop Hor).
+    rewrite <- (rl_sqrt_1 Hon Hop Hor Hii) at 4.
+    apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
+      apply rngl_1_add_cos_div_2_nonneg.
+    }
+    apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_le_add_le_sub_l Hop Hor).
+    rewrite (rngl_2_sub_1 Hos).
+    apply rngl_cos_bound.
+  }
+  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii); [ easy | ].
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_sub_sub_distr Hop).
+  apply (rngl_sub_le_mono_l Hop Hor).
+  apply (rngl_le_add_le_sub_l Hop Hor).
+...
+
 Theorem angle_eucl_dist_straight_div_2_pow_le :
   ∀ n, (angle_eucl_dist (angle_straight /₂^n) 0 ≤ 4 / 2 ^ n)%L.
 Proof.
