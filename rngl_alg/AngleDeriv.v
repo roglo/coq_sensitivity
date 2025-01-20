@@ -1232,12 +1232,61 @@ destruct n. {
   rewrite rngl_cos_opp.
   rewrite <- angle_div_pow2_1.
   rewrite <- angle_div_2_pow_succ_r_2.
-Search (rngl_cos (_ /₂^_)).
-Search rngl_cos_div_pow_2.
+  cbn.
+  remember (0 ≤? √_)%L as zsc eqn:Hzsc.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  symmetry in Hzsc, Hzs.
+  destruct zsc. {
+    rewrite (rngl_mul_1_l Hon).
+    assert (Hhs : (1 / 2 ≤ √((1 + √((1 + rngl_cos θ) / 2)) / 2))%L). {
+      apply (rngl_le_squ_le Hop Hor Hii). {
+        apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+        apply (rngl_0_le_1 Hon Hos Hor).
+      } {
+        apply rl_sqrt_nonneg.
+        apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+        apply (rngl_le_trans Hor _ 1). {
+          apply (rngl_0_le_1 Hon Hos Hor).
+        }
+        apply (rngl_le_add_r Hor).
+        apply rl_sqrt_nonneg.
+        apply rngl_1_add_cos_div_2_nonneg.
+      }
+      rewrite (rngl_squ_sqrt Hon). 2: {
+        apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+        apply (rngl_le_trans Hor _ 1). {
+          apply (rngl_0_le_1 Hon Hos Hor).
+        }
+        apply (rngl_le_add_r Hor).
+        apply rl_sqrt_nonneg.
+        apply rngl_1_add_cos_div_2_nonneg.
+      }
+      rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+      rewrite (rngl_squ_1 Hon).
+      progress unfold rngl_squ.
+      rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+      apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii); [ easy | ].
+      apply (rngl_le_trans Hor _ 1). {
+        apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
+        rewrite (rngl_mul_1_l Hon).
+        apply (rngl_le_add_l Hor).
+        apply (rngl_0_le_1 Hon Hos Hor).
+      }
+      apply (rngl_le_add_r Hor).
+      apply rl_sqrt_nonneg.
+      apply rngl_1_add_cos_div_2_nonneg.
+    }
+    destruct zs; [ now rewrite (rngl_mul_1_l Hon) | ].
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_add_opp_r Hop).
 ...
-Search (angle_eucl_dist _ _ ≤ _)%L.
-Check angle_eucl_dist_div_2_pow_succ_le.
-...
+    apply (rngl_le_squ_le Hop Hor Hii). {
+      apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+      apply (rngl_0_le_1 Hon Hos Hor).
+    } {
+      apply rl_sqrt_nonneg.
+      apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
 ...
 eapply (rngl_le_trans Hor). {
   now apply angle_eucl_dist_div_2_pow_succ_le.
