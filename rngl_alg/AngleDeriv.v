@@ -1349,9 +1349,26 @@ split; intros H1. {
     rewrite (rngl_pow_mul_r Hic Hon).
     rewrite <- (rngl_squ_pow_2 Hon).
     rewrite (rngl_squ_sqrt Hon); [ | easy ].
-Theorem rngl_squ_le_2_pow_succ :
-  ∀ n, ((rngl_of_nat n)² ≤ 2 ^ S n)%L.
+    rewrite <- rngl_of_nat_2.
+    rewrite <- (rngl_of_nat_pow Hon Hos).
+    progress unfold rngl_squ.
+    rewrite <- (rngl_of_nat_mul Hon Hos).
+    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+    rewrite <- Nat.pow_2_r.
+Theorem Nat_pow_2_eq_2_pow_succ : ∀ n, n ^ 2 ≤ 2 ^ S n.
 Proof.
+intros.
+cbn.
+rewrite Nat.mul_1_r, Nat.add_0_r.
+induction n; [ easy | ].
+cbn.
+rewrite (Nat.mul_comm n); cbn.
+rewrite Nat.add_0_r.
+rewrite Nat.add_assoc.
+rewrite <- Nat.add_succ_l.
+apply Nat.add_le_mono; [ | apply IHn ].
+clear IHn.
+Search (_ ≤ 2 ^ _).
 ...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
