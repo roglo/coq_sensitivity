@@ -1301,11 +1301,7 @@ intros.
 split; intros H1. {
   intros ε Hε.
   specialize (H1 ε Hε).
-  destruct H1 as (η & H1).
-  destruct (rngl_eq_dec Heo η 0) as [Hη| Hη]. {
-    subst η.
-Print is_limit_when_tending_to_neighbourhood.
-...
+  destruct H1 as (η & Hη & H1).
   progress unfold angle_lt in H1.
   specialize (int_part Hon Hop Hc1 Hor Har (4 / η)%L) as H2.
   destruct H2 as (N, HN).
@@ -1321,7 +1317,7 @@ Print is_limit_when_tending_to_neighbourhood.
       now apply (rl_sqrt_pos Hon Hos Hor).
     }
     rewrite (rngl_mul_comm Hic).
-    apply (rngl_lt_div_l Hon Hop Hiv Hor); [ admit | ].
+    apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
 ...
 Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
 ...
