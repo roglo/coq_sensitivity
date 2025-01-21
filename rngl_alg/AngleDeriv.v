@@ -1137,10 +1137,21 @@ apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
 apply (angle_eucl_dist_div_2_pow_succ_le 0 θ Hts).
 Qed.
 
-(* to be completed
-(*
+Theorem angle_eucl_dist_straight_0 :
+  angle_eucl_dist angle_straight 0 = 2%L.
+Proof.
+destruct_ac.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite angle_sub_0_l.
+rewrite angle_opp_straight; cbn.
+rewrite (rngl_sub_opp_r Hop).
+rewrite fold_rngl_squ.
+rewrite (rl_sqrt_squ Hon Hop Hor).
+apply (rngl_abs_2 Hon Hos Hor).
+Qed.
+
 Theorem angle_eucl_dist_straight_div_2_pow_le :
-  ∀ n, (angle_eucl_dist (angle_straight /₂^n) 0 ≤ 4 / 2 ^ n)%L.
+  ∀ n, (angle_eucl_dist (angle_straight /₂^n) 0 ≤ 2 / √2 ^ n)%L.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1154,52 +1165,18 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_le_refl Hor).
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
-assert (Hzs2' : (0 ≤ 2)%L) by now apply (rngl_lt_le_incl Hor).
-assert (H20 : (2 ≠ 0)%L) by now apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 intros.
-induction n. {
-  cbn.
-  rewrite (rngl_div_1_r Hon Hiq Hc1).
-  rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
-  rewrite angle_sub_0_r.
-  rewrite angle_straight_div_2.
-  cbn.
-  rewrite (rngl_mul_1_r Hon).
-  apply (rngl_add_le_mono_r Hop Hor).
-  now apply (rngl_le_add_l Hor).
-}
-rewrite rngl_pow_succ_r.
-rewrite (rngl_mul_comm Hic 2).
-rewrite <- (rngl_4_eq_2_mul_2 Hon).
-rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
-  now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-}
-rewrite (rngl_mul_div Hi1); [ | easy ].
-(**)
-destruct n. {
-  rewrite (rngl_div_1_r Hon Hiq Hc1).
-  apply angle_eucl_dist_bound.
-}
-destruct n. {
-  cbn.
-  rewrite (rngl_mul_1_r Hon).
-  rewrite (rngl_div_diag Hon Hiq); [ | easy ].
-  rewrite angle_straight_div_2.
-...
 eapply (rngl_le_trans Hor). {
-  apply angle_eucl_dist_div_2_pow_succ_le.
+  apply angle_eucl_dist_div_2_pow_le.
   apply angle_le_refl.
 }
-apply (rngl_le_div_l Hon Hop Hiv Hor). {
-  now apply (rl_sqrt_pos Hon Hos Hor).
-}
-eapply (rngl_le_trans Hor). {
-  now apply IHn.
-}
-(* euh... non, ça marche pas *)
-...
-*)
+rewrite angle_eucl_dist_straight_0.
+apply (rngl_le_refl Hor).
+Qed.
 
+(* to be completed
 (* could be generalized, perhaps, to a ordered group which has
    a division by 2, not only my angles *)
 Theorem angle_limit_by_sequence :
@@ -1229,12 +1206,22 @@ split; intros H1. {
   intros n Hn.
   apply H1. 2: {
     rewrite angle_eucl_dist_sub_l_diag.
-Theorem angle_eucl_dist_div_2_pow_le :
+Theorem angle_eucl_dist_div_2_pow_bound :
   ∀ θ n,
   (θ ≤ angle_straight)%A
-  → (angle_eucl_dist (θ /₂^n) 0 ≤ 4 / 2 ^ n)%L.
+  → (angle_eucl_dist (θ /₂^n) 0 ≤ 2 / √2 ^ n)%L.
 Proof.
 destruct_ac.
+(**)
+intros * Hts.
+eapply (rngl_le_trans Hor). 2: {
+  apply angle_eucl_dist_straight_div_2_pow_le.
+}
+apply angle_le_angle_eucl_dist_le.
+(* ça devrait être bon *)
+...
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -1249,6 +1236,9 @@ specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 intros * Hts.
+Inspect 3.
+Check angle_eucl_dist_div_2_pow_succ_le.
+...
 revert θ Hts.
 induction n; intros. {
   cbn.
@@ -1269,8 +1259,8 @@ destruct n. {
   rewrite (rngl_4_div_2 Hon Hos Hiv Hor).
   apply angle_eucl_dist_bound.
 }
-(**)
 ...
+(**)
 destruct n. {
   cbn.
   rewrite (rngl_mul_1_r Hon).
