@@ -1176,13 +1176,32 @@ rewrite angle_eucl_dist_straight_0.
 apply (rngl_le_refl Hor).
 Qed.
 
-Theorem angle_eucl_dist_div_2_pow_bound :
+Theorem  rl_sqrt_le_diag :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  rngl_is_ordered T = true →
+  ∀ a, (1 ≤ a)%L → (√a ≤ a)%L.
+Proof.
+intros Hon Hop Hii Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * H1a.
+assert (Hza : (0 ≤ a)%L). {
+  apply (rngl_le_trans Hor _ 1); [ | easy ].
+  apply (rngl_0_le_1 Hon Hos Hor).
+}
+apply (rngl_le_squ_le Hop Hor Hii); [ now apply rl_sqrt_nonneg | easy | ].
+rewrite (rngl_squ_sqrt Hon); [ | easy ].
+rewrite <- (rngl_mul_1_l Hon a) at 1.
+now apply (rngl_mul_le_mono_nonneg_r Hop Hor).
+Qed.
+
+Theorem angle_eucl_dist_le_straight_div_2_pow_bound :
   ∀ θ n,
   (θ ≤ angle_straight)%A
   → (angle_eucl_dist (θ /₂^n) 0 ≤ 2 / √2 ^ n)%L.
 Proof.
 destruct_ac.
-(**)
 intros * Hts.
 eapply (rngl_le_trans Hor). 2: {
   apply angle_eucl_dist_straight_div_2_pow_le.
@@ -1194,6 +1213,64 @@ apply angle_le_angle_eucl_dist_le. {
   apply angle_div_2_pow_le_diag.
 }
 now apply angle_div_2_pow_le.
+Qed.
+
+Theorem angle_eucl_dist_div_2_pow_bound :
+  ∀ θ n,
+  (angle_eucl_dist (θ /₂^n) 0 ≤ 4 / √2 ^ n)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (angle_eucl_dist _ _)).
+  rewrite (H1 (_ / _)%L).
+  apply (rngl_le_refl Hor).
+}
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+intros.
+revert θ.
+induction n; intros. {
+  cbn.
+  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  apply (rngl_le_trans Hor _ 2); [ apply angle_eucl_dist_bound | ].
+  apply (rngl_add_le_mono_r Hop Hor).
+  now apply (rngl_le_add_l Hor).
+}
+rewrite angle_div_2_pow_succ_r_2.
+eapply (rngl_le_trans Hor). {
+  apply angle_eucl_dist_le_straight_div_2_pow_bound.
+  apply angle_div_2_le_straight.
+}
+cbn.
+rewrite (rngl_mul_comm Hic).
+rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+  intros H.
+  now apply (eq_rl_sqrt_0 Hon Hos) in H.
+} {
+  apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+  intros H.
+  now apply (eq_rl_sqrt_0 Hon Hos) in H.
+}
+apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
+  apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+  now apply (rl_sqrt_pos Hon Hos Hor).
+}
+rewrite <- (rngl_mul_1_r Hon 2) at 1.
+rewrite <- (rngl_4_eq_2_mul_2 Hon).
+rewrite <- (rngl_mul_div_assoc Hiv).
+apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+apply (rngl_le_div_r Hon Hop Hiv Hor). {
+  now apply (rl_sqrt_pos Hon Hos Hor).
+}
+rewrite (rngl_mul_1_l Hon).
+apply (rl_sqrt_le_diag Hon Hop Hii Hor).
+apply (rngl_le_add_l Hor).
+apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
 
 (* to be completed
@@ -1226,7 +1303,8 @@ split; intros H1. {
   intros n Hn.
   apply H1. 2: {
     rewrite angle_eucl_dist_sub_l_diag.
-Check angle_eucl_dist_div_2_pow_bound.
+    eapply (rngl_le_lt_trans Hor). {
+      apply angle_eucl_dist_div_2_pow_bound.
 ...
 Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
 ...
