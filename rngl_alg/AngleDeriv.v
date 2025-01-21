@@ -1349,6 +1349,9 @@ split; intros H1. {
     rewrite (rngl_pow_mul_r Hic Hon).
     rewrite <- (rngl_squ_pow_2 Hon).
     rewrite (rngl_squ_sqrt Hon); [ | easy ].
+Theorem rngl_squ_le_2_pow_succ :
+  ∀ n, ((rngl_of_nat n)² ≤ 2 ^ S n)%L.
+Proof.
 ...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
