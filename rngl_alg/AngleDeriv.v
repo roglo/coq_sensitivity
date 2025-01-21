@@ -1543,7 +1543,8 @@ intros θ₀.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
   intros ε Hε.
-  exists 0%L.
+  exists ε.
+  split; [ easy | ].
   intros θ Hlt Hθ.
   destruct Hlt as (Hlt, _).
   apply angle_nle_gt in Hlt.
@@ -1555,6 +1556,7 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   subst θ₀.
   cbn.
   exists ε.
+  split; [ easy | ].
   intros θ Hlt Hθ.
   rewrite <- (rngl_opp_add_distr Hop).
   rewrite (rngl_opp_0 Hop).
@@ -1596,6 +1598,20 @@ move η before ε.
 remember (angle_eucl_dist θ₀ 0) as y.
 exists (rngl_min3 y (angle_eucl_dist θ₀ angle_straight) η).
 subst y.
+split. {
+  apply rngl_min_glb_lt; [ | easy ].
+  apply rngl_min_glb_lt. {
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_eucl_dist_nonneg | ].
+    intros H; symmetry in H.
+    now apply angle_eucl_dist_separation in H.
+  } {
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_eucl_dist_nonneg | ].
+    intros H; symmetry in H.
+    now apply angle_eucl_dist_separation in H.
+  }
+}
 intros θ Htt H2.
 destruct Htt as (Htt, Hovt).
 move θ before θ₀.
@@ -1707,6 +1723,7 @@ specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 intros ε Hε; cbn.
 rewrite (rngl_opp_0 Hop).
 exists ε.
+split; [ easy | ].
 intros θ Hlt Hθ.
 rewrite rngl_cos_angle_eucl_dist_0_r.
 rewrite (rngl_sub_sub_swap Hop).
@@ -1752,6 +1769,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 intros ε Hε; cbn.
 exists ε.
+split; [ easy | ].
 intros θ Hlt Hθ.
 rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_opp_0 Hop).
@@ -1812,6 +1830,20 @@ move η before ε.
 remember (angle_eucl_dist θ₀ 0) as x.
 remember (angle_eucl_dist θ₀ angle_straight) as y.
 exists (rngl_min3 x y η); subst x y.
+split. {
+  apply rngl_min_glb_lt; [ | easy ].
+  apply rngl_min_glb_lt. {
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_eucl_dist_nonneg | ].
+    intros H; symmetry in H.
+    now apply angle_eucl_dist_separation in H.
+  } {
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_eucl_dist_nonneg | ].
+    intros H; symmetry in H.
+    now apply angle_eucl_dist_separation in H.
+  }
+}
 intros θ (Htt, Hovt) H1.
 move θ before θ₀.
 apply (rngl_min_glb_lt_iff Hor) in H1.
