@@ -1176,6 +1176,26 @@ rewrite angle_eucl_dist_straight_0.
 apply (rngl_le_refl Hor).
 Qed.
 
+Theorem angle_eucl_dist_div_2_pow_bound :
+  ∀ θ n,
+  (θ ≤ angle_straight)%A
+  → (angle_eucl_dist (θ /₂^n) 0 ≤ 2 / √2 ^ n)%L.
+Proof.
+destruct_ac.
+(**)
+intros * Hts.
+eapply (rngl_le_trans Hor). 2: {
+  apply angle_eucl_dist_straight_div_2_pow_le.
+}
+apply angle_le_angle_eucl_dist_le. {
+  eapply angle_le_trans; [ | apply Hts ].
+  apply angle_div_2_pow_le_diag.
+} {
+  apply angle_div_2_pow_le_diag.
+}
+now apply angle_div_2_pow_le.
+Qed.
+
 (* to be completed
 (* could be generalized, perhaps, to a ordered group which has
    a division by 2, not only my angles *)
@@ -1206,19 +1226,7 @@ split; intros H1. {
   intros n Hn.
   apply H1. 2: {
     rewrite angle_eucl_dist_sub_l_diag.
-Theorem angle_eucl_dist_div_2_pow_bound :
-  ∀ θ n,
-  (θ ≤ angle_straight)%A
-  → (angle_eucl_dist (θ /₂^n) 0 ≤ 2 / √2 ^ n)%L.
-Proof.
-destruct_ac.
-(**)
-intros * Hts.
-eapply (rngl_le_trans Hor). 2: {
-  apply angle_eucl_dist_straight_div_2_pow_le.
-}
-apply angle_le_angle_eucl_dist_le.
-(* ça devrait être bon *)
+Check angle_eucl_dist_div_2_pow_bound.
 ...
 Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
 ...
