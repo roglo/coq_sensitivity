@@ -1324,6 +1324,10 @@ split; intros H1. {
     rewrite (rngl_mul_comm Hic).
     apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
     eapply (rngl_lt_le_trans Hor); [ apply HN | ].
+    apply Nat.succ_le_mono in Hn.
+    rewrite Nat.add_1_r.
+    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in Hn.
+    eapply (rngl_le_trans Hor); [ apply Hn | ].
 ...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
