@@ -3,6 +3,7 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.RingLike.
+Require Import Main.Misc.
 
 Require Import Trigo.RealLike.
 Require Import Trigo.Angle.
@@ -1285,6 +1286,7 @@ Proof.
 intros Har.
 destruct_ac.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -1310,7 +1312,7 @@ split; intros H1. {
     now apply (rngl_mul_nonneg_nonneg Hos Hor).
   }
   destruct H2 as (N, HN).
-  exists N.
+  exists (N + 2).
   intros n Hn.
   apply H1. 2: {
     rewrite angle_eucl_dist_sub_l_diag.
@@ -1324,10 +1326,29 @@ split; intros H1. {
     rewrite (rngl_mul_comm Hic).
     apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
     eapply (rngl_lt_le_trans Hor); [ apply HN | ].
-    apply Nat.succ_le_mono in Hn.
-    rewrite Nat.add_1_r.
+    apply (rngl_add_le_mono_r Hop Hor _ _ (rngl_of_nat 1)).
+    rewrite <- rngl_of_nat_add.
+    do 2 rewrite Nat.add_1_r.
+    rewrite Nat.add_comm in Hn.
     apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in Hn.
     eapply (rngl_le_trans Hor); [ apply Hn | ].
+    clear Hn.
+    rewrite rngl_add_comm.
+    destruct n; [ now cbn; rewrite rngl_add_0_r | ].
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    rewrite <- (rngl_of_nat_sub Hos); [ | now apply -> Nat.succ_le_mono ].
+    rewrite Nat_sub_succ_1.
+    apply (rngl_le_squ_le Hop Hor Hii). {
+      apply (rngl_of_nat_nonneg Hon Hos Hor).
+    } {
+      apply (rngl_lt_le_incl Hor).
+      apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+      now apply (rl_sqrt_pos Hon Hos Hor).
+    }
+    rewrite (rngl_pow_squ Hic Hon).
+    rewrite (rngl_pow_mul_r Hic Hon).
+    rewrite <- (rngl_squ_pow_2 Hon).
+    rewrite (rngl_squ_sqrt Hon); [ | easy ].
 ...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
