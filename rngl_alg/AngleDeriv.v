@@ -1128,6 +1128,17 @@ rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
   now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
 }
 rewrite (rngl_mul_div Hi1); [ | easy ].
+(**)
+destruct n. {
+  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  apply angle_eucl_dist_bound.
+}
+destruct n. {
+  cbn.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+  rewrite angle_straight_div_2.
+...
 eapply (rngl_le_trans Hor). {
   apply angle_eucl_dist_div_2_pow_succ_le.
   apply angle_le_refl.
@@ -1212,6 +1223,7 @@ destruct n. {
   apply angle_eucl_dist_bound.
 }
 (**)
+...
 destruct n. {
   cbn.
   rewrite (rngl_mul_1_r Hon).
