@@ -1293,8 +1293,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
-(*
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
+(*
 specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 *)
 intros.
@@ -1304,6 +1304,11 @@ split; intros H1. {
   destruct H1 as (η & Hη & H1).
   progress unfold angle_lt in H1.
   specialize (int_part Hon Hop Hc1 Hor Har (4 / η)%L) as H2.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in H2. 2: {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+    rewrite <- (rngl_4_eq_2_mul_2 Hon).
+    now apply (rngl_mul_nonneg_nonneg Hos Hor).
+  }
   destruct H2 as (N, HN).
   exists N.
   intros n Hn.
@@ -1318,8 +1323,7 @@ split; intros H1. {
     }
     rewrite (rngl_mul_comm Hic).
     apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
-...
-Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+    eapply (rngl_lt_le_trans Hor); [ apply HN | ].
 ...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
