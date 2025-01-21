@@ -1284,6 +1284,7 @@ Theorem angle_limit_by_sequence :
 Proof.
 intros Har.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -1291,13 +1292,22 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+(*
+specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+*)
 intros.
 split; intros H1. {
   intros ε Hε.
   specialize (H1 ε Hε).
   destruct H1 as (η & H1).
+  destruct (rngl_eq_dec Heo η 0) as [Hη| Hη]. {
+    subst η.
+Print is_limit_when_tending_to_neighbourhood.
+...
   progress unfold angle_lt in H1.
-  specialize (int_part Hon Hop Hc1 Hor Har (2 / ε)%L) as H2.
+  specialize (int_part Hon Hop Hc1 Hor Har (4 / η)%L) as H2.
   destruct H2 as (N, HN).
   exists N.
   intros n Hn.
@@ -1305,6 +1315,13 @@ split; intros H1. {
     rewrite angle_eucl_dist_sub_l_diag.
     eapply (rngl_le_lt_trans Hor). {
       apply angle_eucl_dist_div_2_pow_bound.
+    }
+    apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+      apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+      now apply (rl_sqrt_pos Hon Hos Hor).
+    }
+    rewrite (rngl_mul_comm Hic).
+    apply (rngl_lt_div_l Hon Hop Hiv Hor); [ admit | ].
 ...
 Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
 ...
