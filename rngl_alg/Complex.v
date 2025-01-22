@@ -1722,43 +1722,6 @@ rewrite angle_div_2_pow_succ_r_1.
 apply rngl_sin_div_2_nonneg.
 Qed.
 
-Theorem eq_angle_div_2_0 : ∀ θ, (θ /₂ = 0 → θ = 0)%A.
-Proof.
-destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  intros.
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  apply H1.
-}
-intros * Htz.
-apply eq_angle_eq in Htz.
-apply eq_angle_eq; cbn.
-injection Htz; clear Htz; intros Hc Hs.
-apply (eq_rl_sqrt_0 Hon Hos) in Hc. 2: {
-  apply rngl_1_sub_cos_div_2_nonneg.
-}
-apply (f_equal (λ x, rngl_mul x 2)) in Hc.
-rewrite (rngl_div_mul Hon Hiv) in Hc. 2: {
-  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-}
-rewrite (rngl_mul_0_l Hos) in Hc.
-apply -> (rngl_sub_move_0_r Hop) in Hc.
-symmetry in Hc.
-apply eq_rngl_cos_1 in Hc.
-now subst θ.
-Qed.
-
-Theorem eq_angle_div_2_pow_0 :
-  ∀ n θ, (angle_div_2_pow θ n = 0 → θ = 0)%A.
-Proof.
-destruct_ac.
-intros * Htn.
-induction n; [ easy | ].
-cbn in Htn.
-apply eq_angle_div_2_0 in Htn.
-now apply IHn.
-Qed.
-
 Theorem rl_sqrt_div_2 :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →

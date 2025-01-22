@@ -1304,8 +1304,9 @@ Qed.
 Theorem angle_limit_by_sequence :
   rngl_is_archimedean T = true →
   ∀ db (f : angle T → T) θ₀ (L : T),
-  is_limit_when_tending_to_neighbourhood angle_lt angle_eucl_dist db f θ₀ L ↔
-  is_limit_when_tending_to_inf db (λ n : nat, f (θ₀ - θ₀ /₂^n))%A L.
+  (θ₀ ≠ 0)%A
+  → is_limit_when_tending_to_neighbourhood angle_lt angle_eucl_dist db f θ₀ L ↔
+    is_limit_when_tending_to_inf db (λ n : nat, f (θ₀ - θ₀ /₂^n))%A L.
 Proof.
 intros Har.
 destruct_ac.
@@ -1323,21 +1324,7 @@ specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 (*
 specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 *)
-intros.
-destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
-  subst θ₀.
-  split; intros H1. {
-    intros ε Hε.
-    specialize (H1 ε Hε).
-    destruct H1 as (η & Hη & H1).
-    exists 0.
-    intros n Hn.
-    rewrite angle_0_div_2_pow.
-    rewrite angle_sub_diag.
-    progress unfold angle_lt in H1.
-Print is_limit_when_tending_to_neighbourhood.
-Print angle_lt.
-...
+intros * Htz.
 split; intros H1. {
   intros ε Hε.
   specialize (H1 ε Hε).
@@ -1416,19 +1403,8 @@ split; intros H1. {
   rewrite angle_mul_1_l in H.
   apply angle_sub_move_l in H.
   rewrite angle_sub_diag in H.
-  (* lemma *)
-  clear Hn.
-  clear H1.
-  revert θ₀ H.
-  induction n; intros. {
-    cbn in H.
-... ...
-  rewrite angle_div_2_pow_succ_r_2 in H.
-  now apply IHn in H.
-Search (_ /₂^_ = 0)%A.
-
-...
-Search (_ * _ /₂^_)%A.
+  now apply eq_angle_div_2_pow_0 in H.
+}
 ...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
