@@ -417,11 +417,12 @@ destruct b. {
 }
 Qed.
 
-Theorem rngl_4_eq_2_mul_2 : rngl_has_1 T = true → (2 * 2 = 4)%L.
+Theorem rngl_4_eq_2_mul_2 : rngl_has_1 T = true → (4 = 2 * 2)%L.
 Proof.
 intros Hon.
 rewrite rngl_mul_add_distr_l.
 rewrite (rngl_mul_1_r Hon).
+symmetry.
 apply rngl_add_assoc.
 Qed.
 
@@ -1262,7 +1263,7 @@ apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
   now apply (rl_sqrt_pos Hon Hos Hor).
 }
 rewrite <- (rngl_mul_1_r Hon 2) at 1.
-rewrite <- (rngl_4_eq_2_mul_2 Hon).
+rewrite (rngl_4_eq_2_mul_2 Hon).
 rewrite <- (rngl_mul_div_assoc Hiv).
 apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
 apply (rngl_le_div_r Hon Hop Hiv Hor). {
@@ -1333,7 +1334,7 @@ split; intros H1. {
   specialize (int_part Hon Hop Hc1 Hor Har (4 / η)%L) as H2.
   rewrite (rngl_abs_nonneg_eq Hop Hor) in H2. 2: {
     apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
-    rewrite <- (rngl_4_eq_2_mul_2 Hon).
+    rewrite (rngl_4_eq_2_mul_2 Hon).
     now apply (rngl_mul_nonneg_nonneg Hos Hor).
   }
   destruct H2 as (N, HN).
@@ -1405,6 +1406,22 @@ split; intros H1. {
   rewrite angle_sub_diag in H.
   now apply eq_angle_div_2_pow_0 in H.
 }
+intros ε Hε.
+specialize (H1 ε Hε).
+destruct H1 as (N & HN).
+exists (4 / rngl_of_nat (N + 2))%L.
+split. {
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    rewrite <- rngl_of_nat_0.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    now rewrite Nat.add_succ_r.
+  }
+  rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_4_eq_2_mul_2 Hon).
+  now apply (rngl_mul_pos_pos Hos Hor Hii).
+}
+intros θ Htt Hd4.
+progress unfold angle_lt in Htt.
 ...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
