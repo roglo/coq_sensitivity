@@ -1274,13 +1274,37 @@ apply (rngl_le_add_l Hor).
 apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
 
+Theorem Nat_pow_2_eq_2_pow_succ : ∀ n, n ^ 2 ≤ 2 ^ S n.
+Proof.
+intros.
+cbn.
+rewrite Nat.mul_1_r, Nat.add_0_r.
+induction n; [ easy | cbn ].
+rewrite (Nat.mul_comm n); cbn.
+rewrite Nat.add_0_r.
+rewrite Nat.add_assoc.
+rewrite <- Nat.add_succ_l.
+apply Nat.add_le_mono; [ | apply IHn ].
+clear IHn.
+induction n; [ now apply -> Nat.succ_le_mono | ].
+cbn.
+rewrite Nat.add_succ_r.
+rewrite Nat.add_0_r.
+do 2 rewrite <- Nat.add_1_r.
+rewrite <- Nat.add_assoc.
+apply Nat.add_le_mono; [ apply IHn | ].
+apply Nat.add_le_mono.
+now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+Qed.
+
 (* to be completed
 (* could be generalized, perhaps, to a ordered group which has
    a division by 2, not only my angles *)
 Theorem angle_limit_by_sequence :
   rngl_is_archimedean T = true →
   ∀ db (f : angle T → T) θ₀ (L : T),
-  is_limit_when_tending_to_neighbourhood _ _ angle_lt angle_eucl_dist db f θ₀ L ↔
+  is_limit_when_tending_to_neighbourhood angle_lt angle_eucl_dist db f θ₀ L ↔
   is_limit_when_tending_to_inf db (λ n : nat, f (θ₀ - θ₀ /₂^n))%A L.
 Proof.
 intros Har.
@@ -1300,6 +1324,20 @@ specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 *)
 intros.
+destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
+  subst θ₀.
+  split; intros H1. {
+    intros ε Hε.
+    specialize (H1 ε Hε).
+    destruct H1 as (η & Hη & H1).
+    exists 0.
+    intros n Hn.
+    rewrite angle_0_div_2_pow.
+    rewrite angle_sub_diag.
+    progress unfold angle_lt in H1.
+Print is_limit_when_tending_to_neighbourhood.
+Print angle_lt.
+...
 split; intros H1. {
   intros ε Hε.
   specialize (H1 ε Hε).
@@ -1355,20 +1393,42 @@ split; intros H1. {
     rewrite <- (rngl_of_nat_mul Hon Hos).
     apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
     rewrite <- Nat.pow_2_r.
-Theorem Nat_pow_2_eq_2_pow_succ : ∀ n, n ^ 2 ≤ 2 ^ S n.
-Proof.
-intros.
-cbn.
-rewrite Nat.mul_1_r, Nat.add_0_r.
-induction n; [ easy | ].
-cbn.
-rewrite (Nat.mul_comm n); cbn.
-rewrite Nat.add_0_r.
-rewrite Nat.add_assoc.
-rewrite <- Nat.add_succ_l.
-apply Nat.add_le_mono; [ | apply IHn ].
-clear IHn.
-Search (_ ≤ 2 ^ _).
+    apply Nat_pow_2_eq_2_pow_succ.
+  }
+  rewrite <- (angle_mul_1_l (_ /₂^_)).
+  rewrite <- (angle_div_2_pow_mul_2_pow n θ₀) at 1.
+  rewrite <- angle_mul_sub_distr_r. 2: {
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  apply (angle_lt_le_trans _ (2 ^ n * (θ₀ /₂^n))). 2: {
+    rewrite angle_div_2_pow_mul_2_pow.
+    apply angle_le_refl.
+  }
+  apply angle_lt_iff.
+  split. {
+    apply angle_mul_le_mono_r; [ | apply Nat.le_sub_l ].
+    apply angle_mul_nat_overflow_pow_div.
+  }
+  intros H.
+  rewrite angle_mul_sub_distr_r in H. 2: {
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite angle_mul_1_l in H.
+  apply angle_sub_move_l in H.
+  rewrite angle_sub_diag in H.
+  (* lemma *)
+  clear Hn.
+  clear H1.
+  revert θ₀ H.
+  induction n; intros. {
+    cbn in H.
+... ...
+  rewrite angle_div_2_pow_succ_r_2 in H.
+  now apply IHn in H.
+Search (_ /₂^_ = 0)%A.
+
+...
+Search (_ * _ /₂^_)%A.
 ...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
