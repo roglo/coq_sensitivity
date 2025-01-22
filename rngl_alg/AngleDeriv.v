@@ -1304,10 +1304,12 @@ Qed.
    a division by 2, not only my angles *)
 Theorem angle_limit_by_sequence :
   rngl_is_archimedean T = true →
-  ∀ db (f : angle T → T) θ₀ (L : T),
+  ∀ (f : angle T → T) θ₀ (L : T),
   (θ₀ ≠ 0)%A
-  → is_limit_when_tending_to_neighbourhood angle_lt angle_eucl_dist db f θ₀ L ↔
-    is_limit_when_tending_to_inf db (λ n : nat, f (θ₀ - θ₀ /₂^n))%A L.
+  → is_limit_when_tending_to_neighbourhood angle_lt angle_eucl_dist
+      rngl_dist f θ₀ L ↔
+    is_limit_when_tending_to_inf
+      rngl_dist (λ n : nat, f (θ₀ - θ₀ /₂^n))%A L.
 Proof.
 intros Har.
 destruct_ac.
@@ -1422,6 +1424,11 @@ split. {
 }
 intros θ Htt Hd4.
 progress unfold angle_lt in Htt.
+eapply (rngl_le_lt_trans Hor); [ | now apply (HN N) ].
+progress unfold rngl_dist.
+apply (rngl_cos_lt_angle_eucl_dist_lt) in Hd4.
+2: {
+(* pas l'air de marcher... *)
 ...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
