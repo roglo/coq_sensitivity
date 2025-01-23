@@ -1785,7 +1785,6 @@ split. {
   specialize (H1 (θ + angle_right)%A).
   rewrite rngl_cos_add_right_r in H1.
   rewrite (rngl_sub_opp_r Hop) in H1.
-...
   assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
     progress unfold angle_lt_for_deriv in Hlt.
     destruct Hlt as (Hlt, Hov).
@@ -1793,39 +1792,15 @@ split. {
     split. {
       do 2 rewrite (angle_add_comm _ angle_right).
       apply angle_add_lt_mono_l; [ | easy ].
-(**)
+      rewrite angle_add_overflow_comm in Hov.
+      rewrite angle_add_overflow_comm.
       progress unfold angle_add_overflow in Hov.
       progress unfold angle_add_overflow.
       apply Bool.andb_false_iff in Hov.
       apply Bool.andb_false_iff.
-      right.
-      apply angle_leb_gt.
-      destruct Hov as [Htz| Htt]. {
-        apply Bool.negb_false_iff in Htz.
-        apply angle_eqb_eq in Htz.
-        subst θ.
+      destruct Hov as [Htz| Htt]; [ now left | ].
+      apply angle_leb_gt in Htt.
 ...
-Search ((_ ≠? _)%A ≠ true).
-...
-      rewrite <- angle_add_overflow_equiv2 in Hov.
-      rewrite <- angle_add_overflow_equiv2.
-      progress unfold angle_add_overflow2 in Hov.
-      progress unfold angle_add_overflow2.
-...
-Search (_ → angle_add_overflow _ _ = false).
-...
-  progress unfold left_derivative_at in H1.
-  progress unfold is_left_limit_when_tending_to_neighbourhood in H1.
-  progress unfold is_limit_when_tending_to_neighbourhood in H1.
-  progress unfold angle_lt_for_deriv in H1.
-...
-  intros ε Hε.
-  specialize (H1 ε Hε).
-Print left_derivative_at.
-...
-apply rngl_cos_left_derivative.
-apply rngl_cos_right_derivative.
-Qed.
 *)
 
 End a.
