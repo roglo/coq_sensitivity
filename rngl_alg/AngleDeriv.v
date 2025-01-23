@@ -1746,6 +1746,45 @@ destruct ov2. {
 }
 Qed.
 
+Theorem angle_lt_angle_lt_opp_iff :
+  ∀ θ1 θ2,
+  (θ1 < θ2 ∧ θ1 < - θ2)%A ↔ (0 ≤ rngl_sin θ1 ∧ rngl_cos θ2 < rngl_cos θ1)%L.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_ltb.
+rewrite rngl_sin_opp, rngl_cos_opp.
+rewrite (rngl_leb_0_opp Hop Hor).
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (rngl_sin θ2 ≤? 0)%L as s2z eqn:Hs2z.
+symmetry in Hzs1, Hzs2, Hs2z.
+split; intros (H1, H2). {
+  destruct zs2. {
+    apply rngl_leb_le in Hzs2.
+    destruct zs1; [ | easy ].
+    apply rngl_leb_le in Hzs1.
+    split; [ easy | ].
+    now apply rngl_ltb_lt in H1.
+  }
+  apply (rngl_leb_gt Hor) in Hzs2.
+  destruct s2z. {
+    destruct zs1; [ | easy ].
+    apply rngl_leb_le in Hzs1.
+    split; [ easy | ].
+    now apply rngl_ltb_lt in H2.
+  }
+  apply (rngl_leb_gt Hor) in Hs2z.
+  now apply (rngl_lt_asymm Hor) in Hzs2.
+}
+generalize H1; intros H.
+apply rngl_leb_le in H.
+rewrite H in Hzs1; clear H.
+subst zs1.
+apply rngl_ltb_lt in H2.
+split; [ now destruct zs2 | now destruct s2z ].
+Qed.
+
 (* to be completed
 Theorem rngl_sin_derivative :
   is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
@@ -1800,6 +1839,62 @@ split. {
       apply Bool.andb_false_iff.
       destruct Hov as [Htz| Htt]; [ now left | ].
       apply angle_leb_gt in Htt.
+      specialize (proj1 (angle_lt_angle_lt_opp_iff _ _) (conj Hlt Htt)) as H.
+      destruct H as (H4, H5).
+...
+Proof.
+progress unfold angle_ltb in Hlt.
+progress unfold angle_ltb in Htt.
+rewrite rngl_sin_opp, rngl_cos_opp in Htt.
+rewrite (rngl_leb_0_opp Hop Hor) in Htt.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+remember (0 ≤? rngl_sin θ₀)%L as zsz eqn:Hzsz.
+remember (rngl_sin θ₀ ≤? 0)%L as szz eqn:Hszz.
+symmetry in Hzs, Hzsz, Hszz.
+destruct zsz. {
+  destruct zs; [ | easy ].
+  apply rngl_leb_le in Hzsz.
+  apply rngl_ltb_lt in Hlt.
+  destruct szz. {
+    clear Htt.
+    apply rngl_leb_le in Hszz.
+    apply (rngl_le_antisymm Hor) in Hzsz; [ | easy ].
+    clear Hszz.
+    apply eq_rngl_sin_0 in Hzsz.
+    destruct Hzsz; subst θ₀. {
+      exfalso.
+      apply rngl_nle_gt in Hlt.
+      apply Hlt, rngl_cos_bound.
+    }
+    cbn in Hlt.
+    admit. (* θ ≠ angle_straight *)
+  }
+  right. (* enough θ₀ ≤ angle_straight *)
+  apply (rngl_leb_gt Hor) in Hszz.
+  apply angle_leb_gt.
+  apply angle_lt_opp_r. {
+    intros H; subst θ₀.
+    now apply (rngl_lt_irrefl Hor) in Hszz.
+  }
+  apply (angle_le_lt_trans _ angle_straight). {
+    now apply rngl_sin_nonneg_angle_le_straight.
+  }
+  progress unfold angle_ltb.
+  cbn.
+  rewrite (rngl_leb_refl Hor).
+  rewrite (rngl_leb_0_opp Hop Hor).
+  rewrite (proj2 (rngl_leb_nle _ _)); [ easy | ].
+  apply rngl_nle_gt.
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+}
+apply (rngl_leb_gt Hor) in Hzsz.
+generalize Hzsz; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+apply rngl_leb_le in H.
+rewrite H in Hszz; clear H.
+subst szz.
+destruct zs; [ | easy ].
+apply rngl_ltb_lt in Htt.
 ...
 *)
 
