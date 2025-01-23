@@ -1424,24 +1424,29 @@ split. {
 }
 intros θ Htt Hd4.
 progress unfold angle_lt in Htt.
+(*
 eapply (rngl_le_lt_trans Hor); [ | now apply (HN N) ].
+*)
+specialize (HN N (Nat.le_refl N)) as H1.
+progress unfold rngl_dist in H1.
 progress unfold rngl_dist.
 (*
 apply (rngl_cos_lt_angle_eucl_dist_lt) in Hd4.
 *)
-(* pas l'air de marcher... *)
-(* il faudrait au minimum que f soit continue (encore qu'il faut voir),
-   mais est-ce que c'est suffisant ? *)
+progress unfold rngl_abs in H1.
 progress unfold rngl_abs.
-do 2 rewrite (rngl_leb_sub_0 Hop Hor).
+rewrite (rngl_leb_sub_0 Hop Hor) in H1.
+rewrite (rngl_leb_sub_0 Hop Hor).
 remember (f θ ≤? L)%L as fl eqn:Hfl.
 remember (f (θ₀ - θ₀ /₂^N)%A ≤? L)%L as ftl eqn:Hftl.
 symmetry in Hfl, Hftl.
 destruct fl. {
   destruct ftl. {
+    rewrite (rngl_opp_sub_distr Hop) in H1.
     rewrite (rngl_opp_sub_distr Hop).
-    rewrite (rngl_opp_sub_distr Hop).
+(*
     apply (rngl_sub_le_mono_l Hop Hor).
+*)
     apply rngl_leb_le in Hfl, Hftl.
 ...
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
