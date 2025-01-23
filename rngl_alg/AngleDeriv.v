@@ -1152,6 +1152,18 @@ rewrite (rl_sqrt_squ Hon Hop Hor).
 apply (rngl_abs_2 Hon Hos Hor).
 Qed.
 
+Theorem angle_eucl_dist_right_0 :
+  angle_eucl_dist angle_right 0 = √2%L.
+Proof.
+destruct_ac.
+rewrite angle_eucl_dist_is_sqrt.
+f_equal.
+rewrite angle_sub_0_l.
+cbn.
+rewrite (rngl_sub_0_r Hos).
+apply (rngl_mul_1_r Hon).
+Qed.
+
 Theorem angle_eucl_dist_straight_div_2_pow_le :
   ∀ n, (angle_eucl_dist (angle_straight /₂^n) 0 ≤ 2 / √2 ^ n)%L.
 Proof.
@@ -1739,8 +1751,52 @@ Theorem rngl_sin_derivative :
   is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_sin rngl_cos.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros θ₀.
+  split. {
+    intros ε Hε; rewrite (H1 ε) in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  } {
+    intros ε Hε; rewrite (H1 ε) in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+}
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 intros θ₀.
-split.
+specialize (rngl_cos_derivative (θ₀ + angle_right)%A) as (H1, H2).
+split. {
+  clear H2.
+  intros ε Hε.
+  specialize (H1 ε Hε).
+  destruct H1 as (η & Hη & Ha).
+  exists (rngl_min η (angle_eucl_dist angle_right 0)).
+  rewrite angle_eucl_dist_right_0.
+  split. {
+    apply rngl_min_glb_lt; [ easy | ].
+    now apply (rl_sqrt_pos Hon Hos Hor).
+  }
+  intros θ Hlt Hθ.
+  apply (rngl_min_glb_lt_iff Hor) in Hθ.
+  destruct Hθ as (H1, H2).
+  specialize (Ha (θ + angle_right)%A).
+  assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
+    progress unfold angle_lt_for_deriv in Hlt.
+    destruct Hlt as (Hlt, Hov).
+    progress unfold angle_lt_for_deriv.
+    split. {
+      do 2 rewrite (angle_add_comm _ angle_right).
+      apply angle_add_lt_mono_l; [ | easy ].
+...
+  progress unfold left_derivative_at in H1.
+  progress unfold is_left_limit_when_tending_to_neighbourhood in H1.
+  progress unfold is_limit_when_tending_to_neighbourhood in H1.
+  progress unfold angle_lt_for_deriv in H1.
+...
+  intros ε Hε.
+  specialize (H1 ε Hε).
+Print left_derivative_at.
 ...
 apply rngl_cos_left_derivative.
 apply rngl_cos_right_derivative.
