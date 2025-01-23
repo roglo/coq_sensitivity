@@ -1879,6 +1879,13 @@ assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
     apply rngl_cos_lt_iff_angle_eucl_lt in H3.
     rewrite angle_sub_0_r in H3.
     cbn - [ angle_sub ] in H3.
+    apply (rngl_nlt_ge_iff Hor).
+    intros Htz.
+    change_angle_opp θ₀.
+    progress sin_cos_opp_hyp T H3.
+    progress sin_cos_opp_hyp T Htz.
+    progress sin_cos_opp_hyp T H5.
+(* aucune contradiction *)
 ...
 Search (_ → 0 ≤ rngl_sin _)%L.
 apply rngl_sin_add_nonneg_sin_nonneg with (θ2 := θ).
