@@ -1813,9 +1813,12 @@ split. {
   rewrite rngl_sin_add_right_r in H1.
   destruct H1 as (η & Hη & H1).
   exists (rngl_min η (angle_eucl_dist angle_right 0)).
+(*
   rewrite angle_eucl_dist_right_0.
+*)
   split. {
     apply rngl_min_glb_lt; [ easy | ].
+    rewrite angle_eucl_dist_right_0.
     now apply (rl_sqrt_pos Hon Hos Hor).
   }
   intros θ Hlt Hθ.
@@ -1849,6 +1852,28 @@ split. {
         apply H5; clear H5.
         apply rngl_cos_bound.
       }
+      progress unfold angle_ltb.
+      cbn.
+      rewrite (rngl_leb_0_opp Hop Hor).
+      specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
+      apply (rngl_leb_gt Hor) in H.
+      rewrite H; clear H.
+      remember (0 ≤? rngl_sin θ₀)%L as zsz eqn:Hzsz.
+      symmetry in Hzsz.
+      destruct zsz; [ easy | ].
+      apply rngl_ltb_lt.
+      apply (rngl_leb_gt Hor) in Hzsz.
+      apply (rngl_nle_gt_iff Hor).
+      intros H; clear H.
+      apply rngl_nle_gt in Hzsz.
+      apply Hzsz; clear Hzsz.
+      apply rngl_cos_lt_iff_angle_eucl_lt in H3.
+      rewrite angle_sub_0_r in H3.
+      cbn - [ angle_sub ] in H3.
+...
+Search (_ → 0 ≤ rngl_sin _)%L.
+apply rngl_sin_add_nonneg_sin_nonneg with (θ2 := θ).
+apply angle_le_rngl_sin_nonneg_sin_nonneg with (θ1 := θ).
 ...
 apply (rngl_leb_gt Hor) in Hzsz.
 generalize Hzsz; intros H.
