@@ -309,7 +309,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
 }
 Qed.
 
-Theorem rngl_sin_angle_eucl_dist' :
+Theorem rngl_sin_angle_eucl_dist_twice_0 :
   ∀ θ,
   (θ ≤ angle_straight)%A
   → rngl_sin θ = (angle_eucl_dist (2 * θ) 0 / 2)%L.
@@ -396,7 +396,7 @@ symmetry in Hb.
 symmetry.
 destruct b. {
   rewrite rngl_sin_add_straight_r.
-  rewrite rngl_sin_angle_eucl_dist'. 2: {
+  rewrite rngl_sin_angle_eucl_dist_twice_0. 2: {
     apply angle_div_2_le_straight.
   }
   rewrite (rngl_mul_opp_l Hop).
@@ -407,7 +407,7 @@ destruct b. {
   apply angle_eucl_dist_move_0_r.
 } {
   rewrite angle_add_0_r.
-  rewrite rngl_sin_angle_eucl_dist'. 2: {
+  rewrite rngl_sin_angle_eucl_dist_twice_0. 2: {
     apply angle_div_2_le_straight.
   }
   rewrite (rngl_mul_1_l Hon).
@@ -1800,6 +1800,49 @@ apply rngl_ltb_lt in H2.
 split; [ now destruct zs2 | now destruct s2z ].
 Qed.
 
+Theorem rngl_sin_angle_eucl_dist_straight_r :
+  ∀ θ,
+  (θ ≤ angle_straight)%A
+  → rngl_sin θ = (rngl_sin (θ /₂) * angle_eucl_dist θ angle_straight)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _)%L).
+  apply H1.
+}
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
+intros * Hts.
+cbn.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite rngl_cos_sub_straight_l.
+rewrite (rngl_sub_opp_r Hop).
+rewrite <- rl_sqrt_mul; cycle 1. {
+  apply rngl_1_sub_cos_div_2_nonneg.
+} {
+  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+  apply (rngl_le_opp_l Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite rngl_mul_assoc.
+rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_squ_sub_squ' Hop).
+rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+rewrite (rngl_add_sub Hos).
+rewrite (rngl_squ_1 Hon).
+specialize (cos2_sin2_1 θ) as H1.
+rewrite <- H1, rngl_add_comm.
+rewrite (rngl_add_sub Hos).
+symmetry.
+rewrite (rl_sqrt_squ Hon Hop Hor).
+apply (rngl_abs_nonneg_eq Hop Hor).
+now apply rngl_sin_nonneg_angle_le_straight.
+Qed.
+
 (* to be completed
 Theorem rngl_sin_left_derivative_at_straight :
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
@@ -1823,6 +1866,28 @@ progress unfold rngl_dist.
 rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_div_opp_l Hop Hiv).
 rewrite (rngl_add_opp_l Hop).
+progress unfold angle_lt_for_deriv in Hlt.
+destruct Hlt as (Hts & Hov).
+rewrite rngl_sin_angle_eucl_dist_straight_r. 2: {
+  now apply angle_lt_le_incl in Hts.
+}
+rewrite (rngl_mul_div Hi1).
+(* hou là ! *)
+...
+Search ((_ - _) * (_ + _))%L.
+rewrite (rngl_mul_add_sub).
+...
+rewrite rngl_cos_angle_eucl_dist_straight_r.
+...
+rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+cbn.
+rewrite rngl_mul_opp_r.
+rewrite rngl_mul_1_r.
+rewrite rngl_opp_0.
+rewrite rngl_mul_0_r.
+rewrite rngl_sub
+progress unfold angle_div_2.
+...
 rewrite angle_eucl_dist_is_sqrt.
 rewrite rngl_cos_sub_straight_l.
 rewrite (rngl_sub_opp_r Hop).
@@ -1830,19 +1895,6 @@ rewrite (rngl_sub_opp_r Hop).
 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
 ...
 Check rngl_cos_angle_eucl_dist_straight_r.
-Theorem rngl_sin_angle_eucl_dist_straight_r :
-  ∀ θ, rngl_sin θ = ((angle_eucl_dist θ angle_straight)² / 2)%L.
-Proof.
-destruct_ac.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  rewrite H1; apply H1.
-}
-intros.
-specialize angle_eucl_dist_is_2_mul_sin_sub_div_2 as H1.
-specialize (H1 θ angle_straight).
 ...
 rewrite rngl_sin_sub_straight in H1.
 rewrite H1.

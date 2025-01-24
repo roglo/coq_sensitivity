@@ -1595,7 +1595,7 @@ apply (rngl_add_nonneg_nonneg Hor);
 apply (rngl_squ_nonneg Hos Hor).
 Qed.
 
-Theorem rngl_sin_angle_eucl_dist :
+Theorem rngl_sin_angle_eucl_dist_right_r :
   ∀ θ, (rngl_sin θ = 1 - (angle_eucl_dist θ angle_right)² / 2)%L.
 Proof.
 destruct_ac.
