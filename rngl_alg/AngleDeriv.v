@@ -1819,7 +1819,43 @@ exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
 rewrite (rngl_sub_0_l Hop).
-Check rngl_cos_angle_eucl_dist_straight_r.
+Theorem rngl_sin_angle_eucl_dist_straight_r :
+  ∀ θ, rngl_sin θ = ((angle_eucl_dist θ angle_straight)² / 2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite H1; apply H1.
+}
+intros.
+specialize (angle_eucl_dist_straight_r_cos_sin) as H1.
+specialize (H1 (θ + angle_right)%A).
+rewrite rngl_cos_add_right_r in H1.
+rewrite rngl_sin_add_right_r in H1.
+rewrite (rngl_squ_add Hic Hon) in H1.
+rewrite (rngl_squ_1 Hon) in H1.
+rewrite (rngl_mul_1_r Hon) in H1.
+rewrite <- rngl_add_assoc in H1.
+rewrite (rngl_squ_opp Hop) in H1.
+rewrite (rngl_add_comm _²) in H1.
+rewrite cos2_sin2_1 in H1.
+rewrite <- rngl_add_add_swap in H1.
+rewrite (rngl_mul_opp_r Hop) in H1.
+rewrite (rngl_add_opp_r Hop) in H1.
+rewrite (rngl_sub_mul_r_diag_l Hon Hop) in H1.
+symmetry in H1.
+apply (rngl_mul_move_l Hic Hi1) in H1. 2: {
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+apply (rngl_sub_move_l Hop) in H1.
+(* bref, c'est la merde *)
+...
+Qed.
+About rngl_cos_angle_eucl_dist_straight_r.
+...
+Search (angle_eucl_dist _ angle_straight).
 ...
 rewrite rngl_cos_angle_eucl_dist_straight_r.
 rewrite (rngl_sub_add Hop).
