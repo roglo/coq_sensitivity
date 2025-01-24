@@ -1819,6 +1819,7 @@ exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
 rewrite (rngl_sub_0_l Hop).
+...
 Theorem rngl_sin_angle_eucl_dist_straight_r :
   ∀ θ, rngl_sin θ = ((angle_eucl_dist θ angle_straight)² / 2)%L.
 Proof.
@@ -1830,6 +1831,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite H1; apply H1.
 }
 intros.
+specialize angle_eucl_dist_is_2_mul_sin_sub_div_2 as H1.
+specialize (H1 θ angle_straight).
+...
+rewrite rngl_sin_sub_straight in H1.
+rewrite H1.
+...
 specialize (angle_eucl_dist_straight_r_cos_sin) as H1.
 specialize (H1 (θ + angle_right)%A).
 rewrite rngl_cos_add_right_r in H1.
