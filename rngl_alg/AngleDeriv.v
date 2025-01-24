@@ -1819,12 +1819,17 @@ exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
 rewrite (rngl_sub_0_l Hop).
-Check rngl_cos_angle_eucl_dist_straight_r.
 progress unfold rngl_dist.
 rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_div_opp_l Hop Hiv).
 rewrite (rngl_add_opp_l Hop).
+rewrite angle_eucl_dist_is_sqrt.
+rewrite rngl_cos_sub_straight_l.
+rewrite (rngl_sub_opp_r Hop).
 ...
+rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
+...
+Check rngl_cos_angle_eucl_dist_straight_r.
 Theorem rngl_sin_angle_eucl_dist_straight_r :
   ∀ θ, rngl_sin θ = ((angle_eucl_dist θ angle_straight)² / 2)%L.
 Proof.
