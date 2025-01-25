@@ -1362,7 +1362,6 @@ apply (rngl_le_add_l Hor).
 apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
 
-(* to be completed
 Theorem rngl_cos_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
@@ -1426,7 +1425,6 @@ apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
-rename H2 into H5.
 (* ce "angle_add_overflow θ θ₀ = false" issu de angle_lt_for_deriv est gênant ;
    je pense que c'est ça qui pose problème pour la dérivée du sinus plus bas.
    Entre autres. Ce qu'il faut, c'est prouver qu'un sous-ensemble de ε ne
@@ -1434,7 +1432,6 @@ rename H2 into H5.
    on pourrait s'en sortir avec un N plus grand, pour "sauter" les indices du
    début qui posent problème. Mais là, c'est pas une suite, c'est un voisinage.
    Comment faire ? *)
-...
 progress unfold rngl_dist.
 rewrite (rngl_sub_opp_r Hop).
 rewrite rngl_cos_sub_cos.
@@ -1474,10 +1471,10 @@ rewrite (angle_eucl_dist_move_0_r θ₀).
 assert (Hzs : (θ₀ < angle_straight)%A). {
   apply angle_lt_iff.
   split; [ | easy ].
-  apply rngl_cos_lt_iff_angle_eucl_lt in H3, H5.
-  rewrite angle_sub_0_r in H5.
+  apply rngl_cos_lt_iff_angle_eucl_lt in H2, H3.
+  rewrite angle_sub_0_r in H2.
   rewrite rngl_cos_sub_straight_r in H3.
-  rewrite rngl_cos_sub_comm in H3, H5.
+  rewrite rngl_cos_sub_comm in H2, H3.
   now apply (rngl_cos_derivative_lemma_3 _ θ).
 }
 rewrite <- (angle_div_2_mul_2 θ₀) at 1.
@@ -1521,7 +1518,6 @@ apply rngl_ltb_lt in Hzs, Htt.
 apply (rngl_lt_le_incl Hor) in Htt.
 apply rngl_sin_sub_nonneg; try easy.
 Qed.
-*)
 
 Theorem rngl_cos_right_derivative_at_0 :
   right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_cos
@@ -1740,7 +1736,6 @@ apply angle_lt_le_incl in Htt.
 now apply rngl_cos_derivative_lemma_2.
 Qed.
 
-(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_cos (λ θ, (- rngl_sin θ)%L).
@@ -1750,7 +1745,6 @@ split.
 apply rngl_cos_left_derivative.
 apply rngl_cos_right_derivative.
 Qed.
-*)
 
 Theorem angle_add_overflow_move_add_l :
   ∀ θ1 θ2 θ3,
@@ -1976,7 +1970,9 @@ apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
 apply (rngl_le_add_l Hor).
 apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
+*)
 
+(* to be completed
 Theorem rngl_sin_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
@@ -2004,6 +2000,7 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   exfalso; apply Hlt.
   apply angle_nonneg.
 }
+(*
 destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   subst θ₀.
 ...
@@ -2129,6 +2126,7 @@ apply rngl_ltb_lt in Hzs, Htt.
 apply (rngl_lt_le_incl Hor) in Htt.
 apply rngl_sin_sub_nonneg; try easy.
 ...
+*)
 (* essai précédent, en essayant d'utiliser la dérivée du cosinus,
    déjà faite *)
 specialize (rngl_cos_left_derivative (θ₀ + angle_right)%A) as H1.
@@ -2159,6 +2157,7 @@ assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
   split. {
     do 2 rewrite (angle_add_comm _ angle_right).
     apply angle_add_lt_mono_l; [ | easy ].
+...
     rewrite angle_add_overflow_comm in Hov.
     rewrite angle_add_overflow_comm.
     progress unfold angle_add_overflow in Hov.
