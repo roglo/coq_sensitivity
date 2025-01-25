@@ -2150,10 +2150,23 @@ destruct Hθ as (H2, H3).
 specialize (H1 (θ + angle_right)%A).
 rewrite rngl_cos_add_right_r in H1.
 rewrite (rngl_sub_opp_r Hop) in H1.
+progress unfold angle_lt_for_deriv in Hlt.
+destruct Hlt as (Hlt, Hov).
+rewrite angle_add_overflow_comm in Hov.
+progress unfold angle_add_overflow in Hov.
+apply Bool.andb_false_iff in Hov.
+destruct Hov as [Hov| Hov]. {
+  apply Bool.negb_false_iff in Hov.
+  now apply angle_eqb_eq in Hov.
+}
+apply angle_leb_gt in Hov.
+specialize (proj1 (angle_lt_angle_lt_opp_iff _ _) (conj Hlt Hov)) as H.
+destruct H as (H4, H5).
+clear Hlt Hov.
+progress unfold rngl_dist.
+rewrite angle_eucl_dist_right_0 in H3.
 ...
 assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
-  progress unfold angle_lt_for_deriv in Hlt.
-  destruct Hlt as (Hlt, Hov).
   progress unfold angle_lt_for_deriv.
   split. {
     do 2 rewrite (angle_add_comm _ angle_right).
