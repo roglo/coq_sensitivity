@@ -1362,6 +1362,7 @@ apply (rngl_le_add_l Hor).
 apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
 
+(* to be completed
 Theorem rngl_cos_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
@@ -1380,6 +1381,15 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 intros θ₀.
+Print angle_lt_for_deriv.
+(* ce "angle_add_overflow θ1 θ2 = false" dans angle_lt_for_deriv est gênant ;
+   je pense que c'est ça qui pose problème pour la dérivée du sinus plus bas.
+   Entre autres. Ce qu'il faut, c'est prouver qu'un sous-ensemble de ε ne
+   poserait plus de problème. Si c'était une suite convergente vers l'infini,
+   on pourrait s'en sortir avec un N plus grand, pour "sauter" les indices du
+   début qui posent problème. Mais là, c'est pas une suite, c'est un voisinage.
+   Comment faire ? *)
+...
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
   intros ε Hε.
@@ -1515,6 +1525,7 @@ apply rngl_ltb_lt in Hzs, Htt.
 apply (rngl_lt_le_incl Hor) in Htt.
 apply rngl_sin_sub_nonneg; try easy.
 Qed.
+*)
 
 Theorem rngl_cos_right_derivative_at_0 :
   right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_cos
@@ -1733,6 +1744,7 @@ apply angle_lt_le_incl in Htt.
 now apply rngl_cos_derivative_lemma_2.
 Qed.
 
+(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_cos (λ θ, (- rngl_sin θ)%L).
@@ -1742,6 +1754,7 @@ split.
 apply rngl_cos_left_derivative.
 apply rngl_cos_right_derivative.
 Qed.
+*)
 
 Theorem angle_add_overflow_move_add_l :
   ∀ θ1 θ2 θ3,
