@@ -1871,8 +1871,23 @@ destruct Hlt as (Hts & Hov).
 rewrite rngl_sin_angle_eucl_dist_straight_r. 2: {
   now apply angle_lt_le_incl in Hts.
 }
-rewrite (rngl_mul_div Hi1).
-(* hou là ! *)
+rewrite (rngl_mul_div Hi1). 2: {
+  intros H.
+  apply angle_eucl_dist_separation in H.
+  subst θ.
+  now apply angle_lt_irrefl in Hts.
+}
+rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_sin_bound.
+}
+change_angle_sub_l θ angle_straight.
+rewrite angle_div_2_sub.
+remember (θ ≤? angle_straight)%A as ts eqn:Hts'.
+symmetry in Hts'.
+destruct ts. {
+  rewrite angle_straight_div_2.
+  rewrite rngl_sin_sub_right_l.
 ...
 Search ((_ - _) * (_ + _))%L.
 rewrite (rngl_mul_add_sub).
