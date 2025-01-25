@@ -1846,7 +1846,7 @@ apply (rngl_abs_nonneg_eq Hop Hor).
 now apply rngl_sin_nonneg_angle_le_straight.
 Qed.
 
-(* to be completed
+(* to be completed ... à revoir plus tard
 Theorem rngl_sin_left_derivative_at_straight :
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
     rngl_cos angle_straight.
@@ -2157,6 +2157,10 @@ assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
   split. {
     do 2 rewrite (angle_add_comm _ angle_right).
     apply angle_add_lt_mono_l; [ | easy ].
+progress unfold angle_add_overflow.
+apply Bool.andb_false_iff.
+right.
+apply angle_leb_gt.
 ...
     rewrite angle_add_overflow_comm in Hov.
     rewrite angle_add_overflow_comm.
