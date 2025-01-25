@@ -1381,15 +1381,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 intros θ₀.
-Print angle_lt_for_deriv.
-(* ce "angle_add_overflow θ1 θ2 = false" dans angle_lt_for_deriv est gênant ;
-   je pense que c'est ça qui pose problème pour la dérivée du sinus plus bas.
-   Entre autres. Ce qu'il faut, c'est prouver qu'un sous-ensemble de ε ne
-   poserait plus de problème. Si c'était une suite convergente vers l'infini,
-   on pourrait s'en sortir avec un N plus grand, pour "sauter" les indices du
-   début qui posent problème. Mais là, c'est pas une suite, c'est un voisinage.
-   Comment faire ? *)
-...
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
   intros ε Hε.
@@ -1405,11 +1396,8 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   subst θ₀.
   apply rngl_cos_left_derivative_at_straight.
 }
-specialize rngl_sin_is_continuous as Hsc.
-progress unfold continuous in Hsc.
-progress unfold continuous_at in Hsc.
-progress unfold is_limit_when_tending_to in Hsc.
 intros ε Hε.
+specialize rngl_sin_is_continuous as Hsc.
 specialize (Hsc θ₀ ε Hε).
 destruct Hsc as (η & Hη & Hsc).
 progress unfold rngl_dist in Hsc.
@@ -1439,6 +1427,14 @@ destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
 rename H2 into H5.
+(* ce "angle_add_overflow θ θ₀ = false" issu de angle_lt_for_deriv est gênant ;
+   je pense que c'est ça qui pose problème pour la dérivée du sinus plus bas.
+   Entre autres. Ce qu'il faut, c'est prouver qu'un sous-ensemble de ε ne
+   poserait plus de problème. Si c'était une suite convergente vers l'infini,
+   on pourrait s'en sortir avec un N plus grand, pour "sauter" les indices du
+   début qui posent problème. Mais là, c'est pas une suite, c'est un voisinage.
+   Comment faire ? *)
+...
 progress unfold rngl_dist.
 rewrite (rngl_sub_opp_r Hop).
 rewrite rngl_cos_sub_cos.
