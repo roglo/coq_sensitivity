@@ -2150,6 +2150,7 @@ destruct Hθ as (H2, H3).
 specialize (H1 (θ + angle_right)%A).
 rewrite rngl_cos_add_right_r in H1.
 rewrite (rngl_sub_opp_r Hop) in H1.
+...
 assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
   progress unfold angle_lt_for_deriv in Hlt.
   destruct Hlt as (Hlt, Hov).
