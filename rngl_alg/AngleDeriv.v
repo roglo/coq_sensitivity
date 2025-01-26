@@ -2147,6 +2147,7 @@ split. {
 intros θ Hlt Hθ.
 apply (rngl_min_glb_lt_iff Hor) in Hθ.
 destruct Hθ as (H2, H3).
+...
 specialize (H1 (θ + angle_right)%A).
 rewrite rngl_cos_add_right_r in H1.
 rewrite (rngl_sub_opp_r Hop) in H1.
@@ -2162,6 +2163,7 @@ destruct Hov as [Hov| Hov]. {
 apply angle_leb_gt in Hov.
 specialize (proj1 (angle_lt_angle_lt_opp_iff _ _) (conj Hlt Hov)) as H.
 destruct H as (H4, H5).
+...
 (*
 clear Hlt Hov.
 *)
@@ -2170,6 +2172,7 @@ rewrite angle_eucl_dist_right_0 in H3.
 assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
   progress unfold angle_lt_for_deriv.
   split. {
+destruct (angle_lt_dec (θ + angle_right
     do 2 rewrite (angle_add_comm _ angle_right).
     apply angle_add_lt_mono_l; [ | easy ].
     progress unfold angle_add_overflow.
