@@ -2162,10 +2162,11 @@ destruct Hov as [Hov| Hov]. {
 apply angle_leb_gt in Hov.
 specialize (proj1 (angle_lt_angle_lt_opp_iff _ _) (conj Hlt Hov)) as H.
 destruct H as (H4, H5).
+(*
 clear Hlt Hov.
+*)
 progress unfold rngl_dist.
 rewrite angle_eucl_dist_right_0 in H3.
-...
 assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
   progress unfold angle_lt_for_deriv.
   split. {
@@ -2190,27 +2191,40 @@ progress unfold angle_ltb.
 cbn.
 ...
 *)
+(*
     rewrite angle_add_overflow_comm in Hov.
     rewrite angle_add_overflow_comm.
     progress unfold angle_add_overflow in Hov.
+*)
     progress unfold angle_add_overflow.
+(*
     apply Bool.andb_false_iff in Hov.
+*)
     apply Bool.andb_false_iff.
+(*
     destruct Hov as [Htt| Htt]; [ now left | ].
     apply angle_leb_gt in Htt.
     specialize (proj1 (angle_lt_angle_lt_opp_iff _ _) (conj Hlt Htt)) as H.
     destruct H as (H4, H5).
+*)
     right.
     apply angle_leb_gt.
     apply angle_lt_opp_r. {
-      intros H; subst θ₀.
-      apply rngl_nle_gt in H5.
-      apply H5; clear H5.
-      apply rngl_cos_bound.
+      intros H.
+      apply eq_angle_eq in H.
+      injection H; clear H; intros H _.
+      now apply (rngl_1_neq_0_iff Hon) in H.
     }
     progress unfold angle_ltb.
     cbn.
     rewrite (rngl_leb_0_opp Hop Hor).
+    rewrite (rngl_0_leb_1 Hon Hos Hor).
+    remember (rngl_sin θ₀ ≤? 0)%L as stz eqn:Hstz.
+    symmetry in Hstz.
+    destruct stz; [ | easy ].
+    apply rngl_leb_le in Hstz.
+    apply rngl_ltb_lt.
+...
     specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
     apply (rngl_leb_gt Hor) in H.
     rewrite H; clear H.
