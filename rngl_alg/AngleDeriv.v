@@ -2172,41 +2172,8 @@ assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
   split. {
     do 2 rewrite (angle_add_comm _ angle_right).
     apply angle_add_lt_mono_l; [ | easy ].
-(*
-progress unfold angle_add_overflow.
-apply Bool.andb_false_iff.
-right.
-apply angle_leb_gt.
-rewrite angle_add_overflow_comm in Hov.
-progress unfold angle_add_overflow in Hov.
-apply Bool.andb_false_iff in Hov.
-destruct Hov as [Hov| Hov]. {
-  apply Bool.negb_false_iff in Hov.
-  now apply angle_eqb_eq in Hov.
-}
-apply angle_leb_gt in Hov.
-specialize (proj1 (angle_lt_angle_lt_opp_iff _ _) (conj Hlt Hov)) as H.
-destruct H as (H4, H5).
-progress unfold angle_ltb.
-cbn.
-...
-*)
-(*
-    rewrite angle_add_overflow_comm in Hov.
-    rewrite angle_add_overflow_comm.
-    progress unfold angle_add_overflow in Hov.
-*)
     progress unfold angle_add_overflow.
-(*
-    apply Bool.andb_false_iff in Hov.
-*)
     apply Bool.andb_false_iff.
-(*
-    destruct Hov as [Htt| Htt]; [ now left | ].
-    apply angle_leb_gt in Htt.
-    specialize (proj1 (angle_lt_angle_lt_opp_iff _ _) (conj Hlt Htt)) as H.
-    destruct H as (H4, H5).
-*)
     right.
     apply angle_leb_gt.
     apply angle_lt_opp_r. {
@@ -2224,6 +2191,19 @@ cbn.
     destruct stz; [ | easy ].
     apply rngl_leb_le in Hstz.
     apply rngl_ltb_lt.
+    apply (rngl_nle_gt_iff Hor).
+    intros Hzc.
+    apply (rngl_cos_lt_angle_eucl_dist_lt) in H3.
+    rewrite rngl_squ_sqrt in H3.
+    rewrite rngl_div_diag in H3.
+    rewrite rngl_sub_diag in H3.
+    change_angle_opp θ₀.
+    progress sin_cos_opp_hyp T Hzc.
+    progress sin_cos_opp_hyp T Hstz.
+    apply (rngl_opp_nonpos_nonneg Hop Hor) in Hstz.
+    progress sin_cos_opp_hyp T H5.
+    progress sin_cos_opp_hyp T H3.
+(* blocked, no contradiction on hypotheses *)
 ...
     specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
     apply (rngl_leb_gt Hor) in H.
