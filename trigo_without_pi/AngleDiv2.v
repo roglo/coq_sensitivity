@@ -1470,4 +1470,19 @@ apply eq_angle_div_2_0 in Htn.
 now apply IHn.
 Qed.
 
+Theorem angle_add_div_2_diag : ∀ θ, (θ /₂ + θ /₂)%A = θ.
+Proof.
+destruct_ac.
+intros.
+apply eq_angle_eq.
+cbn - [ angle_div_2 ].
+do 2 rewrite fold_rngl_squ.
+rewrite <- rngl_cos_mul_2_l.
+rewrite (rngl_mul_comm Hic (rngl_cos (_ /₂))).
+rewrite <- (rngl_mul_2_l Hon).
+rewrite rngl_mul_assoc.
+rewrite <- rngl_sin_mul_2_l.
+now rewrite angle_div_2_mul_2.
+Qed.
+
 End a.

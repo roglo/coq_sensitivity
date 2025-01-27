@@ -1313,8 +1313,14 @@ Qed.
 
 (* *)
 
+(* cette définition ne convient pas ; si θ1 tend vers θ2,
+   alors ça ne marche que pour θ2 < π *)
+(*
 Definition angle_lt_for_deriv θ1 θ2 :=
   (θ1 < θ2)%A ∧ angle_add_overflow θ1 θ2 = false.
+*)
+Definition angle_lt_for_deriv θ1 θ2 :=
+  (θ1 < θ2)%A.
 
 Theorem rngl_cos_left_derivative_at_straight :
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_cos
@@ -1341,11 +1347,10 @@ rewrite (rngl_div_opp_l Hop Hiv).
 rewrite (rngl_div_div_swap Hic Hiv).
 progress unfold rngl_squ.
 rewrite (rngl_mul_div Hi1). 2: {
-  destruct Hlt as (H1, H2).
   intros H.
   apply angle_eucl_dist_separation in H.
-  rewrite H in H1.
-  now apply angle_lt_irrefl in H1.
+  rewrite H in Hlt.
+  now apply angle_lt_irrefl in Hlt.
 }
 progress unfold rngl_dist.
 rewrite (rngl_sub_0_r Hos).
@@ -1362,6 +1367,17 @@ apply (rngl_le_add_l Hor).
 apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
 
+Theorem angle_sub_div_2_diag :
+  ∀ θ, (θ - θ /₂ = θ /₂)%A.
+Proof.
+intros.
+apply angle_add_move_r.
+rewrite angle_sub_opp_r.
+symmetry.
+apply angle_add_div_2_diag.
+Qed.
+
+(* to be completed
 Theorem rngl_cos_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
@@ -1386,7 +1402,6 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   exists ε.
   split; [ easy | ].
   intros θ Hlt Hθ.
-  destruct Hlt as (Hlt, _).
   apply angle_nle_gt in Hlt.
   exfalso; apply Hlt.
   apply angle_nonneg.
@@ -1419,19 +1434,11 @@ split. {
   }
 }
 intros θ Htt H2.
-destruct Htt as (Htt, Hovt).
 move θ before θ₀.
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
-(* ce "angle_add_overflow θ θ₀ = false" issu de angle_lt_for_deriv est gênant ;
-   je pense que c'est ça qui pose problème pour la dérivée du sinus plus bas.
-   Entre autres. Ce qu'il faut, c'est prouver qu'un sous-ensemble de ε ne
-   poserait plus de problème. Si c'était une suite convergente vers l'infini,
-   on pourrait s'en sortir avec un N plus grand, pour "sauter" les indices du
-   début qui posent problème. Mais là, c'est pas une suite, c'est un voisinage.
-   Comment faire ? *)
 progress unfold rngl_dist.
 rewrite (rngl_sub_opp_r Hop).
 rewrite rngl_cos_sub_cos.
@@ -1449,8 +1456,8 @@ rewrite (rngl_mul_div Hi1). 2: {
   rewrite H in Htt.
   now apply angle_lt_irrefl in Htt.
 }
-rewrite angle_add_overflow_comm in Hovt.
-rewrite Hovt.
+remember (angle_add_overflow θ₀ θ) as ovt eqn:Hovt.
+symmetry in Hovt.
 rewrite <- (rngl_abs_opp Hop Hor).
 rewrite (rngl_opp_add_distr Hop).
 rewrite (rngl_sub_opp_r Hop).
@@ -1461,6 +1468,24 @@ apply angle_nlt_ge in H.
 apply Bool.not_true_iff_false in H.
 rewrite H; clear H.
 rewrite (rngl_mul_1_r Hon).
+(*1*)
+destruct ovt. {
+  rewrite angle_div_2_add.
+  rewrite Hovt.
+  rewrite <- angle_add_assoc.
+  rewrite angle_straight_add_straight.
+  rewrite angle_add_0_r.
+  apply Hsc.
+  eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
+  clear η Hη Hsc H4.
+  do 2 rewrite (angle_eucl_dist_symmetry _ θ₀).
+  rewrite angle_eucl_dist_move_0_r.
+  rewrite (angle_eucl_dist_move_0_r θ₀).
+  rewrite angle_sub_add_distr.
+  rewrite angle_sub_div_2_diag.
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+}
+...1
 rewrite angle_add_0_r.
 apply Hsc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
@@ -1745,6 +1770,7 @@ split.
 apply rngl_cos_left_derivative.
 apply rngl_cos_right_derivative.
 Qed.
+*)
 
 Theorem angle_add_overflow_move_add_l :
   ∀ θ1 θ2 θ3,
