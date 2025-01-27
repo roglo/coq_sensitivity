@@ -2136,9 +2136,6 @@ rewrite rngl_cos_add_right_r in H1.
 rewrite rngl_sin_add_right_r in H1.
 destruct H1 as (η & Hη & H1).
 exists (rngl_min η (angle_eucl_dist angle_right 0)).
-(*
-  rewrite angle_eucl_dist_right_0.
-*)
 split. {
   apply rngl_min_glb_lt; [ easy | ].
   rewrite angle_eucl_dist_right_0.
@@ -2147,7 +2144,6 @@ split. {
 intros θ Hlt Hθ.
 apply (rngl_min_glb_lt_iff Hor) in Hθ.
 destruct Hθ as (H2, H3).
-...
 specialize (H1 (θ + angle_right)%A).
 rewrite rngl_cos_add_right_r in H1.
 rewrite (rngl_sub_opp_r Hop) in H1.
@@ -2163,86 +2159,29 @@ destruct Hov as [Hov| Hov]. {
 apply angle_leb_gt in Hov.
 specialize (proj1 (angle_lt_angle_lt_opp_iff _ _) (conj Hlt Hov)) as H.
 destruct H as (H4, H5).
-...
-(*
-clear Hlt Hov.
-*)
 progress unfold rngl_dist.
 rewrite angle_eucl_dist_right_0 in H3.
-assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
-  progress unfold angle_lt_for_deriv.
-  split. {
-destruct (angle_lt_dec (θ + angle_right
-    do 2 rewrite (angle_add_comm _ angle_right).
-    apply angle_add_lt_mono_l; [ | easy ].
+destruct (angle_lt_dec (θ + angle_right) (θ₀ + angle_right)) as [Htt| Htt]. {
+  progress unfold angle_lt_for_deriv in H1.
+  assert
+    (H : angle_add_overflow (θ + angle_right) (θ₀ + angle_right) = false). {
+(**)
+rewrite <- angle_add_overflow_equiv2.
+progress unfold angle_add_overflow2.
+apply angle_ltb_ge.
+rewrite angle_add_assoc.
+rewrite (angle_add_add_swap θ).
+rewrite <- angle_add_assoc.
+rewrite angle_right_add_right.
+eapply angle_le_trans. {
+  apply angle_lt_le_incl, Htt.
+}
+(* bof... *)
+...
     progress unfold angle_add_overflow.
     apply Bool.andb_false_iff.
-    right.
-    apply angle_leb_gt.
-    apply angle_lt_opp_r. {
-      intros H.
-      apply eq_angle_eq in H.
-      injection H; clear H; intros H _.
-      now apply (rngl_1_neq_0_iff Hon) in H.
-    }
-    progress unfold angle_ltb.
-    cbn.
-    rewrite (rngl_leb_0_opp Hop Hor).
-    rewrite (rngl_0_leb_1 Hon Hos Hor).
-    remember (rngl_sin θ₀ ≤? 0)%L as stz eqn:Hstz.
-    symmetry in Hstz.
-    destruct stz; [ | easy ].
-    apply rngl_leb_le in Hstz.
-    apply rngl_ltb_lt.
-    apply (rngl_nle_gt_iff Hor).
-    intros Hzc.
-    apply (rngl_cos_lt_angle_eucl_dist_lt) in H3.
-    rewrite rngl_squ_sqrt in H3.
-    rewrite rngl_div_diag in H3.
-    rewrite rngl_sub_diag in H3.
-    change_angle_opp θ₀.
-    progress sin_cos_opp_hyp T Hzc.
-    progress sin_cos_opp_hyp T Hstz.
-    apply (rngl_opp_nonpos_nonneg Hop Hor) in Hstz.
-    progress sin_cos_opp_hyp T H5.
-    progress sin_cos_opp_hyp T H3.
-(* blocked, no contradiction on hypotheses *)
-...
-    specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
-    apply (rngl_leb_gt Hor) in H.
-    rewrite H; clear H.
-    remember (0 ≤? rngl_sin θ₀)%L as zsz eqn:Hzsz.
-    symmetry in Hzsz.
-    destruct zsz; [ easy | ].
-    apply rngl_ltb_lt.
-    apply (rngl_leb_gt Hor) in Hzsz.
-    apply (rngl_nle_gt_iff Hor).
-    intros H; clear H.
-    apply rngl_nle_gt in Hzsz.
-    apply Hzsz; clear Hzsz.
-    apply rngl_cos_lt_iff_angle_eucl_lt in H3.
-    rewrite angle_sub_0_r in H3.
-    cbn - [ angle_sub ] in H3.
-    apply (rngl_nlt_ge_iff Hor).
-    intros Hsz.
-    change_angle_opp θ₀.
-    progress sin_cos_opp_hyp T H3.
-    progress sin_cos_opp_hyp T Hsz.
-    progress sin_cos_opp_hyp T H5.
-(* aucune contradiction *)
-...
-Search (_ → 0 ≤ rngl_sin _)%L.
-apply rngl_sin_add_nonneg_sin_nonneg with (θ2 := θ).
-apply angle_le_rngl_sin_nonneg_sin_nonneg with (θ1 := θ).
-...
-apply (rngl_leb_gt Hor) in Hzsz.
-generalize Hzsz; intros H.
-apply (rngl_lt_le_incl Hor) in H.
-apply rngl_leb_le in H.
-rewrite H in Hszz; clear H.
-subst szz.
-destruct zs; [ | easy ].
-apply rngl_ltb_lt in Htt.
+right.
+apply angle_leb_gt.
 ...
 *)
 
