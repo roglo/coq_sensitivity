@@ -1483,7 +1483,19 @@ destruct ovt. {
   rewrite (angle_eucl_dist_move_0_r θ₀).
   rewrite angle_sub_add_distr.
   rewrite angle_sub_div_2_diag.
+(*
+  rewrite angle_div_2_sub'.
+...
+  remember (θ ≤? θ₀)%A as tt eqn:Htt'.
+  symmetry in Htt'.
+  destruct tt. 2: {
 Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+...
+*)
+  do 2 rewrite <- angle_eucl_dist_move_0_r.
+(* du coup, c'est faux *)
+(* enfin, je crois : faut regarder H2 et H3, peut-être *)
+...
 }
 ...1
 rewrite angle_add_0_r.
