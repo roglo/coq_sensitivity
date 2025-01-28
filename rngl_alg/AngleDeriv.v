@@ -1503,6 +1503,7 @@ destruct ovt. {
 (* 4π/3 ≤ θ₀ - θ ≤ 2π : bin oui, quoi, ça confirme Htts *)
 (* 2π/3 ≤ (θ₀ - θ) / 2 ≤ π *)
 (* et là, paf ! la conclusion est fausse *)
+(* carrément, c'est l'inverse *)
 ...
 }
 ...1
