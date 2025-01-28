@@ -1483,18 +1483,30 @@ destruct ovt. {
   rewrite (angle_eucl_dist_move_0_r θ₀).
   rewrite angle_sub_add_distr.
   rewrite angle_sub_div_2_diag.
-(*
+  progress unfold angle_lt_for_deriv in Htt.
   rewrite angle_div_2_sub'.
+  generalize Htt; intros H.
+  apply angle_lt_le_incl in H.
+  rewrite H; clear H.
+  destruct (angle_le_dec (θ₀ - θ) angle_straight) as [Htts| Htts]. {
+    apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
+      apply angle_div_2_le_straight.
+    }
+    apply angle_div_2_le.
+  }
+  apply angle_nle_gt in Htts.
 ...
   remember (θ ≤? θ₀)%A as tt eqn:Htt'.
   symmetry in Htt'.
   destruct tt. 2: {
+...
+  do 2 rewrite <- angle_eucl_dist_move_0_r.
 Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
 ...
-*)
-  do 2 rewrite <- angle_eucl_dist_move_0_r.
-(* du coup, c'est faux *)
-(* enfin, je crois : faut regarder H2 et H3, peut-être *)
+  apply rngl_cos_lt_iff_angle_eucl_lt in H2, H3.
+  apply rngl_cos_le_iff_angle_eucl_le.
+  rewrite angle_sub_0_r in H2.
+  rewrite rngl_cos_sub_straight_r in H3.
 ...
 }
 ...1
