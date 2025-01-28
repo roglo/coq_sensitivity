@@ -1495,6 +1495,14 @@ destruct ovt. {
     now apply rngl_cos_le_cos_div_2.
   }
   apply angle_nle_gt in Htts.
+(* seems that θ₀ ≥ 5π/3 and θ ≤ 2π/3 *)
+(* θ₀ must be of the form 5π/3+d with 0 ≤ d < π/3
+   and π/3-d ≤ θ ≤ π/3+d *)
+(* θ₀ = 5π/3+d *)
+(* - π/3-d ≤ -θ ≤ -π/3+d *)
+(* 4π/3 ≤ θ₀ - θ ≤ 2π : bin oui, quoi, ça confirme Htts *)
+(* 2π/3 ≤ (θ₀ - θ) / 2 ≤ π *)
+(* et là, paf ! la conclusion est fausse *)
 ...
 }
 ...1
