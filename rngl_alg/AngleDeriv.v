@@ -309,6 +309,97 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
 }
 Qed.
 
+Theorem rngl_sin_sub_sin :
+  ∀ p q,
+  let c₁ := if angle_add_overflow p q then angle_straight else 0%A in
+  let c₂ := if (p <? q)%A then angle_straight else 0%A in
+  (rngl_sin p - rngl_sin q =
+     2 * rngl_cos ((p + q) /₂ + c₁) * rngl_sin ((p - q) /₂ + c₂))%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _))%L.
+  apply H1.
+}
+intros.
+rewrite (angle_add_div_2_add_sub_div_2 p q) at 1.
+rewrite (angle_add_div_2_sub_sub_div_2 p q) at 5.
+destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
+  do 2 rewrite rngl_sin_add_straight_r.
+  rewrite rngl_sin_add, rngl_sin_sub.
+  remember ((p + q) /₂)%A as a.
+  remember ((p - q) /₂)%A as b.
+  move b before a.
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite (rngl_opp_add_distr Hop).
+  rewrite (rngl_add_sub_assoc Hop).
+  rewrite (rngl_sub_add Hop).
+  rewrite <- (rngl_add_opp_l Hop).
+  rewrite <- (rngl_mul_2_l Hon).
+  rewrite <- rngl_mul_assoc.
+  progress f_equal.
+  subst c₁ c₂.
+  rewrite Hpq.
+  remember (q ≤? p)%A as qp eqn:Hqp.
+  symmetry in Hqp.
+  destruct qp. {
+    apply angle_nlt_ge in Hqp.
+    apply Bool.not_true_iff_false in Hqp.
+    rewrite Hqp.
+    rewrite rngl_cos_add_straight_r.
+    rewrite angle_add_0_r.
+    rewrite <- (rngl_mul_opp_l Hop).
+    easy.
+  } {
+    apply Bool.not_true_iff_false in Hqp.
+    apply angle_nle_gt in Hqp.
+    rewrite Hqp.
+    rewrite rngl_sin_add_straight_r.
+    rewrite angle_add_0_r.
+    rewrite <- (rngl_mul_opp_r Hop).
+    easy.
+  }
+} {
+  do 2 rewrite angle_add_0_r.
+  rewrite rngl_sin_add, rngl_sin_sub.
+  remember ((p + q) /₂)%A as a.
+  remember ((p - q) /₂)%A as b.
+  move b before a.
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite (rngl_add_sub_swap Hop (_ * _)).
+  rewrite (rngl_sub_diag Hos).
+  rewrite rngl_add_0_l.
+  rewrite <- (rngl_mul_2_l Hon).
+  rewrite <- rngl_mul_assoc.
+  progress f_equal.
+  subst c₁ c₂.
+  remember (q ≤? p)%A as qp eqn:Hqp.
+  symmetry in Hqp.
+  destruct qp. {
+    apply Bool.not_true_iff_false in Hpq.
+    rewrite Hpq.
+    apply angle_nlt_ge in Hqp.
+    apply Bool.not_true_iff_false in Hqp.
+    rewrite Hqp.
+    now do 2 rewrite angle_add_0_r.
+  } {
+    apply Bool.not_false_iff_true in Hpq.
+    rewrite Hpq.
+    apply Bool.not_true_iff_false in Hqp.
+    apply angle_nle_gt in Hqp.
+    rewrite Hqp.
+    rewrite rngl_cos_add_straight_r.
+    rewrite rngl_sin_add_straight_r.
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_opp_r Hop).
+    symmetry.
+    apply (rngl_opp_involutive Hop).
+  }
+}
+Qed.
+
 Theorem rngl_sin_angle_eucl_dist_twice_0 :
   ∀ θ,
   (θ ≤ angle_straight)%A
@@ -354,6 +445,27 @@ Proof.
 intros * Hθ.
 apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
 now apply angle_lt_le_incl.
+Qed.
+
+Theorem rngl_cos_is_continuous :
+  continuous angle_eucl_dist rngl_dist rngl_cos.
+Proof.
+destruct_ac.
+intros a ε Hε.
+exists ε.
+split; [ easy | ].
+intros x Hxa.
+progress unfold rngl_dist.
+eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
+apply -> (rngl_abs_le Hop Hor).
+split. {
+  rewrite <- (rngl_opp_sub_distr Hop).
+  apply -> (rngl_opp_le_compat Hop Hor).
+  rewrite angle_eucl_dist_symmetry.
+  apply rngl_cos_diff_le_eucl_dist.
+} {
+  apply rngl_cos_diff_le_eucl_dist.
+}
 Qed.
 
 Theorem rngl_sin_is_continuous :
@@ -1867,16 +1979,15 @@ eapply angle_le_trans; [ apply Hov | ].
 apply angle_straight_le_4_angle_straight_div_3.
 Qed.
 
-(* to be completed
-...
-   voir si on peut pas carrément copier le code du
-   theorème avec right
 Theorem rngl_sin_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_sin rngl_cos θ₀.
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros θ₀.
@@ -1884,7 +1995,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
-specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 intros θ₀.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
@@ -1902,8 +2012,8 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   subst θ₀.
   apply rngl_sin_left_derivative_at_straight.
 }
-specialize rngl_sin_is_continuous as Hsc.
 intros ε Hε.
+specialize rngl_cos_is_continuous as Hsc.
 specialize (Hsc θ₀ ε Hε).
 destruct Hsc as (η & Hη & Hsc).
 progress unfold rngl_dist in Hsc.
@@ -1926,162 +2036,68 @@ split. {
   }
 }
 intros θ Htt H2.
-destruct Htt as (Htt, Hovt).
 move θ before θ₀.
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
-rename H2 into H5.
 progress unfold rngl_dist.
-...
-rewrite (rngl_sub_opp_r Hop).
-rewrite rngl_cos_sub_cos.
+rewrite rngl_sin_sub_sin.
 rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
 rewrite (rngl_mul_div_assoc Hiv).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_comm Hic 2).
 rewrite (rngl_mul_div Hi1); [ | easy ].
-rewrite (rngl_div_opp_l Hop Hiv).
 rewrite rngl_mul_assoc.
 rewrite angle_eucl_dist_symmetry.
 rewrite (rngl_mul_div Hi1). 2: {
   intros H.
   apply angle_eucl_dist_separation in H.
+  destruct Htt as (Htt, _).
   rewrite H in Htt.
   now apply angle_lt_irrefl in Htt.
 }
-rewrite angle_add_overflow_comm in Hovt.
-rewrite Hovt.
+(*
 rewrite <- (rngl_abs_opp Hop Hor).
 rewrite (rngl_opp_add_distr Hop).
 rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_opp_l Hop).
-generalize Htt; intros H.
+*)
+destruct Htt as (Hlt, Htt).
+generalize Hlt; intros H.
 apply angle_lt_le_incl in H.
 apply angle_nlt_ge in H.
 apply Bool.not_true_iff_false in H.
 rewrite H; clear H.
 rewrite (rngl_mul_1_r Hon).
-rewrite angle_add_0_r.
+rewrite angle_div_2_add.
+replace (rngl_abs _) with
+  (rngl_abs (rngl_cos (θ₀ /₂ + θ /₂) - rngl_cos θ₀)). 2: {
+  remember (angle_add_overflow θ₀ θ) as ovt eqn:Hovt.
+  symmetry in Hovt.
+  destruct ovt. {
+    rewrite <- angle_add_assoc.
+    rewrite angle_straight_add_straight.
+    now rewrite angle_add_0_r.
+  }
+  now rewrite angle_add_0_r.
+}
 apply Hsc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hsc H4.
 do 2 rewrite (angle_eucl_dist_symmetry _ θ₀).
 rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_eucl_dist_move_0_r θ₀).
-assert (Hzs : (θ₀ < angle_straight)%A). {
-  apply angle_lt_iff.
-  split; [ | easy ].
-  apply rngl_cos_lt_iff_angle_eucl_lt in H3, H5.
-  rewrite angle_sub_0_r in H5.
-  rewrite rngl_cos_sub_straight_r in H3.
-  rewrite rngl_cos_sub_comm in H3, H5.
-  now apply (rngl_cos_derivative_lemma_3 _ θ).
-}
-rewrite <- (angle_div_2_mul_2 θ₀) at 1.
-rewrite angle_mul_nat_div_2. 2: {
-  cbn.
-  rewrite angle_add_0_r.
-  rewrite Bool.orb_false_r.
-  now apply angle_lt_straight_add_same_not_overflow.
-}
-rewrite angle_div_2_sub'.
-rewrite angle_mul_2_l.
 rewrite angle_sub_add_distr.
-rewrite angle_add_sub.
-rewrite (angle_add_comm θ₀ θ).
-generalize Htt; intros H.
-rewrite angle_add_overflow_comm in Hovt.
+rewrite angle_sub_div_2_diag.
+rewrite angle_div_2_sub'.
+generalize Hlt; intros H.
 apply angle_lt_le_incl in H.
-apply (angle_add_le_mono_l θ₀) in H. 2: {
-  now apply angle_lt_straight_add_same_not_overflow.
-}
-rewrite (angle_add_comm _ θ) in H.
 rewrite H; clear H.
-apply angle_le_angle_eucl_dist_le; cycle 2. {
-  apply angle_div_2_le.
-} {
+apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
   apply angle_div_2_le_straight.
 }
-apply rngl_sin_nonneg_angle_le_straight.
-move Htt at bottom.
-progress unfold angle_ltb in Htt.
-progress unfold angle_ltb in Hzs.
-cbn in Hzs.
-rewrite (rngl_leb_refl Hor) in Hzs.
-remember (0 ≤? rngl_sin θ₀)%L as zsz eqn:Hzsz.
-remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
-symmetry in Hzsz, Hzst.
-destruct zsz; [ | easy ].
-destruct zst; [ | easy ].
-apply rngl_leb_le in Hzsz, Hzst.
-apply rngl_ltb_lt in Hzs, Htt.
-apply (rngl_lt_le_incl Hor) in Htt.
-apply rngl_sin_sub_nonneg; try easy.
-...
-(* essai précédent, en essayant d'utiliser la dérivée du cosinus,
-   déjà faite *)
-specialize (rngl_cos_left_derivative (θ₀ + angle_right)%A) as H1.
-intros ε Hε.
-specialize (H1 ε Hε).
-rewrite rngl_cos_add_right_r in H1.
-rewrite rngl_sin_add_right_r in H1.
-destruct H1 as (η & Hη & H1).
-exists (rngl_min η (angle_eucl_dist angle_right 0)).
-split. {
-  apply rngl_min_glb_lt; [ easy | ].
-  rewrite angle_eucl_dist_right_0.
-  now apply (rl_sqrt_pos Hon Hos Hor).
-}
-intros θ Hlt Hθ.
-apply (rngl_min_glb_lt_iff Hor) in Hθ.
-destruct Hθ as (H2, H3).
-specialize (H1 (θ + angle_right)%A).
-rewrite rngl_cos_add_right_r in H1.
-rewrite (rngl_sub_opp_r Hop) in H1.
-progress unfold angle_lt_for_deriv in Hlt.
-destruct Hlt as (Hlt, Htt).
-assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
-  split. {
-    do 2 rewrite (angle_add_comm _ angle_right).
-    apply angle_add_lt_mono_l; [ | easy ].
-(* chiasse de pute, ça marche pas *)
-...
-rewrite angle_add_overflow_comm in Hov.
-progress unfold angle_add_overflow in Hov.
-apply Bool.andb_false_iff in Hov.
-destruct Hov as [Hov| Hov]. {
-  apply Bool.negb_false_iff in Hov.
-  now apply angle_eqb_eq in Hov.
-}
-apply angle_leb_gt in Hov.
-specialize (proj1 (angle_lt_angle_lt_opp_iff _ _) (conj Hlt Hov)) as H.
-destruct H as (H4, H5).
-progress unfold rngl_dist.
-rewrite angle_eucl_dist_right_0 in H3.
-destruct (angle_lt_dec (θ + angle_right) (θ₀ + angle_right)) as [Htt| Htt]. {
-  progress unfold angle_lt_for_deriv in H1.
-  assert
-    (H : angle_add_overflow (θ + angle_right) (θ₀ + angle_right) = false). {
-(**)
-rewrite <- angle_add_overflow_equiv2.
-progress unfold angle_add_overflow2.
-apply angle_ltb_ge.
-rewrite angle_add_assoc.
-rewrite (angle_add_add_swap θ).
-rewrite <- angle_add_assoc.
-rewrite angle_right_add_right.
-eapply angle_le_trans. {
-  apply angle_lt_le_incl, Htt.
-}
-(* bof... *)
-...
-    progress unfold angle_add_overflow.
-    apply Bool.andb_false_iff.
-right.
-apply angle_leb_gt.
-...
-*)
+apply angle_div_2_le.
+Qed.
 
 End a.
