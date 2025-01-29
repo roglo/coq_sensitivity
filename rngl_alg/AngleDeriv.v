@@ -2144,6 +2144,22 @@ apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
 apply angle_div_2_le.
 Qed.
 
+Theorem rngl_cos_div_2_nonneg :
+  ∀ θ,
+  (θ ≤ angle_straight)%A
+  → (0 ≤ rngl_cos (θ /₂))%L.
+Proof.
+destruct_ac.
+intros * Hts.
+cbn.
+apply rngl_sin_nonneg_angle_le_straight in Hts.
+apply rngl_leb_le in Hts.
+rewrite Hts.
+rewrite (rngl_mul_1_l Hon).
+apply rl_sqrt_nonneg.
+apply rngl_1_add_cos_div_2_nonneg.
+Qed.
+
 (* to be completed
 Theorem rngl_sin_right_derivative_at_0 :
   right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
@@ -2186,20 +2202,11 @@ rewrite (rngl_mul_div Hi1). 2: {
   now apply angle_lt_irrefl in Hlt.
 }
 rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-Search (0 ≤ rngl_sin (_ /₂))%L.
-Theorem rngl_cos_div_2_nonneg :
-  ∀ θ,
-  (θ ≤ angle_straight)%A
-  → (0 ≤ rngl_cos (θ /₂))%L.
-Proof.
-intros * Hts.
-Search (rngl_cos (_ /₂)).
-...
-  apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
-  apply angle_eucl_dist_nonneg.
+  now apply rngl_cos_div_2_nonneg.
 }
-apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
-eapply (rngl_lt_le_trans Hor _ ε); [ easy | ].
+eapply (rngl_le_lt_trans Hor); [ | apply Hθ ].
+Search (rngl_cos _ ≤ angle_eucl_dist _ _)%L.
+...
 rewrite <- (rngl_mul_1_r Hon ε) at 1.
 apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
 apply (rngl_le_add_l Hor).
