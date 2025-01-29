@@ -2186,7 +2186,14 @@ rewrite (rngl_mul_div Hi1). 2: {
   now apply angle_lt_irrefl in Hlt.
 }
 rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-Search (0 ≤ rngl_cos (_ /₂))%L.
+Search (0 ≤ rngl_sin (_ /₂))%L.
+Theorem rngl_cos_div_2_nonneg :
+  ∀ θ,
+  (θ ≤ angle_straight)%A
+  → (0 ≤ rngl_cos (θ /₂))%L.
+Proof.
+intros * Hts.
+Search (rngl_cos (_ /₂)).
 ...
   apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
   apply angle_eucl_dist_nonneg.
