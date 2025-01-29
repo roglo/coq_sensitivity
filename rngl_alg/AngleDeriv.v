@@ -1516,11 +1516,9 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply rngl_cos_left_derivative_at_straight.
 }
 intros ε Hε.
-specialize rngl_sin_is_continuous as Hsc.
-specialize (Hsc θ₀ ε Hε).
-destruct Hsc as (η & Hη & Hsc).
-progress unfold rngl_dist in Hsc.
+destruct (rngl_sin_is_continuous θ₀ ε Hε) as (η & Hη & Hsc).
 move η before ε.
+progress unfold rngl_dist in Hsc.
 remember (angle_eucl_dist θ₀ 0) as y.
 exists (rngl_min3 y (angle_eucl_dist θ₀ angle_straight) η).
 subst y.
@@ -2013,11 +2011,9 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply rngl_sin_left_derivative_at_straight.
 }
 intros ε Hε.
-specialize rngl_cos_is_continuous as Hsc.
-specialize (Hsc θ₀ ε Hε).
-destruct Hsc as (η & Hη & Hsc).
-progress unfold rngl_dist in Hsc.
+destruct (rngl_cos_is_continuous θ₀ ε Hε) as (η & Hη & Hcc).
 move η before ε.
+progress unfold rngl_dist in Hcc.
 remember (angle_eucl_dist θ₀ 0) as y.
 exists (rngl_min3 y (angle_eucl_dist θ₀ angle_straight) η).
 subst y.
@@ -2082,9 +2078,9 @@ replace (rngl_abs _) with
   }
   now rewrite angle_add_0_r.
 }
-apply Hsc.
+apply Hcc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
-clear η Hη Hsc H4.
+clear η Hη Hcc H4.
 do 2 rewrite (angle_eucl_dist_symmetry _ θ₀).
 rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_eucl_dist_move_0_r θ₀).
