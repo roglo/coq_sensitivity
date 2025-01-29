@@ -973,8 +973,6 @@ Qed.
 
 (* *)
 
-Definition angle_lt θ1 θ2 := (θ1 < θ2)%A.
-
 Theorem angle_eucl_dist_div_2_pow_succ_le :
   ∀ n θ,
   (θ ≤ angle_straight)%A
@@ -1804,7 +1802,6 @@ apply (rngl_abs_nonneg_eq Hop Hor).
 now apply rngl_sin_nonneg_angle_le_straight.
 Qed.
 
-(* to be completed ... à revoir plus tard
 Theorem rngl_sin_left_derivative_at_straight :
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
     rngl_cos angle_straight.
@@ -1819,8 +1816,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 intros ε Hε; cbn.
-exists ε.
-split; [ easy | ].
+exists √ε.
+split; [ now apply (rl_sqrt_pos Hon Hos Hor) | ].
 intros θ Hlt Hθ.
 rewrite (rngl_sub_0_l Hop).
 progress unfold rngl_dist.
@@ -1843,92 +1840,32 @@ rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply rngl_sin_bound.
 }
 change_angle_sub_l θ angle_straight.
+rewrite angle_eucl_dist_sub_l_diag in Hθ.
 rewrite angle_div_2_sub.
-remember (θ ≤? angle_straight)%A as ts eqn:Hts'.
-symmetry in Hts'.
-destruct ts. {
-  rewrite angle_straight_div_2.
-  rewrite rngl_sin_sub_right_l.
-...
-Search ((_ - _) * (_ + _))%L.
-rewrite (rngl_mul_add_sub).
-...
-rewrite rngl_cos_angle_eucl_dist_straight_r.
-...
-rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
-cbn.
-rewrite rngl_mul_opp_r.
-rewrite rngl_mul_1_r.
-rewrite rngl_opp_0.
-rewrite rngl_mul_0_r.
-rewrite rngl_sub
-progress unfold angle_div_2.
-...
-rewrite angle_eucl_dist_is_sqrt.
-rewrite rngl_cos_sub_straight_l.
-rewrite (rngl_sub_opp_r Hop).
-...
-rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
-...
-Check rngl_cos_angle_eucl_dist_straight_r.
-...
-rewrite rngl_sin_sub_straight in H1.
-rewrite H1.
-...
-specialize (angle_eucl_dist_straight_r_cos_sin) as H1.
-specialize (H1 (θ + angle_right)%A).
-rewrite rngl_cos_add_right_r in H1.
-rewrite rngl_sin_add_right_r in H1.
-rewrite (rngl_squ_add Hic Hon) in H1.
-rewrite (rngl_squ_1 Hon) in H1.
-rewrite (rngl_mul_1_r Hon) in H1.
-rewrite <- rngl_add_assoc in H1.
-rewrite (rngl_squ_opp Hop) in H1.
-rewrite (rngl_add_comm _²) in H1.
-rewrite cos2_sin2_1 in H1.
-rewrite <- rngl_add_add_swap in H1.
-rewrite (rngl_mul_opp_r Hop) in H1.
-rewrite (rngl_add_opp_r Hop) in H1.
-rewrite (rngl_sub_mul_r_diag_l Hon Hop) in H1.
-symmetry in H1.
-apply (rngl_mul_move_l Hic Hi1) in H1. 2: {
-  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+rewrite Hov.
+rewrite angle_straight_div_2.
+rewrite rngl_sin_sub_right_l.
+generalize Hε.
+intros Hε'.
+apply (rngl_lt_le_incl Hor) in Hε'.
+apply rngl_cos_lt_angle_eucl_dist_lt in Hθ. 2: {
+  now apply rl_sqrt_nonneg.
 }
-apply (rngl_sub_move_l Hop) in H1.
-(* bref, c'est la merde *)
-...
+rewrite (rngl_squ_sqrt Hon) in Hθ; [ | easy ].
+rewrite angle_sub_0_l in Hθ.
+cbn in Hθ.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in Hθ.
+apply (rngl_lt_sub_lt_add_r Hop Hor).
+eapply (rngl_lt_le_trans Hor); [ apply Hθ | ].
+apply (rngl_add_le_compat Hor). {
+  apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_mul_2_r Hon).
+  now apply (rngl_le_add_l Hor).
+}
+apply rngl_cos_le_cos_div_2.
+eapply angle_le_trans; [ apply Hov | ].
+apply angle_straight_le_4_angle_straight_div_3.
 Qed.
-About rngl_cos_angle_eucl_dist_straight_r.
-...
-Search (angle_eucl_dist _ angle_straight).
-...
-rewrite rngl_cos_angle_eucl_dist_straight_r.
-rewrite (rngl_sub_add Hop).
-rewrite (rngl_div_opp_l Hop Hiv).
-rewrite (rngl_div_div_swap Hic Hiv).
-progress unfold rngl_squ.
-rewrite (rngl_mul_div Hi1). 2: {
-  destruct Hlt as (H1, H2).
-  intros H.
-  apply angle_eucl_dist_separation in H.
-  rewrite H in H1.
-  now apply angle_lt_irrefl in H1.
-}
-progress unfold rngl_dist.
-rewrite (rngl_sub_0_r Hos).
-rewrite (rngl_abs_opp Hop Hor).
-rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-  apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
-  apply angle_eucl_dist_nonneg.
-}
-apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
-eapply (rngl_lt_le_trans Hor _ ε); [ easy | ].
-rewrite <- (rngl_mul_1_r Hon ε) at 1.
-apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-apply (rngl_le_add_l Hor).
-apply (rngl_0_le_1 Hon Hos Hor).
-Qed.
-*)
 
 (* to be completed
 Theorem rngl_sin_left_derivative :
