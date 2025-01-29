@@ -1868,6 +1868,9 @@ apply angle_straight_le_4_angle_straight_div_3.
 Qed.
 
 (* to be completed
+...
+   voir si on peut pas carrément copier le code du
+   theorème avec right
 Theorem rngl_sin_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
@@ -1895,16 +1898,11 @@ destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   exfalso; apply Hlt.
   apply angle_nonneg.
 }
-(*
 destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   subst θ₀.
-...
   apply rngl_sin_left_derivative_at_straight.
 }
 specialize rngl_sin_is_continuous as Hsc.
-progress unfold continuous in Hsc.
-progress unfold continuous_at in Hsc.
-progress unfold is_limit_when_tending_to in Hsc.
 intros ε Hε.
 specialize (Hsc θ₀ ε Hε).
 destruct Hsc as (η & Hη & Hsc).
@@ -1936,6 +1934,7 @@ apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
 rename H2 into H5.
 progress unfold rngl_dist.
+...
 rewrite (rngl_sub_opp_r Hop).
 rewrite rngl_cos_sub_cos.
 rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
@@ -2021,7 +2020,6 @@ apply rngl_ltb_lt in Hzs, Htt.
 apply (rngl_lt_le_incl Hor) in Htt.
 apply rngl_sin_sub_nonneg; try easy.
 ...
-*)
 (* essai précédent, en essayant d'utiliser la dérivée du cosinus,
    déjà faite *)
 specialize (rngl_cos_left_derivative (θ₀ + angle_right)%A) as H1.
@@ -2043,7 +2041,13 @@ specialize (H1 (θ + angle_right)%A).
 rewrite rngl_cos_add_right_r in H1.
 rewrite (rngl_sub_opp_r Hop) in H1.
 progress unfold angle_lt_for_deriv in Hlt.
-destruct Hlt as (Hlt, Hov).
+destruct Hlt as (Hlt, Htt).
+assert (H : angle_lt_for_deriv (θ + angle_right) (θ₀ + angle_right)). {
+  split. {
+    do 2 rewrite (angle_add_comm _ angle_right).
+    apply angle_add_lt_mono_l; [ | easy ].
+(* chiasse de pute, ça marche pas *)
+...
 rewrite angle_add_overflow_comm in Hov.
 progress unfold angle_add_overflow in Hov.
 apply Bool.andb_false_iff in Hov.
