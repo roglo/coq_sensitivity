@@ -33,7 +33,10 @@ Record proj_point := mk_pp
 Definition pp_cosh2_sinh2_prop pp :=
   let x := pp_x pp in
   let y := pp_y pp in
-  (x² - y² =? 1)%L.
+  match (pp_prop pp : option (proj_point_prop x y)) with
+  | None => (x² - y² =? 1)%L = true
+  | Some P => false
+  end.
 
 Record pph_angle := mk_pp_hangle
   { pph_coord : proj_point;
