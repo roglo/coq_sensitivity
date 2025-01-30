@@ -2544,4 +2544,14 @@ apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
 apply angle_div_2_le.
 Qed.
 
+Theorem rngl_sin_derivative :
+  is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
+    rngl_sin rngl_cos.
+Proof.
+intros θ₀.
+split.
+apply rngl_sin_left_derivative.
+apply rngl_sin_right_derivative.
+Qed.
+
 End a.
