@@ -1802,16 +1802,6 @@ apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
 apply angle_div_2_le.
 Qed.
 
-Theorem rngl_cos_derivative :
-  is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
-    rngl_cos (λ θ, (- rngl_sin θ)%L).
-Proof.
-intros θ₀.
-split.
-apply rngl_cos_left_derivative.
-apply rngl_cos_right_derivative.
-Qed.
-
 Theorem angle_add_overflow_move_add_l :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 θ2 = false
@@ -2542,6 +2532,16 @@ apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
   apply angle_div_2_le_straight.
 }
 apply angle_div_2_le.
+Qed.
+
+Theorem rngl_cos_derivative :
+  is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
+    rngl_cos (λ θ, (- rngl_sin θ)%L).
+Proof.
+intros θ₀.
+split.
+apply rngl_cos_left_derivative.
+apply rngl_cos_right_derivative.
 Qed.
 
 Theorem rngl_sin_derivative :
