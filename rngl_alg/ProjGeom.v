@@ -26,3 +26,15 @@ Record proj_point := mk_pp
   { pp_x : T;
     pp_y : T;
     pp_prop : option (proj_point_prop pp_x pp_y) }.
+
+(* hyperbolic angle using projective geometry *)
+(* I don't know if it works *)
+
+Definition pp_cosh2_sinh2_prop pp :=
+  let x := pp_x pp in
+  let y := pp_y pp in
+  (x² - y² =? 1)%L.
+
+Record pph_angle := mk_pp_hangle
+  { pph_coord : proj_point;
+    pph_angle_prop : pp_cosh2_sinh2_prop pph_coord }.
