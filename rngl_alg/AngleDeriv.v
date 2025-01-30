@@ -2440,7 +2440,6 @@ eapply (rngl_le_lt_trans Hor); [ | apply Hθ ].
 apply rngl_1_sub_sin_div_2_le_angle_eucl_dist_straight_r.
 Qed.
 
-(* to be completed
 Theorem rngl_sin_right_derivative :
   ∀ θ₀,
   right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
@@ -2468,7 +2467,7 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply rngl_sin_right_derivative_at_straight.
 }
 intros ε Hε.
-destruct (rngl_sin_is_continuous θ₀ ε Hε) as (η & Hη & Hsc).
+destruct (rngl_cos_is_continuous θ₀ ε Hε) as (η & Hη & Hcc).
 move η before ε.
 remember (angle_eucl_dist θ₀ 0) as x.
 remember (angle_eucl_dist θ₀ angle_straight) as y.
@@ -2494,15 +2493,12 @@ destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
 progress unfold rngl_dist.
-...
-rewrite (rngl_sub_opp_r Hop).
-rewrite rngl_cos_sub_cos.
+rewrite rngl_sin_sub_sin.
 rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
 rewrite (rngl_mul_div_assoc Hiv).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_comm Hic 2).
 rewrite (rngl_mul_div Hi1); [ | easy ].
-rewrite (rngl_div_opp_l Hop Hiv).
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_div Hi1). 2: {
   intros H.
@@ -2511,10 +2507,6 @@ rewrite (rngl_mul_div Hi1). 2: {
   rewrite H in Htt.
   now apply angle_lt_irrefl in Htt.
 }
-rewrite <- (rngl_abs_opp Hop Hor).
-rewrite (rngl_opp_add_distr Hop).
-rewrite (rngl_sub_opp_r Hop).
-rewrite (rngl_add_opp_l Hop).
 destruct Htt as (Hlt, Htt).
 generalize Hlt; intros H.
 apply angle_lt_le_incl in H.
@@ -2523,8 +2515,8 @@ apply Bool.not_true_iff_false in H.
 rewrite H; clear H.
 rewrite (rngl_mul_1_r Hon).
 rewrite angle_div_2_add.
-replace (rngl_abs _) with
-  (rngl_abs (rngl_sin (θ /₂ + θ₀ /₂) - rngl_sin θ₀)). 2: {
+progress replace (rngl_abs _) with
+  (rngl_abs (rngl_cos (θ /₂ + θ₀ /₂) - rngl_cos θ₀)). 2: {
   remember (angle_add_overflow θ θ₀) as ovt eqn:Hovt.
   symmetry in Hovt.
   destruct ovt. {
@@ -2534,9 +2526,9 @@ replace (rngl_abs _) with
   }
   now rewrite angle_add_0_r.
 }
-apply Hsc.
+apply Hcc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
-clear η Hη Hsc H4.
+clear η Hη Hcc H4.
 rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_eucl_dist_move_0_r θ).
 rewrite angle_add_sub_swap.
@@ -2551,6 +2543,5 @@ apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
 }
 apply angle_div_2_le.
 Qed.
-*)
 
 End a.
