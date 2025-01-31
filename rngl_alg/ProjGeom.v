@@ -42,9 +42,9 @@ Class pph_angle_ctx :=
   {
 (*
     hc_ic : rngl_mul_is_comm T = true;
-    hc_on : rngl_has_1 T = true;
-    hc_op : rngl_has_opp T = true;
 *)
+    pphc_on : rngl_has_1 T = true;
+    pphc_op : rngl_has_opp T = true;
     pphc_ed : rngl_has_eq_dec T = true;
 (*
     hc_iv : rngl_has_inv T = true;
@@ -60,13 +60,15 @@ Arguments pph_angle_ctx T {ro}.
 Ltac destruct_pphc :=
 (*
   set (Hic := hc_ic);
-  set (Hop := hc_op);
 *)
-  set (Hed := pphc_ed).
+  set (Hop := pphc_op);
+  set (Hed := pphc_ed);
 (*
   set (Hor := hc_or);
+*)
   specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos;
-  specialize hc_on as Hon;
+  specialize pphc_on as Hon.
+(*
   specialize hc_iv as Hiv;
   specialize hc_c2 as Hc2
 *)
@@ -76,8 +78,8 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {pphc : pph_angle_ctx T}.
-(*
 Context {rp : ring_like_prop T}.
+(*
 Context {rl : real_like_prop T}.
 *)
 
@@ -140,6 +142,25 @@ Qed.
 Definition pp_cosh θ := pp_x (pph_coord θ).
 Definition pp_sinh θ := pp_y (pph_coord θ).
 
+(* hyperbolic angle zero *)
+
+Theorem pph_zero_angle_prop :
+  pp_cosh2_sinh2_prop {| pp_x := 1; pp_y := 0; pp_prop := None |}%L.
+Proof.
+destruct_pphc.
+cbn.
+rewrite (rngl_squ_0 Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite (rngl_squ_1 Hon).
+apply (rngl_eqb_refl Hed).
+Qed.
+
+Definition pph_zero :=
+  {| pph_coord := {| pp_x := 1; pp_y := 0; pp_prop := None |}%L;
+     pph_angle_prop := pph_zero_angle_prop |}.
+
+(* sum of hyperbolic angles *)
+
 Theorem pph_angle_add_pp_prop :
   ∀ θ1 θ2,
   option
@@ -168,11 +189,7 @@ destruct p1 as [p1| ]. {
 (* j'ai des doutes... faut voir sur papier *)
 (* verdict du papier : 4(y₁²y₂² + x₁x₂y₁y₂) = 1 *)
 (* donc, ça a pas l'air bon *)
-...
-    progress unfold rngl_abs in pp1.
-    progress unfold rngl_abs in pp2.
-    remember (x1 ≤?
-...
+Admitted.
 
 Theorem pph_angle_add_prop :
   ∀ θ1 θ2,
@@ -182,11 +199,16 @@ Theorem pph_angle_add_prop :
       pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
       pp_prop := pph_angle_add_pp_prop θ1 θ2
     |}.
-...
+Admitted.
 
 Definition pph_angle_add θ1 θ2 :=
-  {| pph_coord :=
-       {| pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
-          pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
-          pp_prop := pph_angle_add_pp_prop θ1 θ2 |};
-     pph_angle_prop := pph_angle_add_prop θ1 θ2 |}.
+  match (pp_prop (pph_coord θ1), pp_prop (pph_coord θ2)) with
+  | (None, None) =>
+      {| pph_coord :=
+           {| pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
+              pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
+              pp_prop := true (*pph_angle_add_pp_prop θ1 θ2*) |};
+         pph_angle_prop := pph_angle_add_prop θ1 θ2 |}
+  | _ =>
+      pph_zero
+  end.
