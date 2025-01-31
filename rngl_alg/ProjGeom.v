@@ -27,6 +27,34 @@ Record proj_point := mk_pp
     pp_y : T;
     pp_prop : option (proj_point_prop pp_x pp_y) }.
 
+Theorem eq_pp_eq : ∀ p1 p2,
+  (pp_x p1, pp_y p1) = (pp_x p2, pp_y p2) ∧
+  match (pp_prop p1, pp_prop p2) with
+  | (None, None) | (Some _, Some _) => True
+  | _ => False
+  end ↔ p1 = p2.
+Proof.
+intros.
+split; intros H12. {
+  destruct H12 as (H12, Hp12).
+  injection H12; clear H12; intros Hy Hx.
+  destruct p1 as (p1x, p1y, H1p).
+  destruct p2 as (p2x, p2y, H2p).
+  cbn in Hp12, Hy, Hx.
+  subst p2x p2y.
+  progress f_equal.
+  destruct H1p as [pp1| ]; [ | now destruct H2p ].
+  destruct H2p as [pp2| ]; [ | easy ].
+  progress f_equal.
+  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+} {
+  subst p2.
+  split; [ easy | ].
+  destruct p1 as (p1x, p1y, H1p).
+  now destruct H1p.
+}
+Qed.
+
 (* hyperbolic angle using projective geometry *)
 (* I don't know if it works *)
 
