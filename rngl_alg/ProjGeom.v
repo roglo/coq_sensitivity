@@ -35,7 +35,7 @@ Definition pp_cosh2_sinh2_prop pp :=
   let y := pp_y pp in
   match (pp_prop pp : option (proj_point_prop x y)) with
   | None => (x² - y² =? 1)%L = true
-  | Some P => false
+  | Some P => (rngl_abs x =? rngl_abs y)%L = true
   end.
 
 Record pph_angle := mk_pp_hangle
