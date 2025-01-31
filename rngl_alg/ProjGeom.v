@@ -166,6 +166,8 @@ destruct p1 as [p1| ]. {
     apply Some.
     apply (rngl_eqb_eq Hed).
 (* j'ai des doutes... faut voir sur papier *)
+(* verdict du papier : 4(y₁²y₂² + x₁x₂y₁y₂) = 1 *)
+(* donc, ça a pas l'air bon *)
 ...
     progress unfold rngl_abs in pp1.
     progress unfold rngl_abs in pp2.
