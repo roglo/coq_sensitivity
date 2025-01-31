@@ -176,6 +176,10 @@ cbn.
 progress unfold proj_point_prop in p1.
 progress unfold proj_point_prop in p2.
 destruct p1 as [p1| ]. {
+  (* bin non, ça devrait être un None, pas un Some *)
+Admitted.
+(*
+...
   apply (rngl_eqb_eq Hed) in p1.
   destruct p2 as [p2| ]. {
     apply (rngl_eqb_eq Hed) in p2.
@@ -216,8 +220,8 @@ rewrite (rngl_add_comm (y1 * x2)).
     apply (rngl_eqb_eq Hed) in p1, p2, pp1, pp2.
     apply (rngl_eqb_eq Hed).
 (* faut voir sur papier *)
+...
 *)
-Admitted.
 
 Definition pph_angle_add θ1 θ2 :=
   match (pp_prop (pph_coord θ1), pp_prop (pph_coord θ2)) with
