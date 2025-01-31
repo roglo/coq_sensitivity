@@ -183,6 +183,10 @@ progress unfold proj_point_prop in p1.
 progress unfold proj_point_prop in p2.
 cbn in pp1, pp2.
 destruct p1 as [p1| ]. {
+  apply (rngl_eqb_eq Hed) in p1, pp1.
+  (* du coup, on en déduit par p1 et pp1 que 2x₁² = 1 *)
+  exfalso.
+...
   destruct p2 as [p2| ]. {
     apply (rngl_eqb_eq Hed) in p1, p2, pp1, pp2.
     apply (rngl_eqb_eq Hed).
