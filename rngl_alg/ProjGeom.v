@@ -161,21 +161,22 @@ Definition pph_zero :=
 
 (* sum of hyperbolic angles *)
 
-Theorem pph_angle_add_pp_prop :
+Theorem pph_angle_add_prop :
   ∀ θ1 θ2,
-  option
-    (proj_point_prop
-       (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L
-       (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L).
+  pp_cosh2_sinh2_prop
+    {|
+      pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
+      pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
+      pp_prop := None
+    |}.
 Proof.
 destruct_pphc.
 intros.
 destruct θ1 as ((x1, y1, p1) & pp1).
 destruct θ2 as ((x2, y2, p2) & pp2).
-cbn.
 move x2 before x1; move y2 before y1.
 move p2 before p1.
-progress unfold proj_point_prop.
+cbn.
 progress unfold pp_cosh2_sinh2_prop in pp1.
 progress unfold pp_cosh2_sinh2_prop in pp2.
 progress unfold proj_point_prop in p1.
@@ -184,22 +185,9 @@ cbn in pp1, pp2.
 destruct p1 as [p1| ]. {
   destruct p2 as [p2| ]. {
     apply (rngl_eqb_eq Hed) in p1, p2, pp1, pp2.
-    apply Some.
     apply (rngl_eqb_eq Hed).
-(* j'ai des doutes... faut voir sur papier *)
-(* verdict du papier : 4(y₁²y₂² + x₁x₂y₁y₂) = 1 *)
-(* donc, ça a pas l'air bon *)
-Admitted.
-
-Theorem pph_angle_add_prop :
-  ∀ θ1 θ2,
-  pp_cosh2_sinh2_prop
-    {|
-      pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
-      pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
-      pp_prop := pph_angle_add_pp_prop θ1 θ2
-    |}.
-Admitted.
+(* faut voir sur papier *)
+...
 
 Definition pph_angle_add θ1 θ2 :=
   match (pp_prop (pph_coord θ1), pp_prop (pph_coord θ2)) with
@@ -207,7 +195,7 @@ Definition pph_angle_add θ1 θ2 :=
       {| pph_coord :=
            {| pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
               pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
-              pp_prop := true (*pph_angle_add_pp_prop θ1 θ2*) |};
+              pp_prop := None |};
          pph_angle_prop := pph_angle_add_prop θ1 θ2 |}
   | _ =>
       pph_zero
