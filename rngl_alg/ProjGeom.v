@@ -95,3 +95,36 @@ destruct p1 as [p1| ]. {
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 }
 Qed.
+
+(* *)
+
+Definition pp_cosh θ := pp_x (pph_coord θ).
+Definition pp_sinh θ := pp_y (pph_coord θ).
+
+
+Theorem pph_angle_add_pp_prop :
+  ∀ θ1 θ2,
+  option
+    (proj_point_prop
+       (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L
+       (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L).
+Proof.
+intros.
+...
+
+Theorem pph_angle_add_prop :
+  ∀ θ1 θ2,
+  pp_cosh2_sinh2_prop
+    {|
+      pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
+      pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
+      pp_prop := pph_angle_add_pp_prop θ1 θ2
+    |}.
+...
+
+Definition pph_angle_add θ1 θ2 :=
+  {| pph_coord :=
+       {| pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
+          pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
+          pp_prop := pph_angle_add_pp_prop θ1 θ2 |};
+     pph_angle_prop := pph_angle_add_prop θ1 θ2 |}.
