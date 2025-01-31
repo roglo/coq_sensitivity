@@ -27,6 +27,23 @@ Record proj_point := mk_pp
     pp_y : T;
     pp_prop : option (proj_point_prop pp_x pp_y) }.
 
+(* hyperbolic angle using projective geometry *)
+(* I don't know if it works *)
+
+Definition pp_cosh2_sinh2_prop pp :=
+  let x := pp_x pp in
+  let y := pp_y pp in
+  match (pp_prop pp : option (proj_point_prop x y)) with
+  | None => (x² - y² =? 1)%L = true
+  | Some P => (rngl_abs x =? rngl_abs y)%L = true
+  end.
+
+Record pph_angle := mk_pp_hangle
+  { pph_coord : proj_point;
+    pph_angle_prop : pp_cosh2_sinh2_prop pph_coord }.
+
+(* equality equivalent of equality between components *)
+
 Theorem eq_pp_eq : ∀ p1 p2,
   (pp_x p1, pp_y p1) = (pp_x p2, pp_y p2) ∧
   match (pp_prop p1, pp_prop p2) with
@@ -55,17 +72,26 @@ split; intros H12. {
 }
 Qed.
 
-(* hyperbolic angle using projective geometry *)
-(* I don't know if it works *)
-
-Definition pp_cosh2_sinh2_prop pp :=
-  let x := pp_x pp in
-  let y := pp_y pp in
-  match (pp_prop pp : option (proj_point_prop x y)) with
-  | None => (x² - y² =? 1)%L = true
-  | Some P => (rngl_abs x =? rngl_abs y)%L = true
-  end.
-
-Record pph_angle := mk_pp_hangle
-  { pph_coord : proj_point;
-    pph_angle_prop : pp_cosh2_sinh2_prop pph_coord }.
+Theorem eq_pph_eq : ∀ θ1 θ2,
+  pph_coord θ1 = pph_coord θ2 ↔ θ1 = θ2.
+Proof.
+intros.
+split; intros H12; [ | now subst θ2 ].
+apply eq_pp_eq in H12.
+destruct H12 as (H12, Hp12).
+injection H12; clear H12; intros Hy Hx.
+destruct θ1 as ((x1, y1, p1) & pp1).
+destruct θ2 as ((x2, y2, p2) & pp2).
+cbn in Hp12, Hx, Hy.
+subst x2 y2.
+destruct p1 as [p1| ]. {
+  destruct p2 as [p2| ]; [ | easy ].
+  assert (p1 = p2) by apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+  assert (pp1 = pp2) by apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+  now subst p2 pp2.
+} {
+  destruct p2 as [p2| ]; [ easy | ].
+  progress f_equal.
+  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+}
+Qed.
