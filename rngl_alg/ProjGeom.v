@@ -110,6 +110,15 @@ Theorem pph_angle_add_pp_prop :
        (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L).
 Proof.
 intros.
+destruct θ1 as ((x1, y1, p1) & pp1).
+destruct θ2 as ((x2, y2, p2) & pp2).
+cbn.
+move x2 before x1; move y2 before y1.
+move p2 before p1.
+progress unfold proj_point_prop.
+progress unfold pp_cosh2_sinh2_prop in pp1.
+progress unfold pp_cosh2_sinh2_prop in pp2.
+cbn in pp1, pp2.
 ...
 
 Theorem pph_angle_add_prop :
