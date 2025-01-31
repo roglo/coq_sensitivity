@@ -8,6 +8,7 @@ Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
 
 Definition proj_point_prop x y := (x² + y² =? 1)%L = true.
 
@@ -39,10 +40,7 @@ Record pph_angle := mk_pp_hangle
     pph_angle_prop : pp_cosh2_sinh2_prop pph_coord }.
 
 Class pph_angle_ctx :=
-  {
-(*
-    hc_ic : rngl_mul_is_comm T = true;
-*)
+  { pphc_ic : rngl_mul_is_comm T = true;
     pphc_on : rngl_has_1 T = true;
     pphc_op : rngl_has_opp T = true;
     pphc_ed : rngl_has_eq_dec T = true;
@@ -55,12 +53,10 @@ Class pph_angle_ctx :=
 
 End a.
 
-Arguments pph_angle_ctx T {ro}.
+Arguments pph_angle_ctx T {ro rp}.
 
 Ltac destruct_pphc :=
-(*
-  set (Hic := hc_ic);
-*)
+  set (Hic := pphc_ic);
   set (Hop := pphc_op);
   set (Hed := pphc_ed);
 (*
@@ -77,8 +73,8 @@ Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
-Context {pphc : pph_angle_ctx T}.
 Context {rp : ring_like_prop T}.
+Context {pphc : pph_angle_ctx T}.
 (*
 Context {rl : real_like_prop T}.
 *)
@@ -162,35 +158,66 @@ Definition pph_zero :=
 (* sum of hyperbolic angles *)
 
 Theorem pph_angle_add_prop :
-  ∀ θ1 θ2,
+  ∀ p1 p2,
   pp_cosh2_sinh2_prop
     {|
-      pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
-      pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
+      pp_x := (pp_x p1 * pp_x p2 + pp_y p1 * pp_y p2)%L;
+      pp_y := (pp_y p1 * pp_x p2 + pp_x p1 * pp_y p2)%L;
       pp_prop := None
     |}.
 Proof.
 destruct_pphc.
 intros.
-destruct θ1 as ((x1, y1, p1) & pp1).
-destruct θ2 as ((x2, y2, p2) & pp2).
+destruct p1 as (x1, y1, p1).
+destruct p2 as (x2, y2, p2).
 move x2 before x1; move y2 before y1.
 move p2 before p1.
 cbn.
-progress unfold pp_cosh2_sinh2_prop in pp1.
-progress unfold pp_cosh2_sinh2_prop in pp2.
 progress unfold proj_point_prop in p1.
 progress unfold proj_point_prop in p2.
-cbn in pp1, pp2.
 destruct p1 as [p1| ]. {
-  apply (rngl_eqb_eq Hed) in p1, pp1.
-  (* du coup, on en déduit par p1 et pp1 que 2x₁² = 1 *)
-...
+  apply (rngl_eqb_eq Hed) in p1.
   destruct p2 as [p2| ]. {
+    apply (rngl_eqb_eq Hed) in p2.
+    apply (rngl_eqb_eq Hed).
+(*
+  Hxy : (x² - y² =? 1)%L = true
+  Hxy' : (x'² - y'² =? 1)%L = true
+  Hzx : (0 ≤? x)%L = true
+  Hzx' : (0 ≤? x')%L = true
+  ============================
+  ((x * x' + y * y')² - (x * y' + y * x')² =? 1)%L = true
+*)
+rewrite (rngl_add_comm (y1 * x2)).
+(*
+  ((x1 * x2 + y1 * y2)² - (x1 * y2 + y1 * x2)²)%L = 1%L
+*)
+    do 2 rewrite (rngl_squ_add Hic Hon).
+    rewrite rngl_add_add_swap.
+    do 2 rewrite (rngl_sub_add_distr Hos).
+    rewrite (rngl_sub_sub_swap Hop (_ + _ + _))%L.
+    do 4 rewrite rngl_mul_assoc.
+    rewrite (rngl_mul_mul_swap Hic (2 * x1 * y2)%L).
+    rewrite (rngl_mul_mul_swap Hic (2 * x1) y2)%L.
+    rewrite (rngl_mul_mul_swap Hic (2 * x1 * x2) y2 y1)%L.
+    rewrite (rngl_add_sub Hos).
+    do 4 rewrite (rngl_squ_mul Hic).
+    do 2 rewrite (rngl_add_sub_swap Hop).
+    rewrite <- (rngl_sub_sub_distr Hop).
+    do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
+(* ah oui, mais ça déconne, là : mes hypothèses p1 et p2
+   contiennent des + alors que ça devait être des - *)
+...
+    apply (rngl_eqb_eq Hed) in Hxy'.
+  rewrite Hxy'.
+  now do 2 rewrite (rngl_mul_1_r Hon).
+...
+    (* du coup, on en déduit par p1 et pp1 que 2x₁² = 1 *)
     apply (rngl_eqb_eq Hed) in p1, p2, pp1, pp2.
     apply (rngl_eqb_eq Hed).
 (* faut voir sur papier *)
-...
+*)
+Admitted.
 
 Definition pph_angle_add θ1 θ2 :=
   match (pp_prop (pph_coord θ1), pp_prop (pph_coord θ2)) with
@@ -199,7 +226,7 @@ Definition pph_angle_add θ1 θ2 :=
            {| pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
               pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
               pp_prop := None |};
-         pph_angle_prop := pph_angle_add_prop θ1 θ2 |}
+         pph_angle_prop := pph_angle_add_prop (pph_coord θ1) (pph_coord θ2) |}
   | _ =>
       pph_zero
   end.
