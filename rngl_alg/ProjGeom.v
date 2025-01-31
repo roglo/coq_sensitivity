@@ -8,10 +8,6 @@ Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
-(*
-Context {rp : ring_like_prop T}.
-Context {rl : real_like_prop T}.
-*)
 
 Definition proj_point_prop x y := (x² + y² =? 1)%L = true.
 
@@ -41,6 +37,49 @@ Definition pp_cosh2_sinh2_prop pp :=
 Record pph_angle := mk_pp_hangle
   { pph_coord : proj_point;
     pph_angle_prop : pp_cosh2_sinh2_prop pph_coord }.
+
+Class pph_angle_ctx :=
+  {
+(*
+    hc_ic : rngl_mul_is_comm T = true;
+    hc_on : rngl_has_1 T = true;
+    hc_op : rngl_has_opp T = true;
+*)
+    pphc_ed : rngl_has_eq_dec T = true;
+(*
+    hc_iv : rngl_has_inv T = true;
+    hc_c2 : rngl_characteristic T ≠ 2;
+    pphc_or : rngl_is_ordered T = true
+*)
+  }.
+
+End a.
+
+Arguments pph_angle_ctx T {ro}.
+
+Ltac destruct_pphc :=
+(*
+  set (Hic := hc_ic);
+  set (Hop := hc_op);
+*)
+  set (Hed := pphc_ed).
+(*
+  set (Hor := hc_or);
+  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos;
+  specialize hc_on as Hon;
+  specialize hc_iv as Hiv;
+  specialize hc_c2 as Hc2
+*)
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {pphc : pph_angle_ctx T}.
+(*
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+*)
 
 (* equality equivalent of equality between components *)
 
@@ -101,7 +140,6 @@ Qed.
 Definition pp_cosh θ := pp_x (pph_coord θ).
 Definition pp_sinh θ := pp_y (pph_coord θ).
 
-
 Theorem pph_angle_add_pp_prop :
   ∀ θ1 θ2,
   option
@@ -109,6 +147,7 @@ Theorem pph_angle_add_pp_prop :
        (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L
        (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L).
 Proof.
+destruct_pphc.
 intros.
 destruct θ1 as ((x1, y1, p1) & pp1).
 destruct θ2 as ((x2, y2, p2) & pp2).
@@ -118,7 +157,19 @@ move p2 before p1.
 progress unfold proj_point_prop.
 progress unfold pp_cosh2_sinh2_prop in pp1.
 progress unfold pp_cosh2_sinh2_prop in pp2.
+progress unfold proj_point_prop in p1.
+progress unfold proj_point_prop in p2.
 cbn in pp1, pp2.
+destruct p1 as [p1| ]. {
+  destruct p2 as [p2| ]. {
+    apply (rngl_eqb_eq Hed) in p1, p2, pp1, pp2.
+    apply Some.
+    apply (rngl_eqb_eq Hed).
+(* j'ai des doutes... faut voir sur papier *)
+...
+    progress unfold rngl_abs in pp1.
+    progress unfold rngl_abs in pp2.
+    remember (x1 ≤?
 ...
 
 Theorem pph_angle_add_prop :
