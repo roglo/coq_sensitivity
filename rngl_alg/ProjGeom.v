@@ -158,7 +158,9 @@ Definition pph_zero :=
 (* sum of hyperbolic angles *)
 
 Theorem pph_angle_add_prop :
-  ∀ p1 p2,
+  ∀ p1 p2
+    (H1 : bool_of_option (pp_prop p1) = false)
+    (H2 : bool_of_option (pp_prop p2) = false),
   pp_cosh2_sinh2_prop
     {|
       pp_x := (pp_x p1 * pp_x p2 + pp_y p1 * pp_y p2)%L;
@@ -175,9 +177,9 @@ move p2 before p1.
 cbn.
 progress unfold proj_point_prop in p1.
 progress unfold proj_point_prop in p2.
-destruct p1 as [p1| ]. {
-  (* bin non, ça devrait être un None, pas un Some *)
-Admitted.
+destruct p1 as [p1| ]; [ easy | ].
+destruct p2 as [p2| ]; [ easy | ].
+clear H1 H2.
 (*
 ...
   apply (rngl_eqb_eq Hed) in p1.
@@ -222,6 +224,24 @@ rewrite (rngl_add_comm (y1 * x2)).
 (* faut voir sur papier *)
 ...
 *)
+...
+
+Definition pph_angle_add θ1 θ2 :=
+  let b1 := bool_of_option (pp_prop (pph_coord θ1)) in
+  let b2 := bool_of_option (pp_prop (pph_coord θ2)) in
+  match (Bool.bool_dec b1 false, Bool.bool_dec b2 false) with
+  | (left H1, left H2) =>
+      {| pph_coord :=
+           {| pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
+              pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
+              pp_prop := None |};
+         pph_angle_prop :=
+           pph_angle_add_prop (pph_coord θ1) (pph_coord θ2) H1 H2 |}
+  | _ =>
+      pph_zero
+  end.
+
+...
 
 Definition pph_angle_add θ1 θ2 :=
   match (pp_prop (pph_coord θ1), pp_prop (pph_coord θ2)) with
