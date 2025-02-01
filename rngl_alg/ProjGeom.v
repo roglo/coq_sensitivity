@@ -270,6 +270,8 @@ split. 2: {
 }
 *)
 apply (rngl_eqb_eq Hed).
+(* ouais mais pp_cosh peut être négatif, maintenant *)
+...
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
