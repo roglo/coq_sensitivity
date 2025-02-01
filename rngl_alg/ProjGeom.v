@@ -6,6 +6,7 @@
 Require Import Utf8.
 
 Require Import Main.RingLike.
+Require Import Trigo.RealLike.
 
 Section a.
 
@@ -56,6 +57,7 @@ Class pph_angle_ctx :=
 
 End a.
 
+Arguments mk_pp {T ro} (pp_x pp_y)%_L pp_prop.
 Arguments pph_angle_ctx T {ro rp}.
 
 Ltac destruct_pphc :=
@@ -78,9 +80,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {pphc : pph_angle_ctx T}.
-(*
 Context {rl : real_like_prop T}.
-*)
 
 (* equality equivalent of equality between components *)
 
@@ -228,13 +228,25 @@ Definition pph_angle_add θ1 θ2 :=
 
 (* division of hyperbolic angle by 2 *)
 
+Theorem pph_angle_div_2_prop :
+  ∀ θ,
+  let ε := if (0 ≤? pp_sinh θ)%L then 1%L else (-1)%L in
+  pp_cosh2_sinh2_prop
+    {| pp_x := √((pp_cosh θ + 1) / 2);
+       pp_y := ε * √((pp_cosh θ - 1) / 2);
+       pp_prop := None |}.
+Proof.
+intros.
 ...
 
-Definition pph_angle_div_2 a :=
-  let ε := if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L in
-  {| rngl_cosh := √((rngl_cosh a + 1) / 2);
-     rngl_sinh := ε * √((rngl_cosh a - 1) / 2);
-     rngl_cosh2_sinh2 := hangle_nonneg_div_2_prop a |}.
+Definition pph_angle_div_2 θ :=
+  let ε := if (0 ≤? pp_sinh θ)%L then 1%L else (-1)%L in
+  {| pph_coord :=
+        {| pp_x := √((pp_cosh θ + 1) / 2);
+           pp_y := ε * √((pp_cosh θ - 1) / 2);
+           pp_prop := None |};
+     pph_angle_prop := pph_angle_div_2_prop θ |}.
+...
 
 Fixpoint hangle_mul_nat a n :=
   match n with
