@@ -1,4 +1,7 @@
 (* attempt to implement projective geometry *)
+(* ... and to apply it to hyperbolic trigonometry
+  in order to try to add the left part curve of
+  the hyperbole among hyperbolic angles *)
 
 Require Import Utf8.
 
