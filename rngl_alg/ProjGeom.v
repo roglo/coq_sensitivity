@@ -225,3 +225,32 @@ Definition pph_angle_add θ1 θ2 :=
   | _ =>
       pph_zero
   end.
+
+(* division of hyperbolic angle by 2 *)
+
+...
+
+Definition pph_angle_div_2 a :=
+  let ε := if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L in
+  {| rngl_cosh := √((rngl_cosh a + 1) / 2);
+     rngl_sinh := ε * √((rngl_cosh a - 1) / 2);
+     rngl_cosh2_sinh2 := hangle_nonneg_div_2_prop a |}.
+
+Fixpoint hangle_mul_nat a n :=
+  match n with
+  | 0 => hangle_zero
+  | S n' => hangle_add a (hangle_mul_nat a n')
+  end.
+
+End a.
+
+Notation "θ /₂" := (hangle_div_2 θ) (at level 40) : hangle_scope.
+Notation "n * θ" := (hangle_mul_nat θ n) : hangle_scope.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {hc : hangle_ctx T}.
