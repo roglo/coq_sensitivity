@@ -158,9 +158,11 @@ Definition pph_zero :=
 (* sum of hyperbolic angles *)
 
 Theorem pph_angle_add_prop :
-  ∀ p1 p2
-    (H1 : bool_of_option (pp_prop p1) = false)
-    (H2 : bool_of_option (pp_prop p2) = false),
+  ∀ θ1 θ2
+    (H1 : bool_of_option (pp_prop (pph_coord θ1)) = false)
+    (H2 : bool_of_option (pp_prop (pph_coord θ2)) = false),
+  let p1 := pph_coord θ1 in
+  let p2 := pph_coord θ2 in
   pp_cosh2_sinh2_prop
     {|
       pp_x := (pp_x p1 * pp_x p2 + pp_y p1 * pp_y p2)%L;
@@ -170,61 +172,41 @@ Theorem pph_angle_add_prop :
 Proof.
 destruct_pphc.
 intros.
+subst p1 p2.
+destruct θ1 as (p1, Hp1).
+destruct θ2 as (p2, Hp2).
+cbn in H1, H2.
 destruct p1 as (x1, y1, p1).
 destruct p2 as (x2, y2, p2).
 move x2 before x1; move y2 before y1.
 move p2 before p1.
-cbn.
+progress unfold pp_cosh2_sinh2_prop in Hp1.
+progress unfold pp_cosh2_sinh2_prop in Hp2.
+cbn in Hp1, Hp2, H1, H2 |-*.
 progress unfold proj_point_prop in p1.
 progress unfold proj_point_prop in p2.
 destruct p1 as [p1| ]; [ easy | ].
 destruct p2 as [p2| ]; [ easy | ].
 clear H1 H2.
-(*
-...
-  apply (rngl_eqb_eq Hed) in p1.
-  destruct p2 as [p2| ]. {
-    apply (rngl_eqb_eq Hed) in p2.
-    apply (rngl_eqb_eq Hed).
-(*
-  Hxy : (x² - y² =? 1)%L = true
-  Hxy' : (x'² - y'² =? 1)%L = true
-  Hzx : (0 ≤? x)%L = true
-  Hzx' : (0 ≤? x')%L = true
-  ============================
-  ((x * x' + y * y')² - (x * y' + y * x')² =? 1)%L = true
-*)
 rewrite (rngl_add_comm (y1 * x2)).
-(*
-  ((x1 * x2 + y1 * y2)² - (x1 * y2 + y1 * x2)²)%L = 1%L
-*)
-    do 2 rewrite (rngl_squ_add Hic Hon).
-    rewrite rngl_add_add_swap.
-    do 2 rewrite (rngl_sub_add_distr Hos).
-    rewrite (rngl_sub_sub_swap Hop (_ + _ + _))%L.
-    do 4 rewrite rngl_mul_assoc.
-    rewrite (rngl_mul_mul_swap Hic (2 * x1 * y2)%L).
-    rewrite (rngl_mul_mul_swap Hic (2 * x1) y2)%L.
-    rewrite (rngl_mul_mul_swap Hic (2 * x1 * x2) y2 y1)%L.
-    rewrite (rngl_add_sub Hos).
-    do 4 rewrite (rngl_squ_mul Hic).
-    do 2 rewrite (rngl_add_sub_swap Hop).
-    rewrite <- (rngl_sub_sub_distr Hop).
-    do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
-(* ah oui, mais ça déconne, là : mes hypothèses p1 et p2
-   contiennent des + alors que ça devait être des - *)
-...
-    apply (rngl_eqb_eq Hed) in Hxy'.
-  rewrite Hxy'.
-  now do 2 rewrite (rngl_mul_1_r Hon).
-...
-    (* du coup, on en déduit par p1 et pp1 que 2x₁² = 1 *)
-    apply (rngl_eqb_eq Hed) in p1, p2, pp1, pp2.
-    apply (rngl_eqb_eq Hed).
-(* faut voir sur papier *)
-...
-*)
-...
+(* code borrowed from HyperbolicTrigo.v *)
+do 2 rewrite (rngl_squ_add Hic Hon).
+rewrite rngl_add_add_swap.
+do 2 rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_sub_swap Hop (_ + _ + _))%L.
+do 4 rewrite rngl_mul_assoc.
+rewrite (rngl_mul_mul_swap Hic (2 * x1 * y2)%L).
+rewrite (rngl_mul_mul_swap Hic (2 * x1) y2)%L.
+rewrite (rngl_mul_mul_swap Hic (2 * x1 * x2) y2 y1)%L.
+rewrite (rngl_add_sub Hos).
+do 4 rewrite (rngl_squ_mul Hic).
+do 2 rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_sub_sub_distr Hop).
+do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
+apply (rngl_eqb_eq Hed) in Hp2.
+rewrite Hp2.
+now do 2 rewrite (rngl_mul_1_r Hon).
+Qed.
 
 Definition pph_angle_add θ1 θ2 :=
   let b1 := bool_of_option (pp_prop (pph_coord θ1)) in
@@ -236,21 +218,7 @@ Definition pph_angle_add θ1 θ2 :=
               pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
               pp_prop := None |};
          pph_angle_prop :=
-           pph_angle_add_prop (pph_coord θ1) (pph_coord θ2) H1 H2 |}
-  | _ =>
-      pph_zero
-  end.
-
-...
-
-Definition pph_angle_add θ1 θ2 :=
-  match (pp_prop (pph_coord θ1), pp_prop (pph_coord θ2)) with
-  | (None, None) =>
-      {| pph_coord :=
-           {| pp_x := (pp_cosh θ1 * pp_cosh θ2 + pp_sinh θ1 * pp_sinh θ2)%L;
-              pp_y := (pp_sinh θ1 * pp_cosh θ2 + pp_cosh θ1 * pp_sinh θ2)%L;
-              pp_prop := None |};
-         pph_angle_prop := pph_angle_add_prop (pph_coord θ1) (pph_coord θ2) |}
+           pph_angle_add_prop θ1 θ2 H1 H2 |}
   | _ =>
       pph_zero
   end.
