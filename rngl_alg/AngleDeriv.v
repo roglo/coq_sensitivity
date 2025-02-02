@@ -451,6 +451,56 @@ Qed.
 Definition angle_lt_for_deriv θ1 θ2 :=
   (θ1 < θ2)%A ∧ (θ2 - θ1 ≤ angle_straight)%A.
 
+Definition angle_lt θ1 θ2 :=
+  (θ1 < θ2)%A.
+
+Theorem glop :
+  ∀ f g θ₀,
+  left_derivative_at angle_lt angle_eucl_dist rngl_dist f g θ₀
+  → left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f g θ₀.
+Proof.
+intros * Hd.
+intros ε Hε.
+specialize (Hd ε Hε).
+destruct Hd as (η & Hη & Hd).
+exists η.
+split; [ easy | ].
+intros θ Hθ Hθη.
+apply Hd; [ | easy ].
+now destruct Hθ.
+Qed.
+
+(* to be completed
+Theorem glip :
+  ∀ f g θ₀,
+  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f g θ₀
+  → left_derivative_at angle_lt angle_eucl_dist rngl_dist f g θ₀.
+Proof.
+destruct_ac.
+intros * Hd.
+intros ε Hε.
+specialize (Hd ε Hε).
+destruct Hd as (η & Hη & Hd).
+exists (rngl_min η (angle_eucl_dist θ₀ (θ₀ + rngl_acos η))).
+split. {
+  apply rngl_min_glb_lt; [ easy | ].
+...
+}
+intros θ Hθ Hθη.
+apply (rngl_min_glb_lt_iff Hor) in Hθη.
+destruct Hθη as (Hθη, H1).
+...
+destruct (angle_le_dec (θ₀ - θ) angle_straight) as [Htts| Htts]. {
+  now apply Hd.
+}
+apply angle_nle_gt in Htts.
+progress unfold angle_lt in Hθ.
+progress unfold angle_lt_for_deriv in Hd.
+eapply (rngl_le_lt_trans Hor). 2: {
+  apply Hd.
+...
+*)
+
 Theorem rngl_cos_left_derivative_at_straight :
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_cos
     (λ θ : angle T, (- rngl_sin θ)%L) angle_straight.
