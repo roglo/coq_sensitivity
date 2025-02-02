@@ -316,6 +316,12 @@ apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 
 (* ne marcherait pas avec la branche de gauche de l'hyperbole
    vu qu'on prendrait alors la racine carrée d'un nombre négatif *)
+(* bon, ça ne marche pas ; car si on veut résoudre
+      (x + j y)² = u + j v, avec j²=1
+   on obtient qu'il faut que x²+y²=u, ce qui impose que u soit
+   positif ; u représentant cosh(θ), il faut donc bien que cosh(θ)
+   soit positif. Fin de l'histoire *)
+...
 Definition pph_angle_div_2 θ :=
   let ε := if (0 ≤? pp_sinh θ)%L then 1%L else (-1)%L in
   {| pph_coord :=
