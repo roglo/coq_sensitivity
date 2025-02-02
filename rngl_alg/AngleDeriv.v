@@ -454,6 +454,7 @@ Definition angle_lt_for_deriv θ1 θ2 :=
 Definition angle_lt θ1 θ2 :=
   (θ1 < θ2)%A.
 
+(* trivial case *)
 Theorem glop :
   ∀ f g θ₀,
   left_derivative_at angle_lt angle_eucl_dist rngl_dist f g θ₀
@@ -471,6 +472,48 @@ now destruct Hθ.
 Qed.
 
 (* to be completed
+(* complicated case *)
+Theorem glup :
+  ∀ f g θ₀,
+  (θ₀ ≤ angle_straight)%A
+  → left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f g θ₀
+  → left_derivative_at angle_lt angle_eucl_dist rngl_dist f g θ₀.
+Proof.
+destruct_ac.
+intros * Hts Hd.
+intros ε Hε.
+specialize (Hd ε Hε).
+destruct Hd as (η & Hη & Hd).
+exists η.
+split; [ easy | ].
+intros θ Hθ Hθη.
+destruct (angle_le_dec (θ₀ - θ) angle_straight) as [Htts| Htts]. {
+  now apply Hd.
+}
+exfalso.
+apply Htts; clear Htts.
+progress unfold angle_lt in Hθ.
+eapply angle_le_trans; [ | apply Hts ].
+(* lemma *)
+progress unfold angle_ltb in Hθ.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ)%L as tst eqn:Htst.
+remember (0 ≤? rngl_sin θ₀)%L as tstz eqn:Htstz.
+symmetry in Htst, Htstz.
+destruct tstz. {
+  destruct tst; [ | easy ].
+  apply rngl_leb_le in Htst, Htstz.
+  apply rngl_ltb_lt in Hθ.
+  generalize Hθ; intros H.
+  apply (rngl_lt_le_incl Hor) in H.
+  specialize (rngl_sin_sub_nonneg _ _ Htstz Htst H) as H1.
+  apply rngl_leb_le in H1.
+  rewrite H1; clear H H1.
+  apply rngl_leb_le.
+...
+Search (rngl_cos _ ≤ rngl_cos (_ - _))%L.
+...
+
 Theorem glip :
   ∀ f g θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f g θ₀
@@ -482,9 +525,10 @@ intros ε Hε.
 specialize (Hd ε Hε).
 destruct Hd as (η & Hη & Hd).
 exists (rngl_min η (angle_eucl_dist θ₀ (θ₀ + rngl_acos η))).
+progress unfold angle_lt_for_deriv in Hd.
 split. {
   apply rngl_min_glb_lt; [ easy | ].
-...
+  admit.
 }
 intros θ Hθ Hθη.
 apply (rngl_min_glb_lt_iff Hor) in Hθη.
