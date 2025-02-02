@@ -270,9 +270,22 @@ split. 2: {
 }
 *)
 apply (rngl_eqb_eq Hed).
-(* ouais mais pp_cosh peut être négatif, maintenant *)
-...
 rewrite (rngl_squ_sqrt Hon). 2: {
+(* ouais mais pp_cosh peut être négatif, maintenant *)
+(* et puis, de toutes façons, je ne vois pas déjà, dans ma tête,
+   comment la géométrie projective pourrait ajouter la branche gauche
+   de l'hyperbole, là où le cosinus hyperbolique est négatif ; c'était
+   mon but, mais il était flou *)
+(* et là, je suis dans un théorème qui concerne la division par 2 ;
+   question : y a-t-il une division par 2 d'un angle dont le point
+   est sur la branche de gauche ? *)
+(* l'angle (-1, 0), par exemple ? il est pourtant bien tel que x²-y²=1
+   (forcément, puisque le point (-1, 0) fait partie de l'hyperbole),
+   c'est quoi, sa division par 2 ? *)
+(* bon, déjà, on fait la racine carrée d'un nombre négatif, ça
+   commence mal *)
+Abort. (*
+...
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   }
@@ -299,7 +312,10 @@ rewrite rngl_add_0_l.
 apply (rngl_div_diag Hon Hiq).
 apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 ...
+*)
 
+(* ne marcherait pas avec la branche de gauche de l'hyperbole
+   vu qu'on prendrait alors la racine carrée d'un nombre négatif *)
 Definition pph_angle_div_2 θ :=
   let ε := if (0 ≤? pp_sinh θ)%L then 1%L else (-1)%L in
   {| pph_coord :=
