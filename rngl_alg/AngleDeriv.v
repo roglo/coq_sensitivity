@@ -514,6 +514,14 @@ destruct tstz. {
   apply (rngl_lt_le_incl Hor) in Hθ.
   now apply rngl_cos_le_cos_sub.
 }
+remember (0 ≤? rngl_sin (θ₀ - θ))%L as zstt eqn:Hzstt.
+symmetry in Hzstt.
+destruct zstt; [ easy | ].
+apply (rngl_leb_gt Hor) in Htstz, Hzstt.
+apply rngl_leb_le.
+destruct tst. {
+  clear Hθ.
+  apply rngl_leb_le in Htst.
 ...
 rewrite rngl_cos_sub_comm.
 apply rngl_cos_lt_rngl_cos_sub; try easy.
