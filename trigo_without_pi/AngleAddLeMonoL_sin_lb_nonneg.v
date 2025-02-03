@@ -351,7 +351,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. 2: {
       now apply rngl_nle_gt in Hzs3.
     }
     apply not_eq_sym in Hs1s3z.
-    apply rngl_cos_lt_rngl_cos_sub; try easy.
+    apply rngl_cos_lt_cos_sub; try easy.
     apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
     now apply (rngl_lt_le_incl Hor).
     now apply rngl_sin_sub_nonneg_sin_le_sin.

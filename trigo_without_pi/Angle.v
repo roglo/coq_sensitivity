@@ -2444,7 +2444,7 @@ progress unfold angle_sub.
 apply angle_add_assoc.
 Qed.
 
-Theorem rngl_cos_lt_rngl_cos_sub :
+Theorem rngl_cos_lt_cos_sub :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
   → (0 < rngl_sin θ2)%L
@@ -2563,6 +2563,43 @@ intros H.
 apply eq_rngl_cos_1 in H.
 subst θ2.
 now apply (rngl_lt_irrefl Hor) in Hzs2.
+Qed.
+
+Theorem rngl_cos_le_cos_sub :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (rngl_cos θ1 ≤ rngl_cos θ2)%L
+  → (rngl_cos θ1 ≤ rngl_cos (θ2 - θ1))%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+intros * Hs1 Hs2 Hcc.
+apply (rngl_lt_eq_cases Hor) in Hs2.
+destruct Hs2 as [Hs2| Hs2]. {
+  apply (rngl_lt_le_incl Hor).
+  now apply rngl_cos_lt_cos_sub.
+}
+symmetry in Hs2.
+apply eq_rngl_sin_0 in Hs2.
+destruct Hs2; subst θ2. {
+  rewrite angle_sub_0_l; cbn.
+  apply (rngl_le_refl Hor).
+}
+rewrite rngl_cos_sub_straight_l.
+cbn in Hcc.
+apply (rngl_nlt_ge_iff Hor).
+intros Hcc1.
+apply (rngl_nlt_ge) in Hcc.
+apply Hcc; clear Hcc.
+apply (rngl_lt_iff Hor).
+split; [ apply rngl_cos_bound | ].
+intros H; symmetry in H.
+apply eq_rngl_cos_opp_1 in H; subst θ1.
+apply rngl_nle_gt in Hcc1.
+apply Hcc1; clear Hcc1; cbn.
+rewrite (rngl_opp_involutive Hop).
+apply (rngl_opp_1_le_1 Hon Hop Hor).
 Qed.
 
 Theorem angle_eqb_eq :

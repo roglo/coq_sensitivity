@@ -151,7 +151,7 @@ destruct zs13. {
         }
       }
       rewrite rngl_cos_sub_comm.
-      apply rngl_cos_lt_rngl_cos_sub; try easy.
+      apply rngl_cos_lt_cos_sub; try easy.
       apply (rngl_lt_le_incl Hor).
       apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
         apply not_eq_sym in Hs1z.
@@ -280,7 +280,7 @@ destruct zs13. {
       as [Hc12| Hc12]. {
     rewrite rngl_cos_sub_comm.
     apply (rngl_lt_le_incl Hor) in Hc12.
-    now apply rngl_cos_lt_rngl_cos_sub.
+    now apply rngl_cos_lt_cos_sub.
   } {
     apply (rngl_nlt_ge_iff Hor) in Hc12.
     exfalso.
@@ -558,7 +558,7 @@ progress sin_cos_add_sub_right_hyp T Hzs2.
 progress sin_cos_add_sub_right_hyp T Hc2z.
 progress sin_cos_add_sub_right_goal T.
 rewrite rngl_cos_sub_comm.
-apply rngl_cos_lt_rngl_cos_sub; try easy.
+apply rngl_cos_lt_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
 apply (rngl_lt_le_incl Hor).
 apply quadrant_1_sin_sub_pos_cos_lt; try easy.

@@ -510,8 +510,13 @@ destruct tstz. {
   apply rngl_leb_le in H1.
   rewrite H1; clear H H1.
   apply rngl_leb_le.
+  rewrite rngl_cos_sub_comm.
+  apply (rngl_lt_le_incl Hor) in Hθ.
+  now apply rngl_cos_le_cos_sub.
+}
 ...
-Search (rngl_cos _ ≤ rngl_cos (_ - _))%L.
+rewrite rngl_cos_sub_comm.
+apply rngl_cos_lt_rngl_cos_sub; try easy.
 ...
 
 Theorem glip :

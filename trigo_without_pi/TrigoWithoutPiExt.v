@@ -276,7 +276,7 @@ progress sin_cos_opp_hyp T Hzs12.
 progress sin_cos_opp_hyp T Hzc2.
 progress sin_cos_opp_goal T.
 rewrite rngl_cos_sub_comm.
-apply rngl_cos_lt_rngl_cos_sub; [ easy | easy | ].
+apply rngl_cos_lt_cos_sub; [ easy | easy | ].
 apply (rngl_lt_le_incl Hor) in Hzs2.
 now apply quadrant_1_sin_sub_nonneg_cos_le.
 Qed.
@@ -901,7 +901,7 @@ destruct s1z. {
     progress sin_cos_opp_hyp T Hzc2.
     progress sin_cos_opp_goal T.
     rewrite rngl_cos_sub_comm.
-    apply rngl_cos_lt_rngl_cos_sub; try easy.
+    apply rngl_cos_lt_cos_sub; try easy.
     apply (rngl_lt_le_incl Hor) in Hs2z, Hzc1, Hzs12.
     now apply quadrant_1_sin_sub_nonneg_cos_le.
   }
@@ -1352,7 +1352,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
   }
-  apply rngl_cos_lt_rngl_cos_sub; try easy.
+  apply rngl_cos_lt_cos_sub; try easy.
   apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
   now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).

@@ -272,7 +272,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
     apply (rngl_lt_sub_lt_add_l Hop Hor).
     rewrite rngl_add_0_r in Hc12z |-*.
     apply (rngl_lt_le_incl Hor) in Hzs1, Hc12z.
-    now apply rngl_cos_lt_rngl_cos_sub.
+    now apply rngl_cos_lt_cos_sub.
   }
 }
 Qed.
@@ -525,7 +525,7 @@ destruct zs1. {
       now apply (rngl_lt_le_incl Hor).
     }
     apply (rngl_lt_le_incl Hor) in Hzs1, Hc12.
-    now apply rngl_cos_lt_rngl_cos_sub.
+    now apply rngl_cos_lt_cos_sub.
   }
   apply (rngl_nle_gt_iff Hor) in Hc1z.
   clear Hc1ez.

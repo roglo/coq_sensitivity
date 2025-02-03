@@ -938,7 +938,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
         progress sin_cos_add_sub_right_hyp T Hzc3.
         progress sin_cos_add_sub_right_goal T.
         rewrite rngl_cos_sub_comm.
-        apply rngl_cos_lt_rngl_cos_sub; try easy.
+        apply rngl_cos_lt_cos_sub; try easy.
         now apply (rngl_lt_le_incl Hor).
         apply (rngl_lt_le_incl Hor).
         apply quadrant_1_sin_sub_pos_cos_lt; try easy.
@@ -1095,7 +1095,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
   progress sin_cos_add_sub_right_hyp T Hzc3.
   progress sin_cos_add_sub_right_goal T.
   rewrite rngl_cos_sub_comm.
-  apply rngl_cos_lt_rngl_cos_sub; try easy.
+  apply rngl_cos_lt_cos_sub; try easy.
   now apply (rngl_lt_le_incl Hor).
   apply (rngl_lt_le_incl Hor) in Hc1z, Hzs3, Hs1z.
   apply (rngl_lt_le_incl Hor).

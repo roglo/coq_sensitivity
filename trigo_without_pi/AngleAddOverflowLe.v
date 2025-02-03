@@ -651,7 +651,7 @@ progress sin_cos_opp_hyp T H12.
 apply rngl_nlt_ge in H12.
 apply H12; clear H12.
 rewrite rngl_cos_sub_comm.
-apply rngl_cos_lt_rngl_cos_sub; try easy.
+apply rngl_cos_lt_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
 apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
 now apply (rngl_lt_le_incl Hor).
