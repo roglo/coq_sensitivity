@@ -488,15 +488,46 @@ Definition angle_lt_for_deriv θ1 θ2 :=
 Definition angle_lt θ1 θ2 :=
   (θ1 < θ2)%A.
 
-(* could be used for derivatives on angles less than straight *)
-(* here, there is no need for the constraint θ2-θ1 ≤ straight *)
+(*
+Theorem angle_le_straight_is_limit_if :
+  ∀ f f' θ₀ lt1 lt2,
+  (∀ θ1 θ2, lt2 θ1 θ2 → lt1 θ1 θ2)
+  → (θ₀ ≤ angle_straight)%A
+  → is_limit_when_tending_to_neighbourhood lt1
+      angle_eucl_dist rngl_dist f θ₀ (f' θ₀)
+  → is_limit_when_tending_to_neighbourhood lt2
+      angle_eucl_dist rngl_dist f θ₀ (f' θ₀).
+Proof.
+destruct_ac.
+intros * Hlt Hts Hd.
+intros ε Hε.
+specialize (Hd ε Hε).
+destruct Hd as (η & Hη & Hd).
+exists η.
+split; [ easy | ].
+intros θ Hθ Hθη.
+destruct (angle_le_dec (θ₀ - θ) angle_straight) as [Htts| Htts]. {
+  apply Hd; [ now apply Hlt | easy ].
+}
+exfalso.
+apply Htts; clear Htts.
+eapply angle_le_trans; [ | apply Hts ].
+apply angle_lt_angle_le_straight_angle_sub_le.
+split; [ | easy ].
+(* euh, non, ça va pas *)
+...
+progress unfold angle_lt in Hθ.
+now apply angle_lt_angle_le_straight_angle_sub_le.
+Qed.
+*)
+
 Theorem angle_le_straight_is_limit_if :
   ∀ f f' θ₀,
   (θ₀ ≤ angle_straight)%A
-  → is_limit_when_tending_to_neighbourhood angle_lt_for_deriv angle_eucl_dist rngl_dist
-      f θ₀ (f' θ₀)
-  → is_limit_when_tending_to_neighbourhood angle_lt angle_eucl_dist rngl_dist
-      f θ₀ (f' θ₀).
+  → is_limit_when_tending_to_neighbourhood angle_lt_for_deriv
+      angle_eucl_dist rngl_dist f θ₀ (f' θ₀)
+  → is_limit_when_tending_to_neighbourhood angle_lt
+      angle_eucl_dist rngl_dist f θ₀ (f' θ₀).
 Proof.
 destruct_ac.
 intros * Hts Hd.
@@ -535,9 +566,11 @@ Theorem angle_le_straight_right_derivative_if :
 Proof.
 intros * Hts Hd.
 progress unfold right_derivative_at in Hd.
-progress unfold right_derivative_at.
 progress unfold is_right_limit_when_tending_to_neighbourhood in Hd.
+progress unfold right_derivative_at.
 progress unfold is_right_limit_when_tending_to_neighbourhood.
+Check angle_le_straight_is_limit_if.
+...
 Print is_limit_when_tending_to_neighbourhood.
 Check angle_le_straight_is_limit_if.
 ...
