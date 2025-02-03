@@ -488,13 +488,15 @@ Definition angle_lt_for_deriv θ1 θ2 :=
 Definition angle_lt θ1 θ2 :=
   (θ1 < θ2)%A.
 
-(* could be used for a left_derivative on angles less than straight *)
+(* could be used for derivatives on angles less than straight *)
 (* here, there is no need for the constraint θ2-θ1 ≤ straight *)
-Theorem angle_le_straight_left_derivative_if :
-  ∀ f g θ₀,
+Theorem angle_le_straight_is_limit_if :
+  ∀ f f' θ₀,
   (θ₀ ≤ angle_straight)%A
-  → left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f g θ₀
-  → left_derivative_at angle_lt angle_eucl_dist rngl_dist f g θ₀.
+  → is_limit_when_tending_to_neighbourhood angle_lt_for_deriv angle_eucl_dist rngl_dist
+      f θ₀ (f' θ₀)
+  → is_limit_when_tending_to_neighbourhood angle_lt angle_eucl_dist rngl_dist
+      f θ₀ (f' θ₀).
 Proof.
 destruct_ac.
 intros * Hts Hd.
@@ -514,7 +516,31 @@ eapply angle_le_trans; [ | apply Hts ].
 now apply angle_lt_angle_le_straight_angle_sub_le.
 Qed.
 
+Theorem angle_le_straight_left_derivative_if :
+  ∀ f f' θ₀,
+  (θ₀ ≤ angle_straight)%A
+  → left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
+  → left_derivative_at angle_lt angle_eucl_dist rngl_dist f f' θ₀.
+Proof.
+intros * Hts Hd.
+now apply angle_le_straight_is_limit_if.
+Qed.
+
 (* to be completed
+Theorem angle_le_straight_right_derivative_if :
+  ∀ f f' θ₀,
+  (θ₀ ≤ angle_straight)%A
+  → right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
+  → right_derivative_at angle_lt angle_eucl_dist rngl_dist f f' θ₀.
+Proof.
+intros * Hts Hd.
+progress unfold right_derivative_at.
+progress unfold is_right_limit_when_tending_to_neighbourhood.
+Print is_limit_when_tending_to_neighbourhood.
+...
+now apply angle_le_straight_is_limit_if.
+Qed.
+
 (* complicated case *)
 Theorem glip :
   ∀ f g θ₀,
