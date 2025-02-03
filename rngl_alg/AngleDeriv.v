@@ -488,7 +488,7 @@ Definition angle_lt_for_deriv θ1 θ2 :=
 Definition angle_lt θ1 θ2 :=
   (θ1 < θ2)%A.
 
-(**)
+(*
 Theorem angle_is_limit_is_limit :
   ∀ f f' θ₀ lt1 lt2,
   (∀ θ1 θ2, lt2 θ1 θ2 → lt1 θ1 θ2)
@@ -507,6 +507,7 @@ split; [ easy | ].
 intros θ Hθ Hθη.
 apply Hd; [ now apply Hlt | easy ].
 Qed.
+*)
 
 Theorem angle_le_straight_is_limit_if :
   ∀ f f' θ₀,
@@ -551,6 +552,31 @@ Theorem angle_le_straight_right_derivative_if :
   → right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
   → right_derivative_at angle_lt angle_eucl_dist rngl_dist f f' θ₀.
 Proof.
+intros * Hts Hd.
+intros ε Hε.
+destruct (angle_eq_dec θ₀ angle_straight) as [Htes| Htes]. {
+  subst θ₀.
+  clear Hts.
+  progress unfold angle_lt.
+(* j'ai peur que ça marche pas, ce théorème *)
+...
+specialize (Hd ε Hε).
+destruct Hd as (η & Hη & Hd).
+exists (rngl_min η (angle_eucl_dist θ₀ angle_straight)).
+split. {
+  apply rngl_min_glb_lt; [ easy | ].
+...
+intros θ Hθ Hθη.
+destruct (angle_le_dec (θ - θ₀) angle_straight) as [Htts| Htts]. {
+  now apply Hd.
+}
+exfalso.
+apply Htts; clear Htts.
+progress unfold angle_lt in Hθ.
+eapply angle_le_trans; [ | apply Hts ].
+...
+now apply angle_lt_angle_le_straight_angle_sub_le.
+...
 intros * Hts Hd.
 progress unfold right_derivative_at in Hd.
 progress unfold is_right_limit_when_tending_to_neighbourhood in Hd.
