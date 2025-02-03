@@ -555,8 +555,8 @@ eapply (rngl_le_lt_trans Hor). 2: {
 *)
 
 Theorem rngl_cos_left_derivative_at_straight :
-  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_cos
-    (λ θ : angle T, (- rngl_sin θ)%L) angle_straight.
+  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+    rngl_cos (λ θ : angle T, (- rngl_sin θ)%L) angle_straight.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -611,8 +611,8 @@ apply angle_add_div_2_diag.
 Qed.
 
 Theorem rngl_cos_right_derivative_at_0 :
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_cos
-    (λ θ : angle T, (- rngl_sin θ)%L) 0%A.
+  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+    rngl_cos (λ θ : angle T, (- rngl_sin θ)%L) 0%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
