@@ -534,9 +534,12 @@ Theorem angle_le_straight_right_derivative_if :
   → right_derivative_at angle_lt angle_eucl_dist rngl_dist f f' θ₀.
 Proof.
 intros * Hts Hd.
+progress unfold right_derivative_at in Hd.
 progress unfold right_derivative_at.
+progress unfold is_right_limit_when_tending_to_neighbourhood in Hd.
 progress unfold is_right_limit_when_tending_to_neighbourhood.
 Print is_limit_when_tending_to_neighbourhood.
+Check angle_le_straight_is_limit_if.
 ...
 now apply angle_le_straight_is_limit_if.
 Qed.
