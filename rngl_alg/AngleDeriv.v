@@ -454,7 +454,7 @@ Definition angle_lt_for_deriv θ1 θ2 :=
 Definition angle_lt θ1 θ2 :=
   (θ1 < θ2)%A.
 
-(* trivial case *)
+(* trivial case
 Theorem glop :
   ∀ f g θ₀,
   left_derivative_at angle_lt angle_eucl_dist rngl_dist f g θ₀
@@ -470,10 +470,9 @@ intros θ Hθ Hθη.
 apply Hd; [ | easy ].
 now destruct Hθ.
 Qed.
+*)
 
-(* to be completed
-(* complicated case *)
-Theorem glup :
+Theorem angle_le_straight_left_derivative_if :
   ∀ f g θ₀,
   (θ₀ ≤ angle_straight)%A
   → left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f g θ₀
@@ -497,36 +496,33 @@ eapply angle_le_trans; [ | apply Hts ].
 (* lemma *)
 progress unfold angle_ltb in Hθ.
 progress unfold angle_leb.
+generalize Hts; intros Hzst.
+apply rngl_sin_nonneg_angle_le_straight in Hzst.
+apply rngl_leb_le in Hzst.
+rewrite Hzst in Hθ |-*.
+apply rngl_leb_le in Hzst.
 remember (0 ≤? rngl_sin θ)%L as tst eqn:Htst.
-remember (0 ≤? rngl_sin θ₀)%L as tstz eqn:Htstz.
-symmetry in Htst, Htstz.
-destruct tstz. {
-  destruct tst; [ | easy ].
-  apply rngl_leb_le in Htst, Htstz.
-  apply rngl_ltb_lt in Hθ.
-  generalize Hθ; intros H.
-  apply (rngl_lt_le_incl Hor) in H.
-  specialize (rngl_sin_sub_nonneg _ _ Htstz Htst H) as H1.
-  apply rngl_leb_le in H1.
-  rewrite H1; clear H H1.
+symmetry in Htst.
+destruct tst; [ | easy ].
+apply rngl_leb_le in Htst.
+apply rngl_ltb_lt in Hθ.
+remember (0 ≤? rngl_sin (θ₀ - θ))%L as zstt eqn:Hzstt.
+symmetry in Hzstt.
+destruct zstt. {
   apply rngl_leb_le.
   rewrite rngl_cos_sub_comm.
   apply (rngl_lt_le_incl Hor) in Hθ.
   now apply rngl_cos_le_cos_sub.
 }
-remember (0 ≤? rngl_sin (θ₀ - θ))%L as zstt eqn:Hzstt.
-symmetry in Hzstt.
-destruct zstt; [ easy | ].
-apply (rngl_leb_gt Hor) in Htstz, Hzstt.
-apply rngl_leb_le.
-destruct tst. {
-  clear Hθ.
-  apply rngl_leb_le in Htst.
-...
-rewrite rngl_cos_sub_comm.
-apply rngl_cos_lt_rngl_cos_sub; try easy.
-...
+apply (rngl_leb_gt Hor) in Hzstt.
+apply rngl_nle_gt in Hzstt.
+exfalso; apply Hzstt; clear Hzstt.
+apply (rngl_lt_le_incl Hor) in Hθ.
+now apply rngl_sin_sub_nonneg.
+Qed.
 
+(* to be completed
+(* complicated case *)
 Theorem glip :
   ∀ f g θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f g θ₀
