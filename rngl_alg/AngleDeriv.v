@@ -446,6 +446,40 @@ symmetry.
 apply rngl_add_assoc.
 Qed.
 
+Theorem angle_lt_angle_le_straight_angle_sub_le :
+  ∀ θ1 θ2,
+  (θ1 < θ2 ≤ angle_straight)%A
+  → (θ2 - θ1 ≤ θ2)%A.
+Proof.
+destruct_ac.
+intros * (Hθ, Hts).
+progress unfold angle_ltb in Hθ.
+progress unfold angle_leb.
+generalize Hts; intros Hzst.
+apply rngl_sin_nonneg_angle_le_straight in Hzst.
+apply rngl_leb_le in Hzst.
+rewrite Hzst in Hθ |-*.
+apply rngl_leb_le in Hzst.
+remember (0 ≤? rngl_sin θ1)%L as tst eqn:Htst.
+symmetry in Htst.
+destruct tst; [ | easy ].
+apply rngl_leb_le in Htst.
+apply rngl_ltb_lt in Hθ.
+remember (0 ≤? rngl_sin (θ2 - θ1))%L as zstt eqn:Hzstt.
+symmetry in Hzstt.
+destruct zstt. {
+  apply rngl_leb_le.
+  rewrite rngl_cos_sub_comm.
+  apply (rngl_lt_le_incl Hor) in Hθ.
+  now apply rngl_cos_le_cos_sub.
+}
+apply (rngl_leb_gt Hor) in Hzstt.
+apply rngl_nle_gt in Hzstt.
+exfalso; apply Hzstt; clear Hzstt.
+apply (rngl_lt_le_incl Hor) in Hθ.
+now apply rngl_sin_sub_nonneg.
+Qed.
+
 (* *)
 
 Definition angle_lt_for_deriv θ1 θ2 :=
@@ -454,24 +488,8 @@ Definition angle_lt_for_deriv θ1 θ2 :=
 Definition angle_lt θ1 θ2 :=
   (θ1 < θ2)%A.
 
-(* trivial case
-Theorem glop :
-  ∀ f g θ₀,
-  left_derivative_at angle_lt angle_eucl_dist rngl_dist f g θ₀
-  → left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f g θ₀.
-Proof.
-intros * Hd.
-intros ε Hε.
-specialize (Hd ε Hε).
-destruct Hd as (η & Hη & Hd).
-exists η.
-split; [ easy | ].
-intros θ Hθ Hθη.
-apply Hd; [ | easy ].
-now destruct Hθ.
-Qed.
-*)
-
+(* could be used for a left_derivative on angles less than straight *)
+(* here, there is no need for the constraint θ2-θ1 ≤ straight *)
 Theorem angle_le_straight_left_derivative_if :
   ∀ f g θ₀,
   (θ₀ ≤ angle_straight)%A
@@ -493,32 +511,7 @@ exfalso.
 apply Htts; clear Htts.
 progress unfold angle_lt in Hθ.
 eapply angle_le_trans; [ | apply Hts ].
-(* lemma *)
-progress unfold angle_ltb in Hθ.
-progress unfold angle_leb.
-generalize Hts; intros Hzst.
-apply rngl_sin_nonneg_angle_le_straight in Hzst.
-apply rngl_leb_le in Hzst.
-rewrite Hzst in Hθ |-*.
-apply rngl_leb_le in Hzst.
-remember (0 ≤? rngl_sin θ)%L as tst eqn:Htst.
-symmetry in Htst.
-destruct tst; [ | easy ].
-apply rngl_leb_le in Htst.
-apply rngl_ltb_lt in Hθ.
-remember (0 ≤? rngl_sin (θ₀ - θ))%L as zstt eqn:Hzstt.
-symmetry in Hzstt.
-destruct zstt. {
-  apply rngl_leb_le.
-  rewrite rngl_cos_sub_comm.
-  apply (rngl_lt_le_incl Hor) in Hθ.
-  now apply rngl_cos_le_cos_sub.
-}
-apply (rngl_leb_gt Hor) in Hzstt.
-apply rngl_nle_gt in Hzstt.
-exfalso; apply Hzstt; clear Hzstt.
-apply (rngl_lt_le_incl Hor) in Hθ.
-now apply rngl_sin_sub_nonneg.
+now apply angle_lt_angle_le_straight_angle_sub_le.
 Qed.
 
 (* to be completed
