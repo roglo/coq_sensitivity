@@ -480,6 +480,64 @@ apply (rngl_lt_le_incl Hor) in Hθ.
 now apply rngl_sin_sub_nonneg.
 Qed.
 
+Theorem angle_straight_le_lt_sub_le_straight :
+  ∀ θ₀ θ,
+  (angle_straight ≤ θ₀ < θ)%A
+  → (θ - θ₀ ≤ angle_straight)%A.
+Proof.
+destruct_ac.
+intros * (Hts, Hθ).
+progress unfold angle_leb in Hts.
+progress unfold angle_ltb in Hθ.
+progress unfold angle_leb.
+cbn in Hts.
+cbn - [ angle_sub ].
+rewrite (rngl_leb_refl Hor) in Hts |-*.
+remember (0 ≤? rngl_sin (θ - θ₀))%L as zstt eqn:Hzstt.
+symmetry in Hzstt.
+destruct zstt; [ apply rngl_leb_le, rngl_cos_bound | exfalso ].
+apply (rngl_leb_gt Hor) in Hzstt.
+rewrite (rngl_sin_sub_anticomm) in Hzstt.
+apply (rngl_opp_neg_pos Hop Hor) in Hzstt.
+remember (0 ≤? rngl_sin θ₀)%L as zstz eqn:Hzstz.
+remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
+symmetry in Hzstz, Hzst.
+destruct zstz. {
+  apply rngl_leb_le in Hzstz, Hts.
+  apply rngl_nlt_ge in Hts.
+  apply Hts; clear Hts.
+  apply (rngl_lt_iff Hor).
+  split; [ apply rngl_cos_bound | ].
+  intros H; symmetry in H.
+  apply eq_rngl_cos_opp_1 in H; subst θ₀.
+  clear Hzstz.
+  rewrite rngl_sin_sub_straight_l in Hzstt.
+  generalize Hzstt; intros H.
+  apply (rngl_lt_le_incl Hor) in Hzstt.
+  apply rngl_leb_le in Hzstt.
+  rewrite Hzstt in Hzst; subst zst.
+  apply rngl_ltb_lt in Hθ.
+  apply rngl_nle_gt in Hθ.
+  apply Hθ, rngl_cos_bound.
+}
+clear Hts.
+destruct zst; [ easy | ].
+apply (rngl_leb_gt Hor) in Hzstz, Hzst.
+apply rngl_ltb_lt in Hθ.
+apply rngl_nle_gt in Hθ.
+apply Hθ; clear Hθ.
+change_angle_add_r θ₀ angle_straight.
+change_angle_add_r θ angle_straight.
+progress sin_cos_add_sub_straight_hyp T Hzstz.
+progress sin_cos_add_sub_straight_hyp T Hzst.
+progress sin_cos_add_sub_straight_hyp T Hzstt.
+progress sin_cos_add_sub_straight_goal T.
+rewrite rngl_add_0_r in Hzstt.
+apply rngl_sin_sub_nonneg_iff; [ easy | | ].
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
 (* *)
 
 Definition angle_lt_for_deriv θ1 θ2 :=
@@ -545,7 +603,6 @@ intros * Hts Hd.
 now apply angle_le_straight_is_limit_if.
 Qed.
 
-(* to be completed
 Theorem angle_le_straight_right_derivative_if :
   ∀ f f' θ₀,
   (angle_straight ≤ θ₀)%A
@@ -561,6 +618,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * Hts Hd.
+(* à voir, comme pour le théorème précédent :
+progress unfold right_derivative_at in Hd.
+progress unfold is_right_limit_when_tending_to_neighbourhood in Hd.
+Check angle_le_straight_is_limit_if.
+...
+*)
 intros ε Hε.
 specialize (Hd ε Hε).
 destruct Hd as (η & Hη & Hd).
@@ -572,103 +635,10 @@ destruct (angle_le_dec (θ - θ₀) angle_straight) as [Htts| Htts]. {
 }
 exfalso.
 apply Htts; clear Htts.
-progress unfold angle_lt in Hθ.
-(* lemma *)
-move Hts at bottom.
-move Hθ at bottom.
-(* autre solution : change_angle_opp à essayer peut-être *)
-progress unfold angle_leb in Hts.
-progress unfold angle_ltb in Hθ.
-progress unfold angle_leb.
-cbn in Hts.
-cbn - [ angle_sub ].
-rewrite (rngl_leb_refl Hor) in Hts |-*.
-remember (0 ≤? rngl_sin (θ - θ₀))%L as zstt eqn:Hzstt.
-symmetry in Hzstt.
-destruct zstt; [ apply rngl_leb_le, rngl_cos_bound | exfalso ].
-apply (rngl_leb_gt Hor) in Hzstt.
-rewrite (rngl_sin_sub_anticomm) in Hzstt.
-apply (rngl_opp_neg_pos Hop Hor) in Hzstt.
-remember (0 ≤? rngl_sin θ₀)%L as zstz eqn:Hzstz.
-remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
-symmetry in Hzstz, Hzst.
-destruct zstz. {
-  apply rngl_leb_le in Hzstz, Hts.
-  apply rngl_nlt_ge in Hts.
-  apply Hts; clear Hts.
-  apply (rngl_lt_iff Hor).
-  split; [ apply rngl_cos_bound | ].
-  intros H; symmetry in H.
-  apply eq_rngl_cos_opp_1 in H; subst θ₀.
-  clear Hzstz.
-  rewrite rngl_sin_sub_straight_l in Hzstt.
-  generalize Hzstt; intros H.
-  apply (rngl_lt_le_incl Hor) in Hzstt.
-  apply rngl_leb_le in Hzstt.
-  rewrite Hzstt in Hzst; subst zst.
-  apply rngl_ltb_lt in Hθ.
-  apply rngl_nle_gt in Hθ.
-  apply Hθ, rngl_cos_bound.
-}
-clear Hts.
-destruct zst; [ easy | ].
-apply (rngl_leb_gt Hor) in Hzstz, Hzst.
-apply rngl_ltb_lt in Hθ.
-apply rngl_nle_gt in Hθ.
-apply Hθ; clear Hθ.
-change_angle_add_r θ₀ angle_straight.
-change_angle_add_r θ angle_straight.
-progress sin_cos_add_sub_straight_hyp T Hzstz.
-progress sin_cos_add_sub_straight_hyp T Hzst.
-progress sin_cos_add_sub_straight_hyp T Hzstt.
-progress sin_cos_add_sub_straight_goal T.
-rewrite rngl_add_0_r in Hzstt.
-Search (0 < rngl_sin (_ - _))%L.
-About quadrant_1_sin_sub_pos_cos_lt.
-(* hyp 0 ≤ rngl_cos θ2 probablement pas nécessaire,
-   mais faut voir avec les < et le ≤ *)
-...
-rewrite <- (angle_opp_involutive (θ - θ₀)).
-rewrite <- angle_opp_straight.
-apply angle_opp_le_compat_if; [ apply (angle_straight_neq_0 Hc1) | ].
-eapply angle_le_trans; [ apply Hts | ].
-rewrite angle_opp_sub_distr.
-Search (_ ≤ _ - _)%A.
-...
-Search (- 1 ≠ _)%L.
-...
-  intros H.
-Require Import Complex.
-Search angle_straight.
-Check angle_straight_pos.
-Search (angle_straight ≠ _).
-Search (_ ≠ angle_straight).
-...
-  injection H.
-Search (-1 ≠ 0)%L.
-  apply angle_straight_neq_0.
-
-apply (angle_le_trans _ θ).
-(* mouais, bon, ça ne va pas non plus, comme ça *)
-...
-eapply angle_le_trans; [ | apply Hts ].
-...
-now apply angle_lt_angle_le_straight_angle_sub_le.
-...
-intros * Hts Hd.
-progress unfold right_derivative_at in Hd.
-progress unfold is_right_limit_when_tending_to_neighbourhood in Hd.
-progress unfold right_derivative_at.
-progress unfold is_right_limit_when_tending_to_neighbourhood.
-Check angle_le_straight_is_limit_if.
-...
-Print is_limit_when_tending_to_neighbourhood.
-Check angle_le_straight_is_limit_if.
-...
-now apply angle_le_straight_is_limit_if.
+now apply angle_straight_le_lt_sub_le_straight.
 Qed.
 
-(* complicated case *)
+(* complicated case
 Theorem glip :
   ∀ f g θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f g θ₀
