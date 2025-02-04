@@ -222,9 +222,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hsz1 Hzs2 Hzc2 Hzs12.
 destruct (rngl_eq_dec Heo (rngl_sin θ2) 0) as [Hs2z| Hs2z]. {
   apply eq_rngl_sin_0 in Hs2z.
-  destruct Hs2z; subst θ2. {
-    apply rngl_cos_bound.
-  }
+  destruct Hs2z; subst θ2; [ apply rngl_cos_bound | ].
   exfalso.
   apply rngl_nlt_ge in Hzc2.
   apply Hzc2; clear Hzc2; cbn.
