@@ -2700,6 +2700,20 @@ rewrite rngl_add_0_r.
 now do 2 rewrite fold_rngl_squ.
 Qed.
 
+Theorem angle_straight_neq_0 :
+  rngl_characteristic T ≠ 1
+  → angle_straight ≠ 0%A.
+Proof.
+destruct_ac.
+intros Hc1.
+intros H.
+apply eq_angle_eq in H.
+injection H; clear H; intros H.
+specialize (rngl_opp_1_lt_1 Hon Hop Hor Hc1) as H1.
+rewrite H in H1.
+now apply (rngl_lt_irrefl Hor) in H1.
+Qed.
+
 End a.
 
 Arguments rngl_acos {T ro rp ac rl} x%_L.

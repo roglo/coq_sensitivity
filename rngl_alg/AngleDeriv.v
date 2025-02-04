@@ -552,6 +552,14 @@ Theorem angle_le_straight_right_derivative_if :
   → right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
   → right_derivative_at angle_lt angle_eucl_dist rngl_dist f f' θ₀.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hts Hd.
+  intros ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros * Hts Hd.
 intros ε Hε.
 specialize (Hd ε Hε).
@@ -565,6 +573,27 @@ destruct (angle_le_dec (θ - θ₀) angle_straight) as [Htts| Htts]. {
 exfalso.
 apply Htts; clear Htts.
 progress unfold angle_lt in Hθ.
+(* lemma *)
+rewrite <- (angle_opp_involutive (θ - θ₀)).
+rewrite <- angle_opp_straight.
+apply angle_opp_le_compat_if; [ apply (angle_straight_neq_0 Hc1) | ].
+eapply angle_le_trans; [ apply Hts | ].
+rewrite angle_opp_sub_distr.
+Search (_ ≤ _ - _)%A.
+...
+Search (- 1 ≠ _)%L.
+...
+  intros H.
+Require Import Complex.
+Search angle_straight.
+Check angle_straight_pos.
+Search (angle_straight ≠ _).
+Search (_ ≠ angle_straight).
+...
+  injection H.
+Search (-1 ≠ 0)%L.
+  apply angle_straight_neq_0.
+
 apply (angle_le_trans _ θ).
 (* mouais, bon, ça ne va pas non plus, comme ça *)
 ...
