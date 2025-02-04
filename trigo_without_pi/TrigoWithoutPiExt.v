@@ -206,7 +206,6 @@ Theorem quadrant_1_sin_sub_nonneg_cos_le :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
   → (0 ≤ rngl_cos θ2)%L
   → (0 ≤ rngl_sin (θ1 - θ2))%L
   → (rngl_cos θ1 ≤ rngl_cos θ2)%L.
@@ -220,7 +219,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   do 2 rewrite (H1 (rngl_cos _)).
   apply (rngl_le_refl Hor).
 }
-intros * Hsz1 Hzs2 Hzc1 Hzc2 Hzs12.
+intros * Hsz1 Hzs2 Hzc2 Hzs12.
 destruct (rngl_eq_dec Heo (rngl_sin θ2) 0) as [Hs2z| Hs2z]. {
   apply eq_rngl_sin_0 in Hs2z.
   destruct Hs2z; subst θ2. {
@@ -303,13 +302,12 @@ Theorem quadrant_1_sin_sub_pos_cos_lt :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
   → (0 ≤ rngl_cos θ2)%L
   → (0 < rngl_sin (θ1 - θ2))%L
   → (rngl_cos θ1 < rngl_cos θ2)%L.
 Proof.
 destruct_ac.
-intros * Hs1z Hzs2 Hc1z Hzc2 Hzs12.
+intros * Hs1z Hzs2 Hzc2 Hzs12.
 apply (rngl_lt_iff Hor).
 split. {
   apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
@@ -1354,7 +1352,6 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
   }
   apply rngl_cos_lt_cos_sub; try easy.
   apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
-  now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).
 }

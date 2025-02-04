@@ -782,8 +782,6 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
 } {
   apply rngl_sin_div_2_nonneg.
 } {
-  now apply (rngl_lt_le_incl Hor) in Hc.
-} {
   apply rngl_cos_div_2_nonneg; cbn.
   apply (rngl_0_le_1 Hon Hos Hor).
 } {
@@ -937,8 +935,6 @@ rewrite rngl_add_0_r in H1.
 rewrite <- H1.
 apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   now rewrite rngl_sin_right_div_2.
-} {
-  now apply (rngl_lt_le_incl Hor) in Hc.
 } {
   now rewrite rngl_cos_right_div_2.
 

@@ -408,7 +408,6 @@ destruct zs3. {
       apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
       now apply (rngl_lt_le_incl Hor).
       now apply (rngl_lt_le_incl Hor).
-      now apply (rngl_lt_le_incl Hor).
       apply (rngl_lt_le_incl Hor) in Hc1z.
       now apply rngl_cos_sub_nonneg.
       rewrite angle_sub_sub_distr.

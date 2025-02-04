@@ -658,7 +658,6 @@ now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
-now apply (rngl_lt_le_incl Hor).
 Qed.
 
 Theorem angle_add_overflow_le :

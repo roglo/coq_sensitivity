@@ -477,9 +477,6 @@ destruct zs. {
     } {
       now apply (rngl_lt_le_incl Hor) in Hzs.
     } {
-      rewrite rngl_cos_right_div_2.
-      apply rl_sqrt_half_nonneg.
-    } {
       apply (rngl_lt_le_incl Hor) in Hcs, Hzs.
       now apply (rngl_le_trans Hor _ (rngl_sin θ)).
     }

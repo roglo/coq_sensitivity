@@ -157,8 +157,6 @@ destruct zs13. {
         apply not_eq_sym in Hs1z.
         now apply (rngl_lt_iff Hor).
       } {
-        now apply (rngl_lt_le_incl Hor) in Hzc1.
-      } {
         now apply (rngl_lt_le_incl Hor) in Hzc3.
       } {
         apply (rngl_lt_iff Hor).
@@ -562,7 +560,6 @@ apply rngl_cos_lt_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
 apply (rngl_lt_le_incl Hor).
 apply quadrant_1_sin_sub_pos_cos_lt; try easy.
-now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
