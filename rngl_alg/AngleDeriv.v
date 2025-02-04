@@ -546,6 +546,9 @@ Definition angle_lt_for_deriv θ1 θ2 :=
 Definition angle_lt θ1 θ2 :=
   (θ1 < θ2)%A.
 
+(* special cases where the contraint "θ2 - θ1 ≤ angle_straight" is not
+   compulsory ; not used in the final proof but interesting to know *)
+
 Theorem angle_le_straight_is_limit_if :
   ∀ f f' θ₀,
   (θ₀ ≤ angle_straight)%A
