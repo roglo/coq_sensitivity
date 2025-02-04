@@ -548,24 +548,16 @@ Qed.
 (* to be completed
 Theorem angle_le_straight_right_derivative_if :
   ∀ f f' θ₀,
-  (θ₀ ≤ angle_straight)%A
+  (angle_straight ≤ θ₀)%A
   → right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
   → right_derivative_at angle_lt angle_eucl_dist rngl_dist f f' θ₀.
 Proof.
 intros * Hts Hd.
 intros ε Hε.
-destruct (angle_eq_dec θ₀ angle_straight) as [Htes| Htes]. {
-  subst θ₀.
-  clear Hts.
-  progress unfold angle_lt.
-(* j'ai peur que ça marche pas, ce théorème *)
-...
 specialize (Hd ε Hε).
 destruct Hd as (η & Hη & Hd).
-exists (rngl_min η (angle_eucl_dist θ₀ angle_straight)).
-split. {
-  apply rngl_min_glb_lt; [ easy | ].
-...
+exists η.
+split; [ easy | ].
 intros θ Hθ Hθη.
 destruct (angle_le_dec (θ - θ₀) angle_straight) as [Htts| Htts]. {
   now apply Hd.
@@ -573,6 +565,9 @@ destruct (angle_le_dec (θ - θ₀) angle_straight) as [Htts| Htts]. {
 exfalso.
 apply Htts; clear Htts.
 progress unfold angle_lt in Hθ.
+apply (angle_le_trans _ θ).
+(* mouais, bon, ça ne va pas non plus, comme ça *)
+...
 eapply angle_le_trans; [ | apply Hts ].
 ...
 now apply angle_lt_angle_le_straight_angle_sub_le.
