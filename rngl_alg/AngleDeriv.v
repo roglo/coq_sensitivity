@@ -574,6 +574,17 @@ exfalso.
 apply Htts; clear Htts.
 progress unfold angle_lt in Hθ.
 (* lemma *)
+move Hts at bottom.
+move Hθ at bottom.
+(* autre solution : change_angle_opp à essayer peut-être *)
+...
+progress unfold angle_leb in Hts.
+progress unfold angle_ltb in Hθ.
+progress unfold angle_leb.
+cbn in Hts.
+rewrite (rngl_leb_refl Hor) in Hts.
+Search (angle_straight ≤ _)%A.
+...
 rewrite <- (angle_opp_involutive (θ - θ₀)).
 rewrite <- angle_opp_straight.
 apply angle_opp_le_compat_if; [ apply (angle_straight_neq_0 Hc1) | ].
