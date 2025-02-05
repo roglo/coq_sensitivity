@@ -16,6 +16,8 @@ Require Import Trigo.SeqAngleIsCauchy.
 Require Import Trigo.AngleTypeIsComplete.
 Require Import Trigo.TacChangeAngle.
 
+Notation "a '°' b" := (comp a b) (at level 40, left associativity).
+
 Section a.
 
 Context {T : Type}.
@@ -601,11 +603,6 @@ Proof.
 intros * Hts Hd.
 now apply angle_le_straight_is_limit_if.
 Qed.
-
-(* *)
-
-Definition comp_rngl_angle {A} (f : T → T) (g : A → T) x := f (g x).
-Notation "a '°' b" := (comp_rngl_angle a b) (at level 40, left associativity).
 
 (* *)
 

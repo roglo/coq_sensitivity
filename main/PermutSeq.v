@@ -10,7 +10,8 @@ Require Import Misc PermutationFun SortingFun SortRank.
 Require Import IterAnd.
 Require Import Pigeonhole.
 
-Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
+(* *)
+
 Definition comp_list (la lb : list nat) := List.map (λ i, List.nth i la 0) lb.
 
 Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40, left associativity).
