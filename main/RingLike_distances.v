@@ -65,17 +65,6 @@ Definition is_limit_when_tending_to {A B} da db
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
    ∀ x : A, da x x₀ < η → db (f x) L < ε)%L.
 
-Definition is_limit_when_tending_to_neighbourhood {A B} lt da db
-  (f : A → B) (x₀ : A) (L : B) :=
-  (∀ ε : T, 0 < ε →
-   ∃ η : T, (0 < η)%L ∧ ∀ x : A, lt x x₀ → da x x₀ < η → db (f x) L < ε)%L.
-
-Definition is_left_limit_when_tending_to_neighbourhood {A B} lt :=
-  @is_limit_when_tending_to_neighbourhood A B (λ a b, lt a b).
-
-Definition is_right_limit_when_tending_to_neighbourhood {A B} lt :=
-  @is_limit_when_tending_to_neighbourhood A B (λ a b, lt b a).
-
 Definition is_limit_when_tending_to_inf {A} dist (u : nat → A) (L : A) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (u n) L < ε)%L.
 
@@ -88,6 +77,20 @@ Definition continuous_at {A B} da db (f : A → B) a :=
 
 Definition continuous {A B} da db (f : A → B) :=
   ∀ a, continuous_at da db f a.
+
+Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
+  da db (f : A → B) (x₀ : A) (L : B) :=
+  (∀ ε : T, 0 < ε →
+   ∃ η : T, (0 < η)%L ∧ ∀ x : A,
+   (if is_left then lt x x₀ else lt x₀ x)
+   → da x x₀ < η
+   → db (f x) L < ε)%L.
+
+Definition is_left_limit_when_tending_to_neighbourhood {A B} :=
+  @is_limit_when_tending_to_neighbourhood true A B.
+
+Definition is_right_limit_when_tending_to_neighbourhood {A B} :=
+  @is_limit_when_tending_to_neighbourhood false A B.
 
 Definition left_derivative_at {A} lt (da : A → A → T) (db : T → T → T)
     f f' a :=
