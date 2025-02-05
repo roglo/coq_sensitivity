@@ -550,11 +550,11 @@ Definition angle_lt θ1 θ2 :=
    compulsory ; not used in the final proof but interesting to know *)
 
 Theorem angle_le_straight_is_limit_if :
-  ∀ (dir : bool) f f' θ₀,
-  (if dir then θ₀ ≤ angle_straight else angle_straight ≤ θ₀)%A
-  → is_limit_when_tending_to_neighbourhood dir angle_lt_for_deriv
+  ∀ (is_left : bool) f f' θ₀,
+  (if is_left then θ₀ ≤ angle_straight else angle_straight ≤ θ₀)%A
+  → is_limit_when_tending_to_neighbourhood is_left angle_lt_for_deriv
       angle_eucl_dist rngl_dist f θ₀ (f' θ₀)
-  → is_limit_when_tending_to_neighbourhood dir angle_lt
+  → is_limit_when_tending_to_neighbourhood is_left angle_lt
       angle_eucl_dist rngl_dist f θ₀ (f' θ₀).
 Proof.
 destruct_ac.
@@ -565,7 +565,7 @@ destruct Hd as (η & Hη & Hd).
 exists η.
 split; [ easy | ].
 intros θ Hθ Hθη.
-destruct dir. {
+destruct is_left. {
   apply Hd; try easy.
   destruct (angle_le_dec (θ₀ - θ) angle_straight) as [Htts| Htts]; [ easy | ].
   exfalso.
