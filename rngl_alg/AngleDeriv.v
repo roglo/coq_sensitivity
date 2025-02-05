@@ -538,7 +538,39 @@ now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-(* *)
+(********)
+(* new version of limit neighbourhood *)
+
+Definition is_limit_when_tending_to_neighbourhood' (is_left : bool) {A B} lt
+  da db (f : A → B) (x₀ : A) (L : B) :=
+  (∀ ε : T, 0 < ε →
+   ∃ η : T, (0 < η)%L ∧ ∀ x : A,
+   (if is_left then lt x x₀ else lt x₀ x)
+   → da x x₀ < η
+   → db (f x) L < ε)%L.
+
+Definition is_left_limit_when_tending_to_neighbourhood' {A B} :=
+  @is_limit_when_tending_to_neighbourhood' true A B.
+
+Definition is_right_limit_when_tending_to_neighbourhood' {A B} :=
+  @is_limit_when_tending_to_neighbourhood' false A B.
+
+Definition left_derivative_at' {A} lt (da : A → A → T) (db : T → T → T)
+    f f' a :=
+  let g x := ((f a - f x) / da x a)%L in
+  is_left_limit_when_tending_to_neighbourhood' lt da db g a (f' a).
+
+Definition right_derivative_at' {A} lt (da : A → A → T) (db : T → T → T)
+    f f' a :=
+  let g x := ((f x - f a) / da x a)%L in
+  is_right_limit_when_tending_to_neighbourhood' lt da db g a (f' a).
+
+Definition is_derivative' {A} lt (da : A → A → T) (db : T → T → T) f f' :=
+  ∀ a,
+  left_derivative_at' lt da db f f' a ∧
+  right_derivative_at' lt da db f f' a.
+
+(********)
 
 Definition angle_lt_for_deriv θ1 θ2 :=
   (θ1 < θ2)%A ∧ (θ2 - θ1 ≤ angle_straight)%A.
@@ -550,11 +582,11 @@ Definition angle_lt θ1 θ2 :=
    compulsory ; not used in the final proof but interesting to know *)
 
 Theorem angle_le_straight_is_limit_if :
-  ∀ f f' θ₀,
-  (θ₀ ≤ angle_straight)%A
-  → is_limit_when_tending_to_neighbourhood angle_lt_for_deriv
+  ∀ (dir : bool) f f' θ₀,
+  (if dir then θ₀ ≤ angle_straight else angle_straight ≤ θ₀)%A
+  → is_limit_when_tending_to_neighbourhood' dir angle_lt_for_deriv
       angle_eucl_dist rngl_dist f θ₀ (f' θ₀)
-  → is_limit_when_tending_to_neighbourhood angle_lt
+  → is_limit_when_tending_to_neighbourhood' dir angle_lt
       angle_eucl_dist rngl_dist f θ₀ (f' θ₀).
 Proof.
 destruct_ac.
@@ -565,44 +597,28 @@ destruct Hd as (η & Hη & Hd).
 exists η.
 split; [ easy | ].
 intros θ Hθ Hθη.
-destruct (angle_le_dec (θ₀ - θ) angle_straight) as [Htts| Htts]. {
-  now apply Hd.
+destruct dir. {
+  apply Hd; try easy.
+  destruct (angle_le_dec (θ₀ - θ) angle_straight) as [Htts| Htts]; [ easy | ].
+  exfalso.
+  apply Htts; clear Htts.
+  progress unfold angle_lt in Hθ.
+  eapply angle_le_trans; [ | apply Hts ].
+  now apply angle_lt_angle_le_straight_angle_sub_le.
+} {
+  apply Hd; try easy.
+  destruct (angle_le_dec (θ - θ₀) angle_straight) as [Htts| Htts]; [ easy | ].
+  exfalso.
+  apply Htts; clear Htts.
+  now apply angle_straight_le_lt_sub_le_straight.
 }
-exfalso.
-apply Htts; clear Htts.
-progress unfold angle_lt in Hθ.
-eapply angle_le_trans; [ | apply Hts ].
-now apply angle_lt_angle_le_straight_angle_sub_le.
-Qed.
-
-Theorem angle_le_straight_is_limit_if' :
-  ∀ f f' θ₀,
-  (angle_straight ≤ θ₀)%A
-  → is_limit_when_tending_to_neighbourhood (λ a b, angle_lt_for_deriv b a)
-      angle_eucl_dist rngl_dist f θ₀ (f' θ₀)
-  → is_limit_when_tending_to_neighbourhood (λ a b, angle_lt b a)
-      angle_eucl_dist rngl_dist f θ₀ (f' θ₀).
-Proof.
-intros * Hts Hd.
-intros ε Hε.
-specialize (Hd ε Hε).
-destruct Hd as (η & Hη & Hd).
-exists η.
-split; [ easy | ].
-intros θ Hθ Hθη.
-destruct (angle_le_dec (θ - θ₀) angle_straight) as [Htts| Htts]. {
-  now apply Hd.
-}
-exfalso.
-apply Htts; clear Htts.
-now apply angle_straight_le_lt_sub_le_straight.
 Qed.
 
 Theorem angle_le_straight_left_derivative_if :
   ∀ f f' θ₀,
   (θ₀ ≤ angle_straight)%A
-  → left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
-  → left_derivative_at angle_lt angle_eucl_dist rngl_dist f f' θ₀.
+  → left_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
+  → left_derivative_at' angle_lt angle_eucl_dist rngl_dist f f' θ₀.
 Proof.
 intros * Hts Hd.
 now apply angle_le_straight_is_limit_if.
@@ -611,17 +627,17 @@ Qed.
 Theorem angle_le_straight_right_derivative_if :
   ∀ f f' θ₀,
   (angle_straight ≤ θ₀)%A
-  → right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
-  → right_derivative_at angle_lt angle_eucl_dist rngl_dist f f' θ₀.
+  → right_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
+  → right_derivative_at' angle_lt angle_eucl_dist rngl_dist f f' θ₀.
 Proof.
 intros * Hts Hd.
-now apply angle_le_straight_is_limit_if'.
+now apply angle_le_straight_is_limit_if.
 Qed.
 
 (* *)
 
 Theorem rngl_cos_left_derivative_at_straight :
-  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  left_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_cos (λ θ : angle T, (- rngl_sin θ)%L) angle_straight.
 Proof.
 destruct_ac.
@@ -677,7 +693,7 @@ apply angle_add_div_2_diag.
 Qed.
 
 Theorem rngl_cos_right_derivative_at_0 :
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  right_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_cos (λ θ : angle T, (- rngl_sin θ)%L) 0%A.
 Proof.
 destruct_ac.
@@ -724,7 +740,7 @@ apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
 
 Theorem rngl_cos_right_derivative_at_straight :
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_cos
+  right_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_cos
     (λ θ : angle T, (- rngl_sin θ)%L) angle_straight.
 Proof.
 destruct_ac.
@@ -912,7 +928,7 @@ easy.
 Qed.
 
 Theorem rngl_sin_left_derivative_at_straight :
-  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
+  left_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
     rngl_cos angle_straight.
 Proof.
 destruct_ac.
@@ -1087,7 +1103,7 @@ apply angle_eucl_dist_nonneg.
 Qed.
 
 Theorem rngl_sin_right_derivative_at_0 :
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
+  right_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
     rngl_cos 0%A.
 Proof.
 destruct_ac.
@@ -1171,7 +1187,7 @@ apply angle_eucl_dist_nonneg.
 Qed.
 
 Theorem rngl_sin_right_derivative_at_straight :
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
+  right_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
     rngl_cos angle_straight.
 Proof.
 destruct_ac.
@@ -1257,7 +1273,7 @@ Qed.
 
 Theorem rngl_sin_right_derivative :
   ∀ θ₀,
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  right_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_sin rngl_cos θ₀.
 Proof.
 destruct_ac.
@@ -1361,7 +1377,7 @@ Qed.
 
 Theorem rngl_sin_left_derivative :
   ∀ θ₀,
-  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  left_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_sin rngl_cos θ₀.
 Proof.
 destruct_ac.
@@ -1474,7 +1490,7 @@ Qed.
 
 Theorem rngl_cos_right_derivative :
   ∀ θ₀,
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  right_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_cos (λ θ, (- rngl_sin θ)%L) θ₀.
 Proof.
 destruct_ac.
@@ -1584,7 +1600,7 @@ Qed.
 
 Theorem rngl_cos_left_derivative :
   ∀ θ₀,
-  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  left_derivative_at' angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_cos (λ θ, (- rngl_sin θ)%L) θ₀.
 Proof.
 destruct_ac.
@@ -1704,7 +1720,7 @@ Qed.
 (* *)
 
 Theorem rngl_cos_derivative :
-  is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
+  is_derivative' angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_cos (λ θ, (- rngl_sin θ)%L).
 Proof.
 intros θ₀.
@@ -1714,7 +1730,7 @@ apply rngl_cos_right_derivative.
 Qed.
 
 Theorem rngl_sin_derivative :
-  is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
+  is_derivative' angle_lt_for_deriv angle_eucl_dist rngl_dist
     rngl_sin rngl_cos.
 Proof.
 intros θ₀.
