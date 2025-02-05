@@ -2466,6 +2466,13 @@ intros H; subst θ3.
 now apply angle_nle_gt in H23.
 Qed.
 
+Theorem angle_lt_trans : ∀ θ1 θ2 θ3, (θ1 < θ2 → θ2 < θ3 → θ1 < θ3)%A.
+Proof.
+intros * H12 H23.
+apply (angle_le_lt_trans _ θ2); [ | easy ].
+now apply angle_lt_le_incl in H12.
+Qed.
+
 Theorem angle_le_dec :
   ∀ θ1 θ2 : angle T, {(θ1 ≤ θ2)%A} + {¬ (θ1 ≤ θ2)%A}.
 Proof.
