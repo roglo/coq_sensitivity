@@ -604,9 +604,14 @@ Qed.
 
 (* *)
 
+Definition comp_rngl_angle {A} (f : T → T) (g : A → T) x := f (g x).
+Notation "a '°' b" := (comp_rngl_angle a b) (at level 40, left associativity).
+
+(* *)
+
 Theorem rngl_cos_left_derivative_at_straight :
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
-    rngl_cos (λ θ : angle T, (- rngl_sin θ)%L) angle_straight.
+    rngl_cos (rngl_opp ° rngl_sin) angle_straight.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -622,6 +627,8 @@ exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
 rewrite <- (rngl_opp_add_distr Hop).
+progress unfold "°".
+cbn.
 rewrite (rngl_opp_0 Hop).
 rewrite rngl_cos_angle_eucl_dist_straight_r.
 rewrite (rngl_sub_add Hop).
@@ -662,7 +669,7 @@ Qed.
 
 Theorem rngl_cos_right_derivative_at_0 :
   right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
-    rngl_cos (λ θ : angle T, (- rngl_sin θ)%L) 0%A.
+    rngl_cos (rngl_opp ° rngl_sin) 0%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -674,6 +681,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 intros ε Hε; cbn.
+progress unfold "°".
+cbn.
 rewrite (rngl_opp_0 Hop).
 exists ε.
 split; [ easy | ].
@@ -709,7 +718,7 @@ Qed.
 
 Theorem rngl_cos_right_derivative_at_straight :
   right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_cos
-    (λ θ : angle T, (- rngl_sin θ)%L) angle_straight.
+    (rngl_opp ° rngl_sin) angle_straight.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -725,6 +734,8 @@ exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
 rewrite (rngl_sub_opp_r Hop).
+progress unfold "°".
+cbn.
 rewrite (rngl_opp_0 Hop).
 rewrite rngl_cos_angle_eucl_dist_straight_r.
 rewrite (rngl_sub_add Hop).
@@ -1459,7 +1470,7 @@ Qed.
 Theorem rngl_cos_right_derivative :
   ∀ θ₀,
   right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
-    rngl_cos (λ θ, (- rngl_sin θ)%L) θ₀.
+    rngl_cos (rngl_opp ° rngl_sin) θ₀.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1509,6 +1520,7 @@ destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
 progress unfold rngl_dist.
+progress unfold "°".
 rewrite (rngl_sub_opp_r Hop).
 rewrite rngl_cos_sub_cos.
 rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
@@ -1569,7 +1581,7 @@ Qed.
 Theorem rngl_cos_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
-    rngl_cos (λ θ, (- rngl_sin θ)%L) θ₀.
+    rngl_cos (rngl_opp ° rngl_sin) θ₀.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1627,6 +1639,7 @@ destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
 progress unfold rngl_dist.
+progress unfold "°".
 rewrite (rngl_sub_opp_r Hop).
 rewrite rngl_cos_sub_cos.
 rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
@@ -1689,7 +1702,7 @@ Qed.
 
 Theorem rngl_cos_derivative :
   is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
-    rngl_cos (λ θ, (- rngl_sin θ)%L).
+    rngl_cos (rngl_opp ° rngl_sin)%L.
 Proof.
 intros θ₀.
 split.
