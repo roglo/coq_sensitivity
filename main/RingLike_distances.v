@@ -86,21 +86,15 @@ Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
    → da x x₀ < η
    → db (f x) L < ε)%L.
 
-Definition is_left_limit_when_tending_to_neighbourhood {A B} :=
-  @is_limit_when_tending_to_neighbourhood true A B.
-
-Definition is_right_limit_when_tending_to_neighbourhood {A B} :=
-  @is_limit_when_tending_to_neighbourhood false A B.
-
 Definition left_derivative_at {A} lt (da : A → A → T) (db : T → T → T)
     f f' a :=
   let g x := ((f a - f x) / da x a)%L in
-  is_left_limit_when_tending_to_neighbourhood lt da db g a (f' a).
+  is_limit_when_tending_to_neighbourhood true lt da db g a (f' a).
 
 Definition right_derivative_at {A} lt (da : A → A → T) (db : T → T → T)
     f f' a :=
   let g x := ((f x - f a) / da x a)%L in
-  is_right_limit_when_tending_to_neighbourhood lt da db g a (f' a).
+  is_limit_when_tending_to_neighbourhood false lt da db g a (f' a).
 
 Definition is_derivative {A} lt (da : A → A → T) (db : T → T → T) f f' :=
   ∀ a,
