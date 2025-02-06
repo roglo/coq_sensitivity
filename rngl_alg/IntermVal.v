@@ -940,7 +940,8 @@ assert (Hl : (rngl_is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
 assert (Hlab : lima = limb). {
   generalize Hbl; intros Hblv.
   apply (limit_opp Hop Hor) in Hbl.
-  specialize (limit_add Hon Hop Hiv Hor) as H1.
+  specialize (limit_add Hon Hop Hiv Hor rngl_dist) as H1.
+  specialize (H1 (rngl_dist_add_add_le Hop Hor)).
   specialize (H1 _ _ _ _ Hal Hbl).
   rewrite (rngl_add_opp_r Hop) in H1.
   eapply gen_limit_ext_in in H1. 2: {

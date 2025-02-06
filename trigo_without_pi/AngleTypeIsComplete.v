@@ -462,7 +462,9 @@ assert (Hcs1 : (c² + s² = 1)%L). {
   generalize Hs; intros H2.
   apply (rngl_limit_limit_squ Hon Hop Hic Hiv Hor) in H1.
   apply (rngl_limit_limit_squ Hon Hop Hic Hiv Hor) in H2.
-  specialize (limit_add Hon Hop Hiv Hor _ _ _ _ H1 H2) as H.
+  specialize (limit_add Hon Hop Hiv Hor rngl_dist) as H.
+  specialize (H (rngl_dist_add_add_le Hop Hor)).
+  specialize (H _ _ _ _ H1 H2).
   cbn in H.
   eapply (is_limit_when_tending_to_inf_eq_compat _ _ 0 0) in H. 2: {
     intros i.

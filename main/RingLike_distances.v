@@ -303,12 +303,13 @@ Theorem limit_add :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ u v limu limv,
-  rngl_is_limit_when_tending_to_inf u limu
-  → rngl_is_limit_when_tending_to_inf v limv
-  → rngl_is_limit_when_tending_to_inf (λ n, (u n + v n))%L (limu + limv)%L.
+  ∀ dist, (∀ a b c d, (dist (a + b) (c + d) ≤ dist a c + dist b d)%L)
+  → ∀ u v limu limv,
+  is_limit_when_tending_to_inf dist u limu
+  → is_limit_when_tending_to_inf dist v limv
+  → is_limit_when_tending_to_inf dist (λ n, (u n + v n))%L (limu + limv)%L.
 Proof.
-intros Hon Hop Hiv Hor * Hu Hv ε Hε.
+intros Hon Hop Hiv Hor * Hd * Hu Hv ε Hε.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -333,18 +334,33 @@ apply Nat.max_lub_iff in H.
 destruct H as (Hnun, Hnvn).
 specialize (Hun _ Hnun).
 specialize (Hvn _ Hnvn).
+apply (rngl_lt_le_trans Hor _ (ε / 2 + ε / 2)%L). 2: {
+  rewrite <- (rngl_mul_2_r Hon).
+  rewrite (rngl_div_mul Hon Hiv). 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_le_refl Hor).
+}
+eapply (rngl_le_lt_trans Hor). 2: {
+  apply (rngl_add_lt_compat Hop Hor); [ apply Hun | apply Hvn ].
+}
+apply Hd.
+Qed.
+
+Theorem rngl_dist_add_add_le :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c d,
+ (rngl_dist (a + b) (c + d) ≤ rngl_dist a c + rngl_dist b d)%L.
+Proof.
+intros Hop Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
 progress unfold rngl_dist.
 rewrite (rngl_sub_add_distr Hos).
 rewrite (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
-eapply (rngl_le_lt_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
-apply (rngl_lt_le_trans Hor _ (ε / 2 + ε / 2)%L). {
-  now apply (rngl_add_lt_compat Hop Hor).
-}
-rewrite <- (rngl_mul_2_r Hon).
-rewrite (rngl_div_mul Hon Hiv).
-apply (rngl_le_refl Hor).
-apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+apply (rngl_abs_triangle Hop Hor).
 Qed.
 
 End a.
