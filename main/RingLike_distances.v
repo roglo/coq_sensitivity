@@ -161,11 +161,8 @@ split. {
   specialize (Hlim H); clear H.
   destruct Hlim as (N, HN).
   specialize (HN N (Nat.le_refl _)).
-  specialize (Hi N).
-  specialize (is_dist_triangular _ (rngl_dist_is_dist Hop Hor)) as H1.
-  specialize (H1 (u N) a c).
+  specialize (Hi N) as H.
   progress unfold rngl_dist in HN.
-  progress unfold rngl_dist in H1.
   rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
     apply (rngl_le_0_sub Hop Hor).
     apply (rngl_le_trans Hor _ a); [ | apply Hi ].
@@ -182,10 +179,7 @@ split. {
   destruct Hlim as (N, HN).
   specialize (HN N (Nat.le_refl _)).
   specialize (Hi N).
-  specialize (is_dist_triangular _ (rngl_dist_is_dist Hop Hor)) as H1.
-  specialize (H1 (u N) b c).
   progress unfold rngl_dist in HN.
-  progress unfold rngl_dist in H1.
   rewrite (rngl_abs_nonpos_eq Hop Hor) in HN. 2: {
     apply (rngl_le_sub_0 Hop Hor).
     apply (rngl_le_trans Hor _ b); [ apply Hi | ].
