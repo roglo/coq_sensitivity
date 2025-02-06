@@ -23,6 +23,12 @@ Record is_dist {A} (dist : A → A → T) :=
     is_dist_separation : ∀ a b, dist a b = 0%L ↔ a = b;
     is_dist_triangular : ∀ a b c, (dist a c ≤ dist a b + dist b c)%L }.
 
+Class distance A :=
+  { d_dist : A → A → T;
+    d_prop : is_dist d_dist }.
+
+Arguments d_dist {A distance} a b.
+
 Definition rngl_dist a b := rngl_abs (a - b)%L.
 
 Theorem rngl_dist_is_dist :
@@ -54,6 +60,9 @@ split. {
 }
 Qed.
 
+Definition rngl_distance Hop Hor :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
+
 (* limits *)
 
 Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
@@ -79,24 +88,24 @@ Definition continuous {A B} da db (f : A → B) :=
   ∀ a, continuous_at da db f a.
 
 Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
-  da db (f : A → B) (x₀ : A) (L : B) :=
+  (da : distance A) (db : distance B) (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε : T, 0 < ε →
    ∃ η : T, (0 < η)%L ∧ ∀ x : A,
    (if is_left then lt x x₀ else lt x₀ x)
-   → da x x₀ < η
-   → db (f x) L < ε)%L.
+   → d_dist x x₀ < η
+   → d_dist (f x) L < ε)%L.
 
-Definition left_derivative_at {A} lt (da : A → A → T) (db : T → T → T)
+Definition left_derivative_at {A} lt (da : distance A) (db : distance T)
     f f' a :=
-  let g x := ((f a - f x) / da x a)%L in
+  let g x := ((f a - f x) / d_dist x a)%L in
   is_limit_when_tending_to_neighbourhood true lt da db g a (f' a).
 
-Definition right_derivative_at {A} lt (da : A → A → T) (db : T → T → T)
+Definition right_derivative_at {A} lt (da : distance A) (db : distance T)
     f f' a :=
-  let g x := ((f x - f a) / da x a)%L in
+  let g x := ((f x - f a) / d_dist x a)%L in
   is_limit_when_tending_to_neighbourhood false lt da db g a (f' a).
 
-Definition is_derivative {A} lt (da : A → A → T) (db : T → T → T) f f' :=
+Definition is_derivative {A} lt (da : distance A) (db : distance T) f f' :=
   ∀ a,
   left_derivative_at lt da db f f' a ∧
   right_derivative_at lt da db f f' a.
@@ -112,8 +121,8 @@ Definition rngl_is_limit_when_tending_to :=
 Definition rngl_is_limit_when_tending_to_inf :=
   is_limit_when_tending_to_inf rngl_dist.
 
-Definition rngl_is_derivative :=
-  is_derivative rngl_lt rngl_dist.
+Definition rngl_is_derivative Hop Hor :=
+  is_derivative rngl_lt (rngl_distance Hop Hor).
 
 Definition rngl_is_complete :=
   is_complete T rngl_dist.

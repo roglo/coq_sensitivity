@@ -540,6 +540,9 @@ now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
+Definition angle_eucl_distance :=
+  {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
+
 (* *)
 
 Definition angle_lt_for_deriv θ1 θ2 :=
@@ -555,9 +558,9 @@ Theorem angle_le_straight_is_limit_if :
   ∀ (is_left : bool) f f' θ₀,
   (if is_left then θ₀ ≤ angle_straight else angle_straight ≤ θ₀)%A
   → is_limit_when_tending_to_neighbourhood is_left angle_lt_for_deriv
-      angle_eucl_dist rngl_dist f θ₀ (f' θ₀)
+      angle_eucl_distance (rngl_distance ac_op ac_or) f θ₀ (f' θ₀)
   → is_limit_when_tending_to_neighbourhood is_left angle_lt
-      angle_eucl_dist rngl_dist f θ₀ (f' θ₀).
+      angle_eucl_distance (rngl_distance ac_op ac_or) f θ₀ (f' θ₀).
 Proof.
 destruct_ac.
 intros * Hts Hd.
@@ -587,8 +590,10 @@ Qed.
 Theorem angle_le_straight_left_derivative_if :
   ∀ f f' θ₀,
   (θ₀ ≤ angle_straight)%A
-  → left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
-  → left_derivative_at angle_lt angle_eucl_dist rngl_dist f f' θ₀.
+  → left_derivative_at angle_lt_for_deriv
+       angle_eucl_distance (rngl_distance ac_op ac_or) f f' θ₀
+  → left_derivative_at angle_lt
+       angle_eucl_distance (rngl_distance ac_op ac_or) f f' θ₀.
 Proof.
 intros * Hts Hd.
 now apply angle_le_straight_is_limit_if.
@@ -597,8 +602,10 @@ Qed.
 Theorem angle_le_straight_right_derivative_if :
   ∀ f f' θ₀,
   (angle_straight ≤ θ₀)%A
-  → right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist f f' θ₀
-  → right_derivative_at angle_lt angle_eucl_dist rngl_dist f f' θ₀.
+  → right_derivative_at angle_lt_for_deriv
+       angle_eucl_distance (rngl_distance ac_op ac_or) f f' θ₀
+  → right_derivative_at angle_lt
+       angle_eucl_distance (rngl_distance ac_op ac_or) f f' θ₀.
 Proof.
 intros * Hts Hd.
 now apply angle_le_straight_is_limit_if.
@@ -607,7 +614,8 @@ Qed.
 (* *)
 
 Theorem rngl_cos_left_derivative_at_straight :
-  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  left_derivative_at angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
     rngl_cos (rngl_opp ° rngl_sin) angle_straight.
 Proof.
 destruct_ac.
@@ -665,7 +673,8 @@ apply angle_add_div_2_diag.
 Qed.
 
 Theorem rngl_cos_right_derivative_at_0 :
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  right_derivative_at angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
     rngl_cos (rngl_opp ° rngl_sin) 0%A.
 Proof.
 destruct_ac.
@@ -714,8 +723,9 @@ apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
 
 Theorem rngl_cos_right_derivative_at_straight :
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_cos
-    (rngl_opp ° rngl_sin) angle_straight.
+  right_derivative_at angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
+    rngl_cos (rngl_opp ° rngl_sin) angle_straight.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -904,8 +914,9 @@ easy.
 Qed.
 
 Theorem rngl_sin_left_derivative_at_straight :
-  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
-    rngl_cos angle_straight.
+  left_derivative_at angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
+    rngl_sin rngl_cos angle_straight.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1079,8 +1090,9 @@ apply angle_eucl_dist_nonneg.
 Qed.
 
 Theorem rngl_sin_right_derivative_at_0 :
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
-    rngl_cos 0%A.
+  right_derivative_at angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
+    rngl_sin rngl_cos 0%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1163,8 +1175,9 @@ apply angle_eucl_dist_nonneg.
 Qed.
 
 Theorem rngl_sin_right_derivative_at_straight :
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist rngl_sin
-    rngl_cos angle_straight.
+  right_derivative_at angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
+    rngl_sin rngl_cos angle_straight.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1249,7 +1262,8 @@ Qed.
 
 Theorem rngl_sin_right_derivative :
   ∀ θ₀,
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  right_derivative_at angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
     rngl_sin rngl_cos θ₀.
 Proof.
 destruct_ac.
@@ -1299,6 +1313,7 @@ apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
+cbn.
 progress unfold rngl_dist.
 rewrite rngl_sin_sub_sin.
 rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
@@ -1337,6 +1352,7 @@ apply Hcc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hcc H4.
 rewrite angle_eucl_dist_move_0_r.
+cbn.
 rewrite (angle_eucl_dist_move_0_r θ).
 rewrite angle_add_sub_swap.
 rewrite <- angle_sub_sub_distr.
@@ -1353,7 +1369,8 @@ Qed.
 
 Theorem rngl_sin_left_derivative :
   ∀ θ₀,
-  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  left_derivative_at angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
     rngl_sin rngl_cos θ₀.
 Proof.
 destruct_ac.
@@ -1411,6 +1428,7 @@ apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
+cbn.
 progress unfold rngl_dist.
 rewrite rngl_sin_sub_sin.
 rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
@@ -1449,6 +1467,7 @@ replace (rngl_abs _) with
 apply Hcc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hcc H4.
+cbn.
 do 2 rewrite (angle_eucl_dist_symmetry _ θ₀).
 rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_eucl_dist_move_0_r θ₀).
@@ -1466,7 +1485,8 @@ Qed.
 
 Theorem rngl_cos_right_derivative :
   ∀ θ₀,
-  right_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  right_derivative_at angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
     rngl_cos (rngl_opp ° rngl_sin) θ₀.
 Proof.
 destruct_ac.
@@ -1516,6 +1536,7 @@ apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
+cbn.
 progress unfold rngl_dist.
 progress unfold "°".
 rewrite (rngl_sub_opp_r Hop).
@@ -1561,6 +1582,7 @@ apply Hsc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hsc H4.
 rewrite angle_eucl_dist_move_0_r.
+cbn.
 rewrite (angle_eucl_dist_move_0_r θ).
 rewrite angle_add_sub_swap.
 rewrite <- angle_sub_sub_distr.
@@ -1577,7 +1599,8 @@ Qed.
 
 Theorem rngl_cos_left_derivative :
   ∀ θ₀,
-  left_derivative_at angle_lt_for_deriv angle_eucl_dist rngl_dist
+  left_derivative_at angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
     rngl_cos (rngl_opp ° rngl_sin) θ₀.
 Proof.
 destruct_ac.
@@ -1635,6 +1658,7 @@ apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
+cbn.
 progress unfold rngl_dist.
 progress unfold "°".
 rewrite (rngl_sub_opp_r Hop).
@@ -1680,6 +1704,7 @@ replace (rngl_abs _) with
 apply Hsc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hsc H4.
+cbn.
 do 2 rewrite (angle_eucl_dist_symmetry _ θ₀).
 rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_eucl_dist_move_0_r θ₀).
@@ -1698,7 +1723,8 @@ Qed.
 (* *)
 
 Theorem rngl_cos_derivative :
-  is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
+  is_derivative angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
     rngl_cos (rngl_opp ° rngl_sin)%L.
 Proof.
 intros θ₀.
@@ -1708,7 +1734,8 @@ apply rngl_cos_right_derivative.
 Qed.
 
 Theorem rngl_sin_derivative :
-  is_derivative angle_lt_for_deriv angle_eucl_dist rngl_dist
+  is_derivative angle_lt_for_deriv
+    angle_eucl_distance (rngl_distance ac_op ac_or)
     rngl_sin rngl_cos.
 Proof.
 intros θ₀.
