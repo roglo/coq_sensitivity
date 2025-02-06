@@ -505,7 +505,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hε.
 specialize rngl_cos_angle_div_2_pow_tending_to_1 as H1.
 specialize (H1 Hc1 Har θ).
-progress unfold rngl_is_limit_when_tending_to_inf in H1.
 progress unfold is_limit_when_tending_to_inf in H1.
 progress unfold rngl_dist in H1.
 specialize (H1 (ε² / 2))%L.

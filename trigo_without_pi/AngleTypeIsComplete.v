@@ -383,7 +383,7 @@ Theorem limit_const :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ c lim,
-  rngl_is_limit_when_tending_to_inf (λ _, c) lim
+  is_limit_when_tending_to_inf rngl_dist (λ _, c) lim
   → lim = c.
 Proof.
 intros Hop Hor * Hlim.

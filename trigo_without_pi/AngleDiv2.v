@@ -1267,7 +1267,7 @@ Qed.
 Theorem rngl_cos_angle_div_2_pow_tending_to_1 :
   rngl_characteristic T ≠ 1 →
   rngl_is_archimedean T = true →
-  ∀ θ, rngl_is_limit_when_tending_to_inf (λ i, rngl_cos (θ /₂^i)) 1%L.
+  ∀ θ, is_limit_when_tending_to_inf rngl_dist (λ i, rngl_cos (θ /₂^i)) 1%L.
 Proof.
 intros Hc1 Har.
 destruct_ac.

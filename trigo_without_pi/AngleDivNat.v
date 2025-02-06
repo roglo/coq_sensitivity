@@ -600,7 +600,7 @@ Qed.
 Theorem angle_div_nat_prop :
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
-  rngl_is_complete T →
+  is_complete T rngl_dist →
   ∀ θ n θ',
   angle_div_nat θ n θ'
   → (n = 0 ∧ θ' = 0%A) ∨ (n * θ')%A = θ.
@@ -769,7 +769,7 @@ Qed.
 Theorem exists_angle_div_nat :
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
-  rngl_is_complete T →
+  is_complete T rngl_dist →
   ∀ θ n,
   n ≠ 0
   → ∃ θ', (n * θ')%A = θ.

@@ -64,6 +64,7 @@ Definition rngl_distance Hop Hor :=
   {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
 
 (* limits *)
+(* perhaps could be moved to Misc.v? *)
 
 Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
   ∀ ε : T, (0 < ε)%L →
@@ -109,26 +110,6 @@ Definition is_derivative {A} lt (da : distance A) (db : distance T) f f' :=
   ∀ a,
   left_derivative_at lt da db f f' a ∧
   right_derivative_at lt da db f f' a.
-
-(* limit with ring-like distance *)
-
-Definition rngl_is_Cauchy_sequence :=
-  is_Cauchy_sequence rngl_dist.
-
-Definition rngl_is_limit_when_tending_to :=
-  is_limit_when_tending_to rngl_dist rngl_dist.
-
-Definition rngl_is_limit_when_tending_to_inf :=
-  is_limit_when_tending_to_inf rngl_dist.
-
-Definition rngl_is_complete :=
-  is_complete T rngl_dist.
-
-Definition rngl_continuous_at :=
-  continuous_at rngl_dist rngl_dist.
-
-Definition rngl_continuous :=
-  continuous rngl_dist rngl_dist.
 
 (* properties of distances and limits *)
 
@@ -366,4 +347,6 @@ Qed.
 End a.
 
 Arguments rngl_dist {T ro} (a b)%_L.
+(*
 Arguments rngl_is_complete T {ro}.
+*)
