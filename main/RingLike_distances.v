@@ -335,11 +335,8 @@ specialize (Hun _ Hnun).
 specialize (Hvn _ Hnvn).
 progress unfold rngl_dist.
 rewrite (rngl_sub_add_distr Hos).
-progress unfold rngl_sub.
-rewrite Hop.
-rewrite <- rngl_add_assoc.
-rewrite rngl_add_add_add_swap.
-do 2 rewrite (rngl_add_opp_r Hop).
+rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_assoc Hop).
 eapply (rngl_le_lt_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
 apply (rngl_lt_le_trans Hor _ (ε / 2 + ε / 2)%L). {
   now apply (rngl_add_lt_compat Hop Hor).
