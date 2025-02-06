@@ -121,9 +121,6 @@ Definition rngl_is_limit_when_tending_to :=
 Definition rngl_is_limit_when_tending_to_inf :=
   is_limit_when_tending_to_inf rngl_dist.
 
-Definition rngl_is_derivative Hop Hor :=
-  is_derivative rngl_lt (rngl_distance Hop Hor).
-
 Definition rngl_is_complete :=
   is_complete T rngl_dist.
 
