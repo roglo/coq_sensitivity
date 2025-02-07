@@ -769,7 +769,7 @@ Qed.
 Theorem dist_diag : ∀ A dist (a : A), is_dist dist → dist a a = 0%L.
 Proof.
 intros * Hd.
-now apply (is_dist_separation dist Hd).
+now apply (dist_separation dist Hd).
 Qed.
 
 Theorem rngl_squ_lt_squ_nonneg :

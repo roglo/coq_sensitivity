@@ -19,9 +19,9 @@ Context {rp : ring_like_prop T}.
 (* distances *)
 
 Record is_dist {A} (dist : A → A → T) :=
-  { is_dist_symmetry : ∀ a b, dist a b = dist b a;
-    is_dist_separation : ∀ a b, dist a b = 0%L ↔ a = b;
-    is_dist_triangular : ∀ a b c, (dist a c ≤ dist a b + dist b c)%L }.
+  { dist_symmetry : ∀ a b, dist a b = dist b a;
+    dist_separation : ∀ a b, dist a b = 0%L ↔ a = b;
+    dist_triangular : ∀ a b c, (dist a c ≤ dist a b + dist b c)%L }.
 
 Class distance A :=
   { d_dist : A → A → T;
@@ -168,7 +168,7 @@ split. {
     apply (rngl_lt_iff Hor).
     split; [ apply (dist_nonneg Hon Hop Hiv Hor _ _ d_prop) | ].
     intros H; symmetry in H.
-    apply -> (is_dist_separation _ d_prop) in H.
+    apply -> (dist_separation _ d_prop) in H.
     subst c.
     now apply (rngl_lt_irrefl Hor) in Hca.
   }
@@ -178,7 +178,7 @@ split. {
   specialize (Hi N) as H.
   apply rngl_nle_gt in HN.
   apply HN; clear HN.
-  do 2 rewrite (is_dist_symmetry _ d_prop _ c).
+  do 2 rewrite (dist_symmetry _ d_prop _ c).
   apply mono_1.
   split; [ | easy ].
   now apply (rngl_lt_le_incl Hor).
@@ -190,7 +190,7 @@ split. {
     apply (rngl_lt_iff Hor).
     split; [ apply (dist_nonneg Hon Hop Hiv Hor _ _ d_prop) | ].
     intros H; symmetry in H.
-    apply -> (is_dist_separation _ d_prop) in H.
+    apply -> (dist_separation _ d_prop) in H.
     subst c.
     now apply (rngl_lt_irrefl Hor) in Hbc.
   }
