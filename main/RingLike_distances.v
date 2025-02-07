@@ -162,14 +162,15 @@ split. {
   destruct Hlim as (N, HN).
   specialize (HN N (Nat.le_refl _)).
   specialize (Hi N) as H.
-  progress unfold rngl_dist in HN.
-  rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
+  apply rngl_nle_gt in HN.
+  apply HN; clear HN.
+  progress unfold rngl_dist.
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     apply (rngl_le_0_sub Hop Hor).
     apply (rngl_le_trans Hor _ a); [ | apply Hi ].
     now apply (rngl_lt_le_incl Hor) in Hca.
   }
-  apply (rngl_sub_lt_mono_r Hop Hor) in HN.
-  now apply rngl_nle_gt in HN.
+  now apply (rngl_sub_le_mono_r Hop Hor).
 } {
   apply (rngl_nlt_ge_iff Hor).
   intros Hbc.
@@ -179,15 +180,16 @@ split. {
   destruct Hlim as (N, HN).
   specialize (HN N (Nat.le_refl _)).
   specialize (Hi N).
-  progress unfold rngl_dist in HN.
-  rewrite (rngl_abs_nonpos_eq Hop Hor) in HN. 2: {
+  apply rngl_nle_gt in HN.
+  apply HN; clear HN.
+  progress unfold rngl_dist.
+  rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
     apply (rngl_le_sub_0 Hop Hor).
     apply (rngl_le_trans Hor _ b); [ apply Hi | ].
     now apply (rngl_lt_le_incl Hor) in Hbc.
   }
-  rewrite (rngl_opp_sub_distr Hop) in HN.
-  apply (rngl_sub_lt_mono_l Hop Hor) in HN.
-  now apply rngl_nle_gt in HN.
+  rewrite (rngl_opp_sub_distr Hop).
+  now apply (rngl_sub_le_mono_l Hop Hor).
 }
 Qed.
 
