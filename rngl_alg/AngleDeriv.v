@@ -933,7 +933,7 @@ destruct_ac.
 intros a ε Hε.
 exists ε.
 split; [ easy | ].
-intros x Hxa.
+intros x _ Hxa.
 cbn.
 progress unfold rngl_dist.
 eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
@@ -956,7 +956,7 @@ destruct_ac.
 intros a ε Hε.
 exists ε.
 split; [ easy | ].
-intros x Hxa.
+intros x _ Hxa.
 cbn.
 progress unfold rngl_dist.
 eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
@@ -1348,7 +1348,7 @@ progress replace (rngl_abs _) with
   }
   now rewrite angle_add_0_r.
 }
-apply Hcc.
+apply (Hcc _ I).
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hcc H4.
 cbn.
@@ -1464,7 +1464,7 @@ replace (rngl_abs _) with
   }
   now rewrite angle_add_0_r.
 }
-apply Hcc.
+apply (Hcc _ I).
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hcc H4.
 cbn.
@@ -1577,7 +1577,7 @@ replace (rngl_abs _) with
   }
   now rewrite angle_add_0_r.
 }
-apply Hsc.
+apply (Hsc _ I).
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hsc H4.
 cbn.
@@ -1700,7 +1700,7 @@ replace (rngl_abs _) with
   }
   now rewrite angle_add_0_r.
 }
-apply Hsc.
+apply (Hsc _ I).
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hsc H4.
 cbn.

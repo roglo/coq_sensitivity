@@ -1116,7 +1116,7 @@ assert (Hfu : ∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
     eapply (rngl_lt_le_trans Hor); [ apply Hx | ].
     apply (rngl_le_min_l Hor).
   }
-  specialize (H2 _ H); clear H.
+  specialize (H2 _ I H); clear H.
   destruct (rngl_le_dec Hor (f x) (f a)) as [Hfxa| Hfxa]. {
     cbn in H2.
     progress unfold rngl_dist in H2.
@@ -1211,7 +1211,7 @@ assert (Hfu : ∀ x, (rngl_max a (b - η) < x ≤ b → u < f x)%L). {
     eapply (rngl_le_lt_trans Hor); [ | apply Hx ].
     apply (rngl_le_max_r Hor).
   }
-  specialize (H2 _ H); clear H.
+  specialize (H2 _ I H); clear H.
   destruct (rngl_le_dec Hor (f x) (f b)) as [Hfxb| Hfxb]. {
     cbn in H2.
     progress unfold rngl_dist in H2.
@@ -1390,7 +1390,7 @@ assert
   }
   split. {
     intros x Hx.
-    apply Hη1.
+    apply (Hη1 _ I).
     eapply (rngl_lt_le_trans Hor); [ apply Hx | ].
     apply (rngl_le_min_l Hor).
   }
@@ -1592,8 +1592,8 @@ assert (H : continuous rngl_distance rngl_distance (λ x, (- f x))%L). {
   destruct (Hfc x ε Hε) as (η & Hzη & Hη).
   exists η.
   split; [ easy | ].
-  intros y Hy.
-  specialize (Hη y Hy).
+  intros y _ Hy.
+  specialize (Hη y I Hy).
   cbn.
   progress unfold rngl_dist.
   rewrite <- (rngl_abs_opp Hop Hor).

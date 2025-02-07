@@ -73,17 +73,6 @@ Definition is_complete A (dist : A → A → T) :=
   ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
 
-Definition is_limit_when_tending_to {A B} (da : distance A) (db : distance B)
-    (f : A → B) (x₀ : A) (L : B) :=
-  (∀ ε, 0 < ε → ∃ η, 0 < η ∧
-   ∀ x : A, d_dist x x₀ < η → d_dist (f x) L < ε)%L.
-
-Definition continuous_at {A B} da db (f : A → B) a :=
-  is_limit_when_tending_to da db f a (f a).
-
-Definition continuous {A B} da db (f : A → B) :=
-  ∀ a, continuous_at da db f a.
-
 Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
   (da : distance A) (db : distance B) (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε : T, 0 < ε →
@@ -91,6 +80,19 @@ Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
    (if is_left then lt x x₀ else lt x₀ x)
    → d_dist x x₀ < η
    → d_dist (f x) L < ε)%L.
+
+Definition is_limit_when_tending_to {A B} da db f (x₀ : A) (L : B) :=
+  is_limit_when_tending_to_neighbourhood true (λ _ _, True) da db f x₀ L.
+
+(* continuity *)
+
+Definition continuous_at {A B} da db (f : A → B) a :=
+  is_limit_when_tending_to da db f a (f a).
+
+Definition continuous {A B} da db (f : A → B) :=
+  ∀ a, continuous_at da db f a.
+
+(* derivability *)
 
 Definition left_derivative_at {A} lt (da : distance A) (db : distance T)
     f f' a :=
