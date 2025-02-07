@@ -66,17 +66,17 @@ Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
   ∀ ε : T, (0 < ε)%L →
   ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (dist (u p) (u q) < ε)%L.
 
-Definition is_limit_when_tending_to {A B} da db
-    (f : A → B) (x₀ : A) (L : B) :=
-  (∀ ε, 0 < ε → ∃ η, 0 < η ∧
-   ∀ x : A, da x x₀ < η → db (f x) L < ε)%L.
-
 Definition is_limit_when_tending_to_inf {A} dist (u : nat → A) (L : A) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (u n) L < ε)%L.
 
 Definition is_complete A (dist : A → A → T) :=
   ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
+
+Definition is_limit_when_tending_to {A B} (da : distance A) (db : distance B)
+    (f : A → B) (x₀ : A) (L : B) :=
+  (∀ ε, 0 < ε → ∃ η, 0 < η ∧
+   ∀ x : A, d_dist x x₀ < η → d_dist (f x) L < ε)%L.
 
 Definition continuous_at {A B} da db (f : A → B) a :=
   is_limit_when_tending_to da db f a (f a).
@@ -335,7 +335,7 @@ Theorem rngl_dist_add_add_le :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a b c d,
- (rngl_dist (a + b) (c + d) ≤ rngl_dist a c + rngl_dist b d)%L.
+  (rngl_dist (a + b) (c + d) ≤ rngl_dist a c + rngl_dist b d)%L.
 Proof.
 intros Hop Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.

@@ -829,14 +829,15 @@ specialize (AnBn_not_P Hon Hop Hiv Hor P) as H1.
 now apply (H1 a b n an bn H Habn).
 Qed.
 
-Definition rngl_distance Hop Hor :=
+Context {Hop : rngl_has_opp T = true}.
+Context {Hor : rngl_is_ordered T = true}.
+
+Definition rngl_distance :=
   {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
 
 Theorem exists_supremum :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   is_complete T rngl_dist →
   ∀ (P : T → Prop) a b,
@@ -846,7 +847,7 @@ Theorem exists_supremum :
     is_limit_when_tending_to_inf rngl_dist (λ n, fst (AnBn P a b n)) c ∧
     is_limit_when_tending_to_inf rngl_dist (λ n, snd (AnBn P a b n)) c.
 Proof.
-intros Hon Hop Hiv Hor Har Hco * Ha Hs.
+intros Hon Hiv Har Hco * Ha Hs.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 move Hos before Har.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
@@ -947,7 +948,7 @@ assert (Hlab : lima = limb). {
     now intros; rewrite (rngl_add_opp_r Hop).
   }
   apply (rngl_sub_move_0_r Hop).
-  eapply (limit_unique Hon Hop Hiv Hor _ (rngl_distance Hop Hor)).
+  eapply (limit_unique Hon Hop Hiv Hor _ rngl_distance).
   apply H1.
   apply Hl.
 }
@@ -1088,17 +1089,15 @@ Qed.
 
 Theorem intermediate_value_prop_1 :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ f, continuous rngl_dist rngl_dist f →
+  ∀ f, continuous rngl_distance rngl_distance f →
   ∀ a b c u,
   (a < b)%L
   → (f a < u)%L
   → (∀ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L → (x ≤ c)%L)
   → c ≠ a.
 Proof.
-intros Hon Hop Hiv Hor * Hfc * Hab Hfab Hub1.
+intros Hon Hiv * Hfc * Hab Hfab Hub1.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1119,6 +1118,7 @@ assert (Hfu : ∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
   }
   specialize (H2 _ H); clear H.
   destruct (rngl_le_dec Hor (f x) (f a)) as [Hfxa| Hfxa]. {
+    cbn in H2.
     progress unfold rngl_dist in H2.
     rewrite (rngl_abs_nonpos_eq Hop Hor) in H2. 2: {
       now apply (rngl_le_sub_0 Hop Hor).
@@ -1126,6 +1126,7 @@ assert (Hfu : ∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
     now apply (rngl_le_lt_trans Hor _ (f a)).
   }
   apply (rngl_nle_gt_iff Hor) in Hfxa.
+  cbn in H2.
   progress unfold rngl_dist in H2.
   rewrite (rngl_abs_nonneg_eq Hop Hor) in H2. 2: {
      apply (rngl_le_0_sub Hop Hor).
@@ -1177,10 +1178,8 @@ Qed.
 
 Theorem intermediate_value_prop_2 :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ f, continuous rngl_dist rngl_dist f →
+  ∀ f, continuous rngl_distance rngl_distance f →
   ∀ a b c u,
   (a < b)%L
   → (u < f b)%L
@@ -1190,7 +1189,7 @@ Theorem intermediate_value_prop_2 :
        else True)
   → c ≠ b.
 Proof.
-intros Hon Hop Hiv Hor * Hfc * Hab Hub Hc.
+intros Hon Hiv * Hfc * Hab Hub Hc.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1214,6 +1213,7 @@ assert (Hfu : ∀ x, (rngl_max a (b - η) < x ≤ b → u < f x)%L). {
   }
   specialize (H2 _ H); clear H.
   destruct (rngl_le_dec Hor (f x) (f b)) as [Hfxb| Hfxb]. {
+    cbn in H2.
     progress unfold rngl_dist in H2.
     rewrite (rngl_abs_nonpos_eq Hop Hor) in H2. 2: {
       now apply (rngl_le_sub_0 Hop Hor).
@@ -1269,17 +1269,15 @@ Qed.
 (* https://en.wikipedia.org/wiki/Intermediate_value_theorem#Proof *)
 Theorem intermediate_value_le :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   is_complete T rngl_dist →
-  ∀ f, continuous rngl_dist rngl_dist f
+  ∀ f, continuous rngl_distance rngl_distance f
   → ∀ a b u, (a ≤ b)%L
   → (f a ≤ u ≤ f b)%L
   → ∃ c : T, (a ≤ c ≤ b)%L ∧ f c = u.
 Proof.
-intros Hon Hop Hiv Hor Har Hco * Hfc * Hab Hfab.
+intros Hon Hiv Har Hco * Hfc * Hab Hfab.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -1330,7 +1328,7 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
-specialize (exists_supremum Hon Hop Hiv Hor Har Hco P) as H1.
+specialize (exists_supremum Hon Hiv Har Hco P) as H1.
 specialize (H1 a b Ha).
 assert (H : (∀ x, P x → (x < b)%L)). {
   intros y ((Hay & Hyb) & Hy).
@@ -1355,15 +1353,15 @@ split. {
 }
 (* continuity of f to prove that *)
 assert (Hac : c ≠ a). {
-  now apply (intermediate_value_prop_1 Hon Hop Hiv Hor f Hfc a b c u).
+  now apply (intermediate_value_prop_1 Hon Hiv f Hfc a b c u).
 }
 assert (Hbc : c ≠ b). {
-  now apply (intermediate_value_prop_2 Hon Hop Hiv Hor f Hfc a b c u).
+  now apply (intermediate_value_prop_2 Hon Hiv f Hfc a b c u).
 }
 specialize (Hfc c) as Hcc.
-progress unfold rngl_dist in Hcc.
 progress unfold continuous_at in Hcc.
 progress unfold is_limit_when_tending_to in Hcc.
+cbn in Hcc.
 set (η2 := rngl_min (c - a) (b - c)).
 assert (Hzη2 : (0 < η2)%L). {
   progress unfold η2.
@@ -1572,32 +1570,31 @@ Qed.
 
 Theorem intermediate_value :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   is_complete T rngl_dist →
-  ∀ f, continuous rngl_dist rngl_dist f
+  ∀ f, continuous rngl_distance rngl_distance f
   → ∀ a b u, (a ≤ b)%L
   → (rngl_min (f a) (f b) ≤ u ≤ rngl_max (f a) (f b))%L
   → ∃ c, (a ≤ c ≤ b)%L ∧ f c = u.
 Proof.
-intros Hon Hop Hiv Hor Har Hco.
+intros Hon Hiv Har Hco.
 intros * Hfc * Hab Hfab.
 progress unfold rngl_min in Hfab.
 progress unfold rngl_max in Hfab.
 remember (f a ≤? f b)%L as ab eqn:Hlab; symmetry in Hlab.
-specialize (intermediate_value_le Hon Hop Hiv Hor Har Hco) as H1.
+specialize (intermediate_value_le Hon Hiv Har Hco) as H1.
 destruct ab; [ now apply (H1 _ Hfc) | ].
 specialize (H1 (λ x, (- f x))%L).
 cbn in H1.
-assert (H : continuous rngl_dist rngl_dist (λ x, (- f x))%L). {
+assert (H : continuous rngl_distance rngl_distance (λ x, (- f x))%L). {
   intros x ε Hε.
   destruct (Hfc x ε Hε) as (η & Hzη & Hη).
   exists η.
   split; [ easy | ].
   intros y Hy.
   specialize (Hη y Hy).
+  cbn.
   progress unfold rngl_dist.
   rewrite <- (rngl_abs_opp Hop Hor).
   rewrite (rngl_opp_sub_distr Hop).

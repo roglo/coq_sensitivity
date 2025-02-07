@@ -927,19 +927,21 @@ Qed.
 (* *)
 
 Theorem rngl_cos_is_continuous :
-  continuous angle_eucl_dist rngl_dist rngl_cos.
+  continuous angle_eucl_distance rngl_distance rngl_cos.
 Proof.
 destruct_ac.
 intros a ε Hε.
 exists ε.
 split; [ easy | ].
 intros x Hxa.
+cbn.
 progress unfold rngl_dist.
 eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
 apply -> (rngl_abs_le Hop Hor).
 split. {
   rewrite <- (rngl_opp_sub_distr Hop).
   apply -> (rngl_opp_le_compat Hop Hor).
+  cbn.
   rewrite angle_eucl_dist_symmetry.
   apply rngl_cos_diff_le_eucl_dist.
 } {
@@ -948,19 +950,21 @@ split. {
 Qed.
 
 Theorem rngl_sin_is_continuous :
-  continuous angle_eucl_dist rngl_dist rngl_sin.
+  continuous angle_eucl_distance rngl_distance rngl_sin.
 Proof.
 destruct_ac.
 intros a ε Hε.
 exists ε.
 split; [ easy | ].
 intros x Hxa.
+cbn.
 progress unfold rngl_dist.
 eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
 apply -> (rngl_abs_le Hop Hor).
 split. {
   rewrite <- (rngl_opp_sub_distr Hop).
   apply -> (rngl_opp_le_compat Hop Hor).
+  cbn.
   rewrite angle_eucl_dist_symmetry.
   apply rngl_sin_diff_le_eucl_dist.
 } {
@@ -1347,8 +1351,8 @@ progress replace (rngl_abs _) with
 apply Hcc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hcc H4.
-rewrite angle_eucl_dist_move_0_r.
 cbn.
+rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_eucl_dist_move_0_r θ).
 rewrite angle_add_sub_swap.
 rewrite <- angle_sub_sub_distr.
@@ -1399,6 +1403,7 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
 intros ε Hε.
 destruct (rngl_cos_is_continuous θ₀ ε Hε) as (η & Hη & Hcc).
 move η before ε.
+cbn in Hcc.
 progress unfold rngl_dist in Hcc.
 remember (angle_eucl_dist θ₀ 0) as y.
 exists (rngl_min3 y (angle_eucl_dist θ₀ angle_straight) η).
@@ -1575,8 +1580,8 @@ replace (rngl_abs _) with
 apply Hsc.
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hsc H4.
-rewrite angle_eucl_dist_move_0_r.
 cbn.
+rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_eucl_dist_move_0_r θ).
 rewrite angle_add_sub_swap.
 rewrite <- angle_sub_sub_distr.
@@ -1627,6 +1632,7 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
 intros ε Hε.
 destruct (rngl_sin_is_continuous θ₀ ε Hε) as (η & Hη & Hsc).
 move η before ε.
+cbn in Hsc.
 progress unfold rngl_dist in Hsc.
 remember (angle_eucl_dist θ₀ 0) as y.
 exists (rngl_min3 y (angle_eucl_dist θ₀ angle_straight) η).
