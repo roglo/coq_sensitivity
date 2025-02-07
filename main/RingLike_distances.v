@@ -198,23 +198,23 @@ Theorem limit_unique :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ A (dist : A → A → T) (id : is_dist dist) u lim1 lim2,
-  is_limit_when_tending_to_inf dist u lim1
-  → is_limit_when_tending_to_inf dist u lim2
+  ∀ A (dist : distance A) u lim1 lim2,
+  is_limit_when_tending_to_inf d_dist u lim1
+  → is_limit_when_tending_to_inf d_dist u lim2
   → lim1 = lim2.
 Proof.
-intros Hon Hop Hiv Hor * Hid * Hu1 Hu2.
+intros Hon Hop Hiv Hor * Hu1 Hu2.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  destruct Hid as (Hdsym, Hdsep, Hdtri).
+  destruct dist as (d, (Hdsym, Hdsep, Hdtri)).
   assert (H : ∀ a b : A, a = b) by now intros; apply Hdsep, H1.
   apply H.
 }
-specialize (dist_nonneg Hon Hop Hiv Hor _ dist Hid) as Hdpos.
-destruct Hid as (Hdsym, Hdsep, Hdtri).
+specialize (dist_nonneg Hon Hop Hiv Hor _ d_dist d_prop) as Hdpos.
+destruct dist as (dist, (Hdsym, Hdsep, Hdtri)).
 assert (Hu : is_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   intros ε Hε.
   assert (Hε2 : (0 < ε / 2)%L). {

@@ -1263,6 +1263,9 @@ apply Nat.add_le_mono_l.
 now apply -> Nat.succ_le_mono.
 Qed.
 
+Definition rngl_distance :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
+
 Theorem rat_is_inf_sum_of_inv_rad_pow' :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →
@@ -1280,8 +1283,7 @@ intros Hon Hic Hop Hiv Hor Har.
 intros * H2r Hbz Hlim.
 specialize (rat_is_inf_sum_of_inv_rad_pow Hon Hic Hop Hiv Hor Har) as H1.
 specialize (H1 _ a i H2r Hbz).
-specialize (limit_unique Hon Hop Hiv Hor _ rngl_dist) as H2.
-specialize (H2 (rngl_dist_is_dist Hop Hor)).
+specialize (limit_unique Hon Hop Hiv Hor _ rngl_distance) as H2.
 specialize (H2 _ _ _ Hlim H1).
 subst c.
 rewrite (rngl_mul_comm Hic).

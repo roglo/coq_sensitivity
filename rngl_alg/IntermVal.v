@@ -829,6 +829,9 @@ specialize (AnBn_not_P Hon Hop Hiv Hor P) as H1.
 now apply (H1 a b n an bn H Habn).
 Qed.
 
+Definition rngl_distance Hop Hor :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
+
 Theorem exists_supremum :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -944,8 +947,7 @@ assert (Hlab : lima = limb). {
     now intros; rewrite (rngl_add_opp_r Hop).
   }
   apply (rngl_sub_move_0_r Hop).
-  eapply (limit_unique Hon Hop Hiv Hor _ rngl_dist).
-  apply (rngl_dist_is_dist Hop Hor).
+  eapply (limit_unique Hon Hop Hiv Hor _ (rngl_distance Hop Hor)).
   apply H1.
   apply Hl.
 }

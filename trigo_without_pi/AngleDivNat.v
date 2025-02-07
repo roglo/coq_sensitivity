@@ -597,6 +597,9 @@ split; intros H12. {
 }
 Qed.
 
+Definition angle_eucl_distance :=
+  {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
+
 Theorem angle_div_nat_prop :
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
@@ -633,13 +636,8 @@ progress unfold angle_div_nat in Hdn.
 rename Hdn into Hlim.
 specialize (angle_lim_mul n _ _ Hlim) as H1.
 enough (H2 : angle_lim (λ i, (n * seq_angle_to_div_nat θ n i)%A) θ). {
-  apply (limit_unique Hon Hop Hiv Hor) with (lim1 := (n * θ')%A) in H2. {
-    easy.
-  } {
-    apply angle_eucl_dist_is_dist.
-  } {
-    easy.
-  }
+  specialize (limit_unique Hon Hop Hiv Hor _ angle_eucl_distance) as H3.
+  now apply (H3 _ (n * θ')%A) in H2.
 }
 clear θ' Hlim H1.
 destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
