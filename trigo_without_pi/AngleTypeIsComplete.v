@@ -418,6 +418,9 @@ apply (rngl_nlt_ge_iff Hor) in Hlc.
 apply (rngl_le_antisymm Hor _ _ Hlc Hcl).
 Qed.
 
+Definition rngl_distance :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
+
 Theorem rngl_is_complete_angle_is_complete :
   is_complete T rngl_dist
   → is_complete (angle T) angle_eucl_dist.
@@ -450,13 +453,19 @@ specialize (H2 H); clear H.
 destruct H2 as (s, Hs).
 move s before c.
 generalize Hc; intros Hci.
-apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in Hci. 2: {
+specialize (rngl_limit_interv Hon Hop Hiv Hor rngl_distance) as H1.
+specialize (rngl_dist_left_mono Hop Hor) as H.
+specialize (H1 H); clear H.
+specialize (rngl_dist_right_mono Hop Hor) as H.
+specialize (H1 H); clear H.
+apply H1 with (a := (-1)%L) (b := 1%L) in Hci. 2: {
   intros; apply rngl_cos_bound.
 }
 generalize Hs; intros Hsi.
-apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in Hsi. 2: {
+apply H1 with (a := (-1)%L) (b := 1%L) in Hsi. 2: {
   intros; apply rngl_sin_bound.
 }
+clear H1.
 assert (Hcs1 : (c² + s² = 1)%L). {
   generalize Hc; intros H1.
   generalize Hs; intros H2.

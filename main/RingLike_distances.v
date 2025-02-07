@@ -143,53 +143,64 @@ apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 Qed.
 
 Theorem rngl_limit_interv :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ u a b c,
+  ∀ (dist : distance T),
+  (∀ x y z, (x ≤ y ≤ z → d_dist x y ≤ d_dist x z)%L)
+  → (∀ x y z, (x ≤ y ≤ z → d_dist y z ≤ d_dist x z)%L)
+  → ∀ u a b c,
   (∀ i, (a ≤ u i ≤ b)%L)
-  → is_limit_when_tending_to_inf rngl_dist u c
+  → is_limit_when_tending_to_inf d_dist u c
   → (a ≤ c ≤ b)%L.
 Proof.
-intros Hop Hor.
-intros * Hi Hlim.
+intros Hon Hop Hiv Hor.
+intros * mono_1 mono_2 * Hi Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
 split. {
   apply (rngl_nlt_ge_iff Hor).
   intros Hca.
-  specialize (Hlim (a - c))%L.
-  assert (H : (0 < a - c)%L) by now apply (rngl_lt_0_sub Hop Hor).
+  specialize (Hlim (d_dist a c))%L.
+  assert (H : (0 < d_dist a c)%L). {
+    apply (rngl_lt_iff Hor).
+    split; [ apply (dist_nonneg Hon Hop Hiv Hor _ _ d_prop) | ].
+    intros H; symmetry in H.
+    apply -> (is_dist_separation _ d_prop) in H.
+    subst c.
+    now apply (rngl_lt_irrefl Hor) in Hca.
+  }
   specialize (Hlim H); clear H.
   destruct Hlim as (N, HN).
   specialize (HN N (Nat.le_refl _)).
   specialize (Hi N) as H.
   apply rngl_nle_gt in HN.
   apply HN; clear HN.
-  progress unfold rngl_dist.
-  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-    apply (rngl_le_0_sub Hop Hor).
-    apply (rngl_le_trans Hor _ a); [ | apply Hi ].
-    now apply (rngl_lt_le_incl Hor) in Hca.
-  }
-  now apply (rngl_sub_le_mono_r Hop Hor).
+  do 2 rewrite (is_dist_symmetry _ d_prop _ c).
+  apply mono_1.
+  split; [ | easy ].
+  now apply (rngl_lt_le_incl Hor).
 } {
   apply (rngl_nlt_ge_iff Hor).
   intros Hbc.
-  specialize (Hlim (c - b))%L.
-  assert (H : (0 < c - b)%L) by now apply (rngl_lt_0_sub Hop Hor).
+  specialize (Hlim (d_dist b c))%L.
+  assert (H : (0 < d_dist b c)%L). {
+    apply (rngl_lt_iff Hor).
+    split; [ apply (dist_nonneg Hon Hop Hiv Hor _ _ d_prop) | ].
+    intros H; symmetry in H.
+    apply -> (is_dist_separation _ d_prop) in H.
+    subst c.
+    now apply (rngl_lt_irrefl Hor) in Hbc.
+  }
   specialize (Hlim H); clear H.
   destruct Hlim as (N, HN).
   specialize (HN N (Nat.le_refl _)).
   specialize (Hi N).
   apply rngl_nle_gt in HN.
   apply HN; clear HN.
-  progress unfold rngl_dist.
-  rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
-    apply (rngl_le_sub_0 Hop Hor).
-    apply (rngl_le_trans Hor _ b); [ apply Hi | ].
-    now apply (rngl_lt_le_incl Hor) in Hbc.
-  }
-  rewrite (rngl_opp_sub_distr Hop).
-  now apply (rngl_sub_le_mono_l Hop Hor).
+  apply mono_2.
+  split; [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
 }
 Qed.
 
@@ -334,6 +345,48 @@ rewrite (rngl_sub_add_distr Hos).
 rewrite (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
 apply (rngl_abs_triangle Hop Hor).
+Qed.
+
+Theorem rngl_dist_left_mono :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c,
+  (a ≤ b ≤ c)%L
+  → (rngl_dist a b ≤ rngl_dist a c)%L.
+Proof.
+intros Hop Hor.
+intros * Habc.
+progress unfold rngl_dist.
+rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+  now apply (rngl_le_sub_0 Hop Hor).
+}
+rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+  apply (rngl_le_sub_0 Hop Hor).
+  now apply (rngl_le_trans Hor _ b).
+}
+do 2 rewrite (rngl_opp_sub_distr Hop).
+now apply (rngl_sub_le_mono_r Hop Hor).
+Qed.
+
+Theorem rngl_dist_right_mono :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c,
+  (a ≤ b ≤ c)%L
+  → (rngl_dist b c ≤ rngl_dist a c)%L.
+Proof.
+intros Hop Hor.
+intros * Habc.
+progress unfold rngl_dist.
+rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+  now apply (rngl_le_sub_0 Hop Hor).
+}
+rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+  apply (rngl_le_sub_0 Hop Hor).
+  now apply (rngl_le_trans Hor _ b).
+}
+do 2 rewrite (rngl_opp_sub_distr Hop).
+now apply (rngl_sub_le_mono_l Hop Hor).
 Qed.
 
 End a.
