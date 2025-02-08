@@ -1264,10 +1264,14 @@ apply (rngl_leb_gt Hor) in Hscz.
 apply squ_rngl_cos_div_pow_2_div_2_bound.
 Qed.
 
+Definition rngl_distance :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
+
 Theorem rngl_cos_angle_div_2_pow_tending_to_1 :
   rngl_characteristic T ≠ 1 →
   rngl_is_archimedean T = true →
-  ∀ θ, is_limit_when_tending_to_inf rngl_dist (λ i, rngl_cos (θ /₂^i)) 1%L.
+  ∀ θ,
+  is_limit_when_tending_to_inf rngl_distance (λ i, rngl_cos (θ /₂^i)) 1%L.
 Proof.
 intros Hc1 Har.
 destruct_ac.
@@ -1282,6 +1286,7 @@ enough (H :
   exists N.
   intros n Hn.
   specialize (HN n Hn).
+  cbn.
   progress unfold rngl_dist.
   rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
     apply (rngl_le_sub_0 Hop Hor).

@@ -560,18 +560,23 @@ rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
 apply (rngl_le_refl Hor).
 Qed.
 
+Context {Hop : rngl_has_opp T = true}.
+Context {Hor : rngl_is_ordered T = true}.
+
+Definition rngl_distance :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
+
 Theorem limit_opp :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
   ∀ u lim,
-  is_limit_when_tending_to_inf rngl_dist u lim
-  → is_limit_when_tending_to_inf rngl_dist (λ n, (- u n)%L) (- lim)%L.
+  is_limit_when_tending_to_inf rngl_distance u lim
+  → is_limit_when_tending_to_inf rngl_distance (λ n, (- u n)%L) (- lim)%L.
 Proof.
-intros Hop Hor * Hu.
+intros * Hu.
 intros ε Hε.
 destruct (Hu ε Hε) as (N, HN).
 exists N.
 intros n Hn.
+cbn.
 progress unfold rngl_dist.
 rewrite <- (rngl_opp_add_distr Hop).
 rewrite rngl_add_comm.
@@ -581,7 +586,7 @@ now apply HN.
 Qed.
 
 Theorem gen_limit_ext_in :
-  ∀ {A} (dist : A → A → _) u v lim,
+  ∀ {A} (dist : distance A) u v lim,
   (∀ n, u n = v n)
   → is_limit_when_tending_to_inf dist u lim
   → is_limit_when_tending_to_inf dist v lim.
@@ -596,17 +601,15 @@ Qed.
 
 Theorem limit_between_An_and_Bn :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   ∀ a b lim P,
   P a
   → (∀ x : T, P x → (x < b)%L)
-  → is_limit_when_tending_to_inf rngl_dist (λ n, fst (AnBn P a b n)) lim
-  → is_limit_when_tending_to_inf rngl_dist (λ n, snd (AnBn P a b n)) lim
+  → is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn P a b n)) lim
+  → is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn P a b n)) lim
   → ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
 Proof.
-intros Hon Hop Hiv Hor * Ha Hs Hal Hbl * Habn.
+intros Hon Hiv * Ha Hs Hal Hbl * Habn.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hab : (a ≤ b)%L). {
   apply (rngl_lt_le_incl Hor).
@@ -636,6 +639,7 @@ split. {
   specialize (AnBn_le Hon Hop Hiv Hor a b Hab P) as H6.
   specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
   destruct H6 as (H6, H7).
+  cbn in HM.
   progress unfold rngl_dist in HM.
   rewrite (rngl_abs_nonneg_eq Hop Hor) in HM. 2: {
     apply (rngl_le_0_sub Hop Hor).
@@ -677,6 +681,7 @@ split. {
   specialize (AnBn_le Hon Hop Hiv Hor a b Hab P) as H6.
   specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
   destruct H6 as (H6, H7).
+  cbn in HM.
   progress unfold rngl_dist in HM.
   rewrite (rngl_abs_nonpos_eq Hop Hor) in HM. 2: {
     apply (rngl_le_sub_0 Hop Hor).
@@ -705,9 +710,7 @@ Qed.
 
 Theorem AnBn_exists_P :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   ∀ (P : _ → Prop) a b x,
   (∀ x : T, P x → (x ≤ b)%L)
   → (a ≤ x ≤ b)%L
@@ -716,7 +719,7 @@ Theorem AnBn_exists_P :
   AnBn P a b n = (an, bn)
   → ∃ y, (an ≤ y ≤ bn ∧ P y)%L.
 Proof.
-intros Hon Hop Hiv Hor * Hs Hab Hx * Habn.
+intros Hon Hiv * Hs Hab Hx * Habn.
 revert a b x Hs Hab Hx an bn Habn.
 induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
@@ -759,9 +762,7 @@ Qed.
 
 Theorem in_AnBn :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   ∀ (P : _ → Prop) a b,
   P a
   → (∀ x : T, P x → (x < b)%L)
@@ -769,8 +770,8 @@ Theorem in_AnBn :
   AnBn P a b n = (an, bn)
   → ∃ y : T, (an ≤ y ≤ bn)%L ∧ P y.
 Proof.
-intros Hon Hop Hiv Hor * Ha Hs * Habn.
-specialize (AnBn_exists_P Hon Hop Hiv Hor P) as H1.
+intros Hon Hiv * Ha Hs * Habn.
+specialize (AnBn_exists_P Hon Hiv P) as H1.
 specialize (H1 a b a).
 assert (H : ∀ x : T, P x → (x ≤ b)%L). {
   now intros; apply (rngl_lt_le_incl Hor), Hs.
@@ -785,15 +786,13 @@ Qed.
 
 Theorem AnBn_not_P :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   ∀ (P : _ → Prop) a b n an bn,
   (∀ x : T, P x → (x ≤ b)%L)
   → AnBn P a b n = (an, bn)
   → ∀ y, (bn < y → ¬ P y)%L.
 Proof.
-intros Hon Hop Hiv Hor * Hs Habn y Hby.
+intros Hon Hiv * Hs Habn y Hby.
 revert a b Hs Habn.
 induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
@@ -810,9 +809,7 @@ Qed.
 
 Theorem after_AnBn :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   ∀ (P : _ → Prop) a b,
   P a
   → (∀ x : T, P x → (x < b)%L)
@@ -821,19 +818,13 @@ Theorem after_AnBn :
   → ∀ y, (bn < y)%L
   → ¬ P y.
 Proof.
-intros Hon Hop Hiv Hor * Ha Hs * Habn * Hby.
+intros Hon Hiv * Ha Hs * Habn * Hby.
 assert (H : ∀ x : T, P x → (x ≤ b)%L). {
   now intros; apply (rngl_lt_le_incl Hor), Hs.
 }
-specialize (AnBn_not_P Hon Hop Hiv Hor P) as H1.
+specialize (AnBn_not_P Hon Hiv P) as H1.
 now apply (H1 a b n an bn H Habn).
 Qed.
-
-Context {Hop : rngl_has_opp T = true}.
-Context {Hor : rngl_is_ordered T = true}.
-
-Definition rngl_distance :=
-  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
 
 Theorem exists_supremum :
   rngl_has_1 T = true →
@@ -844,8 +835,8 @@ Theorem exists_supremum :
   P a
   → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L ∧
-    is_limit_when_tending_to_inf rngl_dist (λ n, fst (AnBn P a b n)) c ∧
-    is_limit_when_tending_to_inf rngl_dist (λ n, snd (AnBn P a b n)) c.
+    is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn P a b n)) c ∧
+    is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn P a b n)) c.
 Proof.
 intros Hon Hiv Har Hco * Ha Hs.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -904,7 +895,7 @@ destruct Hac as (lima, Hal).
 destruct Hbc as (limb, Hbl).
 move limb before lima.
 assert
-  (Hl : (is_limit_when_tending_to_inf rngl_dist (λ n, (u n - v n)) 0)%L). {
+  (Hl : (is_limit_when_tending_to_inf rngl_distance (λ n, (u n - v n)) 0)%L). {
   intros ε Hε.
   progress unfold u.
   progress unfold v.
@@ -917,6 +908,7 @@ assert
   }
   exists (N + 1).
   intros n Hn.
+  cbn.
   progress unfold rngl_dist.
   rewrite (rngl_sub_0_r Hos).
   eapply (rngl_le_lt_trans Hor). {
@@ -939,8 +931,8 @@ assert
 }
 assert (Hlab : lima = limb). {
   generalize Hbl; intros Hblv.
-  apply (limit_opp Hop Hor) in Hbl.
-  specialize (limit_add Hon Hop Hiv Hor rngl_dist) as H1.
+  apply limit_opp in Hbl.
+  specialize (limit_add Hon Hop Hiv Hor rngl_distance) as H1.
   specialize (H1 (rngl_dist_add_add_le Hop Hor)).
   specialize (H1 _ _ _ _ Hal Hbl).
   rewrite (rngl_add_opp_r Hop) in H1.
@@ -963,10 +955,10 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
     destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
     apply (rngl_nlt_ge_iff Hor).
     intros Hc.
-    specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
+    specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
     specialize (Hl Ha Hs Hal Hbl).
     specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
-    specialize (in_AnBn Hon Hop Hiv Hor P a b) as Hin.
+    specialize (in_AnBn Hon Hiv P a b) as Hin.
     specialize (Hin Ha Hs).
     (* if (b - a) / 2 ^ n < lim - c, then c < an < lim,
        we have a y between an and bn with P y, but
@@ -1021,7 +1013,7 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
     apply H2 in Hy.
     now apply rngl_nlt_ge in Hy.
   } {
-    specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
+    specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
     specialize (Hl Ha Hs Hal Hbl).
     now specialize (Hl 0 _ _ (surjective_pairing _)).
   }
@@ -1032,12 +1024,12 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
   intros Hc.
   apply (rngl_nlt_ge_iff Hor).
   intros Hlc.
-  specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
+  specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
   specialize (Hl Ha Hs Hal Hbl).
   specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
-  specialize (in_AnBn Hon Hop Hiv Hor P a b) as Hin.
+  specialize (in_AnBn Hon Hiv P a b) as Hin.
   specialize (Hin Ha Hs).
-  specialize (after_AnBn Hon Hop Hiv Hor P a b Ha Hs) as Han.
+  specialize (after_AnBn Hon Hiv P a b Ha Hs) as Han.
   (* faut que je trouve un n tel que bn < c,
      (qui contradira Hc avec Han),
      c'est-à-dire an + (b - a) / 2 ^ n < c

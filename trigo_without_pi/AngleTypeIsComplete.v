@@ -135,6 +135,12 @@ destruct (rngl_le_dec Hor (rngl_sin (θ q)) (rngl_sin (θ p))) as [Hpq| Hpq]. {
 }
 Qed.
 
+Definition rngl_distance :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
+
+Definition angle_eucl_distance :=
+  {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
+
 (* to be moved somewhere else *)
 Theorem rngl_dist_to_limit_bounded :
   rngl_has_1 T = true →
@@ -142,7 +148,7 @@ Theorem rngl_dist_to_limit_bounded :
   rngl_is_ordered T = true →
   rngl_characteristic T ≠ 1 →
   ∀ u l,
-  is_limit_when_tending_to_inf rngl_dist u l
+  is_limit_when_tending_to_inf rngl_distance u l
   → ∃ N, ∀ n, N ≤ n → (rngl_dist (u n) l < 1)%L.
 Proof.
 intros Hon Hop Hor Hc1.
@@ -159,7 +165,7 @@ Theorem rngl_converging_seq_bounded :
   rngl_is_ordered T = true →
   rngl_characteristic T ≠ 1 →
   ∀ u l,
-  is_limit_when_tending_to_inf rngl_dist u l
+  is_limit_when_tending_to_inf rngl_distance u l
   → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n) < rngl_abs l + 1)%L.
 Proof.
 intros Hon Hop Hor Hc1.
@@ -184,7 +190,7 @@ Theorem rngl_converging_seq_add_limit_bounded :
   rngl_is_ordered T = true →
   rngl_characteristic T ≠ 1 →
   ∀ u k,
-  is_limit_when_tending_to_inf rngl_dist u k
+  is_limit_when_tending_to_inf rngl_distance u k
   → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n + k) < 2 * rngl_abs k + 1)%L.
 Proof.
 intros Hon Hop Hor Hc1.
@@ -210,8 +216,8 @@ Theorem rngl_limit_limit_squ :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ u l,
-  is_limit_when_tending_to_inf rngl_dist u l
-  → is_limit_when_tending_to_inf rngl_dist (λ i, (u i)²)%L l²%L.
+  is_limit_when_tending_to_inf rngl_distance u l
+  → is_limit_when_tending_to_inf rngl_distance (λ i, (u i)²)%L l²%L.
 Proof.
 intros Hon Hop Hic Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -240,6 +246,7 @@ assert (H : (0 < ε / (2 * rngl_abs l + 1))%L). {
   apply (rngl_abs_nonneg Hop Hor).
 }
 specialize (Hu H); clear H.
+cbn in Hu.
 progress unfold rngl_dist in Hu.
 destruct Hu as (N1, HN1).
 destruct H2 as (N2, HN2).
@@ -255,6 +262,7 @@ assert (H : N2 ≤ n). {
   apply Nat.le_max_r.
 }
 specialize (HN2 _ H); clear H.
+cbn.
 progress unfold rngl_dist.
 rewrite (rngl_squ_sub_squ Hop).
 rewrite (rngl_mul_comm Hic (u n)).
@@ -282,7 +290,7 @@ now apply (rngl_mul_lt_mono_pos_l Hop Hor Hii).
 Qed.
 
 Theorem is_limit_when_tending_to_inf_eq_compat :
-  ∀ A (dist : A → _) a b f g z,
+  ∀ A (dist : distance A) a b f g z,
   (∀ i, f (i + a) = g (i + b))
   → is_limit_when_tending_to_inf dist f z
   → is_limit_when_tending_to_inf dist g z.
@@ -302,9 +310,11 @@ Qed.
 
 Theorem limit_cos_cos_sin_sin :
   ∀ u θ,
-  is_limit_when_tending_to_inf rngl_dist (λ i, rngl_cos (u i)) (rngl_cos θ)
-  → is_limit_when_tending_to_inf rngl_dist (λ i, rngl_sin (u i)) (rngl_sin θ)
-  → is_limit_when_tending_to_inf angle_eucl_dist u θ.
+  is_limit_when_tending_to_inf rngl_distance
+    (λ i, rngl_cos (u i)) (rngl_cos θ)
+  → is_limit_when_tending_to_inf rngl_distance
+      (λ i, rngl_sin (u i)) (rngl_sin θ)
+  → is_limit_when_tending_to_inf angle_eucl_distance u θ.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -333,6 +343,7 @@ destruct Hs as (ns, Hns).
 move ns before nc.
 exists (Nat.max nc ns).
 intros n Hn.
+cbn.
 progress unfold angle_eucl_dist.
 specialize (Hnc n).
 assert (H : nc ≤ n). {
@@ -346,6 +357,7 @@ assert (H : ns ≤ n). {
   apply Nat.le_max_r.
 }
 specialize (Hns H); clear H.
+cbn in Hnc, Hns.
 progress unfold rngl_dist in Hnc.
 progress unfold rngl_dist in Hns.
 assert (H : (0 ≤ ε² / 2)%L). {
@@ -383,7 +395,7 @@ Theorem limit_const :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ c lim,
-  is_limit_when_tending_to_inf rngl_dist (λ _, c) lim
+  is_limit_when_tending_to_inf rngl_distance (λ _, c) lim
   → lim = c.
 Proof.
 intros Hop Hor * Hlim.
@@ -394,6 +406,7 @@ destruct (rngl_lt_dec Hor lim c) as [Hlc| Hcl]. {
   specialize (Hlim Hlc).
   destruct Hlim as (N, HN).
   specialize (HN N (Nat.le_refl _)).
+  cbn in HN.
   progress unfold rngl_dist in HN.
   apply (rngl_lt_le_incl Hor) in Hlc.
   rewrite (rngl_abs_nonneg_eq Hop Hor) in HN; [ | easy ].
@@ -408,6 +421,7 @@ destruct (rngl_lt_dec Hor c lim) as [Hlc| Hlc]. {
   specialize (Hlim H); clear H.
   destruct Hlim as (N, HN).
   specialize (HN N (Nat.le_refl _)).
+  cbn in HN.
   progress unfold rngl_dist in HN.
   apply (rngl_le_sub_0 Hop Hor) in Hcl.
   rewrite (rngl_abs_nonpos_eq Hop Hor) in HN; [ | easy ].
@@ -417,12 +431,6 @@ destruct (rngl_lt_dec Hor c lim) as [Hlc| Hlc]. {
 apply (rngl_nlt_ge_iff Hor) in Hlc.
 apply (rngl_le_antisymm Hor _ _ Hlc Hcl).
 Qed.
-
-Definition rngl_distance :=
-  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
-
-Definition angle_eucl_distance :=
-  {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
 
 Theorem rngl_is_complete_angle_is_complete :
   is_complete T rngl_distance
@@ -474,7 +482,7 @@ assert (Hcs1 : (c² + s² = 1)%L). {
   generalize Hs; intros H2.
   apply (rngl_limit_limit_squ Hon Hop Hic Hiv Hor) in H1.
   apply (rngl_limit_limit_squ Hon Hop Hic Hiv Hor) in H2.
-  specialize (limit_add Hon Hop Hiv Hor rngl_dist) as H.
+  specialize (limit_add Hon Hop Hiv Hor rngl_distance) as H.
   specialize (H (rngl_dist_add_add_le Hop Hor)).
   specialize (H _ _ _ _ H1 H2).
   cbn in H.

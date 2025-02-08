@@ -1265,8 +1265,8 @@ Theorem rngl_limit_sub_l_limit :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a u l,
-  is_limit_when_tending_to_inf rngl_dist (λ i, (a - u i)%L) (a - l)%L
-  → is_limit_when_tending_to_inf rngl_dist u l.
+  is_limit_when_tending_to_inf rngl_distance (λ i, (a - u i)%L) (a - l)%L
+  → is_limit_when_tending_to_inf rngl_distance u l.
 Proof.
 intros Hop Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -1277,6 +1277,7 @@ destruct Hlim as (N, HN).
 exists N.
 intros n Hn.
 specialize (HN n Hn).
+cbn in HN.
 progress unfold rngl_dist in HN.
 rewrite (rngl_sub_sub_swap Hop) in HN.
 rewrite (rngl_sub_sub_distr Hop) in HN.

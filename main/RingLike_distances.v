@@ -66,12 +66,12 @@ Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
   ∀ ε : T, (0 < ε)%L →
   ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (dist (u p) (u q) < ε)%L.
 
-Definition is_limit_when_tending_to_inf {A} dist (u : nat → A) (L : A) :=
-  ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (u n) L < ε)%L.
+Definition is_limit_when_tending_to_inf {A} (dist : distance A) u L :=
+  ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (d_dist (u n) L < ε)%L.
 
 Definition is_complete A (dist : distance A) :=
   ∀ u, is_Cauchy_sequence d_dist u
-  → ∃ c, is_limit_when_tending_to_inf d_dist u c.
+  → ∃ c, is_limit_when_tending_to_inf dist u c.
 
 Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
   (da : distance A) (db : distance B) (f : A → B) (x₀ : A) (L : B) :=
@@ -154,7 +154,7 @@ Theorem rngl_limit_interv :
   → (∀ x y z, (x ≤ y ≤ z → d_dist y z ≤ d_dist x z)%L)
   → ∀ u a b c,
   (∀ i, (a ≤ u i ≤ b)%L)
-  → is_limit_when_tending_to_inf d_dist u c
+  → is_limit_when_tending_to_inf dist u c
   → (a ≤ c ≤ b)%L.
 Proof.
 intros Hon Hop Hiv Hor.
@@ -212,8 +212,8 @@ Theorem limit_unique :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ A (dist : distance A) u lim1 lim2,
-  is_limit_when_tending_to_inf d_dist u lim1
-  → is_limit_when_tending_to_inf d_dist u lim2
+  is_limit_when_tending_to_inf dist u lim1
+  → is_limit_when_tending_to_inf dist u lim2
   → lim1 = lim2.
 Proof.
 intros Hon Hop Hiv Hor * Hu1 Hu2.
@@ -227,7 +227,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H.
 }
 specialize (dist_nonneg Hon Hop Hiv Hor _ d_dist d_prop) as Hdpos.
-destruct dist as (dist, (Hdsym, Hdsep, Hdtri)).
 assert (Hu : is_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   intros ε Hε.
   assert (Hε2 : (0 < ε / 2)%L). {
@@ -244,6 +243,7 @@ assert (Hu : is_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   destruct Hu2 as (N2, Hu2).
   exists (max N1 N2).
   intros n HN.
+  destruct dist as (dist, (Hdsym, Hdsep, Hdtri)).
   eapply (rngl_le_lt_trans Hor); [ apply (Hdtri _ (u n)) | ].
   rewrite Hdsym.
   replace ε with (ε / 2 + ε / 2)%L. 2: {
@@ -267,13 +267,14 @@ assert (Hu : is_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
     apply Nat.le_max_r.
   }
 }
-assert (H : ∀ ε : T, (0 < ε)%L → (dist lim1 lim2 < ε)%L). {
+assert (H : ∀ ε : T, (0 < ε)%L → (d_dist lim1 lim2 < ε)%L). {
   intros ε Hε.
   specialize (Hu ε Hε).
   destruct Hu as (N, HN).
   now apply (HN N).
 }
 clear Hu; rename H into Hu.
+destruct dist as (dist, (Hdsym, Hdsep, Hdtri)).
 apply Hdsep.
 apply (rngl_abs_le_ε Hon Hop Hiv Hor).
 intros ε Hε.
@@ -289,7 +290,8 @@ Theorem limit_add :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ dist, (∀ a b c d, (dist (a + b) (c + d) ≤ dist a c + dist b d)%L)
+  ∀ dist,
+  (∀ a b c d, (d_dist (a + b) (c + d) ≤ d_dist a c + d_dist b d)%L)
   → ∀ u v limu limv,
   is_limit_when_tending_to_inf dist u limu
   → is_limit_when_tending_to_inf dist v limv

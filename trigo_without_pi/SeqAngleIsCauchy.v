@@ -506,6 +506,7 @@ intros * Hε.
 specialize rngl_cos_angle_div_2_pow_tending_to_1 as H1.
 specialize (H1 Hc1 Har θ).
 progress unfold is_limit_when_tending_to_inf in H1.
+cbn in H1.
 progress unfold rngl_dist in H1.
 specialize (H1 (ε² / 2))%L.
 assert (Hε2 : (0 < ε² / 2)%L). {

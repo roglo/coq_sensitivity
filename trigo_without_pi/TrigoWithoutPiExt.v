@@ -1704,7 +1704,10 @@ destruct z1. {
 }
 Qed.
 
-Definition angle_lim := is_limit_when_tending_to_inf angle_eucl_dist.
+Definition angle_eucl_distance :=
+  {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
+
+Definition angle_lim := is_limit_when_tending_to_inf angle_eucl_distance.
 
 Theorem angle_eucl_dist_opp_opp :
   ∀ θ1 θ2, angle_eucl_dist (- θ1) (- θ2) = angle_eucl_dist θ1 θ2.
@@ -1918,6 +1921,7 @@ progress unfold is_limit_when_tending_to_inf in H1.
 apply angle_eucl_dist_separation.
 rewrite angle_eucl_dist_symmetry.
 specialize (angle_eucl_dist_nonneg θ1 θ2) as Hzx.
+cbn in H1.
 remember (angle_eucl_dist θ1 θ2) as x eqn:Hx.
 clear θ1 θ2 Hx.
 specialize (proj1 (rngl_lt_eq_cases Hor _ x) Hzx) as H3.
@@ -1984,6 +1988,7 @@ exists (max M N).
 intros n Hn.
 specialize (HM n (Nat.max_lub_l _ _ _ Hn)).
 specialize (HN n (Nat.max_lub_r _ _ _ Hn)).
+cbn in HM, HN |-*.
 rewrite angle_eucl_dist_move_0_l in HM, HN.
 rewrite angle_eucl_dist_move_0_l.
 specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as Hεε2.
@@ -2017,6 +2022,7 @@ induction k. {
   intros ε Hε.
   exists 0.
   intros n _.
+  cbn.
   progress unfold angle_eucl_dist.
   progress unfold rl_modl.
   cbn.

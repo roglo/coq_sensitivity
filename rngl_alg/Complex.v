@@ -1129,7 +1129,7 @@ Theorem rat_is_inf_sum_of_inv_rad_pow :
   ∀ rad a b,
   2 ≤ rad
   → rngl_of_nat b ≠ 0%L
-  → is_limit_when_tending_to_inf rngl_dist (seq_converging_to_rat rad a b)
+  → is_limit_when_tending_to_inf rngl_distance (seq_converging_to_rat rad a b)
        (rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
 intros Hon Hic Hop Hiv Hor Har.
@@ -1181,6 +1181,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
   eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
   clear ε Hε HN Hnε.
   progress unfold seq_converging_to_rat.
+  cbn.
   progress unfold rngl_dist.
   rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
     apply (rngl_le_sub_0 Hop Hor).
@@ -1276,7 +1277,7 @@ Theorem rat_is_inf_sum_of_inv_rad_pow' :
   ∀ rad a i c,
   2 ≤ rad
   → rngl_of_nat i ≠ 0%L
-  → is_limit_when_tending_to_inf rngl_dist (seq_converging_to_rat rad a i) c
+  → is_limit_when_tending_to_inf rngl_distance (seq_converging_to_rat rad a i) c
   → rngl_of_nat a = (rngl_of_nat i * c)%L.
 Proof.
 intros Hon Hic Hop Hiv Hor Har.

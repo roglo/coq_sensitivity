@@ -41,6 +41,7 @@ specialize (Hft ε Hε).
 destruct Hft as (N, HN).
 exists N.
 intros n Hn.
+cbn.
 rewrite angle_eucl_dist_opp_opp.
 now apply HN.
 Qed.
@@ -56,6 +57,7 @@ split; intros Hlim. {
   exists N.
   intros n Hn.
   specialize (HN n Hn).
+  cbn in HN.
   now rewrite angle_eucl_dist_move_0_r in HN.
 } {
   intros ε Hε.
@@ -64,6 +66,7 @@ split; intros Hlim. {
   exists N.
   intros n Hn.
   specialize (HN n Hn).
+  cbn.
   now rewrite angle_eucl_dist_move_0_r.
 }
 Qed.
@@ -650,6 +653,7 @@ destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
   intros ε Hε.
   exists 0.
   intros m _.
+  cbn.
   now rewrite angle_eucl_dist_diag.
 }
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
