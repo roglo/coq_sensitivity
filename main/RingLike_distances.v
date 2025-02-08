@@ -119,14 +119,21 @@ destruct Hid as (Hdsym, Hdsep, Hdtri).
 apply (proj2 (Hdsep a a) eq_refl).
 Qed.
 
+Theorem dist_diag : ∀ {A} (dist : distance A) a, d_dist a a = 0%L.
+Proof.
+intros.
+destruct dist.
+now apply dist_separation.
+Qed.
+
 Theorem dist_nonneg :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ A (dist : A → A → T) (Hid : is_dist dist) a b, (0 ≤ dist a b)%L.
+  ∀ {A} (dist : distance A) a b, (0 ≤ d_dist a b)%L.
 Proof.
-intros Hon Hop Hiv Hor * Hid *.
+intros Hon Hop Hiv Hor *.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -134,7 +141,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite H1.
   apply (rngl_le_refl Hor).
 }
-destruct Hid as (Hdsym, Hdsep, Hdtri).
+destruct dist as (dist, (Hdsym, Hdsep, Hdtri)).
 specialize (proj2 (Hdsep a a) eq_refl) as H1.
 specialize (Hdtri a b a) as H2.
 rewrite H1, (Hdsym b a) in H2.
@@ -166,7 +173,7 @@ split. {
   specialize (Hlim (d_dist a c))%L.
   assert (H : (0 < d_dist a c)%L). {
     apply (rngl_lt_iff Hor).
-    split; [ apply (dist_nonneg Hon Hop Hiv Hor _ _ d_prop) | ].
+    split; [ apply (dist_nonneg Hon Hop Hiv Hor) | ].
     intros H; symmetry in H.
     apply -> (dist_separation _ d_prop) in H.
     subst c.
@@ -188,7 +195,7 @@ split. {
   specialize (Hlim (d_dist b c))%L.
   assert (H : (0 < d_dist b c)%L). {
     apply (rngl_lt_iff Hor).
-    split; [ apply (dist_nonneg Hon Hop Hiv Hor _ _ d_prop) | ].
+    split; [ apply (dist_nonneg Hon Hop Hiv Hor) | ].
     intros H; symmetry in H.
     apply -> (dist_separation _ d_prop) in H.
     subst c.
@@ -226,7 +233,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   assert (H : ∀ a b : A, a = b) by now intros; apply Hdsep, H1.
   apply H.
 }
-specialize (dist_nonneg Hon Hop Hiv Hor _ d_dist d_prop) as Hdpos.
+specialize (dist_nonneg Hon Hop Hiv Hor dist) as Hdpos.
 assert (Hu : is_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   intros ε Hε.
   assert (Hε2 : (0 < ε / 2)%L). {

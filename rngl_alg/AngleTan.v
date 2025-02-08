@@ -62,14 +62,17 @@ Definition rngl_distance :=
 
 (* to be completed
 Theorem left_derivative_mul :
- (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
   ∀ A lt da (f g f' g' : A → T) x₀,
   left_derivative_at lt da rngl_distance f f' x₀
   → left_derivative_at lt da rngl_distance g g' x₀
   → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
       (λ x : A, (f x * g' x + f' x * g x)%L) x₀.
 Proof.
-intros Hii.
+intros Hon Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hf Hg.
 intros ε Hε.
 specialize (Hf ε Hε).
@@ -95,13 +98,27 @@ assert (H : (d_dist x x₀ < ηg)%L). {
   apply (rngl_le_min_r Hor).
 }
 specialize (Hg H); clear H.
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hf.
+cbn.
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hf. 2: {
+  clear H.
+  apply (rngl_lt_iff Hor).
+  destruct da as (da, dap).
+About dist_nonneg.
+  split; [ now apply (dist_nonneg Hon Hop Hiv Hor) | ].
+  cbn; intros H; symmetry in H.
+  apply dist_separation in H; [ | easy ].
+  subst x.
+  rewrite dist_diag in Hd, Hf, Hg.
+  rewrite (rngl_sub_diag Hos) in Hf, Hg.
+...
 cbn in Hf.
 rewrite (rngl_dist_mul_distr_r Hii) in Hf. 2: {
-  destruct da as (da, dap).
-  cbn.
+  now apply (dist_nonneg Hon Hop Hiv Hor).
+}
+...
 Search (0 ≤ angle_eucl_dist _ _)%L.
 Require Import Trigo.TrigoWithoutPiExt.
+About dist_nonneg.
 Check angle_eucl_dist_nonneg.
 ...
 Search rngl_dist.

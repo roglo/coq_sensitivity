@@ -508,12 +508,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist _ _)). 2: {
-  apply (dist_nonneg Hon Hop Hiv Hor).
-  apply angle_eucl_dist_is_dist.
+  apply (dist_nonneg Hon Hop Hiv Hor angle_eucl_distance).
 }
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist θ1 _)). 2: {
-  apply (dist_nonneg Hon Hop Hiv Hor).
-  apply angle_eucl_dist_is_dist.
+  apply (dist_nonneg Hon Hop Hiv Hor angle_eucl_distance).
 }
 rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_eucl_dist_move_0_r θ1).
