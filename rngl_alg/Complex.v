@@ -1264,9 +1264,6 @@ apply Nat.add_le_mono_l.
 now apply -> Nat.succ_le_mono.
 Qed.
 
-Definition rngl_distance :=
-  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
-
 Theorem rat_is_inf_sum_of_inv_rad_pow' :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →

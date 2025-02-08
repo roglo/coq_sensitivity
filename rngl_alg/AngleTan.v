@@ -1,3 +1,5 @@
+Set Nested Proofs Allowed.
+
 Require Import Utf8.
 Require Import Main.RingLike.
 Require Import Trigo.Angle.
@@ -11,10 +13,13 @@ Context {rp : ring_like_prop T}.
 Definition rngl_tan θ := (rngl_sin θ / rngl_cos θ)%L.
 
 (* to be completed
+Definition rngl_distance :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
+
 Theorem left_derivative_mul :
   rngl_is_ordered T = true →
-  ∀ A lt da db (f g f' g' : A → T) x₀,
-  left_derivative_at lt da db f f' x₀
+  ∀ A lt da (f g f' g' : A → T) x₀,
+  left_derivative_at lt da rngl_distance f f' x₀
   → left_derivative_at lt da db g g' x₀
   → left_derivative_at lt da db (λ x : A, (f x * g x)%L)
       (λ x : A, (f x * g' x + f' x * g x)%L) x₀.
@@ -45,6 +50,14 @@ assert (H : (d_dist x x₀ < ηg)%L). {
   apply (rngl_le_min_r Hor).
 }
 specialize (Hg H); clear H.
+Theorem dist_mul_distr_r :
+  ∀ (dist : distance T) a b c,
+  (d_dist a b * c = d_dist (a * c) (b * c))%L.
+Proof.
+intros.
+destruct dist.
+cbn.
+destruct d_prop.
 ....
 
 Theorem derivative_mul :
