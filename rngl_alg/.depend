@@ -2,6 +2,7 @@ AngleAddOverflowEquiv.vo AngleAddOverflowEquiv.glob AngleAddOverflowEquiv.v.beau
 AngleDeriv.vo AngleDeriv.glob AngleDeriv.v.beautified AngleDeriv.required_vo: AngleDeriv.v ../main/RingLike.vo ../main/Misc.vo ../trigo_without_pi/RealLike.vo ../trigo_without_pi/Angle.vo ../trigo_without_pi/AngleDiv2.vo ../trigo_without_pi/TrigoWithoutPiExt.vo ../trigo_without_pi/Angle_order.vo ../trigo_without_pi/AngleDiv2Add.vo ../trigo_without_pi/AngleDivNat.vo ../trigo_without_pi/SeqAngleIsCauchy.vo ../trigo_without_pi/AngleTypeIsComplete.vo ../trigo_without_pi/TacChangeAngle.vo
 AngleEuclDistLtAngleLtLt.vo AngleEuclDistLtAngleLtLt.glob AngleEuclDistLtAngleLtLt.v.beautified AngleEuclDistLtAngleLtLt.required_vo: AngleEuclDistLtAngleLtLt.v ../main/Misc.vo ../main/RingLike.vo ../trigo_without_pi/TacChangeAngle.vo ../trigo_without_pi/RealLike.vo ../trigo_without_pi/Angle.vo ../trigo_without_pi/TrigoWithoutPiExt.vo ../trigo_without_pi/Angle_order.vo ../trigo_without_pi/AngleDiv2.vo ../trigo_without_pi/AngleDiv2Add.vo ../trigo_without_pi/AngleAddLeMonoL.vo ../trigo_without_pi/AngleAddOverflowLe.vo Complex.vo
 AngleRl.vo AngleRl.glob AngleRl.v.beautified AngleRl.required_vo: AngleRl.v ../main/RingLike.vo ../trigo_without_pi/Angle.vo
+AngleTan.vo AngleTan.glob AngleTan.v.beautified AngleTan.required_vo: AngleTan.v ../main/RingLike.vo ../trigo_without_pi/Angle.vo
 Complex.vo Complex.glob Complex.v.beautified Complex.required_vo: Complex.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo ../trigo_without_pi/TacChangeAngle.vo ../trigo_without_pi/RealLike.vo ../trigo_without_pi/Angle.vo ../trigo_without_pi/TrigoWithoutPiExt.vo ../trigo_without_pi/Angle_order.vo ../trigo_without_pi/AngleAddOverflowLe.vo ../trigo_without_pi/AngleAddLeMonoL.vo ../trigo_without_pi/AngleDiv2.vo ../trigo_without_pi/AngleDiv2Add.vo Misc.vo
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v ../main/Misc.vo ../main/PermutationFun.vo Misc.vo
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v ../main/Misc.vo PQ.vo Nat_ggcd.vo
@@ -15,6 +16,7 @@ Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v
 NewtonBinomial.vo NewtonBinomial.glob NewtonBinomial.v.beautified NewtonBinomial.required_vo: NewtonBinomial.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo Misc.vo
 Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v ../main/Misc.vo Misc.vo FermatLittle.vo ../main/RingLike.vo
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v ../main/Misc.vo Misc.vo Nat_ggcd.vo
+ProjGeom.vo ProjGeom.glob ProjGeom.v.beautified ProjGeom.required_vo: ProjGeom.v ../main/RingLike.vo ../trigo_without_pi/RealLike.vo
 QG.vo QG.glob QG.v.beautified QG.required_vo: QG.v ../main/Misc.vo ../main/RingLike.vo
 Qrl.vo Qrl.glob Qrl.v.beautified Qrl.required_vo: Qrl.v ../main/RingLike.vo Rational.vo
 QuadIntRl.vo QuadIntRl.glob QuadIntRl.v.beautified QuadIntRl.required_vo: QuadIntRl.v ../main/Misc.vo ../main/RingLike.vo Misc.vo
