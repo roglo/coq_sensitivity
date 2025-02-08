@@ -69,9 +69,9 @@ Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
 Definition is_limit_when_tending_to_inf {A} dist (u : nat → A) (L : A) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (u n) L < ε)%L.
 
-Definition is_complete A (dist : A → A → T) :=
-  ∀ u, is_Cauchy_sequence dist u
-  → ∃ c, is_limit_when_tending_to_inf dist u c.
+Definition is_complete A (dist : distance A) :=
+  ∀ u, is_Cauchy_sequence d_dist u
+  → ∃ c, is_limit_when_tending_to_inf d_dist u c.
 
 Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
   (da : distance A) (db : distance B) (f : A → B) (x₀ : A) (L : B) :=

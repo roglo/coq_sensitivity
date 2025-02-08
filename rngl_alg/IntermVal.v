@@ -839,7 +839,7 @@ Theorem exists_supremum :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_is_archimedean T = true →
-  is_complete T rngl_dist →
+  is_complete T rngl_distance →
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x < b)%L)
@@ -1271,7 +1271,7 @@ Theorem intermediate_value_le :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_is_archimedean T = true →
-  is_complete T rngl_dist →
+  is_complete T rngl_distance →
   ∀ f, continuous rngl_distance rngl_distance f
   → ∀ a b u, (a ≤ b)%L
   → (f a ≤ u ≤ f b)%L
@@ -1572,7 +1572,7 @@ Theorem intermediate_value :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_is_archimedean T = true →
-  is_complete T rngl_dist →
+  is_complete T rngl_distance →
   ∀ f, continuous rngl_distance rngl_distance f
   → ∀ a b u, (a ≤ b)%L
   → (rngl_min (f a) (f b) ≤ u ≤ rngl_max (f a) (f b))%L

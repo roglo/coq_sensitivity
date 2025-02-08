@@ -421,9 +421,12 @@ Qed.
 Definition rngl_distance :=
   {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
 
+Definition angle_eucl_distance :=
+  {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
+
 Theorem rngl_is_complete_angle_is_complete :
-  is_complete T rngl_dist
-  → is_complete (angle T) angle_eucl_dist.
+  is_complete T rngl_distance
+  → is_complete (angle T) angle_eucl_distance.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.

@@ -597,13 +597,10 @@ split; intros H12. {
 }
 Qed.
 
-Definition angle_eucl_distance :=
-  {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
-
 Theorem angle_div_nat_prop :
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
-  is_complete T rngl_dist →
+  is_complete T rngl_distance →
   ∀ θ n θ',
   angle_div_nat θ n θ'
   → (n = 0 ∧ θ' = 0%A) ∨ (n * θ')%A = θ.
@@ -767,7 +764,7 @@ Qed.
 Theorem exists_angle_div_nat :
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
-  is_complete T rngl_dist →
+  is_complete T rngl_distance →
   ∀ θ n,
   n ≠ 0
   → ∃ θ', (n * θ')%A = θ.

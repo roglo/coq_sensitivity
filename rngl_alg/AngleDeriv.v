@@ -540,12 +540,6 @@ now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-Definition rngl_distance :=
-  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
-
-Definition angle_eucl_distance :=
-  {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
-
 (* *)
 
 Definition angle_lt_for_deriv θ1 θ2 :=
