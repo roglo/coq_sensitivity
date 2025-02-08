@@ -12,19 +12,20 @@ Context {rp : ring_like_prop T}.
 
 Definition rngl_tan θ := (rngl_sin θ / rngl_cos θ)%L.
 
+Context {Hop : rngl_has_opp T = true}.
+Context {Hor : rngl_is_ordered T = true}.
+
 (* to be completed
 Definition rngl_distance :=
-  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
 
 Theorem left_derivative_mul :
-  rngl_is_ordered T = true →
   ∀ A lt da (f g f' g' : A → T) x₀,
   left_derivative_at lt da rngl_distance f f' x₀
-  → left_derivative_at lt da db g g' x₀
-  → left_derivative_at lt da db (λ x : A, (f x * g x)%L)
+  → left_derivative_at lt da rngl_distance g g' x₀
+  → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
       (λ x : A, (f x * g' x + f' x * g x)%L) x₀.
 Proof.
-intros Hor.
 intros * Hf Hg.
 intros ε Hε.
 specialize (Hf ε Hε).
@@ -50,14 +51,13 @@ assert (H : (d_dist x x₀ < ηg)%L). {
   apply (rngl_le_min_r Hor).
 }
 specialize (Hg H); clear H.
-Theorem dist_mul_distr_r :
-  ∀ (dist : distance T) a b c,
-  (d_dist a b * c = d_dist (a * c) (b * c))%L.
+Theorem rngl_dist_mul_distr_r :
+  ∀ a b c, (rngl_dist a b * c = rngl_dist (a * c) (b * c))%L.
 Proof.
 intros.
-destruct dist.
-cbn.
-destruct d_prop.
+progress unfold rngl_dist.
+rewrite <- (rngl_mul_sub_distr_r Hop).
+progress unfold rngl_abs.
 ....
 
 Theorem derivative_mul :
