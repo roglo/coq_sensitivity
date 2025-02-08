@@ -1204,7 +1204,7 @@ apply rngl_sin_nonneg_is_pos; [ | | easy ]. {
 Qed.
 
 Theorem is_Cauchy_sequence_eq_compat :
-  ∀ A (dist : A → _) a b f g,
+  ∀ A (dist : distance A) a b f g,
   (∀ i, f (i + a) = g (i + b))
   → is_Cauchy_sequence dist f
   → is_Cauchy_sequence dist g.

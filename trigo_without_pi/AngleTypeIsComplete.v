@@ -75,10 +75,16 @@ rewrite <- angle_eucl_dist_move_0_r.
 apply (rngl_le_refl Hor).
 Qed.
 
+Definition rngl_distance :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
+
+Definition angle_eucl_distance :=
+  {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
+
 Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
   ∀ θ,
-  is_Cauchy_sequence angle_eucl_dist θ
-  → is_Cauchy_sequence rngl_dist (λ i, rngl_cos (θ i)).
+  is_Cauchy_sequence angle_eucl_distance θ
+  → is_Cauchy_sequence rngl_distance (λ i, rngl_cos (θ i)).
 Proof.
 destruct_ac.
 intros * Hcs.
@@ -87,6 +93,7 @@ specialize (Hcs ε Hε).
 destruct Hcs as (N, HN).
 exists N.
 intros * Hp Hq.
+cbn.
 progress unfold rngl_dist.
 destruct (rngl_le_dec Hor (rngl_cos (θ q)) (rngl_cos (θ p))) as [Hpq| Hpq]. {
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
@@ -107,8 +114,8 @@ Qed.
 
 Theorem rngl_is_Cauchy_angle_is_Cauchy_sin :
   ∀ θ,
-  is_Cauchy_sequence angle_eucl_dist θ
-  → is_Cauchy_sequence rngl_dist (λ i, rngl_sin (θ i)).
+  is_Cauchy_sequence angle_eucl_distance θ
+  → is_Cauchy_sequence rngl_distance (λ i, rngl_sin (θ i)).
 Proof.
 destruct_ac.
 intros * Hcs.
@@ -117,6 +124,7 @@ specialize (Hcs ε Hε).
 destruct Hcs as (N, HN).
 exists N.
 intros * Hp Hq.
+cbn.
 progress unfold rngl_dist.
 destruct (rngl_le_dec Hor (rngl_sin (θ q)) (rngl_sin (θ p))) as [Hpq| Hpq]. {
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
@@ -134,12 +142,6 @@ destruct (rngl_le_dec Hor (rngl_sin (θ q)) (rngl_sin (θ p))) as [Hpq| Hpq]. {
   apply rngl_sin_diff_le_eucl_dist.
 }
 Qed.
-
-Definition rngl_distance :=
-  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
-
-Definition angle_eucl_distance :=
-  {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
 
 (* to be moved somewhere else *)
 Theorem rngl_dist_to_limit_bounded :

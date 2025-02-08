@@ -345,17 +345,21 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 }
 Qed.
 
+Context {Hop : rngl_has_opp T = true}.
+Context {Hor : rngl_is_ordered T = true}.
+
+Definition rngl_distance :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
+
 Theorem An_Bn_are_Cauchy_sequences :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ P a b, (a ≤ b)%L →
-  is_Cauchy_sequence rngl_dist (λ n : nat, fst (AnBn P a b n)) ∧
-  is_Cauchy_sequence rngl_dist (λ n : nat, snd (AnBn P a b n)).
+  is_Cauchy_sequence rngl_distance (λ n : nat, fst (AnBn P a b n)) ∧
+  is_Cauchy_sequence rngl_distance (λ n : nat, snd (AnBn P a b n)).
 Proof.
-intros Hon Hop Hiv Hor Har * Hab.
+intros Hon Hiv Har * Hab.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -523,15 +527,13 @@ Qed.
 
 Theorem rngl_abs_An_Bn_le :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   ∀ a b, (a ≤ b)%L →
   ∀ P n an bn,
   AnBn P a b n = (an, bn)
   → (rngl_abs (an - bn) ≤ (b - a) / 2 ^ n)%L.
 Proof.
-intros Hon Hop Hiv Hor * Hab * Habn.
+intros Hon Hiv * Hab * Habn.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
@@ -559,12 +561,6 @@ rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
 }
 apply (rngl_le_refl Hor).
 Qed.
-
-Context {Hop : rngl_has_opp T = true}.
-Context {Hor : rngl_is_ordered T = true}.
-
-Definition rngl_distance :=
-  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
 
 Theorem limit_opp :
   ∀ u lim,
@@ -883,7 +879,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 unfold is_supremum.
 set (u := λ n, fst (AnBn P a b n)).
 set (v := λ n, snd (AnBn P a b n)).
-specialize (An_Bn_are_Cauchy_sequences Hon Hop Hiv Hor Har P) as H1.
+specialize (An_Bn_are_Cauchy_sequences Hon Hiv Har P) as H1.
 assert (Hab : (a ≤ b)%L) by now apply (rngl_lt_le_incl Hor), Hs.
 specialize (H1 a b Hab).
 progress fold u in H1.
@@ -912,7 +908,7 @@ assert
   progress unfold rngl_dist.
   rewrite (rngl_sub_0_r Hos).
   eapply (rngl_le_lt_trans Hor). {
-    apply (rngl_abs_An_Bn_le Hon Hop Hiv Hor _ _ Hab P n).
+    apply (rngl_abs_An_Bn_le Hon Hiv _ _ Hab P n).
     apply surjective_pairing.
   }
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {

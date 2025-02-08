@@ -541,7 +541,7 @@ Qed.
 Theorem seq_angle_to_div_nat_is_Cauchy :
   rngl_is_archimedean T = true →
   ∀ n θ,
-  is_Cauchy_sequence angle_eucl_dist (seq_angle_to_div_nat θ n).
+  is_Cauchy_sequence angle_eucl_distance (seq_angle_to_div_nat θ n).
 Proof.
 intros Har *.
 destruct_ac.
@@ -556,7 +556,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
   subst θ.
-  enough (H : is_Cauchy_sequence angle_eucl_dist (λ _, 0%A)). {
+  enough (H : is_Cauchy_sequence angle_eucl_distance (λ _, 0%A)). {
     intros ε Hε.
     specialize (H ε Hε).
     destruct H as (N, HN).
@@ -566,11 +566,13 @@ destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
     progress unfold seq_angle_to_div_nat.
     do 2 rewrite angle_0_div_2_pow.
     do 2 rewrite angle_mul_0_r.
+    cbn.
     now rewrite angle_eucl_dist_diag.
   }
   (* lemma to do const_seq_is_Cauchy *)
   exists 0.
   intros p q _ _.
+  cbn.
   now rewrite angle_eucl_dist_diag.
 }
 intros * ε Hε.
@@ -588,6 +590,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   progress unfold seq_angle_to_div_nat.
   do 2 rewrite Nat.div_1_r.
   do 2 rewrite angle_div_2_pow_mul_2_pow.
+  cbn.
   now rewrite angle_eucl_dist_diag.
 }
 assert (Hss : ∀ i, (seq_angle_to_div_nat θ n i ≤ angle_straight)%A). {

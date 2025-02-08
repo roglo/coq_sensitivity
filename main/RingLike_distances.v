@@ -62,15 +62,15 @@ Qed.
 
 (* limits *)
 
-Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
+Definition is_Cauchy_sequence {A} (dist : distance A) (u : nat → A) :=
   ∀ ε : T, (0 < ε)%L →
-  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (dist (u p) (u q) < ε)%L.
+  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (d_dist (u p) (u q) < ε)%L.
 
 Definition is_limit_when_tending_to_inf {A} (dist : distance A) u L :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (d_dist (u n) L < ε)%L.
 
 Definition is_complete A (dist : distance A) :=
-  ∀ u, is_Cauchy_sequence d_dist u
+  ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
 
 Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
