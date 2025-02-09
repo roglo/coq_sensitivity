@@ -120,11 +120,23 @@ apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hg. 2: {
   subst x.
   now apply Hlti in Hlt.
 }
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)). {
+  apply (rngl_lt_iff Hor).
+  destruct da as (da, dap).
+  split; [ now apply (dist_nonneg Hon Hop Hiv Hor) | ].
+  cbn; intros H; symmetry in H.
+  apply dist_separation in H; [ | easy ].
+  subst x.
+  now apply Hlti in Hlt.
+}
 cbn in Hf, Hg.
 rewrite (rngl_dist_mul_distr_r Hii) in Hf. 2: {
   now apply (dist_nonneg Hon Hop Hiv Hor).
 }
 rewrite (rngl_dist_mul_distr_r Hii) in Hg. 2: {
+  now apply (dist_nonneg Hon Hop Hiv Hor).
+}
+rewrite (rngl_dist_mul_distr_r Hii). 2: {
   now apply (dist_nonneg Hon Hop Hiv Hor).
 }
 rewrite (rngl_div_mul Hon Hiv) in Hf. 2: {
@@ -139,6 +151,13 @@ rewrite (rngl_div_mul Hon Hiv) in Hg. 2: {
   subst x.
   now apply Hlti in Hlt.
 }
+rewrite (rngl_div_mul Hon Hiv). 2: {
+  intros H.
+  apply dist_separation in H; [ | now destruct da ].
+  subst x.
+  now apply Hlti in Hlt.
+}
+rewrite rngl_mul_add_distr_r.
 ...
 Search (0 ≤ angle_eucl_dist _ _)%L.
 Require Import Trigo.TrigoWithoutPiExt.
