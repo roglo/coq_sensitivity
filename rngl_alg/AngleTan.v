@@ -1,3 +1,5 @@
+(* trigonometry; tangent; derivability of a product *)
+
 Set Nested Proofs Allowed.
 
 Require Import Utf8.
@@ -158,6 +160,10 @@ rewrite (rngl_div_mul Hon Hiv). 2: {
   now apply Hlti in Hlt.
 }
 rewrite rngl_mul_add_distr_r.
+...
+progress unfold rngl_dist.
+progress unfold rngl_dist in Hf.
+progress unfold rngl_dist in Hg.
 ...
 Search (0 ≤ angle_eucl_dist _ _)%L.
 Require Import Trigo.TrigoWithoutPiExt.
