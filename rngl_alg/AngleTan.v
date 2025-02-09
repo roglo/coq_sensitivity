@@ -64,6 +64,7 @@ Definition rngl_distance :=
 
 (* to be completed
 Theorem left_derivative_mul :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ A lt, (∀ x, ¬ (lt x x)) →
@@ -73,7 +74,7 @@ Theorem left_derivative_mul :
   → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
       (λ x : A, (f x * g' x + f' x * g x)%L) x₀.
 Proof.
-intros Hon Hiv.
+intros Hic Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hlti * Hf Hg.
@@ -160,6 +161,26 @@ rewrite (rngl_div_mul Hon Hiv). 2: {
   now apply Hlti in Hlt.
 }
 rewrite rngl_mul_add_distr_r.
+rewrite <- (rngl_add_sub Hos (_ - _) (f x * g x₀)).
+rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite <- (rngl_mul_sub_distr_r Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+remember (f x₀ - f x)%L as a.
+remember (g x₀ - g x)%L as b.
+rewrite (rngl_add_comm (_ * _ * _)).
+rewrite (rngl_mul_mul_swap Hic (f' x₀)).
+rewrite <- (rngl_mul_assoc (f x₀)).
+rewrite (rngl_mul_comm Hic (f x₀)).
+remember (f' x₀ * d_dist x x₀)%L as c.
+remember (g' x₀ * d_dist x x₀)%L as d.
+move Hf at bottom.
+move Hg at bottom.
+rewrite (rngl_mul_comm Hic _ b).
+(* merde, j'ai b * f x à gauche mais d * f x₀ à droite,
+   x₀ à la place de x *)
 ...
 progress unfold rngl_dist.
 progress unfold rngl_dist in Hf.
