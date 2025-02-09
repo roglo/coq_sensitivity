@@ -64,7 +64,8 @@ Definition rngl_distance :=
 Theorem left_derivative_mul :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ A lt da (f g f' g' : A → T) x₀,
+  ∀ A lt, (∀ x, ¬ (lt x x)) →
+  ∀ da (f g f' g' : A → T) x₀,
   left_derivative_at lt da rngl_distance f f' x₀
   → left_derivative_at lt da rngl_distance g g' x₀
   → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
@@ -73,7 +74,7 @@ Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Hf Hg.
+intros * Hlti * Hf Hg.
 intros ε Hε.
 specialize (Hf ε Hε).
 specialize (Hg ε Hε).
@@ -103,17 +104,40 @@ apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hf. 2: {
   clear H.
   apply (rngl_lt_iff Hor).
   destruct da as (da, dap).
-About dist_nonneg.
   split; [ now apply (dist_nonneg Hon Hop Hiv Hor) | ].
   cbn; intros H; symmetry in H.
   apply dist_separation in H; [ | easy ].
   subst x.
-  rewrite dist_diag in Hd, Hf, Hg.
-  rewrite (rngl_sub_diag Hos) in Hf, Hg.
-...
-cbn in Hf.
+  now apply Hlti in Hlt.
+}
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hg. 2: {
+  clear H.
+  apply (rngl_lt_iff Hor).
+  destruct da as (da, dap).
+  split; [ now apply (dist_nonneg Hon Hop Hiv Hor) | ].
+  cbn; intros H; symmetry in H.
+  apply dist_separation in H; [ | easy ].
+  subst x.
+  now apply Hlti in Hlt.
+}
+cbn in Hf, Hg.
 rewrite (rngl_dist_mul_distr_r Hii) in Hf. 2: {
   now apply (dist_nonneg Hon Hop Hiv Hor).
+}
+rewrite (rngl_dist_mul_distr_r Hii) in Hg. 2: {
+  now apply (dist_nonneg Hon Hop Hiv Hor).
+}
+rewrite (rngl_div_mul Hon Hiv) in Hf. 2: {
+  intros H.
+  apply dist_separation in H; [ | now destruct da ].
+  subst x.
+  now apply Hlti in Hlt.
+}
+rewrite (rngl_div_mul Hon Hiv) in Hg. 2: {
+  intros H.
+  apply dist_separation in H; [ | now destruct da ].
+  subst x.
+  now apply Hlti in Hlt.
 }
 ...
 Search (0 ≤ angle_eucl_dist _ _)%L.
