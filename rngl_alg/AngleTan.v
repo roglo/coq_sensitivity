@@ -115,8 +115,7 @@ assert (H : (d_dist x x₀ < ηg)%L). {
 }
 specialize (Hg H); clear H.
 cbn.
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hf. 2: {
-  clear H.
+assert (Hzd : (0 < d_dist x x₀)%L). {
   apply (rngl_lt_iff Hor).
   destruct da as (da, dap).
   split; [ now apply (dist_nonneg Hon Hop Hiv Hor) | ].
@@ -125,52 +124,27 @@ apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hf. 2: {
   subst x.
   now apply Hlti in Hlt.
 }
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hg. 2: {
-  clear H.
-  apply (rngl_lt_iff Hor).
-  destruct da as (da, dap).
-  split; [ now apply (dist_nonneg Hon Hop Hiv Hor) | ].
-  cbn; intros H; symmetry in H.
-  apply dist_separation in H; [ | easy ].
-  subst x.
-  now apply Hlti in Hlt.
+assert (Hzed : (0 ≤ d_dist x x₀)%L). {
+  now apply (dist_nonneg Hon Hop Hiv Hor).
 }
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)). {
-  apply (rngl_lt_iff Hor).
-  destruct da as (da, dap).
-  split; [ now apply (dist_nonneg Hon Hop Hiv Hor) | ].
-  cbn; intros H; symmetry in H.
-  apply dist_separation in H; [ | easy ].
-  subst x.
-  now apply Hlti in Hlt.
-}
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii _ _ _ Hzd) in Hf.
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii _ _ _ Hzd) in Hg.
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii _ _ _ Hzd).
 cbn in Hf, Hg.
-rewrite (rngl_dist_mul_distr_r Hii) in Hf. 2: {
-  now apply (dist_nonneg Hon Hop Hiv Hor).
-}
-rewrite (rngl_dist_mul_distr_r Hii) in Hg. 2: {
-  now apply (dist_nonneg Hon Hop Hiv Hor).
-}
-rewrite (rngl_dist_mul_distr_r Hii). 2: {
-  now apply (dist_nonneg Hon Hop Hiv Hor).
-}
+rewrite (rngl_dist_mul_distr_r Hii _ _ _ Hzed) in Hf.
+rewrite (rngl_dist_mul_distr_r Hii _ _ _ Hzed) in Hg.
+rewrite (rngl_dist_mul_distr_r Hii _ _ _ Hzed).
 rewrite (rngl_div_mul Hon Hiv) in Hf. 2: {
-  intros H.
-  apply dist_separation in H; [ | now destruct da ].
-  subst x.
-  now apply Hlti in Hlt.
+  intros H; rewrite H in Hzd.
+  now apply (rngl_lt_irrefl Hor) in Hzd.
 }
 rewrite (rngl_div_mul Hon Hiv) in Hg. 2: {
-  intros H.
-  apply dist_separation in H; [ | now destruct da ].
-  subst x.
-  now apply Hlti in Hlt.
+  intros H; rewrite H in Hzd.
+  now apply (rngl_lt_irrefl Hor) in Hzd.
 }
 rewrite (rngl_div_mul Hon Hiv). 2: {
-  intros H.
-  apply dist_separation in H; [ | now destruct da ].
-  subst x.
-  now apply Hlti in Hlt.
+  intros H; rewrite H in Hzd.
+  now apply (rngl_lt_irrefl Hor) in Hzd.
 }
 rewrite rngl_mul_add_distr_r.
 rewrite <- (rngl_add_sub Hos (_ - _) (f x * g x₀)).
