@@ -77,9 +77,21 @@ Proof.
 intros Hic Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 intros * Hlti * Hf Hg.
 intros ε Hε.
+(*
+specialize (Hf (ε * rngl_abs (f x₀) + 1))%L.
+assert (H : (0 < ε * rngl_abs (f x₀) + 1)%L) by admit.
+specialize (Hf H); clear H.
+...
+destruct (rngl_eq_dec Heo (f x₀) 0) as [Hfz| Hfz]. {
+  rewrite Hfz.
+  progress unfold left_derivative_at in Hf.
+*)
 specialize (Hf ε Hε).
+(**)
 specialize (Hg ε Hε).
 move Hε before ε.
 destruct Hf as (ηf & Hηf & Hf).
@@ -176,6 +188,9 @@ rewrite <- (rngl_mul_assoc (f x₀)).
 rewrite (rngl_mul_comm Hic (f x₀)).
 remember (f' x₀ * d_dist x x₀)%L as c.
 remember (g' x₀ * d_dist x x₀)%L as d.
+move x before x₀.
+move a before x; move b before a; move c before b; move d before c.
+move Heqb before Heqa.
 move Hf at bottom.
 move Hg at bottom.
 rewrite (rngl_mul_comm Hic _ b).
@@ -198,6 +213,34 @@ rewrite <- (rngl_sub_sub_distr Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite <- Heqa.
 rewrite (rngl_mul_comm Hic b).
+(* lemma *)
+rewrite <- (rngl_add_opp_r Hop).
+eapply (rngl_le_lt_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
+rewrite (rngl_abs_opp Hop Hor).
+eapply (rngl_le_lt_trans Hor). {
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_abs_triangle Hop Hor).
+}
+do 2 rewrite (rngl_abs_mul Hop Hi1 Hor).
+apply (rngl_lt_le_incl Hor) in Hf, Hg.
+apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_abs (g x₀))) in Hf. 2: {
+  apply (rngl_abs_nonneg Hop Hor).
+}
+apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_abs (f x₀))) in Hg. 2: {
+  apply (rngl_abs_nonneg Hop Hor).
+}
+eapply (rngl_le_lt_trans Hor). {
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply Hf.
+}
+eapply (rngl_le_lt_trans Hor). {
+  rewrite (rngl_add_comm (_ * _)).
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply Hg.
+}
+rewrite <- rngl_mul_add_distr_l.
 ....
 
 Theorem derivative_mul :
