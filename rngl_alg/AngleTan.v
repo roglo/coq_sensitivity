@@ -2,7 +2,7 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8.
+Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import Trigo.Angle.
 
@@ -59,6 +59,58 @@ symmetry.
 apply (rngl_opp_0 Hop).
 Qed.
 
+Definition is_limit_when_tending_to_neighbourhood_le (is_left : bool) {A B} lt
+  (da : distance A) (db : distance B) (f : A → B) (x₀ : A) (L : B) :=
+  (∀ ε : T, 0 < ε →
+   ∃ η : T, (0 < η)%L ∧ ∀ x : A,
+   (if is_left then lt x x₀ else lt x₀ x)
+   → d_dist x x₀ < η
+   → d_dist (f x) L ≤ ε)%L.
+
+Theorem is_limit_lt_is_limit_le_iff :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  ∀ is_left {A B} lt da db (f : A → B) x₀ L,
+  is_limit_when_tending_to_neighbourhood is_left lt da db f x₀ L
+  ↔ is_limit_when_tending_to_neighbourhood_le is_left lt da db f x₀ L.
+Proof.
+intros Hon Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  split; intros H ε; rewrite (H1 ε); intro Hε;
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+intros.
+split; intros H1 ε Hε. {
+  specialize (H1 ε Hε).
+  destruct H1 as (η & Hη & H1).
+  exists η.
+  split; [ easy | ].
+  intros x Hlt Hd.
+  apply (rngl_lt_le_incl Hor).
+  now apply H1.
+} {
+  specialize (H1 (ε / 2))%L.
+  assert (Hε2 : (0 < ε / 2)%L). {
+    apply (rngl_div_pos Hon Hop Hiv Hor _ _ Hε Hz2).
+  }
+  specialize (H1 Hε2).
+  destruct H1 as (η & Hη & H1).
+  exists η.
+  split; [ easy | ].
+  intros x Hlt Hd.
+  apply (rngl_le_lt_trans Hor _ (ε / 2)). 2: {
+    apply (rngl_lt_div_l Hon Hop Hiv Hor _ _ _ Hz2).
+    rewrite (rngl_mul_2_r Hon).
+    apply (rngl_lt_add_l Hos Hor _ _ Hε).
+  }
+  now apply H1.
+}
+Qed.
+
 Definition rngl_distance :=
   {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
 
@@ -80,18 +132,19 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 intros * Hlti * Hf Hg.
+progress unfold left_derivative_at in Hf.
+progress unfold left_derivative_at in Hg.
+progress unfold left_derivative_at.
+apply (is_limit_lt_is_limit_le_iff Hon Hiv) in Hf, Hg.
+apply (is_limit_lt_is_limit_le_iff Hon Hiv).
 intros ε Hε.
 (*
 specialize (Hf (ε * rngl_abs (f x₀) + 1))%L.
 assert (H : (0 < ε * rngl_abs (f x₀) + 1)%L) by admit.
 specialize (Hf H); clear H.
 ...
-destruct (rngl_eq_dec Heo (f x₀) 0) as [Hfz| Hfz]. {
-  rewrite Hfz.
-  progress unfold left_derivative_at in Hf.
 *)
 specialize (Hf ε Hε).
-(**)
 specialize (Hg ε Hε).
 move Hε before ε.
 destruct Hf as (ηf & Hηf & Hf).
@@ -127,9 +180,9 @@ assert (Hzd : (0 < d_dist x x₀)%L). {
 assert (Hzed : (0 ≤ d_dist x x₀)%L). {
   now apply (dist_nonneg Hon Hop Hiv Hor).
 }
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii _ _ _ Hzd) in Hf.
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii _ _ _ Hzd) in Hg.
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii _ _ _ Hzd).
+apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ _ Hzd) in Hf.
+apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ _ Hzd) in Hg.
+apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ _ Hzd).
 cbn in Hf, Hg.
 rewrite (rngl_dist_mul_distr_r Hii _ _ _ Hzed) in Hf.
 rewrite (rngl_dist_mul_distr_r Hii _ _ _ Hzed) in Hg.
@@ -189,21 +242,30 @@ rewrite <- Heqa.
 rewrite (rngl_mul_comm Hic b).
 (* lemma *)
 rewrite <- (rngl_add_opp_r Hop).
-eapply (rngl_le_lt_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
+eapply (rngl_le_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
 rewrite (rngl_abs_opp Hop Hor).
-eapply (rngl_le_lt_trans Hor). {
+eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_r Hop Hor).
   apply (rngl_abs_triangle Hop Hor).
 }
 do 2 rewrite (rngl_abs_mul Hop Hi1 Hor).
-apply (rngl_lt_le_incl Hor) in Hf, Hg.
+...
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor).
+  apply (rngl_abs_nonneg Hop Hor).
+  apply Hf.
+}
 apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_abs (g x₀))) in Hf. 2: {
   apply (rngl_abs_nonneg Hop Hor).
 }
+...
 apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_abs (f x₀))) in Hg. 2: {
   apply (rngl_abs_nonneg Hop Hor).
 }
-eapply (rngl_le_lt_trans Hor). {
+eapply (rngl_le_trans Hor). {
+...
   apply (rngl_add_le_mono_r Hop Hor).
   apply (rngl_add_le_mono_r Hop Hor).
   apply Hf.
