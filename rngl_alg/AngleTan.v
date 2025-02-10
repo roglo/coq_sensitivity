@@ -181,19 +181,23 @@ move Hg at bottom.
 rewrite (rngl_mul_comm Hic _ b).
 (* merde, j'ai b * f x à gauche mais d * f x₀ à droite,
    x₀ à la place de x *)
-...
 progress unfold rngl_dist.
 progress unfold rngl_dist in Hf.
 progress unfold rngl_dist in Hg.
-...
-Search (0 ≤ angle_eucl_dist _ _)%L.
-Require Import Trigo.TrigoWithoutPiExt.
-About dist_nonneg.
-Check angle_eucl_dist_nonneg.
-...
-Search rngl_dist.
-Search (0 ≤ rngl_dist _ _)%L.
-Search (0 ≤ d_dist _ _)%L.
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_mul_sub_distr_r Hop).
+rewrite <- (rngl_add_sub Hos (_ - _) (b  * f x₀)).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite rngl_add_add_swap.
+rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_assoc Hop _ (b * f x₀)).
+rewrite <- (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_sub_sub_distr Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite <- Heqa.
+rewrite (rngl_mul_comm Hic b).
 ....
 
 Theorem derivative_mul :

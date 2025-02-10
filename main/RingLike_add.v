@@ -736,6 +736,7 @@ End a.
 
 Arguments rngl_abs {T ro} a%_L.
 Arguments rngl_add_sub {T ro rp} Hom (a b)%_L.
+Arguments rngl_add_sub_assoc {T ro rp} Hop (a b c)%_L.
 Arguments rngl_add_sub_swap {T ro rp} Hop (a b c)%_L.
 Arguments rngl_min {T ro} (a b)%_L.
 Arguments rngl_mul_nat {T ro} a%_L n%_nat.
