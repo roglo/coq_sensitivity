@@ -128,6 +128,7 @@ Proof.
 intros Hon Hiv.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 intros * Hlti * Hd.
 rename x into x₀.
 intros ε Hε.
@@ -163,21 +164,26 @@ enough (Hxx : lt x x₀). {
   rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
   progress unfold rngl_dist in Hd.
   progress unfold rngl_dist.
-eapply (rngl_lt_le_trans Hor). {
-  rewrite <- (rngl_add_sub Hos (_ - _) (f' x₀ * d_dist x x₀)).
-  rewrite <- (rngl_abs_opp Hop Hor).
-  rewrite (rngl_opp_sub_distr Hop).
-  rewrite (rngl_sub_add_distr Hos).
-  rewrite (rngl_sub_sub_distr Hop).
-  rewrite <- (rngl_add_sub_swap Hop).
-  rewrite rngl_add_comm.
-  do 2 rewrite (rngl_add_sub_swap Hop).
-  eapply (rngl_le_lt_trans Hor). {
-    apply (rngl_abs_triangle Hop Hor).
+  eapply (rngl_lt_le_trans Hor). {
+    rewrite <- (rngl_add_sub Hos (_ - _) (f' x₀ * d_dist x x₀)).
+    rewrite <- (rngl_abs_opp Hop Hor).
+    rewrite (rngl_opp_sub_distr Hop).
+    rewrite (rngl_sub_add_distr Hos).
+    rewrite (rngl_sub_sub_distr Hop).
+    rewrite <- (rngl_add_sub_swap Hop).
+    rewrite rngl_add_comm.
+    do 2 rewrite (rngl_add_sub_swap Hop).
+    eapply (rngl_le_lt_trans Hor). {
+      apply (rngl_abs_triangle Hop Hor).
+    }
+    apply (rngl_add_lt_mono_r Hop Hor).
+    apply Hd.
   }
-  apply (rngl_add_lt_mono_r Hop Hor).
-  apply Hd.
-}
+  rewrite (rngl_abs_mul Hop Hi1 Hor).
+  rewrite (rngl_abs_nonneg_eq Hop Hor (d_dist _ _)). 2: {
+    apply (dist_nonneg Hon Hop Hiv Hor).
+  }
+  rewrite <- rngl_mul_add_distr_r.
 ...
   rewrite <- (rngl_abs_opp Hop Hor) in Hd.
   rewrite (rngl_opp_sub_distr Hop) in Hd.
