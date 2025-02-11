@@ -146,14 +146,24 @@ progress unfold left_derivative_at.
 apply (is_limit_lt_is_limit_le_iff Hon Hiv) in Hf, Hg.
 apply (is_limit_lt_is_limit_le_iff Hon Hiv).
 intros ε Hε.
-specialize (Hf (ε / (rngl_abs (g x₀) + 2)))%L.
-assert (H : (0 < ε / (rngl_abs (g x₀) + 2))%L). {
+specialize (Hf (ε / (2 * rngl_abs (g x₀) + 1)))%L.
+assert (H : (0 < ε / (2 * rngl_abs (g x₀) + 1))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor _ _ Hε).
-  apply (rngl_add_nonneg_pos Hor); [ | easy ].
+  apply (rngl_add_nonneg_pos Hor).
+  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
   apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 specialize (Hf H); clear H.
-specialize (Hg ε Hε).
+specialize (Hg (ε / (2 * rngl_abs (f x₀) + 1)))%L.
+assert (H : (0 < ε / (2 * rngl_abs (f x₀) + 1))%L). {
+  apply (rngl_div_pos Hon Hop Hiv Hor _ _ Hε).
+  apply (rngl_add_nonneg_pos Hor).
+  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+  apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+}
+specialize (Hg H); clear H.
 move Hε before ε.
 destruct Hf as (ηf & Hηf & Hf).
 destruct Hg as (ηg & Hηg & Hg).
@@ -278,43 +288,56 @@ eapply (rngl_le_trans Hor). {
   apply (rngl_le_trans Hor _ (ε * d_dist x x₀ / 2)). 2: {
     apply (rngl_le_refl Hor).
   }
-(* chuis pas sûr que ça soit bon, ça *)
-...
-  apply (rngl_mul_le_mono_nonneg_r Hop Hor). {
-    apply (dist_nonneg Hon Hop Hiv Hor).
-  }
+  rewrite <- (rngl_div_mul_mul_div Hic Hiv).
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ _ Hzed).
+  apply -> (rngl_le_div_r Hon Hop Hiv Hor); [ | easy ].
+  rewrite (rngl_mul_mul_swap Hic).
+  rewrite <- rngl_mul_assoc.
   rewrite (rngl_div_mul_mul_div Hic Hiv).
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
-    apply (rngl_add_nonneg_pos Hor); [ | easy ].
+    apply (rngl_add_nonneg_pos Hor).
+    apply (rngl_mul_nonneg_nonneg Hos Hor _ _ Hz2').
     apply (rngl_abs_nonneg Hop Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
   }
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
-    now apply (rngl_lt_le_incl Hor).
-  }
-  now apply (rngl_le_add_r Hor).
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_le_add_r Hor).
+  apply (rngl_0_le_1 Hon Hos Hor).
 }
-...
-rewrite (rngl_div_mul_mul_div Hic Hiv).
-...
-apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_abs (g x₀))) in Hf. 2: {
-  apply (rngl_abs_nonneg Hop Hor).
-}
-apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_abs (f x₀))) in Hg. 2: {
-  apply (rngl_abs_nonneg Hop Hor).
-}
+rewrite (rngl_add_comm (_ / _)).
 eapply (rngl_le_trans Hor). {
-...
   apply (rngl_add_le_mono_r Hop Hor).
   apply (rngl_add_le_mono_r Hop Hor).
-  apply Hf.
-}
-eapply (rngl_le_lt_trans Hor). {
-  rewrite (rngl_add_comm (_ * _)).
-  apply (rngl_add_le_mono_r Hop Hor).
-  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor).
+  apply (rngl_abs_nonneg Hop Hor).
   apply Hg.
 }
-rewrite <- rngl_mul_add_distr_l.
+rewrite (rngl_mul_mul_swap Hic).
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_le_trans Hor _ (ε * d_dist x x₀ / 2)). 2: {
+    apply (rngl_le_refl Hor).
+  }
+  rewrite <- (rngl_div_mul_mul_div Hic Hiv).
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ _ Hzed).
+  apply -> (rngl_le_div_r Hon Hop Hiv Hor); [ | easy ].
+  rewrite (rngl_mul_mul_swap Hic).
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_div_mul_mul_div Hic Hiv).
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    apply (rngl_add_nonneg_pos Hor).
+    apply (rngl_mul_nonneg_nonneg Hos Hor _ _ Hz2').
+    apply (rngl_abs_nonneg Hop Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_le_add_r Hor).
+  apply (rngl_0_le_1 Hon Hos Hor).
+}
+(* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 ....
 
 Theorem derivative_mul :
