@@ -4,6 +4,7 @@ Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
 Require Import Main.RingLike.
+Require Import Trigo.RealLike.
 Require Import Trigo.Angle.
 
 Section a.
@@ -11,6 +12,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
 
 Definition rngl_tan θ := (rngl_sin θ / rngl_cos θ)%L.
 
@@ -125,9 +127,43 @@ Theorem derivable_continuous :
 Proof.
 intros Hon Hiv.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hlti * Hd.
 rename x into x₀.
 intros ε Hε.
+(**)
+specialize (Hd √ε).
+assert (Hsε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
+specialize (Hd Hsε).
+destruct Hd as (η & Hη & Hd).
+exists (rngl_min √ε η).
+split; [ now apply rngl_min_glb_lt | ].
+intros x _ Hdxx.
+specialize (Hd x).
+enough (Hxx : lt x x₀). {
+  specialize (Hd Hxx).
+  apply (rngl_min_glb_lt_iff Hor) in Hdxx.
+  destruct Hdxx as (Hdε, Hdη).
+  specialize (Hd Hdη).
+  assert (Hdz : d_dist x x₀ ≠ 0%L). {
+    intros H.
+    apply dist_separation in H; [ | apply d_prop ].
+    subst x.
+    now apply Hlti in Hxx.
+  }
+  cbn in Hd |-*.
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
+    clear H.
+    apply (rngl_lt_iff Hor).
+    split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
+  }
+  rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
+    apply (dist_nonneg Hon Hop Hiv Hor).
+  }
+  rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
+  progress unfold rngl_dist in Hd.
+  progress unfold rngl_dist.
+...
 specialize (Hd ε Hε).
 destruct Hd as (η & Hη & Hd).
 exists η.
