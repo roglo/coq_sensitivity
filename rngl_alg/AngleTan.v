@@ -163,6 +163,29 @@ enough (Hxx : lt x x₀). {
   rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
   progress unfold rngl_dist in Hd.
   progress unfold rngl_dist.
+eapply (rngl_lt_le_trans Hor). {
+  rewrite <- (rngl_add_sub Hos (_ - _) (f' x₀ * d_dist x x₀)).
+  rewrite <- (rngl_abs_opp Hop Hor).
+  rewrite (rngl_opp_sub_distr Hop).
+  rewrite (rngl_sub_add_distr Hos).
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite rngl_add_comm.
+  do 2 rewrite (rngl_add_sub_swap Hop).
+  eapply (rngl_le_lt_trans Hor). {
+    apply (rngl_abs_triangle Hop Hor).
+  }
+  apply (rngl_add_lt_mono_r Hop Hor).
+  apply Hd.
+}
+...
+  rewrite <- (rngl_abs_opp Hop Hor) in Hd.
+  rewrite (rngl_opp_sub_distr Hop) in Hd.
+  rewrite (rngl_sub_sub_distr Hop) in Hd.
+  rewrite <- (rngl_add_sub_swap Hop) in Hd.
+  rewrite rngl_add_comm in Hd.
+  rewrite (rngl_add_sub_swap Hop) in Hd.
+Search (rngl_abs (_ + _)).
 ...
 specialize (Hd ε Hε).
 destruct Hd as (η & Hη & Hd).
