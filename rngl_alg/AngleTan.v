@@ -115,6 +115,41 @@ Definition rngl_distance :=
   {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
 
 (* to be completed
+Theorem derivable_continuous :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  ∀ A lt da (f f' : A → T) x,
+  left_derivative_at lt da rngl_distance f f' x
+  → continuous_at da rngl_distance f x.
+Proof.
+intros Hon Hiv.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hd.
+rename x into x₀.
+intros ε Hε.
+specialize (Hd ε Hε).
+destruct Hd as (η & Hη & Hd).
+exists η.
+split; [ easy | ].
+intros x _ Hdz.
+specialize (Hd x).
+(* bon, c'est compliqué, il faut pouvoir indiquer qu'on est dans
+   le cas "lt x x₀", c'est pas clair *)
+enough (H : lt x x₀). {
+  specialize (Hd H Hdz); clear H.
+  cbn in Hd |-*.
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd.
+  rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
+    apply (dist_nonneg Hon Hop Hiv Hor).
+  }
+  (* bon, avec tout ça, il faut que dist x x₀ ≠ 0 ; il faut que
+     je trouve un moyen d'exprimer cette condition ; en principe,
+     c'est "lt" qui est censé protéger de ça ; faut réfléchir *)
+...
+  progress unfold rngl_dist in Hd.
+  progress unfold rngl_dist.
+...
+
 Theorem left_derivative_mul :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -140,6 +175,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 intros * Hlti * Hf Hg.
+... ...
+generalize Hf; intros Hcf.
+apply derivable_continuous in Hcf.
+(**)
 progress unfold left_derivative_at in Hf.
 progress unfold left_derivative_at in Hg.
 progress unfold left_derivative_at.
@@ -217,13 +256,6 @@ rewrite (rngl_div_mul Hon Hiv). 2: {
   intros H; rewrite H in Hzd.
   now apply (rngl_lt_irrefl Hor) in Hzd.
 }
-(*
-rewrite (rngl_div_mul_mul_div Hic Hiv) in Hf.
-apply (rngl_le_div_r Hon Hop Hiv Hor) in Hf. 2: {
-  apply (rngl_add_nonneg_pos Hor); [ | easy ].
-  apply (rngl_abs_nonneg Hop Hor).
-}
-*)
 rewrite rngl_mul_add_distr_r.
 rewrite <- (rngl_add_sub Hos (_ - _) (f x * g x₀)).
 rewrite (rngl_add_sub_swap Hop).
@@ -338,6 +370,7 @@ eapply (rngl_le_trans Hor). {
   apply (rngl_0_le_1 Hon Hos Hor).
 }
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
+(* ça doit se démontrer par la continuité de f et de g *)
 ....
 
 Theorem derivative_mul :
