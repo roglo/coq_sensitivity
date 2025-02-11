@@ -118,34 +118,42 @@ Definition rngl_distance :=
 Theorem derivable_continuous :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ A lt da (f f' : A → T) x,
+  ∀ A lt, (∀ x, ¬ (lt x x)) →
+  ∀ da (f f' : A → T) x,
   left_derivative_at lt da rngl_distance f f' x
   → continuous_at da rngl_distance f x.
 Proof.
 intros Hon Hiv.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Hd.
+intros * Hlti * Hd.
 rename x into x₀.
 intros ε Hε.
 specialize (Hd ε Hε).
 destruct Hd as (η & Hη & Hd).
 exists η.
 split; [ easy | ].
-intros x _ Hdz.
+intros x _ Hdxx.
 specialize (Hd x).
 (* bon, c'est compliqué, il faut pouvoir indiquer qu'on est dans
    le cas "lt x x₀", c'est pas clair *)
-enough (H : lt x x₀). {
-  specialize (Hd H Hdz); clear H.
+enough (Hxx : lt x x₀). {
+  specialize (Hd Hxx Hdxx).
+  assert (Hdz : d_dist x x₀ ≠ 0%L). {
+    intros H.
+    apply dist_separation in H; [ | apply d_prop ].
+    subst x.
+    now apply Hlti in Hxx.
+  }
   cbn in Hd |-*.
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd.
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
+    clear H.
+    apply (rngl_lt_iff Hor).
+    split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
+  }
   rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
     apply (dist_nonneg Hon Hop Hiv Hor).
   }
-  (* bon, avec tout ça, il faut que dist x x₀ ≠ 0 ; il faut que
-     je trouve un moyen d'exprimer cette condition ; en principe,
-     c'est "lt" qui est censé protéger de ça ; faut réfléchir *)
-...
+  rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
   progress unfold rngl_dist in Hd.
   progress unfold rngl_dist.
 ...
