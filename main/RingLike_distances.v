@@ -81,13 +81,10 @@ Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
    → d_dist x x₀ < η
    → d_dist (f x) L < ε)%L.
 
-Definition is_limit_when_tending_to {A B} da db f (x₀ : A) (L : B) :=
-  is_limit_when_tending_to_neighbourhood true (λ _ _, True) da db f x₀ L.
-
 (* continuity *)
 
 Definition continuous_at {A B} da db (f : A → B) a :=
-  is_limit_when_tending_to da db f a (f a).
+  is_limit_when_tending_to_neighbourhood true (λ _ _, True) da db f a (f a).
 
 Definition continuous {A B} da db (f : A → B) :=
   ∀ a, continuous_at da db f a.

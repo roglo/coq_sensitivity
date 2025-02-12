@@ -1348,7 +1348,6 @@ assert (Hbc : c ≠ b). {
 }
 specialize (Hfc c) as Hcc.
 progress unfold continuous_at in Hcc.
-progress unfold is_limit_when_tending_to in Hcc.
 cbn in Hcc.
 set (η2 := rngl_min (c - a) (b - c)).
 assert (Hzη2 : (0 < η2)%L). {
