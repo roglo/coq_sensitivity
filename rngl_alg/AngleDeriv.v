@@ -1721,6 +1721,8 @@ Theorem rngl_cos_derivative :
 Proof.
 intros θ₀.
 split.
+apply rngl_cos_is_continuous.
+split.
 apply rngl_cos_left_derivative.
 apply rngl_cos_right_derivative.
 Qed.
@@ -1730,6 +1732,8 @@ Theorem rngl_sin_derivative :
     rngl_sin rngl_cos.
 Proof.
 intros θ₀.
+split.
+apply rngl_sin_is_continuous.
 split.
 apply rngl_sin_left_derivative.
 apply rngl_sin_right_derivative.

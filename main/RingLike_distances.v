@@ -103,6 +103,7 @@ Definition right_derivative_at {A} lt (da : distance A) (db : distance T)
 
 Definition is_derivative {A} lt (da : distance A) (db : distance T) f f' :=
   ∀ a,
+  continuous_at da db f a ∧
   left_derivative_at lt da db f f' a ∧
   right_derivative_at lt da db f f' a.
 
