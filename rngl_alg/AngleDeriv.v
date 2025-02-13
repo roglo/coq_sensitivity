@@ -1562,7 +1562,6 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply rngl_cos_right_derivative_at_straight.
 }
 intros ε Hε.
-(**)
 specialize (rngl_sin_is_continuous θ₀) as (Hsl, Hsr).
 destruct (Hsl ε Hε) as (η & Hη & Hss).
 destruct (Hsr ε Hε) as (η' & Hη' & Hss').
@@ -1709,16 +1708,19 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply rngl_cos_left_derivative_at_straight.
 }
 intros ε Hε.
-...
-destruct (rngl_sin_is_continuous θ₀ ε Hε) as (η & Hη & Hsc).
+specialize (rngl_sin_is_continuous θ₀) as (Hsl, Hsr).
+destruct (Hsl ε Hε) as (η & Hη & Hss).
+destruct (Hsr ε Hε) as (η' & Hη' & Hss').
 move η before ε.
-cbn in Hsc.
-progress unfold rngl_dist in Hsc.
+move η' before η.
+cbn in Hss, Hss'.
+progress unfold rngl_dist in Hss.
+progress unfold rngl_dist in Hss'.
+remember (angle_eucl_dist θ₀ angle_straight) as x.
 remember (angle_eucl_dist θ₀ 0) as y.
-exists (rngl_min3 y (angle_eucl_dist θ₀ angle_straight) η).
-subst y.
+exists (rngl_min3 x y (rngl_min η η')); subst x y.
 split. {
-  apply rngl_min_glb_lt; [ | easy ].
+  apply rngl_min_glb_lt; [ | now apply rngl_min_glb_lt ].
   apply rngl_min_glb_lt. {
     apply (rngl_lt_iff Hor).
     split; [ apply angle_eucl_dist_nonneg | ].
@@ -1737,6 +1739,8 @@ apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
+apply (rngl_min_glb_lt_iff Hor) in H4.
+destruct H4 as (H4, H5).
 cbn.
 progress unfold rngl_dist.
 progress unfold "°".
@@ -1780,6 +1784,7 @@ replace (rngl_abs _) with
   }
   now rewrite angle_add_0_r.
 }
+...
 apply (Hsc _ I).
 eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
 clear η Hη Hsc H4.
