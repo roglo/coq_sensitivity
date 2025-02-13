@@ -123,7 +123,7 @@ Theorem derivable_continuous :
   ∀ A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f f' : A → T) x,
   left_derivative_at lt da rngl_distance f f' x
-  → continuous_at da rngl_distance f x.
+  → left_continuous_at lt da rngl_distance f x.
 Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -133,7 +133,6 @@ specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 intros * Hlti * Hd.
 rename x into x₀.
 intros ε Hε.
-(**)
 destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
   specialize (Hd √ε).
   assert (Hsε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
@@ -142,50 +141,47 @@ destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
   destruct Hd as (η & Hη & Hd).
   exists (rngl_min √ε η).
   split; [ now apply rngl_min_glb_lt | ].
-  intros x _ Hdxx.
-  specialize (Hd x).
-  enough (Hxx : lt x x₀). {
-    specialize (Hd Hxx).
-    apply (rngl_min_glb_lt_iff Hor) in Hdxx.
-    destruct Hdxx as (Hdε, Hdη).
-    specialize (Hd Hdη).
-    assert (Hdz : d_dist x x₀ ≠ 0%L). {
-      intros H.
-      apply dist_separation in H; [ | apply d_prop ].
-      subst x.
-      now apply Hlti in Hxx.
-    }
-    apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
-      clear H.
-      apply (rngl_lt_iff Hor).
-      split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
-    }
-    cbn in Hd |-*.
-    rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
-      apply (dist_nonneg Hon Hop Hiv Hor).
-    }
-    rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
-    rewrite (rngl_mul_0_l Hos) in Hd.
-    progress unfold rngl_dist in Hd.
-    progress unfold rngl_dist.
-    rewrite (rngl_sub_0_r Hos) in Hd.
-    eapply (rngl_lt_le_trans Hor). {
-      rewrite <- (rngl_abs_opp Hop Hor).
-      rewrite (rngl_opp_sub_distr Hop).
-      apply Hd.
-    }
-    eapply (rngl_le_trans Hor). {
-      apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
-        now apply (rl_sqrt_pos Hon Hos Hor).
-      }
-      apply (rngl_lt_le_incl Hor), Hdε.
-    }
-    rewrite fold_rngl_squ.
-    rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
-    now apply (rngl_lt_le_incl Hor).
+  intros x Hlt Hdxx.
+  specialize (Hd x Hlt).
+  apply (rngl_min_glb_lt_iff Hor) in Hdxx.
+  destruct Hdxx as (Hdε, Hdη).
+  specialize (Hd Hdη).
+  assert (Hdz : d_dist x x₀ ≠ 0%L). {
+    intros H.
+    apply dist_separation in H; [ | apply d_prop ].
+    subst x.
+    now apply Hlti in Hlt.
   }
-(* comment fait-on pour avoir comme hypothèse que "lt x x₀" ? *)
-...
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
+    clear H.
+    apply (rngl_lt_iff Hor).
+    split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
+  }
+  cbn in Hd |-*.
+  rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
+    apply (dist_nonneg Hon Hop Hiv Hor).
+  }
+  rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
+  rewrite (rngl_mul_0_l Hos) in Hd.
+  progress unfold rngl_dist in Hd.
+  progress unfold rngl_dist.
+  rewrite (rngl_sub_0_r Hos) in Hd.
+  eapply (rngl_lt_le_trans Hor). {
+    rewrite <- (rngl_abs_opp Hop Hor).
+    rewrite (rngl_opp_sub_distr Hop).
+    apply Hd.
+  }
+  eapply (rngl_le_trans Hor). {
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+      now apply (rl_sqrt_pos Hon Hos Hor).
+    }
+    apply (rngl_lt_le_incl Hor), Hdε.
+  }
+  rewrite fold_rngl_squ.
+  rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
+  now apply (rngl_lt_le_incl Hor).
+}
+(**)
 remember 3%L as xxx.
 clear Heqxxx.
 specialize (Hd xxx).
@@ -194,58 +190,59 @@ specialize (Hd Hse).
 destruct Hd as (η & Hη & Hd).
 exists (rngl_min xxx η).
 split; [ now apply rngl_min_glb_lt | ].
-intros x _ Hdxx.
-specialize (Hd x).
-enough (Hxx : lt x x₀). {
-  specialize (Hd Hxx).
-  apply (rngl_min_glb_lt_iff Hor) in Hdxx.
-  destruct Hdxx as (Hdε, Hdη).
-  specialize (Hd Hdη).
-  assert (Hdz : d_dist x x₀ ≠ 0%L). {
-    intros H.
-    apply dist_separation in H; [ | apply d_prop ].
-    subst x.
-    now apply Hlti in Hxx.
+intros x Hlt Hdxx.
+specialize (Hd x Hlt).
+apply (rngl_min_glb_lt_iff Hor) in Hdxx.
+destruct Hdxx as (Hdε, Hdη).
+specialize (Hd Hdη).
+assert (Hdz : d_dist x x₀ ≠ 0%L). {
+  intros H.
+  apply dist_separation in H; [ | apply d_prop ].
+  subst x.
+  now apply Hlti in Hlt.
+}
+cbn in Hd |-*.
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
+  clear H.
+  apply (rngl_lt_iff Hor).
+  split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
+}
+rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
+  apply (dist_nonneg Hon Hop Hiv Hor).
+}
+rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
+progress unfold rngl_dist in Hd.
+progress unfold rngl_dist.
+eapply (rngl_lt_le_trans Hor). {
+  rewrite <- (rngl_add_sub Hos (_ - _) (f' x₀ * d_dist x x₀)).
+  rewrite <- (rngl_abs_opp Hop Hor).
+  rewrite (rngl_opp_sub_distr Hop).
+  rewrite (rngl_sub_add_distr Hos).
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite rngl_add_comm.
+  do 2 rewrite (rngl_add_sub_swap Hop).
+  eapply (rngl_le_lt_trans Hor). {
+    apply (rngl_abs_triangle Hop Hor).
   }
-  cbn in Hd |-*.
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
-    clear H.
-    apply (rngl_lt_iff Hor).
-    split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
+  apply (rngl_add_lt_mono_r Hop Hor).
+  apply Hd.
+}
+rewrite (rngl_abs_mul Hop Hi1 Hor).
+rewrite (rngl_abs_nonneg_eq Hop Hor (d_dist _ _)). 2: {
+  apply (dist_nonneg Hon Hop Hiv Hor).
+}
+rewrite <- rngl_mul_add_distr_r.
+eapply (rngl_le_trans Hor). {
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii). 2: {
+    apply (rngl_lt_le_incl Hor), Hdε.
   }
-  rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
-    apply (dist_nonneg Hon Hop Hiv Hor).
-  }
-  rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
-  progress unfold rngl_dist in Hd.
-  progress unfold rngl_dist.
-  eapply (rngl_lt_le_trans Hor). {
-    rewrite <- (rngl_add_sub Hos (_ - _) (f' x₀ * d_dist x x₀)).
-    rewrite <- (rngl_abs_opp Hop Hor).
-    rewrite (rngl_opp_sub_distr Hop).
-    rewrite (rngl_sub_add_distr Hos).
-    rewrite (rngl_sub_sub_distr Hop).
-    rewrite <- (rngl_add_sub_swap Hop).
-    rewrite rngl_add_comm.
-    do 2 rewrite (rngl_add_sub_swap Hop).
-    eapply (rngl_le_lt_trans Hor). {
-      apply (rngl_abs_triangle Hop Hor).
-    }
-    apply (rngl_add_lt_mono_r Hop Hor).
-    apply Hd.
-  }
-  rewrite (rngl_abs_mul Hop Hi1 Hor).
-  rewrite (rngl_abs_nonneg_eq Hop Hor (d_dist _ _)). 2: {
-    apply (dist_nonneg Hon Hop Hiv Hor).
-  }
-  rewrite <- rngl_mul_add_distr_r.
-  eapply (rngl_le_trans Hor). {
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii). 2: {
-      apply (rngl_lt_le_incl Hor), Hdε.
-    }
-    apply (rngl_add_pos_nonneg Hor); [ easy | ].
-    apply (rngl_abs_nonneg Hop Hor).
-  }
+  apply (rngl_add_pos_nonneg Hor); [ easy | ].
+  apply (rngl_abs_nonneg Hop Hor).
+}
+(* maintenant que j'ai que f' x₀ ≠ 0, je peux me permettre de
+   diviser par lui, et il est possible alors que je trouve une
+   bonne valeur à xxx *)
 ...
 specialize (Hd √ε).
 assert (Hsε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
