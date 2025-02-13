@@ -83,11 +83,14 @@ Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
 
 (* continuity *)
 
-Definition continuous_at {A B} da db (f : A → B) a :=
-  is_limit_when_tending_to_neighbourhood true (λ _ _, True) da db f a (f a).
+Definition left_continuous_at {A B} le da db (f : A → B) a :=
+  is_limit_when_tending_to_neighbourhood true le da db f a (f a).
 
-Definition continuous {A B} da db (f : A → B) :=
-  ∀ a, continuous_at da db f a.
+Definition right_continuous_at {A B} le da db (f : A → B) a :=
+  is_limit_when_tending_to_neighbourhood false le da db f a (f a).
+
+Definition is_continuous {A B} lt da db (f : A → B) :=
+  ∀ a, left_continuous_at lt da db f a ∧ right_continuous_at lt da db f a.
 
 (* derivability *)
 
@@ -101,9 +104,10 @@ Definition right_derivative_at {A} lt (da : distance A) (db : distance T)
   let g x := ((f x - f a) / d_dist x a)%L in
   is_limit_when_tending_to_neighbourhood false lt da db g a (f' a).
 
-Definition is_derivative {A} lt (da : distance A) (db : distance T) f f' :=
+Definition is_derivative {A} le lt (da : distance A) (db : distance T) f f' :=
   ∀ a,
-  continuous_at da db f a ∧
+  left_continuous_at le da db f a ∧
+  right_continuous_at le da db f a ∧
   left_derivative_at lt da db f f' a ∧
   right_derivative_at lt da db f f' a.
 

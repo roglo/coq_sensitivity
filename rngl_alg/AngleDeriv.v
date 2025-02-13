@@ -548,6 +548,9 @@ Definition angle_lt_for_deriv θ1 θ2 :=
 Definition angle_lt θ1 θ2 :=
   (θ1 < θ2)%A.
 
+Definition angle_le θ1 θ2 :=
+  (θ1 ≤ θ2)%A.
+
 (* special cases where the contraint "θ2 - θ1 ≤ angle_straight" is not
    compulsory ; not used in the final proof but interesting to know *)
 
@@ -921,49 +924,63 @@ Qed.
 (* *)
 
 Theorem rngl_cos_is_continuous :
-  continuous angle_eucl_distance rngl_distance rngl_cos.
+  is_continuous angle_le angle_eucl_distance rngl_distance rngl_cos.
 Proof.
 destruct_ac.
-intros a ε Hε.
-exists ε.
-split; [ easy | ].
-intros x _ Hxa.
-cbn.
-progress unfold rngl_dist.
-eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
-apply -> (rngl_abs_le Hop Hor).
-split. {
-  rewrite <- (rngl_opp_sub_distr Hop).
-  apply -> (rngl_opp_le_compat Hop Hor).
+intros a.
+assert (H :
+  ∀ is_left le,
+  is_limit_when_tending_to_neighbourhood is_left le
+    angle_eucl_distance rngl_distance rngl_cos a (rngl_cos a)). {
+  intros * ε Hε.
+  exists ε.
+  split; [ easy | ].
+  intros x _ Hxa.
   cbn.
-  rewrite angle_eucl_dist_symmetry.
-  apply rngl_cos_diff_le_eucl_dist.
-} {
-  apply rngl_cos_diff_le_eucl_dist.
+  progress unfold rngl_dist.
+  eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
+  apply -> (rngl_abs_le Hop Hor).
+  split. {
+    rewrite <- (rngl_opp_sub_distr Hop).
+    apply -> (rngl_opp_le_compat Hop Hor).
+    cbn.
+    rewrite angle_eucl_dist_symmetry.
+    apply rngl_cos_diff_le_eucl_dist.
+  } {
+    apply rngl_cos_diff_le_eucl_dist.
+  }
 }
+split; apply H.
 Qed.
 
 Theorem rngl_sin_is_continuous :
-  continuous angle_eucl_distance rngl_distance rngl_sin.
+  is_continuous angle_le angle_eucl_distance rngl_distance rngl_sin.
 Proof.
 destruct_ac.
-intros a ε Hε.
-exists ε.
-split; [ easy | ].
-intros x _ Hxa.
-cbn.
-progress unfold rngl_dist.
-eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
-apply -> (rngl_abs_le Hop Hor).
-split. {
-  rewrite <- (rngl_opp_sub_distr Hop).
-  apply -> (rngl_opp_le_compat Hop Hor).
+intros a.
+assert (H :
+  ∀ is_left le,
+  is_limit_when_tending_to_neighbourhood is_left le
+    angle_eucl_distance rngl_distance rngl_sin a (rngl_sin a)). {
+  intros * ε Hε.
+  exists ε.
+  split; [ easy | ].
+  intros x _ Hxa.
   cbn.
-  rewrite angle_eucl_dist_symmetry.
-  apply rngl_sin_diff_le_eucl_dist.
-} {
-  apply rngl_sin_diff_le_eucl_dist.
+  progress unfold rngl_dist.
+  eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
+  apply -> (rngl_abs_le Hop Hor).
+  split. {
+    rewrite <- (rngl_opp_sub_distr Hop).
+    apply -> (rngl_opp_le_compat Hop Hor).
+    cbn.
+    rewrite angle_eucl_dist_symmetry.
+    apply rngl_sin_diff_le_eucl_dist.
+  } {
+    apply rngl_sin_diff_le_eucl_dist.
+  }
 }
+split; apply H.
 Qed.
 
 (* *)
@@ -1282,13 +1299,16 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply rngl_sin_right_derivative_at_straight.
 }
 intros ε Hε.
-destruct (rngl_cos_is_continuous θ₀ ε Hε) as (η & Hη & Hcc).
+specialize (rngl_cos_is_continuous θ₀) as (Hcl, Hcr).
+destruct (Hcl ε Hε) as (η & Hη & Hcc).
+destruct (Hcr ε Hε) as (η' & Hη' & Hcc').
 move η before ε.
+move η' before η.
 remember (angle_eucl_dist θ₀ 0) as x.
 remember (angle_eucl_dist θ₀ angle_straight) as y.
-exists (rngl_min3 x y η); subst x y.
+exists (rngl_min3 x y (rngl_min η η')); subst x y.
 split. {
-  apply rngl_min_glb_lt; [ | easy ].
+  apply rngl_min_glb_lt; [ | now apply rngl_min_glb_lt ].
   apply rngl_min_glb_lt. {
     apply (rngl_lt_iff Hor).
     split; [ apply angle_eucl_dist_nonneg | ].
@@ -1307,6 +1327,8 @@ apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H3).
+apply (rngl_min_glb_lt_iff Hor) in H4.
+destruct H4 as (H4, H5).
 cbn.
 progress unfold rngl_dist.
 rewrite rngl_sin_sub_sin.
@@ -1342,25 +1364,35 @@ progress replace (rngl_abs _) with
   }
   now rewrite angle_add_0_r.
 }
-apply (Hcc _ I).
-eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
-clear η Hη Hcc H4.
-cbn.
-rewrite angle_eucl_dist_move_0_r.
-rewrite (angle_eucl_dist_move_0_r θ).
-rewrite angle_add_sub_swap.
-rewrite <- angle_sub_sub_distr.
-rewrite angle_sub_div_2_diag.
-rewrite angle_div_2_sub'.
-generalize Hlt; intros H.
-apply angle_lt_le_incl in H.
-rewrite H; clear H.
-apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
-  apply angle_div_2_le_straight.
+assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
+  rewrite angle_eucl_dist_move_0_r.
+  rewrite (angle_eucl_dist_move_0_r θ).
+  rewrite angle_add_sub_swap.
+  rewrite <- angle_sub_sub_distr.
+  rewrite angle_sub_div_2_diag.
+  rewrite angle_div_2_sub'.
+  generalize Hlt; intros H.
+  apply angle_lt_le_incl in H.
+  rewrite H; clear H.
+  apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
+    apply angle_div_2_le_straight.
+  }
+  apply angle_div_2_le.
 }
-apply angle_div_2_le.
+destruct (angle_le_dec (θ /₂ + θ₀ /₂) θ₀) as [Httt| Httt]. {
+  apply (Hcc _ Httt).
+  eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
+  easy.
+} {
+  apply angle_nle_gt in Httt.
+  apply angle_lt_le_incl in Httt.
+  apply (Hcc' _ Httt).
+  eapply (rngl_le_lt_trans Hor); [ | apply H5 ].
+  easy.
+}
 Qed.
 
+(* to be completed
 Theorem rngl_sin_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
@@ -1395,6 +1427,7 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply rngl_sin_left_derivative_at_straight.
 }
 intros ε Hε.
+...
 destruct (rngl_cos_is_continuous θ₀ ε Hε) as (η & Hη & Hcc).
 move η before ε.
 cbn in Hcc.
@@ -1738,5 +1771,6 @@ split.
 apply rngl_sin_left_derivative.
 apply rngl_sin_right_derivative.
 Qed.
+*)
 
 End a.
