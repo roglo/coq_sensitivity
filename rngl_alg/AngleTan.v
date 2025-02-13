@@ -184,11 +184,12 @@ destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
 (**)
 remember 3%L as xxx.
 clear Heqxxx.
-specialize (Hd xxx).
-assert (Hse : (0 < xxx)%L) by admit.
+set (u := (xxx / rngl_abs (f' x₀))%L).
+specialize (Hd u)%L.
+assert (Hse : (0 < u)%L) by admit.
 specialize (Hd Hse).
 destruct Hd as (η & Hη & Hd).
-exists (rngl_min xxx η).
+exists (rngl_min u η).
 split; [ now apply rngl_min_glb_lt | ].
 intros x Hlt Hdxx.
 specialize (Hd x Hlt).
@@ -240,6 +241,7 @@ eapply (rngl_le_trans Hor). {
   apply (rngl_add_pos_nonneg Hor); [ easy | ].
   apply (rngl_abs_nonneg Hop Hor).
 }
+subst u.
 (* maintenant que j'ai que f' x₀ ≠ 0, je peux me permettre de
    diviser par lui, et il est possible alors que je trouve une
    bonne valeur à xxx *)
