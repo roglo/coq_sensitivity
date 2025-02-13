@@ -1818,12 +1818,13 @@ Qed.
 
 (* *)
 
-(* to be completed
 Theorem rngl_cos_derivative :
-  is_derivative angle_lt_for_deriv angle_eucl_distance rngl_distance
+  is_derivative angle_le angle_lt_for_deriv angle_eucl_distance rngl_distance
     rngl_cos (rngl_opp ° rngl_sin)%L.
 Proof.
 intros θ₀.
+split.
+apply rngl_cos_is_continuous.
 split.
 apply rngl_cos_is_continuous.
 split.
@@ -1832,16 +1833,17 @@ apply rngl_cos_right_derivative.
 Qed.
 
 Theorem rngl_sin_derivative :
-  is_derivative angle_lt_for_deriv angle_eucl_distance rngl_distance
+  is_derivative angle_le angle_lt_for_deriv angle_eucl_distance rngl_distance
     rngl_sin rngl_cos.
 Proof.
 intros θ₀.
 split.
 apply rngl_sin_is_continuous.
 split.
+apply rngl_sin_is_continuous.
+split.
 apply rngl_sin_left_derivative.
 apply rngl_sin_right_derivative.
 Qed.
-*)
 
 End a.
