@@ -1491,7 +1491,7 @@ apply Bool.not_true_iff_false in H.
 rewrite H; clear H.
 rewrite (rngl_mul_1_r Hon).
 rewrite angle_div_2_add.
-replace (rngl_abs _) with
+progress replace (rngl_abs _) with
   (rngl_abs (rngl_cos (θ₀ /₂ + θ /₂) - rngl_cos θ₀)). 2: {
   remember (angle_add_overflow θ₀ θ) as ovt eqn:Hovt.
   symmetry in Hovt.
@@ -1673,7 +1673,6 @@ destruct (angle_le_dec (θ /₂ + θ₀ /₂) θ₀) as [Httt| Httt]. {
 }
 Qed.
 
-(* to be completed
 Theorem rngl_cos_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
@@ -1773,7 +1772,7 @@ apply Bool.not_true_iff_false in H.
 rewrite H; clear H.
 rewrite (rngl_mul_1_r Hon).
 rewrite angle_div_2_add.
-replace (rngl_abs _) with
+progress replace (rngl_abs _) with
   (rngl_abs (rngl_sin (θ₀ /₂ + θ /₂) - rngl_sin θ₀)). 2: {
   remember (angle_add_overflow θ₀ θ) as ovt eqn:Hovt.
   symmetry in Hovt.
@@ -1784,28 +1783,42 @@ replace (rngl_abs _) with
   }
   now rewrite angle_add_0_r.
 }
-...
-apply (Hsc _ I).
-eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
-clear η Hη Hsc H4.
-cbn.
-do 2 rewrite (angle_eucl_dist_symmetry _ θ₀).
-rewrite angle_eucl_dist_move_0_r.
-rewrite (angle_eucl_dist_move_0_r θ₀).
-rewrite angle_sub_add_distr.
-rewrite angle_sub_div_2_diag.
-rewrite angle_div_2_sub'.
-generalize Hlt; intros H.
-apply angle_lt_le_incl in H.
-rewrite H; clear H.
-apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
-  apply angle_div_2_le_straight.
+rewrite angle_add_comm.
+assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
+  clear - Hlt Htt.
+  rewrite angle_eucl_dist_move_0_r.
+  rewrite (angle_eucl_dist_move_0_r θ).
+  rewrite angle_add_sub_swap.
+  rewrite <- angle_sub_sub_distr.
+  rewrite angle_sub_div_2_diag.
+  do 2 rewrite <- (angle_eucl_dist_opp_opp _ 0).
+  do 2 rewrite angle_opp_sub_distr.
+  rewrite angle_opp_0.
+  rewrite angle_div_2_sub'.
+  generalize Hlt; intros H.
+  apply angle_lt_le_incl in H.
+  rewrite H; clear H.
+  apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
+    apply angle_div_2_le_straight.
+  }
+  apply angle_div_2_le.
 }
-apply angle_div_2_le.
+destruct (angle_le_dec (θ /₂ + θ₀ /₂) θ₀) as [Httt| Httt]. {
+  apply (Hss _ Httt).
+  eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
+  easy.
+} {
+  apply angle_nle_gt in Httt.
+  apply angle_lt_le_incl in Httt.
+  apply (Hss' _ Httt).
+  eapply (rngl_le_lt_trans Hor); [ | apply H5 ].
+  easy.
+}
 Qed.
 
 (* *)
 
+(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_lt_for_deriv angle_eucl_distance rngl_distance
     rngl_cos (rngl_opp ° rngl_sin)%L.
