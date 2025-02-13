@@ -120,17 +120,17 @@ Definition rngl_distance :=
 Theorem derivable_continuous :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ A lt, (∀ x, ¬ (lt x x)) →
+  ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, le x y → lt x y) →
   ∀ da (f f' : A → T) x,
   left_derivative_at lt da rngl_distance f f' x
-  → left_continuous_at lt da rngl_distance f x.
+  → left_continuous_at le da rngl_distance f x.
 Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-intros * Hlti * Hd.
+intros * Hlti Hlet * Hd.
 rename x into x₀.
 intros ε Hε.
 destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
@@ -141,7 +141,9 @@ destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
   destruct Hd as (η & Hη & Hd).
   exists (rngl_min √ε η).
   split; [ now apply rngl_min_glb_lt | ].
-  intros x Hlt Hdxx.
+  intros x Hle Hdxx.
+  generalize Hle; intros Hlt.
+  apply Hlet in Hlt.
   specialize (Hd x Hlt).
   apply (rngl_min_glb_lt_iff Hor) in Hdxx.
   destruct Hdxx as (Hdε, Hdη).
@@ -184,14 +186,20 @@ destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
 (**)
 remember 3%L as xxx.
 clear Heqxxx.
+(*
 set (u := (xxx / rngl_abs (f' x₀))%L).
+*)
+set (u := xxx).
+(**)
 specialize (Hd u)%L.
 assert (Hse : (0 < u)%L) by admit.
 specialize (Hd Hse).
 destruct Hd as (η & Hη & Hd).
 exists (rngl_min u η).
 split; [ now apply rngl_min_glb_lt | ].
-intros x Hlt Hdxx.
+intros x Hle Hdxx.
+generalize Hle; intros Hlt.
+apply Hlet in Hlt.
 specialize (Hd x Hlt).
 apply (rngl_min_glb_lt_iff Hor) in Hdxx.
 destruct Hdxx as (Hdε, Hdη).
