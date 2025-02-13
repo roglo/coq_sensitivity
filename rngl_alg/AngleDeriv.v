@@ -1365,6 +1365,16 @@ progress replace (rngl_abs _) with
   now rewrite angle_add_0_r.
 }
 assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
+  clear - Hlt Htt.
+  (* lemma to do: I found the same proof below;
+     there is also a similar version with θ instead of θ₀
+     in 2 versions; must think of it... *)
+(*
+  Hlt : (θ₀ < θ)%A
+  Htt : (θ - θ₀ ≤ angle_straight)%A
+  ============================
+  (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L
+*)
   rewrite angle_eucl_dist_move_0_r.
   rewrite (angle_eucl_dist_move_0_r θ).
   rewrite angle_add_sub_swap.
@@ -1494,6 +1504,7 @@ replace (rngl_abs _) with
 }
 rewrite angle_add_comm.
 assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
+  clear - Hlt Htt.
   rewrite angle_eucl_dist_move_0_r.
   rewrite (angle_eucl_dist_move_0_r θ).
   rewrite angle_add_sub_swap.
@@ -1628,6 +1639,13 @@ progress replace (rngl_abs _) with
 }
 rewrite angle_add_comm.
 assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
+clear - Hlt Htt.
+(*
+  Hlt : (θ₀ < θ)%A
+  Htt : (θ - θ₀ ≤ angle_straight)%A
+  ============================
+  (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L
+*)
   rewrite angle_eucl_dist_move_0_r.
   rewrite (angle_eucl_dist_move_0_r θ).
   rewrite angle_add_sub_swap.
@@ -1691,6 +1709,7 @@ destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   apply rngl_cos_left_derivative_at_straight.
 }
 intros ε Hε.
+...
 destruct (rngl_sin_is_continuous θ₀ ε Hε) as (η & Hη & Hsc).
 move η before ε.
 cbn in Hsc.
