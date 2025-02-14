@@ -186,26 +186,31 @@ destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
 (**)
 progress unfold left_derivative_at in Hd.
 progress unfold is_limit_when_tending_to_neighbourhood in Hd.
-remember 3%L as xxx.
-clear Heqxxx.
-(*
-set (u := (xxx / rngl_abs (f' x₀))%L).
-*)
-set (u := xxx).
+remember 3%L as xxx; clear Heqxxx.
+remember 3%L as yyy; clear Heqyyy.
+specialize (Hd xxx)%L.
+move yyy before xxx.
 (**)
-specialize (Hd u)%L.
-assert (Hse : (0 < u)%L) by admit.
-specialize (Hd Hse).
+assert (Hxx : (0 < xxx)%L) by admit.
+assert (Hyy : (0 < yyy)%L) by admit.
+specialize (Hd Hxx).
 destruct Hd as (η & Hη & Hd).
-exists (rngl_min u η).
-split; [ now apply rngl_min_glb_lt | ].
+exists (rngl_min3 xxx yyy η).
+split. {
+  apply rngl_min_glb_lt; [ | easy ].
+  apply rngl_min_glb_lt; [ easy | ].
+  easy.
+}
 intros x Hle Hdxx.
 generalize Hle; intros Hlt.
 apply Hlet in Hlt.
+move Hlt before Hle.
 specialize (Hd x Hlt).
 apply (rngl_min_glb_lt_iff Hor) in Hdxx.
-destruct Hdxx as (Hdε, Hdη).
-specialize (Hd Hdη).
+destruct Hdxx as (H1, H3).
+apply (rngl_min_glb_lt_iff Hor) in H1.
+destruct H1 as (H1, H2).
+specialize (Hd H3).
 assert (Hdz : d_dist x x₀ ≠ 0%L). {
   intros H.
   apply dist_separation in H; [ | apply d_prop ].
@@ -229,11 +234,6 @@ apply (rngl_nle_gt_iff Hor).
 apply rngl_nle_gt in Hd.
 intros Hea.
 apply Hd; clear Hd.
-subst u.
-specialize (rngl_abs_triangle Hop Hor) as H1.
-specialize (H1 (f x₀ - f x - f' x₀ * d_dist x x₀))%L.
-specialize (H1 (f' x₀ * d_dist x x₀))%L.
-rewrite (rngl_sub_add Hop) in H1.
 progress unfold rngl_abs.
 rewrite (rngl_leb_sub_0 Hop Hor).
 remember (f x₀ - f x ≤? f' x₀ * d_dist x x₀)%L as b eqn:Hb.
