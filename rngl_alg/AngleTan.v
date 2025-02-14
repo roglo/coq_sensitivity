@@ -184,6 +184,9 @@ destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
   now apply (rngl_lt_le_incl Hor).
 }
 (**)
+progress unfold left_derivative_at in Hd.
+progress unfold is_limit_when_tending_to_neighbourhood in Hd.
+...
 remember 3%L as xxx.
 clear Heqxxx.
 (*
@@ -343,7 +346,9 @@ enough (Hxx : lt x x₀). {
   progress unfold rngl_dist in Hd.
   progress unfold rngl_dist.
 ...
+*)
 
+(* to be completed
 Theorem left_derivative_mul :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
