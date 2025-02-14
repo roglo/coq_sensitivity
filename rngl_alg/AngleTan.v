@@ -234,7 +234,25 @@ specialize (rngl_abs_triangle Hop Hor) as H1.
 specialize (H1 (f x₀ - f x - f' x₀ * d_dist x x₀))%L.
 specialize (H1 (f' x₀ * d_dist x x₀))%L.
 rewrite (rngl_sub_add Hop) in H1.
-(* oh, zut, fait chier *)
+progress unfold rngl_abs.
+rewrite (rngl_leb_sub_0 Hop Hor).
+remember (f x₀ - f x ≤? f' x₀ * d_dist x x₀)%L as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  apply rngl_leb_le in Hb.
+  rewrite (rngl_opp_sub_distr Hop).
+  progress unfold rngl_abs in Hea.
+  rewrite (rngl_leb_sub_0 Hop Hor) in Hea.
+  remember (f x ≤? f x₀)%L as c eqn:Hc.
+  symmetry in Hc.
+  destruct c. {
+    apply rngl_leb_le in Hc.
+    rewrite (rngl_opp_sub_distr Hop) in Hea.
+    apply (rngl_le_add_le_sub_r Hop Hor).
+    rewrite rngl_add_comm.
+    apply (rngl_le_add_le_sub_r Hop Hor).
+    rewrite <- (rngl_mul_sub_distr_r Hop).
+(* et alors ? *)
 ...
 eapply (rngl_le_trans Hor). 2: {
   eapply (rngl_le_trans Hor); [ apply H1 | ].
