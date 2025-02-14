@@ -224,6 +224,20 @@ rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
 rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
 progress unfold rngl_dist in Hd.
 progress unfold rngl_dist.
+(**)
+apply (rngl_nle_gt_iff Hor).
+apply rngl_nle_gt in Hd.
+intros Hea.
+apply Hd; clear Hd.
+subst u.
+specialize (rngl_abs_triangle Hop Hor) as H1.
+specialize (H1 (f x₀ - f x - f' x₀ * d_dist x x₀))%L.
+specialize (H1 (f' x₀ * d_dist x x₀))%L.
+rewrite (rngl_sub_add Hop) in H1.
+(* oh, zut, fait chier *)
+...
+eapply (rngl_le_trans Hor). 2: {
+  eapply (rngl_le_trans Hor); [ apply H1 | ].
 ...
 eapply (rngl_lt_le_trans Hor). {
   rewrite <- (rngl_add_sub Hos (_ - _) (f' x₀ * d_dist x x₀)).
