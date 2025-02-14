@@ -186,7 +186,6 @@ destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
 (**)
 progress unfold left_derivative_at in Hd.
 progress unfold is_limit_when_tending_to_neighbourhood in Hd.
-...
 remember 3%L as xxx.
 clear Heqxxx.
 (*
@@ -225,6 +224,7 @@ rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
 rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
 progress unfold rngl_dist in Hd.
 progress unfold rngl_dist.
+...
 eapply (rngl_lt_le_trans Hor). {
   rewrite <- (rngl_add_sub Hos (_ - _) (f' x₀ * d_dist x x₀)).
   rewrite <- (rngl_abs_opp Hop Hor).
