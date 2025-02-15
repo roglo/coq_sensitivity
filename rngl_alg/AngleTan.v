@@ -197,10 +197,14 @@ specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 intros * Hlti Hlet * Hd.
 rename x into x₀.
-destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
+specialize (derivable_continuous_when_derivative_eq_0 Hon Hiv) as H1.
+specialize (H1 A le lt Hlti Hlet da).
 ...
+specialize (H1 (λ x, (f x - x * f x₀)%L)).
+...
+destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
   apply derivable_continuous_when_derivative_eq_0.
-
+...
 intros ε Hε.
   specialize (Hd √ε).
   assert (Hsε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
