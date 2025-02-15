@@ -221,11 +221,12 @@ assert (Hyy : (0 < yyy)%L) by admit.
 specialize (Hd Hxx).
 destruct Hd as (η & Hη & Hd).
 intros ε Hε.
-exists (rngl_min3 xxx yyy η).
+exists (rngl_min3 xxx yyy (rngl_min η √ε)).
 split. {
-  apply rngl_min_glb_lt; [ | easy ].
+  apply rngl_min_glb_lt.
+  now apply rngl_min_glb_lt.
   apply rngl_min_glb_lt; [ easy | ].
-  easy.
+  now apply (rl_sqrt_pos Hon Hos Hor).
 }
 intros x Hle Hdxx.
 generalize Hle; intros Hlt.
@@ -236,6 +237,8 @@ apply (rngl_min_glb_lt_iff Hor) in Hdxx.
 destruct Hdxx as (H1, H3).
 apply (rngl_min_glb_lt_iff Hor) in H1.
 destruct H1 as (H1, H2).
+apply (rngl_min_glb_lt_iff Hor) in H3.
+destruct H3 as (H3, H4).
 specialize (Hd H3).
 assert (Hdz : d_dist x x₀ ≠ 0%L). {
   intros H.
@@ -274,6 +277,7 @@ destruct b. {
   destruct c. {
     apply rngl_leb_le in Hc.
     rewrite (rngl_opp_sub_distr Hop) in Hea.
+...
     apply (rngl_le_add_le_sub_r Hop Hor).
     rewrite rngl_add_comm.
     apply (rngl_le_add_le_sub_r Hop Hor).
