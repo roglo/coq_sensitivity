@@ -277,6 +277,25 @@ destruct b. {
   destruct c. {
     apply rngl_leb_le in Hc.
     rewrite (rngl_opp_sub_distr Hop) in Hea.
+    destruct (rngl_le_dec Hor (f' x₀) 0) as [Hflz| Hflz]. {
+      exfalso.
+      apply rngl_nle_gt in Hb.
+      apply Hb; clear Hb.
+      eapply (rngl_le_lt_trans Hor). {
+        apply (rngl_mul_le_mono_pos_r Hop Hor Hii). {
+          apply (rngl_lt_iff Hor).
+          split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
+        }
+        apply Hflz.
+      }
+      rewrite (rngl_mul_0_l Hos).
+      apply (rngl_lt_0_sub Hop Hor).
+      apply (rngl_lt_iff Hor).
+      split; [ easy | ].
+      intros H; rewrite H, (rngl_sub_diag Hos) in Hea.
+      now apply rngl_nlt_ge in Hea.
+    }
+    apply (rngl_nle_gt_iff Hor) in Hflz.
 ...
     apply (rngl_le_add_le_sub_r Hop Hor).
     rewrite rngl_add_comm.
