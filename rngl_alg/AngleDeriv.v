@@ -555,12 +555,12 @@ Definition angle_le θ1 θ2 :=
    compulsory ; not used in the final proof but interesting to know *)
 
 Theorem angle_le_straight_is_limit_if :
-  ∀ (is_left : bool) f f' θ₀,
+  ∀ (is_left : bool) f θ₀ θ₀',
   (if is_left then θ₀ ≤ angle_straight else angle_straight ≤ θ₀)%A
   → is_limit_when_tending_to_neighbourhood is_left angle_lt_for_deriv
-      angle_eucl_distance rngl_distance f θ₀ (f' θ₀)
+      angle_eucl_distance rngl_distance f θ₀ θ₀'
   → is_limit_when_tending_to_neighbourhood is_left angle_lt
-      angle_eucl_distance rngl_distance f θ₀ (f' θ₀).
+      angle_eucl_distance rngl_distance f θ₀ θ₀'.
 Proof.
 destruct_ac.
 intros * Hts Hd.
@@ -588,22 +588,22 @@ destruct is_left. {
 Qed.
 
 Theorem angle_le_straight_left_derivative_if :
-  ∀ f f' θ₀,
+  ∀ f θ₀ θ₀',
   (θ₀ ≤ angle_straight)%A
   → left_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-       f f' θ₀
-  → left_derivative_at angle_lt angle_eucl_distance rngl_distance f f' θ₀.
+       f θ₀ θ₀'
+  → left_derivative_at angle_lt angle_eucl_distance rngl_distance f θ₀ θ₀'.
 Proof.
 intros * Hts Hd.
 now apply angle_le_straight_is_limit_if.
 Qed.
 
 Theorem angle_le_straight_right_derivative_if :
-  ∀ f f' θ₀,
+  ∀ f θ₀ θ₀',
   (angle_straight ≤ θ₀)%A
   → right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-      f f' θ₀
-  → right_derivative_at angle_lt angle_eucl_distance rngl_distance f f' θ₀.
+      f θ₀ θ₀'
+  → right_derivative_at angle_lt angle_eucl_distance rngl_distance f θ₀ θ₀'.
 Proof.
 intros * Hts Hd.
 now apply angle_le_straight_is_limit_if.
@@ -987,7 +987,7 @@ Qed.
 
 Theorem rngl_sin_right_derivative_at_0 :
   right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_sin rngl_cos 0%A.
+    rngl_sin 0%A (rngl_cos 0).
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1025,7 +1025,7 @@ Qed.
 
 Theorem rngl_sin_right_derivative_at_straight :
   right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_sin rngl_cos angle_straight.
+    rngl_sin angle_straight (rngl_cos angle_straight).
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1064,7 +1064,7 @@ Qed.
 
 Theorem rngl_sin_left_derivative_at_straight :
   left_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_sin rngl_cos angle_straight.
+    rngl_sin angle_straight (rngl_cos angle_straight).
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1129,7 +1129,7 @@ Qed.
 
 Theorem rngl_cos_right_derivative_at_0 :
   right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_cos (rngl_opp ° rngl_sin) 0%A.
+    rngl_cos 0%A ((rngl_opp ° rngl_sin) 0%A).
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1178,7 +1178,7 @@ Qed.
 
 Theorem rngl_cos_right_derivative_at_straight :
   right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_cos (rngl_opp ° rngl_sin) angle_straight.
+    rngl_cos angle_straight ((rngl_opp ° rngl_sin) angle_straight).
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1224,7 +1224,7 @@ Qed.
 
 Theorem rngl_cos_left_derivative_at_straight :
   left_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_cos (rngl_opp ° rngl_sin) angle_straight.
+    rngl_cos angle_straight ((rngl_opp ° rngl_sin) angle_straight).
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1275,7 +1275,7 @@ Qed.
 Theorem rngl_sin_right_derivative :
   ∀ θ₀,
   right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_sin rngl_cos θ₀.
+    rngl_sin θ₀ (rngl_cos θ₀).
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1405,7 +1405,7 @@ Qed.
 Theorem rngl_sin_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_sin rngl_cos θ₀.
+    rngl_sin θ₀ (rngl_cos θ₀).
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1538,7 +1538,7 @@ Qed.
 Theorem rngl_cos_right_derivative :
   ∀ θ₀,
   right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_cos (rngl_opp ° rngl_sin) θ₀.
+    rngl_cos θ₀ ((rngl_opp ° rngl_sin) θ₀).
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1676,7 +1676,7 @@ Qed.
 Theorem rngl_cos_left_derivative :
   ∀ θ₀,
   left_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_cos (rngl_opp ° rngl_sin) θ₀.
+    rngl_cos θ₀ ((rngl_opp ° rngl_sin) θ₀).
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.

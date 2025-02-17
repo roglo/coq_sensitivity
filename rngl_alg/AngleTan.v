@@ -120,21 +120,19 @@ Theorem derivable_continuous_when_derivative_eq_0 :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, le x y → lt x y) →
-  ∀ da (f f' : A → T) x,
-  f' x = 0%L
-  → left_derivative_at lt da rngl_distance f f' x
+  ∀ da (f : A → T) x,
+  left_derivative_at lt da rngl_distance f x 0%L
   → left_continuous_at le da rngl_distance f x.
 Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Hlti Hlet * Hfz Hd.
+intros * Hlti Hlet * Hd.
 rename x into x₀.
 intros ε Hε.
 specialize (Hd √ε).
 assert (Hsε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
 specialize (Hd Hsε).
-rewrite Hfz in Hd.
 destruct Hd as (η & Hη & Hd).
 exists (rngl_min √ε η).
 split; [ now apply rngl_min_glb_lt | ].
@@ -186,8 +184,8 @@ Theorem derivable_continuous :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, le x y → lt x y) →
-  ∀ da (f f' : A → T) x,
-  left_derivative_at lt da rngl_distance f f' x
+  ∀ da (f : A → T) x a,
+  left_derivative_at lt da rngl_distance f x a
   → left_continuous_at le da rngl_distance f x.
 Proof.
 intros Hon Hiv.
@@ -197,9 +195,10 @@ specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 intros * Hlti Hlet * Hd.
 rename x into x₀.
-destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hfz| Hfz]. {
+destruct (rngl_eq_dec Heo a 0) as [Hfz| Hfz]. {
+  subst a.
   specialize (derivable_continuous_when_derivative_eq_0 Hon Hiv) as H1.
-  now apply (H1 _ le lt Hlti Hlet da f f').
+  now apply (H1 _ le lt Hlti Hlet da f).
 }
 (**)
 progress unfold left_derivative_at in Hd.
@@ -258,7 +257,7 @@ intros Hea.
 apply Hd; clear Hd.
 progress unfold rngl_abs.
 rewrite (rngl_leb_sub_0 Hop Hor).
-remember (f x₀ - f x ≤? f' x₀ * d_dist x x₀)%L as b eqn:Hb.
+remember (f x₀ - f x ≤? a * d_dist x x₀)%L as b eqn:Hb.
 symmetry in Hb.
 destruct b. {
   apply rngl_leb_le in Hb.
@@ -270,7 +269,7 @@ destruct b. {
   destruct c. {
     apply rngl_leb_le in Hc.
     rewrite (rngl_opp_sub_distr Hop) in Hea.
-    destruct (rngl_le_dec Hor (f' x₀) 0) as [Hflz| Hflz]. {
+    destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
       exfalso.
       apply rngl_nle_gt in Hb.
       apply Hb; clear Hb.

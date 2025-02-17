@@ -95,21 +95,21 @@ Definition is_continuous {A B} lt da db (f : A → B) :=
 (* derivability *)
 
 Definition left_derivative_at {A} lt (da : distance A) (db : distance T)
-    f f' a :=
+    f a a' :=
   let g x := ((f a - f x) / d_dist x a)%L in
-  is_limit_when_tending_to_neighbourhood true lt da db g a (f' a).
+  is_limit_when_tending_to_neighbourhood true lt da db g a a'.
 
 Definition right_derivative_at {A} lt (da : distance A) (db : distance T)
-    f f' a :=
+    f a a' :=
   let g x := ((f x - f a) / d_dist x a)%L in
-  is_limit_when_tending_to_neighbourhood false lt da db g a (f' a).
+  is_limit_when_tending_to_neighbourhood false lt da db g a a'.
 
 Definition is_derivative {A} le lt (da : distance A) (db : distance T) f f' :=
   ∀ a,
   left_continuous_at le da db f a ∧
   right_continuous_at le da db f a ∧
-  left_derivative_at lt da db f f' a ∧
-  right_derivative_at lt da db f f' a.
+  left_derivative_at lt da db f a (f' a) ∧
+  right_derivative_at lt da db f a (f' a).
 
 (* properties of distances and limits *)
 
