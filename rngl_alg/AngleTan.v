@@ -457,6 +457,7 @@ apply (is_limit_lt_is_limit_le_iff Hon Hiv).
 progress unfold is_limit_when_tending_to_neighbourhood_le in Hf.
 progress unfold is_limit_when_tending_to_neighbourhood_le in Hg.
 intros ε Hε.
+...
 specialize (Hf (ε / (2 * rngl_abs (g x₀) + 1)))%L.
 assert (H : (0 < ε / (2 * rngl_abs (g x₀) + 1))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor _ _ Hε).
