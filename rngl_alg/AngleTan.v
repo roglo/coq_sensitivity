@@ -415,6 +415,24 @@ destruct c. {
   now apply (rngl_lt_le_incl Hor).
 }
 apply (rngl_leb_gt Hor) in Hc.
+destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
+...
+  rewrite (rngl_abs_nonpos_eq Hop Hor) in Hd; [ | easy ].
+  apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
+  rewrite (rngl_mul_opp_l Hop) in Hd.
+  rewrite (rngl_add_opp_l Hop) in Hd.
+  rewrite (rngl_sub_diag Hos) in Hd.
+    apply -> (rngl_lt_sub_0 Hop Hor) in Hd.
+    now apply rngl_nle_gt in Hd.
+  }
+... ...
+exfalso.
+apply rngl_nle_gt in Hb.
+apply Hb; clear Hb.
+apply (rngl_le_trans Hor _ 0). {
+  apply (rngl_le_sub_0 Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
 ...
 eapply (rngl_le_trans Hor). 2: {
   eapply (rngl_le_trans Hor); [ apply H1 | ].
