@@ -204,17 +204,16 @@ destruct (rngl_eq_dec Heo a 0) as [Hfz| Hfz]. {
 (**)
 progress unfold left_derivative_at in Hd.
 progress unfold is_limit_when_tending_to_neighbourhood in Hd.
-remember 3%L as xxx; clear Heqxxx.
 remember 3%L as yyy; clear Heqyyy.
-specialize (Hd xxx)%L.
-move yyy before xxx.
+specialize (Hd (rngl_abs a))%L.
+move yyy before a.
 (**)
-assert (Hxx : (0 < xxx)%L) by admit.
+assert (Haz : (0 < rngl_abs a)%L) by now apply (rngl_abs_pos Hop Hor).
 assert (Hyy : (0 < yyy)%L) by admit.
-specialize (Hd Hxx).
+specialize (Hd Haz).
 destruct Hd as (η & Hη & Hd).
 intros ε Hε.
-exists (rngl_min3 xxx yyy (rngl_min η (ε / rngl_abs a))).
+exists (rngl_min3 (rngl_abs a) yyy (rngl_min η (ε / rngl_abs a))).
 split. {
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
@@ -253,7 +252,7 @@ rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
 progress unfold rngl_dist in Hd.
 progress unfold rngl_dist.
 (**)
-progress unfold rngl_abs in Hd.
+progress unfold rngl_abs in Hd at 1.
 rewrite (rngl_leb_sub_0 Hop Hor) in Hd.
 remember (f x₀ - f x ≤? a * d_dist x x₀)%L as b eqn:Hb.
 symmetry in Hb.
@@ -303,8 +302,26 @@ destruct b. {
   rewrite (rngl_sub_sub_distr Hop) in Hd.
   rewrite <- (rngl_add_sub_swap Hop) in Hd.
   rewrite <- (rngl_add_sub_assoc Hop) in Hd.
-  (* suffirait de prendre xxx = a
-     et contradiction in Hd *)
+  apply (rngl_lt_add_lt_sub_l Hop Hor) in Hd.
+  rewrite <- (rngl_mul_sub_distr_r Hop) in Hd.
+  exfalso.
+  apply rngl_nle_gt in Hd.
+  apply Hd; clear Hd.
+  destruct (rngl_lt_dec Hor a 0) as [Haz'| Haz']. {
+    rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+      now apply (rngl_lt_le_incl Hor).
+    }
+...
+    apply (rngl_le_trans Hor _ 0). 2: {
+      apply (rngl_le_0_sub Hop Hor).
+      now apply (rngl_lt_le_incl Hor).
+    }
+...
+    apply (rngl_mul_nonneg_nonpos Hop Hor).
+    rewrite <- (rngl_opp_add_distr Hop).
+    apply (rngl_opp_nonpos_nonneg Hop Hor).
+    apply (rngl_lt_le_incl Hor) in Haz'.
+    now apply (rngl_add_nonpos_nonpos Hor).
 ...
 eapply (rngl_le_trans Hor). 2: {
   eapply (rngl_le_trans Hor); [ apply H1 | ].
