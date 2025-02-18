@@ -449,14 +449,13 @@ generalize Hf; intros Hcf.
 apply (left_derivable_continuous Hic Hon Hiv _ lt) in Hcf; [ | easy | easy ].
 generalize Hg; intros Hcg.
 apply (left_derivable_continuous Hic Hon Hiv _ lt) in Hcg; [ | easy | easy ].
-intros ε Hε.
-...
 (**)
 progress unfold left_derivative_at in Hf.
 progress unfold left_derivative_at in Hg.
-progress unfold left_derivative_at.
 apply (is_limit_lt_is_limit_le_iff Hon Hiv) in Hf, Hg.
 apply (is_limit_lt_is_limit_le_iff Hon Hiv).
+progress unfold is_limit_when_tending_to_neighbourhood_le in Hf.
+progress unfold is_limit_when_tending_to_neighbourhood_le in Hg.
 intros ε Hε.
 specialize (Hf (ε / (2 * rngl_abs (g x₀) + 1)))%L.
 assert (H : (0 < ε / (2 * rngl_abs (g x₀) + 1))%L). {
@@ -537,6 +536,7 @@ rewrite <- (rngl_mul_sub_distr_r Hop).
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
+...
 remember (f x₀ - f x)%L as a.
 remember (g x₀ - g x)%L as b.
 rewrite (rngl_add_comm (_ * _ * _)).
