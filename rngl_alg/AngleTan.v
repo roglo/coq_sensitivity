@@ -179,7 +179,7 @@ rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-Theorem derivable_continuous :
+Theorem left_derivable_continuous :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
