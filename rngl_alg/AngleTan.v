@@ -381,6 +381,30 @@ destruct b. {
   now apply rngl_nlt_ge in Hd.
 }
 apply (rngl_leb_gt Hor) in Hb.
+progress unfold rngl_abs.
+rewrite (rngl_leb_sub_0 Hop Hor).
+remember (f x ≤? f x₀)%L as c eqn:Hc.
+symmetry in Hc.
+destruct c. {
+  apply rngl_leb_le in Hc.
+  rewrite (rngl_opp_sub_distr Hop).
+  destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
+    rewrite (rngl_abs_nonpos_eq Hop Hor) in Hd; [ | easy ].
+    apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
+    rewrite (rngl_mul_opp_l Hop) in Hd.
+    rewrite (rngl_add_opp_l Hop) in Hd.
+    rewrite (rngl_sub_diag Hos) in Hd.
+    apply -> (rngl_lt_sub_0 Hop Hor) in Hd.
+    now apply rngl_nle_gt in Hd.
+  }
+  apply (rngl_nle_gt_iff Hor) in Hflz.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd, H4.
+  apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
+  rewrite <- (rngl_mul_2_l Hon) in Hd. 2: {
+    now apply (rngl_lt_le_incl Hor).
+  }
+  eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
+(* ça devrait le faire *)
 ...
 eapply (rngl_le_trans Hor). 2: {
   eapply (rngl_le_trans Hor); [ apply H1 | ].
