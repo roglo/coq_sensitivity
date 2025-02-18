@@ -441,11 +441,11 @@ Theorem left_derivative_mul :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ A lt, (∀ x, ¬ (lt x x)) →
-  ∀ da (f g f' g' : A → T) x₀,
-  left_derivative_at lt da rngl_distance f f' x₀
-  → left_derivative_at lt da rngl_distance g g' x₀
+  ∀ da (f g : A → T) x₀ a b,
+  left_derivative_at lt da rngl_distance f x₀ a
+  → left_derivative_at lt da rngl_distance g x₀ b
   → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
-      (λ x : A, (f x * g' x + f' x * g x)%L) x₀.
+      x₀ (f x₀ * b + a * g x₀)%L.
 Proof.
 intros Hic Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -461,9 +461,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 intros * Hlti * Hf Hg.
-... ...
 generalize Hf; intros Hcf.
-apply derivable_continuous in Hcf.
+Check left_derivable_continuous.
+...
+apply left_derivable_continuous in Hcf.
 (**)
 progress unfold left_derivative_at in Hf.
 progress unfold left_derivative_at in Hg.
