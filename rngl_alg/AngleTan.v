@@ -398,13 +398,23 @@ destruct c. {
     now apply rngl_nle_gt in Hd.
   }
   apply (rngl_nle_gt_iff Hor) in Hflz.
-  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd, H4.
-  apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
-  rewrite <- (rngl_mul_2_l Hon) in Hd. 2: {
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd, H4; cycle 1. {
+    now apply (rngl_lt_le_incl Hor).
+  } {
     now apply (rngl_lt_le_incl Hor).
   }
+  apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
+  rewrite <- (rngl_mul_2_l Hon) in Hd.
   eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
-(* ça devrait le faire *)
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_mul_pos_pos Hos Hor Hii); [ | easy ].
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  now apply (rngl_lt_le_incl Hor).
+}
+apply (rngl_leb_gt Hor) in Hc.
 ...
 eapply (rngl_le_trans Hor). 2: {
   eapply (rngl_le_trans Hor); [ apply H1 | ].
