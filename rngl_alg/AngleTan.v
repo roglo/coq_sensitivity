@@ -373,6 +373,14 @@ destruct b. {
     apply (rngl_le_refl Hor).
   }
   apply (rngl_nlt_ge_iff Hor) in Haz'.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd; [ | easy ].
+  rewrite (rngl_sub_diag Hos) in Hd.
+  rewrite (rngl_mul_0_l Hos) in Hd.
+  apply -> (rngl_lt_sub_0 Hop Hor) in Hd.
+  apply (rngl_lt_le_incl Hor) in Hd.
+  now apply rngl_nlt_ge in Hd.
+}
+apply (rngl_leb_gt Hor) in Hb.
 ...
 eapply (rngl_le_trans Hor). 2: {
   eapply (rngl_le_trans Hor); [ apply H1 | ].
