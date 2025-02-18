@@ -446,9 +446,11 @@ specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 intros * Hlti * Hf Hg.
 generalize Hf; intros Hcf.
-Check left_derivable_continuous.
+apply (left_derivable_continuous Hic Hon Hiv _ lt) in Hcf; [ | easy | easy ].
+generalize Hg; intros Hcg.
+apply (left_derivable_continuous Hic Hon Hiv _ lt) in Hcg; [ | easy | easy ].
+intros ε Hε.
 ...
-apply left_derivable_continuous in Hcf.
 (**)
 progress unfold left_derivative_at in Hf.
 progress unfold left_derivative_at in Hg.
