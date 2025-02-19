@@ -444,6 +444,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H2z.
 assert (Hz4 : (0 < 4)%L). {
   apply (rngl_lt_le_trans Hor _ 2); [ easy | ].
   apply (rngl_add_le_mono_r Hop Hor).
@@ -485,11 +486,12 @@ assert (H : (0 < ε / (4 * rngl_abs (f x₀) + 1))%L). {
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 specialize (Hg H); clear H.
-assert (H : (0 < ε / 4)%L). {
-  now apply (rngl_div_pos Hon Hop Hiv Hor _ _ Hε).
+assert (H : (0 < √ε / 2)%L). {
+  apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+  now apply (rl_sqrt_pos Hon Hos Hor).
 }
-specialize (Hcf (ε / 4) H)%L.
-specialize (Hcg (ε / 4) H)%L; clear H.
+specialize (Hcf (√ε / 2) H)%L.
+specialize (Hcg (√ε / 2) H)%L; clear H.
 move Hε before ε.
 destruct Hf as (ηf & Hηf & Hf).
 destruct Hg as (ηg & Hηg & Hg).
@@ -559,6 +561,11 @@ rewrite <- (rngl_mul_sub_distr_r Hop).
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
+cbn in Hcf, Hcg.
+progress unfold rngl_dist in Hcf.
+progress unfold rngl_dist in Hcg.
+rewrite <- (rngl_abs_opp Hop Hor) in Hcf, Hcg.
+rewrite (rngl_opp_sub_distr Hop) in Hcf, Hcg.
 remember (f x₀ - f x)%L as a.
 remember (g x₀ - g x)%L as b.
 rewrite (rngl_add_comm (_ * _ * _)).
@@ -664,6 +671,20 @@ eapply (rngl_le_trans Hor). {
 }
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 (* ça doit se démontrer par la continuité de f et de g *)
+rewrite (rngl_abs_mul Hop Hi1 Hor).
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply (rngl_mul_le_compat_nonneg Hor). {
+    split; [ | apply (rngl_lt_le_incl Hor), Hcf ].
+    apply (rngl_abs_nonneg Hop Hor).
+  } {
+    split; [ | apply (rngl_lt_le_incl Hor), Hcg ].
+    apply (rngl_abs_nonneg Hop Hor).
+  }
+}
+rewrite fold_rngl_squ.
+rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+(* ah, non, c'est pas encore ça... *)
 ....
 
 Theorem derivative_mul :
@@ -675,7 +696,7 @@ Theorem derivative_mul :
       (λ x, (f x * g' x + f' x * g x)%L).
 Proof.
 intros * Hf Hg.
-split. {
+...
 *)
 
 End a.
