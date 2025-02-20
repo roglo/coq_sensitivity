@@ -504,10 +504,11 @@ move ηcg before ηcf.
 move Hηg before Hηf.
 move Hηcf before Hηg.
 move Hηcg before Hηcf.
-exists (rngl_min3 ηf ηg (rngl_min ηcf ηcg)).
+exists (rngl_min3 ηf ηg (rngl_min3 ηcf ηcg ε)).
 split. {
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
+  apply rngl_min_glb_lt; [ | easy ].
   now apply rngl_min_glb_lt.
 }
 intros x Hlt Hd.
@@ -516,6 +517,8 @@ apply (rngl_min_glb_lt_iff Hor) in Hd.
 destruct Hd as (H1, H3).
 apply (rngl_min_glb_lt_iff Hor) in H1, H3.
 destruct H1 as (H1, H2).
+destruct H3 as (H3, H5).
+apply (rngl_min_glb_lt_iff Hor) in H3.
 destruct H3 as (H3, H4).
 specialize (Hf x Hlt H1).
 specialize (Hg x Hlt H2).
@@ -684,7 +687,13 @@ eapply (rngl_le_trans Hor). {
 }
 rewrite fold_rngl_squ.
 rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
-(* ah, non, c'est pas encore ça... *)
+rewrite <- (rngl_mul_2_l Hon).
+rewrite (rngl_squ_sqrt Hon); [ | now apply (rngl_lt_le_incl Hor) ].
+...
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_compat Hor). {
+    apply (rngl_add_le_compat Hor). {
+
 ....
 
 Theorem derivative_mul :
