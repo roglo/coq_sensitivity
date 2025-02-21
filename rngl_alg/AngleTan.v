@@ -490,6 +490,8 @@ assert (H : (0 < √ε / 2)%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
   now apply (rl_sqrt_pos Hon Hos Hor).
 }
+generalize Hcf; intros Hcf_v.
+generalize Hcg; intros Hcg_v.
 specialize (Hcf (√ε / 2) H)%L.
 specialize (Hcg (√ε / 2) H)%L; clear H.
 move Hε before ε.
@@ -674,6 +676,18 @@ eapply (rngl_le_trans Hor). {
 }
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 (* ça doit se démontrer par la continuité de f et de g *)
+specialize (Hcf_v (ε / d_dist x x₀)%L).
+specialize (Hcg_v (ε / d_dist x x₀)%L).
+assert (H : (0 < ε / d_dist x x₀)%L). {
+  now apply (rngl_div_pos Hon Hop Hiv Hor).
+}
+specialize (Hcf_v H).
+specialize (Hcg_v H); clear H.
+destruct Hcf_v as (ηcf' & Hηcf' & Hcf_v).
+destruct Hcg_v as (ηcg' & Hηcg' & Hcg_v).
+specialize (Hcf_v x Hlt).
+specialize (Hcg_v x Hlt).
+...
 rewrite (rngl_abs_mul Hop Hi1 Hor).
 eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_l Hop Hor).
