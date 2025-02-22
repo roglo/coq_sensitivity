@@ -687,6 +687,12 @@ destruct Hcf_v as (ηcf' & Hηcf' & Hcf_v).
 destruct Hcg_v as (ηcg' & Hηcg' & Hcg_v).
 specialize (Hcf_v x Hlt).
 specialize (Hcg_v x Hlt).
+(**)
+enough (H :
+  (∃ M, (0 < M)%L ∧
+   ∀ x, (d_dist x x₀ < M)%L → left_continuous_at lt da rngl_distance f x)).
+destruct H as (M & HM & H).
+specialize (H x).
 ...
 rewrite (rngl_abs_mul Hop Hi1 Hor).
 eapply (rngl_le_trans Hor). {
