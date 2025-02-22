@@ -426,7 +426,7 @@ Theorem left_derivative_mul_at :
   rngl_has_inv T = true →
   ∀ A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f g : A → T) f' g',
-  (∀ x, left_derivative_at lt da rngl_distance f x (f' x))
+  is_derivative lt lt da rngl_distance f f'
   → (∀ x, left_derivative_at lt da rngl_distance g x (g' x))
   → ∀ x₀,
   left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
@@ -457,6 +457,8 @@ assert (Hz4' : (0 ≤ 4)%L). {
   now apply (rngl_le_add_l Hor).
 }
 intros * Hlti * Hf Hg *.
+progress unfold is_derivative in Hf.
+....
 progress unfold left_derivative_at in Hf.
 progress unfold left_derivative_at in Hg.
 specialize (Hf x₀) as H1.
@@ -643,6 +645,8 @@ eapply (rngl_le_trans Hor). {
 }
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 rewrite (rngl_abs_mul Hop Hi1 Hor).
+specialize (Hf x) as H5.
+progress unfold is_limit_when_tending_to_neighbourhood in H5.
 ...
 specialize (Hmf x H3).
 specialize (Hmg x H4).
