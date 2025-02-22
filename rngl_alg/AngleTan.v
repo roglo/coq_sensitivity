@@ -420,13 +420,17 @@ apply (dist_nonneg Hon Hop Hiv Hor).
 Qed.
 
 (* to be completed
-Theorem left_derivative_mul :
+Theorem left_derivative_mul_at :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f g : A → T) x₀ u v,
-  left_derivative_at lt da rngl_distance f x₀ u
+  (∃ M, (0 < M)%L ∧
+   ∀ x, (d_dist x x₀ < M)%L → right_continuous_at lt da rngl_distance f x)
+  → (∃ M, (0 < M)%L ∧
+     ∀ x, (d_dist x x₀ < M)%L → right_continuous_at lt da rngl_distance g x)
+  → left_derivative_at lt da rngl_distance f x₀ u
   → left_derivative_at lt da rngl_distance g x₀ v
   → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
       x₀ (f x₀ * v + u * g x₀)%L.
@@ -438,7 +442,7 @@ specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hlit * Hf Hg ε Hε.
+  intros * Hlit * Hmf Hmg Hf Hg ε Hε.
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
@@ -455,7 +459,7 @@ assert (Hz4' : (0 ≤ 4)%L). {
   apply (rngl_add_le_mono_r Hop Hor).
   now apply (rngl_le_add_l Hor).
 }
-intros * Hlti * Hf Hg.
+intros * Hlti * Hmf Hmg Hf Hg.
 generalize Hf; intros Hcf.
 apply (left_derivable_continuous Hic Hon Hiv _ lt) in Hcf; [ | easy | easy ].
 generalize Hg; intros Hcg.
@@ -486,6 +490,7 @@ assert (H : (0 < ε / (4 * rngl_abs (f x₀) + 1))%L). {
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 specialize (Hg H); clear H.
+(*
 assert (H : (0 < √ε / 2)%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
   now apply (rl_sqrt_pos Hon Hos Hor).
@@ -494,23 +499,33 @@ generalize Hcf; intros Hcf_v.
 generalize Hcg; intros Hcg_v.
 specialize (Hcf (√ε / 2) H)%L.
 specialize (Hcg (√ε / 2) H)%L; clear H.
+*)
 move Hε before ε.
 destruct Hf as (ηf & Hηf & Hf).
 destruct Hg as (ηg & Hηg & Hg).
+(*
 destruct Hcf as (ηcf & Hηcf & Hcf).
 destruct Hcg as (ηcg & Hηcg & Hcg).
+*)
 move ηf before ε.
 move ηg before ηf.
+(*
 move ηcf before ηg.
 move ηcg before ηcf.
+*)
 move Hηg before Hηf.
+(*
 move Hηcf before Hηg.
 move Hηcg before Hηcf.
 exists (rngl_min3 ηf ηg (rngl_min3 ηcf ηcg ε)).
+*)
+destruct Hmf as (M & HM & Hmf).
+destruct Hmg as (N & HN & Hmg).
+exists (rngl_min3 ηf ηg (rngl_min M N)).
+(**)
 split. {
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
-  apply rngl_min_glb_lt; [ | easy ].
   now apply rngl_min_glb_lt.
 }
 intros x Hlt Hd.
@@ -519,13 +534,13 @@ apply (rngl_min_glb_lt_iff Hor) in Hd.
 destruct Hd as (H1, H3).
 apply (rngl_min_glb_lt_iff Hor) in H1, H3.
 destruct H1 as (H1, H2).
-destruct H3 as (H3, H5).
-apply (rngl_min_glb_lt_iff Hor) in H3.
 destruct H3 as (H3, H4).
 specialize (Hf x Hlt H1).
 specialize (Hg x Hlt H2).
+(*
 specialize (Hcf x Hlt H3).
 specialize (Hcg x Hlt H4).
+*)
 cbn.
 assert (Hzd : (0 < d_dist x x₀)%L). {
   apply (rngl_lt_iff Hor).
@@ -567,10 +582,12 @@ rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 cbn in Hcf, Hcg.
+(*
 progress unfold rngl_dist in Hcf.
 progress unfold rngl_dist in Hcg.
 rewrite <- (rngl_abs_opp Hop Hor) in Hcf, Hcg.
 rewrite (rngl_opp_sub_distr Hop) in Hcf, Hcg.
+*)
 remember (f x₀ - f x)%L as a.
 remember (g x₀ - g x)%L as b.
 rewrite (rngl_add_comm (_ * _ * _)).
@@ -676,6 +693,19 @@ eapply (rngl_le_trans Hor). {
 }
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 (* ça doit se démontrer par la continuité de f et de g *)
+rewrite (rngl_abs_mul Hop Hi1 Hor).
+specialize (Hmf x H3).
+specialize (Hmg x H4).
+move N before M.
+move HN before HM.
+assert (H : (0 < ε * d_dist x x₀)%L). {
+  now apply (rngl_mul_pos_pos Hos Hor Hii).
+}
+specialize (Hmf (ε * d_dist x x₀)%L H).
+destruct Hmf as (ηmf & Hηmf & Hmf).
+specialize (Hmf x₀ Hlt).
+(* ah zut, ça ne marche pas *)
+...
 specialize (Hcf_v (ε / d_dist x x₀)%L).
 specialize (Hcg_v (ε / d_dist x x₀)%L).
 assert (H : (0 < ε / d_dist x x₀)%L). {
@@ -693,6 +723,8 @@ enough (H :
    ∀ x, (d_dist x x₀ < M)%L → left_continuous_at lt da rngl_distance f x)).
 destruct H as (M & HM & H).
 specialize (H x).
+progress unfold left_continuous_at in H.
+progress unfold is_limit_when_tending_to_neighbourhood in H.
 ...
 rewrite (rngl_abs_mul Hop Hi1 Hor).
 eapply (rngl_le_trans Hor). {
