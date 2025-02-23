@@ -425,12 +425,13 @@ Theorem left_derivative_mul_at :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ A lt, (∀ x, ¬ (lt x x)) →
-  ∀ da (f g : A → T) f' g',
-  is_derivative lt lt da rngl_distance f f'
-  → (∀ x, left_derivative_at lt da rngl_distance g x (g' x))
-  → ∀ x₀,
-  left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
-     x₀ (f x₀ * g' x₀ + f' x₀ * g x₀)%L.
+  ∀ da (f g : A → T) f' g' x₀,
+  (∃ Df Mf, (0 < Mf ∧ ∀ x, d_dist x x₀ < Mf → rngl_abs (f' x) < Df)%L)
+  → (∃ Dg Mg, (0 < Mg ∧ ∀ x, d_dist x x₀ < Mg → rngl_abs (g' x) < Dg)%L)
+  → left_derivative_at lt da rngl_distance f x₀ (f' x₀)
+  → left_derivative_at lt da rngl_distance g x₀ (g' x₀)
+  → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
+       x₀ (f x₀ * g' x₀ + f' x₀ * g x₀)%L.
 Proof.
 intros Hic Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -439,7 +440,7 @@ specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hlti * Hf Hg * ε Hε.
+  intros * Hlti * Hbf Hbg Hf Hg * ε Hε.
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
@@ -456,20 +457,15 @@ assert (Hz4' : (0 ≤ 4)%L). {
   apply (rngl_add_le_mono_r Hop Hor).
   now apply (rngl_le_add_l Hor).
 }
-intros * Hlti * Hf Hg *.
-progress unfold is_derivative in Hf.
+intros * Hlti * Hbf Hbg Hf Hg *.
 progress unfold left_derivative_at in Hf.
 progress unfold left_derivative_at in Hg.
-specialize (Hf x₀) as H1.
-specialize (Hg x₀) as H2.
-destruct H1 as (H11 & H12 & H1 & H13).
-move H1 before H2.
-apply (is_limit_lt_is_limit_le_iff Hon Hiv) in H1, H2.
+apply (is_limit_lt_is_limit_le_iff Hon Hiv) in Hf, Hg.
 apply (is_limit_lt_is_limit_le_iff Hon Hiv).
-progress unfold is_limit_when_tending_to_neighbourhood_le in H1.
-progress unfold is_limit_when_tending_to_neighbourhood_le in H2.
+progress unfold is_limit_when_tending_to_neighbourhood_le in Hf.
+progress unfold is_limit_when_tending_to_neighbourhood_le in Hg.
 intros ε Hε.
-specialize (H1 (ε / (4 * rngl_abs (g x₀) + 1)))%L.
+specialize (Hf (ε / (4 * rngl_abs (g x₀) + 1)))%L.
 assert (H : (0 < ε / (4 * rngl_abs (g x₀) + 1))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor _ _ Hε).
   apply (rngl_add_nonneg_pos Hor).
@@ -477,8 +473,8 @@ assert (H : (0 < ε / (4 * rngl_abs (g x₀) + 1))%L). {
   apply (rngl_abs_nonneg Hop Hor).
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
-specialize (H1 H); clear H.
-specialize (H2 (ε / (4 * rngl_abs (f x₀) + 1)))%L.
+specialize (Hf H); clear H.
+specialize (Hg (ε / (4 * rngl_abs (f x₀) + 1)))%L.
 assert (H : (0 < ε / (4 * rngl_abs (f x₀) + 1))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor _ _ Hε).
   apply (rngl_add_nonneg_pos Hor).
@@ -486,19 +482,45 @@ assert (H : (0 < ε / (4 * rngl_abs (f x₀) + 1))%L). {
   apply (rngl_abs_nonneg Hop Hor).
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
-specialize (H2 H); clear H.
+specialize (Hg H); clear H.
 move Hε before ε.
-destruct H1 as (ηf & Hηf & H1).
-destruct H2 as (ηg & Hηg & H2).
+destruct Hf as (ηf & Hηf & H1).
+destruct Hg as (ηg & Hηg & H2).
 move ηf before ε.
 move ηg before ηf.
 move Hηg before Hηf.
-exists (rngl_min ηf ηg).
-split; [ now apply rngl_min_glb_lt | ].
+destruct Hbf as (Df & Mf & Hmf & Hbf).
+destruct Hbg as (Dg & Mg & Hmg & Hbg).
+move Dg before Df; move Mg before Mf.
+move Hmg before Hmf.
+assert (Hdf : (0 < Df)%L). {
+  specialize (Hbf x₀).
+  rewrite dist_diag in Hbf.
+  specialize (Hbf Hmf).
+  apply (rngl_le_lt_trans Hor _ (rngl_abs (f' x₀))); [ | easy ].
+  apply (rngl_abs_nonneg Hop Hor).
+}
+assert (Hdg : (0 < Dg)%L). {
+  specialize (Hbg x₀).
+  rewrite dist_diag in Hbg.
+  specialize (Hbg Hmg).
+  apply (rngl_le_lt_trans Hor _ (rngl_abs (g' x₀))); [ | easy ].
+  apply (rngl_abs_nonneg Hop Hor).
+}
+move Hdf after Hmf; move Hdg after Hmf.
+exists (rngl_min3 ηf ηg (rngl_min Df Dg)).
+split. {
+  apply rngl_min_glb_lt.
+  now apply rngl_min_glb_lt.
+  now apply rngl_min_glb_lt.
+}
 intros x Hlt Hd.
 move x before x₀.
 apply (rngl_min_glb_lt_iff Hor) in Hd.
-destruct Hd as (H3, H4).
+destruct Hd as (H3, H5).
+apply (rngl_min_glb_lt_iff Hor) in H3, H5.
+destruct H3 as (H3, H4).
+destruct H5 as (H5, H6).
 specialize (H1 x Hlt H3).
 specialize (H2 x Hlt H4).
 cbn.
@@ -646,14 +668,6 @@ eapply (rngl_le_trans Hor). {
 }
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 rewrite (rngl_abs_mul Hop Hi1 Hor).
-specialize (Hf x) as H5.
-destruct H5 as (H5 & H6 & H7 & H8).
-progress unfold right_derivative_at in H8.
-progress unfold is_limit_when_tending_to_neighbourhood in H8.
-
-(* ça va pas, ça, à cause de l'η qui vient d'apparaître ; il faudrait que je
-   démontre que f et g sont uniformément continues dans un voisinage de x₀ *)
-
 ...
 specialize (Hmf x H3).
 specialize (Hmg x H4).
