@@ -674,7 +674,6 @@ eapply (rngl_le_trans Hor). {
 }
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 rewrite (rngl_abs_mul Hop Hi1 Hor).
-...
 specialize (Hbf x H5) as Hbf1.
 specialize (Hbf x₀) as Hbf2.
 rewrite dist_diag in Hbf2.
