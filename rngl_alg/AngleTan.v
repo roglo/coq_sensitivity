@@ -458,14 +458,18 @@ assert (Hz4' : (0 ≤ 4)%L). {
   now apply (rngl_le_add_l Hor).
 }
 intros * Hlti * Hbf Hbg Hf Hg *.
+(*
 progress unfold left_derivative_at in Hf.
 progress unfold left_derivative_at in Hg.
 apply (is_limit_lt_is_limit_le_iff Hon Hiv) in Hf, Hg.
+*)
 apply (is_limit_lt_is_limit_le_iff Hon Hiv).
+(*
 progress unfold is_limit_when_tending_to_neighbourhood_le in Hf.
 progress unfold is_limit_when_tending_to_neighbourhood_le in Hg.
+*)
 intros ε Hε.
-specialize (Hf (ε / (4 * rngl_abs (g x₀) + 1)))%L.
+specialize (Hf (ε / (4 * rngl_abs (g x₀) + 1)))%L as H1.
 assert (H : (0 < ε / (4 * rngl_abs (g x₀) + 1))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor _ _ Hε).
   apply (rngl_add_nonneg_pos Hor).
@@ -473,8 +477,8 @@ assert (H : (0 < ε / (4 * rngl_abs (g x₀) + 1))%L). {
   apply (rngl_abs_nonneg Hop Hor).
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
-specialize (Hf H); clear H.
-specialize (Hg (ε / (4 * rngl_abs (f x₀) + 1)))%L.
+specialize (H1 H); clear H.
+specialize (Hg (ε / (4 * rngl_abs (f x₀) + 1)))%L as H2.
 assert (H : (0 < ε / (4 * rngl_abs (f x₀) + 1))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor _ _ Hε).
   apply (rngl_add_nonneg_pos Hor).
@@ -482,10 +486,10 @@ assert (H : (0 < ε / (4 * rngl_abs (f x₀) + 1))%L). {
   apply (rngl_abs_nonneg Hop Hor).
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
-specialize (Hg H); clear H.
+specialize (H2 H); clear H.
 move Hε before ε.
-destruct Hf as (ηf & Hηf & H1).
-destruct Hg as (ηg & Hηg & H2).
+destruct H1 as (ηf & Hηf & H1).
+destruct H2 as (ηg & Hηg & H2).
 move ηf before ε.
 move ηg before ηf.
 move Hηg before Hηf.
@@ -508,7 +512,7 @@ assert (Hdg : (0 < Dg)%L). {
   apply (rngl_abs_nonneg Hop Hor).
 }
 move Hdf after Hmf; move Hdg after Hmf.
-exists (rngl_min3 ηf ηg (rngl_min Df Dg)).
+exists (rngl_min3 ηf ηg (rngl_min Mf Mg)).
 split. {
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
@@ -536,8 +540,8 @@ assert (Hzd : (0 < d_dist x x₀)%L). {
 assert (Hzed : (0 ≤ d_dist x x₀)%L). {
   now apply (dist_nonneg Hon Hop Hiv Hor).
 }
-apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ _ Hzd) in H1.
-apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ _ Hzd) in H2.
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii _ _ _ Hzd) in H1.
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii _ _ _ Hzd) in H2.
 apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ _ Hzd).
 cbn in H1, H2.
 rewrite (rngl_dist_mul_distr_r Hii _ _ _ Hzed) in H1.
@@ -608,6 +612,7 @@ eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_r Hop Hor).
   apply (rngl_mul_le_mono_nonneg_r Hop Hor).
   apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_lt_le_incl Hor).
   apply H1.
 }
 rewrite (rngl_mul_mul_swap Hic).
@@ -640,6 +645,7 @@ eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_r Hop Hor).
   apply (rngl_mul_le_mono_nonneg_r Hop Hor).
   apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_lt_le_incl Hor).
   apply H2.
 }
 rewrite (rngl_mul_mul_swap Hic).
@@ -668,6 +674,27 @@ eapply (rngl_le_trans Hor). {
 }
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 rewrite (rngl_abs_mul Hop Hi1 Hor).
+...
+specialize (Hbf x H5) as Hbf1.
+specialize (Hbf x₀) as Hbf2.
+rewrite dist_diag in Hbf2.
+specialize (Hbf2 Hmf).
+specialize (Hbg x H6) as Hbg1.
+specialize (Hbg x₀) as Hbg2.
+rewrite dist_diag in Hbg2.
+specialize (Hbg2 Hmg).
+rewrite Heqa, Heqb.
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply (rngl_mul_le_compat_nonneg Hor).
+  split; [ apply (rngl_abs_nonneg Hop Hor) | ].
+  rewrite <- (rngl_add_opp_r Hop).
+  apply (rngl_abs_triangle Hop Hor).
+  split; [ apply (rngl_abs_nonneg Hop Hor) | ].
+  rewrite <- (rngl_add_opp_r Hop).
+  apply (rngl_abs_triangle Hop Hor).
+}
+do 2 rewrite (rngl_abs_opp Hop Hor).
 ...
 specialize (Hmf x H3).
 specialize (Hmg x H4).
