@@ -458,11 +458,12 @@ assert (Hz4' : (0 ≤ 4)%L). {
 }
 intros * Hlti * Hf Hg *.
 progress unfold is_derivative in Hf.
-....
 progress unfold left_derivative_at in Hf.
 progress unfold left_derivative_at in Hg.
 specialize (Hf x₀) as H1.
 specialize (Hg x₀) as H2.
+destruct H1 as (H11 & H12 & H1 & H13).
+move H1 before H2.
 apply (is_limit_lt_is_limit_le_iff Hon Hiv) in H1, H2.
 apply (is_limit_lt_is_limit_le_iff Hon Hiv).
 progress unfold is_limit_when_tending_to_neighbourhood_le in H1.
@@ -646,7 +647,13 @@ eapply (rngl_le_trans Hor). {
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 rewrite (rngl_abs_mul Hop Hi1 Hor).
 specialize (Hf x) as H5.
-progress unfold is_limit_when_tending_to_neighbourhood in H5.
+destruct H5 as (H5 & H6 & H7 & H8).
+progress unfold right_derivative_at in H8.
+progress unfold is_limit_when_tending_to_neighbourhood in H8.
+
+(* ça va pas, ça, à cause de l'η qui vient d'apparaître ; il faudrait que je
+   démontre que f et g sont uniformément continues dans un voisinage de x₀ *)
+
 ...
 specialize (Hmf x H3).
 specialize (Hmg x H4).
