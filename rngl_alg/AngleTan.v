@@ -682,6 +682,17 @@ specialize (Hbg x H6) as Hbg1.
 specialize (Hbg x₀) as Hbg2.
 rewrite dist_diag in Hbg2.
 specialize (Hbg2 Hmg).
+rewrite <- (rngl_sub_add Hop a c).
+rewrite <- (rngl_sub_add Hop b d).
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply (rngl_mul_le_compat_nonneg Hor).
+  split; [ apply (rngl_abs_nonneg Hop Hor) | ].
+  apply (rngl_abs_triangle Hop Hor).
+  split; [ apply (rngl_abs_nonneg Hop Hor) | ].
+  apply (rngl_abs_triangle Hop Hor).
+}
+...
 rewrite Heqa, Heqb.
 eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_l Hop Hor).
