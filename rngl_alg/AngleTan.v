@@ -435,6 +435,7 @@ Theorem left_derivative_mul_at :
 Proof.
 intros Hic Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -730,6 +731,100 @@ rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic (_ + _)).
 rewrite <- rngl_mul_assoc.
 rewrite fold_rngl_squ.
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply (rngl_mul_le_compat_nonneg Hor).
+  split. {
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    now apply (rngl_lt_le_incl Hor).
+    apply (rngl_add_nonneg_pos Hor).
+    apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+    apply (rngl_abs_nonneg Hop Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    now apply (rngl_lt_le_incl Hor).
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    now apply (rngl_lt_le_incl Hor).
+    apply (rngl_add_nonneg_pos Hor).
+    apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+    apply (rngl_abs_nonneg Hop Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_mul_le_compat_nonneg Hor).
+  split. {
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    now apply (rngl_lt_le_incl Hor).
+    apply (rngl_add_nonneg_pos Hor).
+    apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+    apply (rngl_abs_nonneg Hop Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_add_le_compat Hor).
+  apply (rngl_le_div_l Hon Hop Hiv Hor ε ε).
+  apply (rngl_add_nonneg_pos Hor).
+  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+  apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_div_diag Hon Hiq). 2: {
+    intros H; rewrite H in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  apply (rngl_le_add_l Hor).
+  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+  apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_le_refl Hor).
+  split. {
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    now apply (rngl_lt_le_incl Hor).
+    apply (rngl_add_nonneg_pos Hor).
+    apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+    apply (rngl_abs_nonneg Hop Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_add_le_compat Hor).
+  apply (rngl_le_div_l Hon Hop Hiv Hor ε ε).
+  apply (rngl_add_nonneg_pos Hor).
+  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+  apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_div_diag Hon Hiq). 2: {
+    intros H; rewrite H in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  apply (rngl_le_add_l Hor).
+  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+  apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_le_refl Hor).
+  split; [ apply (rngl_squ_nonneg Hos Hor) | ].
+  apply (rngl_le_refl Hor).
+}
+...
+  ============================
+  (ε * rd / 4 + ε * rd / 4 + (ε + Df) * (ε + Dg) * rd² ≤ ε * rd)%L
+...
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  rewrite (rngl_mul_comm Hic).
+...
+  apply Hε.
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    now apply (rngl_lt_le_incl Hor).
+    apply (rngl_add_nonneg_pos Hor).
+    apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+    apply (rngl_abs_nonneg Hop Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    now apply (rngl_lt_le_incl Hor).
 ...
 rewrite Heqa, Heqb.
 eapply (rngl_le_trans Hor). {
