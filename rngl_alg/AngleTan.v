@@ -512,11 +512,13 @@ assert (Hdg : (0 < Dg)%L). {
   apply (rngl_abs_nonneg Hop Hor).
 }
 move Hdf after Hmf; move Hdg after Hmf.
-exists (rngl_min3 ηf ηg (rngl_min Mf Mg)).
+exists (rngl_min3 ηf ηg (rngl_min3 Mf Mg 1%L)).
 split. {
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
+  apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 intros x Hlt Hd.
 move x before x₀.
@@ -524,6 +526,8 @@ apply (rngl_min_glb_lt_iff Hor) in Hd.
 destruct Hd as (H3, H5).
 apply (rngl_min_glb_lt_iff Hor) in H3, H5.
 destruct H3 as (H3, H4).
+destruct H5 as (H5, H7).
+apply (rngl_min_glb_lt_iff Hor) in H5.
 destruct H5 as (H5, H6).
 specialize (H1 x Hlt H3).
 specialize (H2 x Hlt H4).
@@ -692,6 +696,40 @@ eapply (rngl_le_trans Hor). {
   split; [ apply (rngl_abs_nonneg Hop Hor) | ].
   apply (rngl_abs_triangle Hop Hor).
 }
+set (rd := d_dist x x₀).
+fold rd in H1, H2, H7, Heqc, Heqd |-*.
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii rd) in Hbf2; [ | easy ].
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii rd) in Hbg2; [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor rd) in Hbf2 at 1; [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor rd) in Hbg2 at 1; [ | easy ].
+rewrite <- (rngl_abs_mul Hop Hi1 Hor) in Hbf2, Hbg2.
+rewrite <- Heqc in Hbf2.
+rewrite <- Heqd in Hbg2.
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply (rngl_mul_le_compat_nonneg Hor).
+  split. {
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply (rngl_abs_nonneg Hop Hor).
+    apply (rngl_abs_nonneg Hop Hor).
+  }
+  apply (rngl_add_le_compat Hor).
+  apply (rngl_lt_le_incl Hor), H1.
+  apply (rngl_lt_le_incl Hor), Hbf2.
+  split. {
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply (rngl_abs_nonneg Hop Hor).
+    apply (rngl_abs_nonneg Hop Hor).
+  }
+  apply (rngl_add_le_compat Hor).
+  apply (rngl_lt_le_incl Hor), H2.
+  apply (rngl_lt_le_incl Hor), Hbg2.
+}
+do 2 rewrite <- rngl_mul_add_distr_r.
+rewrite rngl_mul_assoc.
+rewrite (rngl_mul_mul_swap Hic (_ + _)).
+rewrite <- rngl_mul_assoc.
+rewrite fold_rngl_squ.
 ...
 rewrite Heqa, Heqb.
 eapply (rngl_le_trans Hor). {
