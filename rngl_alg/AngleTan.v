@@ -687,6 +687,9 @@ specialize (Hbg x H6) as Hbg1.
 specialize (Hbg x₀) as Hbg2.
 rewrite dist_diag in Hbg2.
 specialize (Hbg2 Hmg).
+set (dxx := d_dist x x₀).
+fold dxx in H1, H2, H3, H4, H5, H6, H7, Heqc, Heqd, Hzd, Hzed |-*.
+...
 rewrite <- (rngl_sub_add Hop a c).
 rewrite <- (rngl_sub_add Hop b d).
 eapply (rngl_le_trans Hor). {
@@ -697,12 +700,10 @@ eapply (rngl_le_trans Hor). {
   split; [ apply (rngl_abs_nonneg Hop Hor) | ].
   apply (rngl_abs_triangle Hop Hor).
 }
-set (rd := d_dist x x₀).
-fold rd in H1, H2, H7, Heqc, Heqd |-*.
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii rd) in Hbf2; [ | easy ].
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii rd) in Hbg2; [ | easy ].
-rewrite <- (rngl_abs_nonneg_eq Hop Hor rd) in Hbf2 at 1; [ | easy ].
-rewrite <- (rngl_abs_nonneg_eq Hop Hor rd) in Hbg2 at 1; [ | easy ].
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii dxx) in Hbf2; [ | easy ].
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii dxx) in Hbg2; [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor dxx) in Hbf2 at 1; [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor dxx) in Hbg2 at 1; [ | easy ].
 rewrite <- (rngl_abs_mul Hop Hi1 Hor) in Hbf2, Hbg2.
 rewrite <- Heqc in Hbf2.
 rewrite <- Heqd in Hbg2.
@@ -811,7 +812,7 @@ eapply (rngl_le_trans Hor). {
 }
 ...
   ============================
-  (ε * rd / 4 + ε * rd / 4 + (ε + Df) * (ε + Dg) * rd² ≤ ε * rd)%L
+  (ε * dxx / 4 + ε * dxx / 4 + (ε + Df) * (ε + Dg) * dxx² ≤ ε * dxx)%L
 ...
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
   rewrite (rngl_mul_comm Hic).
