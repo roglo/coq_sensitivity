@@ -707,6 +707,10 @@ fold dxx in H1, H2, H3, H4, H5, H6, H7, Heqc, Heqd, Hzd, Hzed |-*.
   Il faut donc que je démontre l'équivalence avec le fait d'être
   lipschitzienne.
 
+  Sauf que, pour faire cette démonstration, il faut faire appel
+  à encore d'autres théorèmes, éventuellement avec des intégrales.
+  On n'est pas sortis de l'auberge.
+
 *)
 ...
 assert (H : ∃ k, ∀ x y, (rngl_abs (f x - f y) ≤ k * d_dist x y)%L). {
