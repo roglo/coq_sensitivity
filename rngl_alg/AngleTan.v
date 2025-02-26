@@ -685,6 +685,24 @@ rewrite dist_diag in Hbg2.
 specialize (Hbg2 Hmg).
 set (dxx := d_dist x x₀).
 fold dxx in H1, H2, H3, H4, H5, H6, H7, Heqc, Heqd, Hzd, Hzed |-*.
+(**)
+
+(* Selon wikipédia
+
+  Une fonction f dérivable sur un intervalle réel est lipschitzienne
+  si et seulement si sa dérivée est bornée.
+
+  On dit que f est k-lipschitzienne si
+    ∀ (x ,y) ∈ E2 , | f(x) − f(y) | ≤ k | x − y |
+
+  Il faudrait donc que je démontre que f est Mf-lipschitzienne.
+  J'ai bien mon hypothèse de dérivée bornée.
+  Il faut donc que je démontre l'équivalence avec le fait d'être
+  lipschitzienne.
+
+*)
+
+...
 rewrite <- (rngl_sub_add Hop a c).
 rewrite <- (rngl_sub_add Hop b d).
 eapply (rngl_le_trans Hor). {
