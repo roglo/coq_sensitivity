@@ -708,9 +708,12 @@ fold dxx in H1, H2, H3, H4, H5, H6, H7, Heqc, Heqd, Hzd, Hzed |-*.
   lipschitzienne.
 
 *)
+...
 assert (H : ∃ k, ∀ x y, (rngl_abs (f x - f y) ≤ k * d_dist x y)%L). {
   subst dxx.
   clear x Heqa Heqb Heqc Heqd Hlt H3 H4 H5 H6 H7 Hzd Hzed H1 H2 Hbf1 Hbg1.
+  exists Df.
+  intros.
 ...
 rewrite <- (rngl_sub_add Hop a c).
 rewrite <- (rngl_sub_add Hop b d).
