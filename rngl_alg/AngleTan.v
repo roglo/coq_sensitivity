@@ -717,7 +717,13 @@ enough (H : ∃ k, ∀ x y, (rngl_abs (f x - f y) ≤ k * d_dist x y)%L). {
   rewrite dist_comm in Hk.
   progress fold dxx in Hk.
   rewrite <- Heqa in Hk.
-  (* peut-être qu'il y a un lien entre Df et k, voire dxx ? *)
+  (* peut-être qu'il y a un lien entre Df et k ? *)
+  (* en fait, oui, je pense que k=Df, en fait *)
+  (* mais, du coup, pas moyen de borner rngl_abs a *)
+...
+(f x₀ - f x) / d xx - f' x₀ < ε
+f x₀ - f x - f' x₀ * dxx < ε * dxx
+f x₀ - f x < (ε + f' x₀) * dxx
 ... ...
 subst dxx.
 clear x Heqa Heqb Heqc Heqd Hlt H3 H4 H5 H6 H7 Hzd Hzed H1 H2 Hbf1 Hbg1.
