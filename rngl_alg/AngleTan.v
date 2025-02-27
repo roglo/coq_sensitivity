@@ -693,7 +693,6 @@ specialize (Hbg2 Hmg).
 set (dxx := d_dist x x₀).
 fold dxx in H1, H2, H3, H4, H5, H6, H7, Heqc, Heqd, Hzd, Hzed |-*.
 (**)
-
 (* Selon wikipédia
 
   Une fonction f dérivable sur un intervalle réel est lipschitzienne
@@ -712,12 +711,18 @@ fold dxx in H1, H2, H3, H4, H5, H6, H7, Heqc, Heqd, Hzd, Hzed |-*.
   On n'est pas sortis de l'auberge.
 
 *)
-...
-assert (H : ∃ k, ∀ x y, (rngl_abs (f x - f y) ≤ k * d_dist x y)%L). {
-  subst dxx.
-  clear x Heqa Heqb Heqc Heqd Hlt H3 H4 H5 H6 H7 Hzd Hzed H1 H2 Hbf1 Hbg1.
-  exists Df.
-  intros.
+enough (H : ∃ k, ∀ x y, (rngl_abs (f x - f y) ≤ k * d_dist x y)%L). {
+  destruct H as (k & Hk).
+  specialize (Hk x₀ x).
+  rewrite dist_comm in Hk.
+  progress fold dxx in Hk.
+  rewrite <- Heqa in Hk.
+  (* peut-être qu'il y a un lien entre Df et k, voire dxx ? *)
+... ...
+subst dxx.
+clear x Heqa Heqb Heqc Heqd Hlt H3 H4 H5 H6 H7 Hzd Hzed H1 H2 Hbf1 Hbg1.
+exists Df.
+intros.
 ...
 rewrite <- (rngl_sub_add Hop a c).
 rewrite <- (rngl_sub_add Hop b d).
