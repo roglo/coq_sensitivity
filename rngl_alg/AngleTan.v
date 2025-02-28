@@ -516,13 +516,19 @@ destruct H2 as (ηg & Hηg & H2).
 move ηf before ε.
 move ηg before ηf.
 move Hηg before Hηf.
-exists (rngl_min3 ηf ηg (rngl_min3 Mf Mg 1%L)).
+(**)
+generalize Hf; intros H.
+apply left_derivable_continuous with (le := lt) in H.
+(**)
+assert (Hrε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
+specialize (H √ε Hrε).
+destruct H as (η & Hη & Hcf).
+exists (rngl_min3 ηf ηg (rngl_min3 Mf Mg η)).
 split. {
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
-  apply rngl_min_glb_lt.
+  apply rngl_min_glb_lt; [ | easy ].
   now apply rngl_min_glb_lt.
-  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 intros x Hlt Hd.
 move x before x₀.
@@ -692,6 +698,12 @@ rewrite dist_diag in Hbg2.
 specialize (Hbg2 Hmg).
 set (dx := d_dist x x₀).
 fold dx in H1, H2, H3, H4, H5, H6, H7, Heqc, Heqd, Hzd, Hzed |-*.
+specialize (Hcf x Hlt H7).
+cbn in Hcf.
+progress unfold rngl_dist in Hcf.
+rewrite <- rngl_abs_opp in Hcf.
+rewrite rngl_opp_sub_distr in Hcf.
+rewrite <- Heqa in Hcf.
 ...
 (**)
 (* Selon wikipédia
