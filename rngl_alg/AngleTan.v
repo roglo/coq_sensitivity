@@ -613,6 +613,7 @@ rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite <- Heqa.
 rewrite (rngl_mul_comm Hic b).
 (* lemma *)
+(*
 progress unfold rngl_abs.
 rewrite (rngl_leb_sub_0 Hop Hor).
 remember ((a - c) * g x₀ + (b - d) * f x₀ ≤? a * b)%L as ab eqn:Hab.
@@ -652,7 +653,49 @@ destruct ab. 2: {
     do 2 rewrite (rngl_mul_mul_swap Hic _ (d_dist x x₀)).
     rewrite <- rngl_mul_add_distr_r.
     apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
+    eapply (rngl_le_trans Hor). {
+      apply (rngl_add_le_mono_r Hop Hor).
+      apply (rngl_le_trans Hor _ (ε' / 4)). 2: {
+        apply (rngl_le_refl Hor).
+      }
+      apply -> (rngl_le_div_r Hon Hop Hiv Hor); [ | easy ].
+      rewrite (rngl_mul_mul_swap Hic).
+      rewrite <- rngl_mul_assoc.
+      rewrite (rngl_div_mul_mul_div Hic Hiv).
+      apply (rngl_le_div_l Hon Hop Hiv Hor). {
+        apply (rngl_add_nonneg_pos Hor).
+        apply (rngl_mul_nonneg_nonneg Hos Hor _ _ Hz4').
+        apply (rngl_abs_nonneg Hop Hor).
+        apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+      }
+      apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+      now apply (rngl_lt_le_incl Hor).
+      apply (rngl_le_add_r Hor).
+      apply (rngl_0_le_1 Hon Hos Hor).
+    }
+    rewrite rngl_add_comm.
+    eapply (rngl_le_trans Hor). {
+      apply (rngl_add_le_mono_r Hop Hor).
+      apply (rngl_le_trans Hor _ (ε' / 4)). 2: {
+        apply (rngl_le_refl Hor).
+      }
+      apply -> (rngl_le_div_r Hon Hop Hiv Hor); [ | easy ].
+      rewrite (rngl_mul_mul_swap Hic).
+      rewrite <- rngl_mul_assoc.
+      rewrite (rngl_div_mul_mul_div Hic Hiv).
+      apply (rngl_le_div_l Hon Hop Hiv Hor). {
+        apply (rngl_add_nonneg_pos Hor).
+        apply (rngl_mul_nonneg_nonneg Hos Hor _ _ Hz4').
+        apply (rngl_abs_nonneg Hop Hor).
+        apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+      }
+      apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+      now apply (rngl_lt_le_incl Hor).
+      apply (rngl_le_add_r Hor).
+      apply (rngl_0_le_1 Hon Hos Hor).
+    }
 ...
+*)
 rewrite <- (rngl_add_opp_r Hop).
 eapply (rngl_le_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
 rewrite (rngl_abs_opp Hop Hor).
