@@ -622,14 +622,36 @@ destruct ab. 2: {
   destruct (rngl_le_dec Hor 0 (a * b)) as [Hzab| Hzab]. {
     apply (rngl_le_sub_le_add_r Hop Hor).
     eapply (rngl_le_trans Hor); [ | now apply (rngl_le_add_r Hor) ].
-...
+    destruct (rngl_le_dec Hor ((a - c) * g x₀ + (b - d) * f x₀) 0) as
+      [Hac| Hac]. {
+      apply (rngl_le_trans Hor _ 0); [ easy | ].
+      apply (rngl_mul_nonneg_nonneg Hos Hor); [ | easy ].
+      now apply (rngl_lt_le_incl Hor).
+    }
+    apply (rngl_nle_gt_iff Hor) in Hac.
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor (_ + _)%L). 2: {
+      now apply (rngl_lt_le_incl Hor).
+    }
+    eapply (rngl_le_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
     eapply (rngl_le_trans Hor). {
       apply (rngl_add_le_mono_r Hop Hor).
+      rewrite (rngl_abs_mul Hop Hi1 Hor).
       apply (rngl_mul_le_mono_nonneg_r Hop Hor).
-  apply (rngl_abs_nonneg Hop Hor).
-  apply (rngl_lt_le_incl Hor).
-  apply H1.
-}
+      apply (rngl_abs_nonneg Hop Hor).
+      apply (rngl_lt_le_incl Hor).
+      apply H1.
+    }
+    eapply (rngl_le_trans Hor). {
+      apply (rngl_add_le_mono_l Hop Hor).
+      rewrite (rngl_abs_mul Hop Hi1 Hor).
+      apply (rngl_mul_le_mono_nonneg_r Hop Hor).
+      apply (rngl_abs_nonneg Hop Hor).
+      apply (rngl_lt_le_incl Hor).
+      apply H2.
+    }
+    do 2 rewrite (rngl_mul_mul_swap Hic _ (d_dist x x₀)).
+    rewrite <- rngl_mul_add_distr_r.
+    apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
 ...
 rewrite <- (rngl_add_opp_r Hop).
 eapply (rngl_le_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
