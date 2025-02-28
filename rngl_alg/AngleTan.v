@@ -613,6 +613,24 @@ rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite <- Heqa.
 rewrite (rngl_mul_comm Hic b).
 (* lemma *)
+progress unfold rngl_abs.
+rewrite (rngl_leb_sub_0 Hop Hor).
+remember ((a - c) * g x₀ + (b - d) * f x₀ ≤? a * b)%L as ab eqn:Hab.
+symmetry in Hab.
+destruct ab. 2: {
+  apply rngl_leb_gt in Hab.
+  destruct (rngl_le_dec Hor 0 (a * b)) as [Hzab| Hzab]. {
+    apply (rngl_le_sub_le_add_r Hop Hor).
+    eapply (rngl_le_trans Hor); [ | now apply (rngl_le_add_r Hor) ].
+...
+    eapply (rngl_le_trans Hor). {
+      apply (rngl_add_le_mono_r Hop Hor).
+      apply (rngl_mul_le_mono_nonneg_r Hop Hor).
+  apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_lt_le_incl Hor).
+  apply H1.
+}
+...
 rewrite <- (rngl_add_opp_r Hop).
 eapply (rngl_le_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
 rewrite (rngl_abs_opp Hop Hor).
