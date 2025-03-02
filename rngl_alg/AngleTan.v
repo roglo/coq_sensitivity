@@ -516,20 +516,10 @@ destruct H2 as (ηg & Hηg & H2).
 move ηf before ε.
 move ηg before ηf.
 move Hηg before Hηf.
-generalize Hf; intros H.
-apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H; cycle 1. {
-  apply Hlti.
-} {
-  easy.
-}
-assert (Hrε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
-specialize (H √ε Hrε).
-destruct H as (η & Hη & Hcf).
-exists (rngl_min3 ηf ηg (rngl_min3 Mf Mg η)).
+exists (rngl_min3 ηf ηg (rngl_min Mf Mg)).
 split. {
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
-  apply rngl_min_glb_lt; [ | easy ].
   now apply rngl_min_glb_lt.
 }
 intros x Hlt Hd.
@@ -538,8 +528,6 @@ apply (rngl_min_glb_lt_iff Hor) in Hd.
 destruct Hd as (H3, H5).
 apply (rngl_min_glb_lt_iff Hor) in H3, H5.
 destruct H3 as (H3, H4).
-destruct H5 as (H5, H7).
-apply (rngl_min_glb_lt_iff Hor) in H5.
 destruct H5 as (H5, H6).
 specialize (H1 x Hlt H3).
 specialize (H2 x Hlt H4).
@@ -782,13 +770,33 @@ specialize (Hbg x₀) as Hbg2.
 rewrite dist_diag in Hbg2.
 specialize (Hbg2 Hmg).
 set (dx := d_dist x x₀).
-fold dx in H1, H2, H3, H4, H5, H6, H7, Heqc, Heqd, Hzd, Hzed |-*.
-specialize (Hcf x Hlt H7).
+fold dx in H1, H2, H3, H4, H5, H6, Heqc, Heqd, Hzd, Hzed |-*.
+generalize Hf; intros H.
+apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H; cycle 1. {
+  apply Hlti.
+} {
+  easy.
+}
+assert (Hrε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
+specialize (H √ε Hrε).
+destruct H as (η & Hη & Hcf).
+specialize (Hcf x Hlt).
 cbn in Hcf.
 progress unfold rngl_dist in Hcf.
 rewrite <- (rngl_abs_opp Hop Hor) in Hcf.
 rewrite (rngl_opp_sub_distr Hop) in Hcf.
 rewrite <- Heqa in Hcf.
+progress fold dx in Hcf.
+move Hcf at bottom.
+specialize (Hg (ε / rngl_abs a)%L) as H8.
+assert (H : (0 < ε / rngl_abs a)%L) by admit.
+specialize (H8 H); clear H.
+destruct H8 as (η' & Hη' & H8).
+specialize (H8 x Hlt).
+rewrite <- Heqb in H8.
+progress fold dx in H8.
+cbn in H8.
+progress unfold rngl_dist in H8.
 ...
 (**)
 specialize (Hf √ε Hrε) as H8.
