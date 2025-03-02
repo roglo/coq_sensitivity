@@ -516,10 +516,12 @@ destruct H2 as (ηg & Hηg & H2).
 move ηf before ε.
 move ηg before ηf.
 move Hηg before Hηf.
-(**)
 generalize Hf; intros H.
-apply left_derivable_continuous with (le := lt) in H.
-(**)
+apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H; cycle 1. {
+  apply Hlti.
+} {
+  easy.
+}
 assert (Hrε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
 specialize (H √ε Hrε).
 destruct H as (η & Hη & Hcf).
@@ -784,9 +786,18 @@ fold dx in H1, H2, H3, H4, H5, H6, H7, Heqc, Heqd, Hzd, Hzed |-*.
 specialize (Hcf x Hlt H7).
 cbn in Hcf.
 progress unfold rngl_dist in Hcf.
-rewrite <- rngl_abs_opp in Hcf.
-rewrite rngl_opp_sub_distr in Hcf.
+rewrite <- (rngl_abs_opp Hop Hor) in Hcf.
+rewrite (rngl_opp_sub_distr Hop) in Hcf.
 rewrite <- Heqa in Hcf.
+...
+(**)
+specialize (Hf √ε Hrε) as H8.
+destruct H8 as (η' & Hη' & H8).
+cbn in H8.
+progress unfold rngl_dist in H8.
+specialize (H8 x Hlt).
+rewrite <- Heqa in H8.
+fold dx in H8.
 ...
 (**)
 (* Selon wikipédia
