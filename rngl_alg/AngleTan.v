@@ -516,8 +516,29 @@ destruct H2 as (ηg & Hηg & H2).
 move ηf before ε.
 move ηg before ηf.
 move Hηg before Hηf.
-exists (rngl_min3 ηf ηg (rngl_min Mf Mg)).
+(**)
+specialize (Hg 1%L (rngl_0_lt_1 Hon Hos Hc1 Hor)) as H10.
+destruct H10 as (δ₁ & Hδ₁ & H10).
+cbn in H10.
+progress unfold rngl_dist in H10.
+set (K := (rngl_abs (g' x₀) + 1)%L).
+specialize (Hf (ε / K)%L) as H11.
+assert (H : (0 < ε / K)%L). {
+  apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+  progress unfold K.
+  apply (rngl_add_nonneg_pos Hor).
+  apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+}
+specialize (H11 H); clear H.
+destruct H11 as (δ₂ & Hδ₂ & H11).
+cbn in H11.
+progress unfold rngl_dist in H11.
+(**)
+exists (rngl_min3 ηf ηg (rngl_min3 Mf Mg (rngl_min δ₁ δ₂))).
 split. {
+  apply rngl_min_glb_lt.
+  now apply rngl_min_glb_lt.
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
@@ -528,7 +549,10 @@ apply (rngl_min_glb_lt_iff Hor) in Hd.
 destruct Hd as (H3, H5).
 apply (rngl_min_glb_lt_iff Hor) in H3, H5.
 destruct H3 as (H3, H4).
+destruct H5 as (H5, H7).
+apply (rngl_min_glb_lt_iff Hor) in H5, H7.
 destruct H5 as (H5, H6).
+destruct H7 as (H7, H8).
 specialize (H1 x Hlt H3).
 specialize (H2 x Hlt H4).
 cbn.
@@ -771,6 +795,16 @@ rewrite dist_diag in Hbg2.
 specialize (Hbg2 Hmg).
 set (dx := d_dist x x₀).
 fold dx in H1, H2, H3, H4, H5, H6, Heqc, Heqd, Hzd, Hzed |-*.
+(**)
+specialize (H10 x Hlt H7).
+specialize (H11 x Hlt H8).
+move H10 at bottom.
+move H11 at bottom.
+rewrite <- Heqb in H10.
+rewrite <- Heqa in H11.
+progress fold dx in H10.
+progress fold dx in H11.
+...
 generalize Hf; intros H.
 apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H; cycle 1. {
   apply Hlti.
