@@ -431,6 +431,7 @@ Theorem left_derivative_mul_at :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
+  rngl_has_eq_dec T = true →
   ∀ A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f g : A → T) f' g' x₀,
   (∃ Df Mf, (0 < Mf ∧ ∀ x, d_dist x x₀ < Mf → rngl_abs (f' x) < Df)%L)
@@ -440,7 +441,7 @@ Theorem left_derivative_mul_at :
   → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
        x₀ (f x₀ * g' x₀ + f' x₀ * g x₀)%L.
 Proof.
-intros Hic Hon Hiv.
+intros Hic Hon Hiv Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -721,50 +722,21 @@ rewrite <- Heqb in H10.
 rewrite <- Heqa in H11.
 progress fold dx in H10.
 progress fold dx in H11.
-destruct (rngl_le_dec Hor (g x₀) (g x)) as [Hgg| Hgg]. {
-  rewrite <- (rngl_abs_opp Hop Hor) in H10.
-  rewrite (rngl_opp_sub_distr Hop) in H10.
-  progress unfold rngl_abs in H10.
-  rewrite (rngl_leb_sub_0 Hop Hor) in H10.
-  remember (g' x₀ ≤? b / dx)%L as bdg eqn:Hbdg.
-  symmetry in Hbdg.
-  destruct bdg. {
-    apply rngl_leb_le in Hbdg.
-    rewrite (rngl_opp_sub_distr Hop) in H10.
-2: {
-....
-  progress unfold rngl_abs in H10.
-  rewrite (rngl_leb_sub_0 Hop Hor) in H10.
-  rewrite <- (rngl_add_opp_r Hop) in H10.
-...
-  rewrite <- (rngl_div_opp_l Hop Hiv) in H10.
-Search (rngl_abs (_ + _)).
-...
-  apply (rngl_nlt_ge_iff Hor).
-  intros H.
-...
-assert (H : (b < K * dx)%L). {
-  apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
+assert (H : (rngl_abs b < K * dx)%L). {
   progress unfold K.
+  apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
   apply (rngl_lt_sub_lt_add_l Hop Hor).
-  destruct (rngl_lt_dec Hor (b / dx) (g' x₀)) as [Hbd| Hbd]. {
-    apply (rngl_le_lt_trans Hor _ 0). {
-      apply (rngl_le_sub_0 Hop Hor).
-      eapply (rngl_le_trans Hor). {
-        apply (rngl_lt_le_incl Hor), Hbd.
-      }
-      apply (rngl_le_abs_diag Hop Hor).
-    }
-    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
-  }
-  apply (rngl_nlt_ge_iff Hor) in Hbd.
-  rewrite (rngl_abs_nonneg_eq Hop Hor) in H10.
   eapply (rngl_le_lt_trans Hor); [ | apply H10 ].
-  apply (rngl_sub_le_mono_l Hop Hor).
-  apply (rngl_le_abs_diag Hop Hor).
-  now apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  eapply (rngl_le_trans Hor); [ | apply (rngl_abs_triangle Hop Hor) ].
+  rewrite (rngl_sub_add Hop).
+  rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
+    intros H; rewrite H in Hzd.
+    now apply (rngl_lt_irrefl Hor) in Hzd.
+  }
+  rewrite (rngl_abs_nonneg_eq Hop Hor dx); [ | easy ].
+  apply (rngl_le_refl Hor).
 }
-(* oui mais, si b < 0 ? *)
 ...
 generalize Hf; intros H.
 apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H; cycle 1. {
