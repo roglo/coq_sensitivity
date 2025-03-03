@@ -804,6 +804,27 @@ rewrite <- Heqb in H10.
 rewrite <- Heqa in H11.
 progress fold dx in H10.
 progress fold dx in H11.
+assert (H : (b / dx < K)%L). {
+  progress unfold K.
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  destruct (rngl_lt_dec Hor (b / dx) (g' x₀)) as [Hbd| Hbd]. {
+    apply (rngl_le_lt_trans Hor _ 0). {
+      apply (rngl_le_sub_0 Hop Hor).
+      eapply (rngl_le_trans Hor). {
+        apply (rngl_lt_le_incl Hor), Hbd.
+      }
+      apply (rngl_le_abs_diag Hop Hor).
+    }
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_nlt_ge_iff Hor) in Hbd.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in H10.
+  eapply (rngl_le_lt_trans Hor); [ | apply H10 ].
+  apply (rngl_sub_le_mono_l Hop Hor).
+  apply (rngl_le_abs_diag Hop Hor).
+  now apply (rngl_le_0_sub Hop Hor).
+}
+move H before H10; clear H10; rename H into H10.
 ...
 generalize Hf; intros H.
 apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H; cycle 1. {
