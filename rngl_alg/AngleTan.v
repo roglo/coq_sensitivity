@@ -804,7 +804,8 @@ rewrite <- Heqb in H10.
 rewrite <- Heqa in H11.
 progress fold dx in H10.
 progress fold dx in H11.
-assert (H : (b / dx < K)%L). {
+assert (H : (b < K * dx)%L). {
+  apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
   progress unfold K.
   apply (rngl_lt_sub_lt_add_l Hop Hor).
   destruct (rngl_lt_dec Hor (b / dx) (g' x₀)) as [Hbd| Hbd]. {
@@ -824,7 +825,6 @@ assert (H : (b / dx < K)%L). {
   apply (rngl_le_abs_diag Hop Hor).
   now apply (rngl_le_0_sub Hop Hor).
 }
-move H before H10; clear H10; rename H into H10.
 ...
 generalize Hf; intros H.
 apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H; cycle 1. {
