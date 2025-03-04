@@ -440,9 +440,7 @@ Theorem left_derivative_mul_at :
 Proof.
 intros Hic Hon Hiv Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -452,7 +450,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
-specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H2z.
 assert (Hz4 : (0 < 4)%L). {
   apply (rngl_lt_le_trans Hor _ 2); [ easy | ].
   apply (rngl_add_le_mono_r Hop Hor).
@@ -758,7 +755,6 @@ eapply (rngl_le_trans Hor). 2: {
 }
 apply (rngl_le_refl Hor).
 Qed.
-(* above: to be simplified *)
 
 (* to be completed
 Theorem derivative_mul :
