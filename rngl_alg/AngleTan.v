@@ -523,9 +523,10 @@ destruct H10 as (δ₁ & Hδ₁ & H10).
 cbn in H10.
 progress unfold rngl_dist in H10.
 set (K := (rngl_abs (g' x₀) + 1)%L).
-specialize (Hf (ε / K)%L) as H11.
-assert (H : (0 < ε / K)%L). {
+specialize (Hf (ε / (4 * K))%L) as H11.
+assert (H : (0 < ε / (4 * K))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+  apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
   progress unfold K.
   apply (rngl_add_nonneg_pos Hor).
   apply (rngl_abs_nonneg Hop Hor).
@@ -543,9 +544,10 @@ apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H12;
 } {
   easy.
 }
-specialize (H12 (ε / K)%L).
-assert (H : (0 < ε / K)%L). {
+specialize (H12 (ε / (4 * K))%L).
+assert (H : (0 < ε / (4 * K))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+  apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
   progress unfold K.
   apply (rngl_add_nonneg_pos Hor).
   apply (rngl_abs_nonneg Hop Hor).
@@ -763,6 +765,33 @@ assert (Hbk : (rngl_abs b < K * dx)%L). {
   rewrite (rngl_abs_nonneg_eq Hop Hor dx); [ | easy ].
   apply (rngl_le_refl Hor).
 }
+assert (H : (rngl_abs a * rngl_abs b < ε / (4 * dx))%L). {
+  rewrite <- (rngl_div_mul Hon Hiv ε (4 * K)%L). 2: {
+...
+}
+...
+    progress unfold K.
+    intros H.
+    rewrite <- (rngl_sub_opp_r Hop) in H.
+    apply -> (rngl_sub_move_0_r Hop) in H.
+    specialize (rngl_abs_nonneg Hop Hor (g' x₀)) as H'.
+    rewrite H in H'.
+    apply rngl_nlt_ge in H'.
+    apply H'; clear H'.
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  }
+Search (_ * _ / _)%L.
+
+  rewrite <- rngl_mul_assoc.
+...
+  apply (rngl_mul_lt_mono_nonneg Hop Hor Hii). {
+    split; [ | easy ].
+    apply (rngl_abs_nonneg Hop Hor).
+  }
+  split; [ | easy ].
+  apply (rngl_abs_nonneg Hop Hor).
+}
+...
 assert (Hak : (rngl_abs a < ε / K * dx)%L). {
   apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
 ...
