@@ -432,11 +432,11 @@ Theorem left_derivative_mul_at :
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
   ∀ A lt, (∀ x, ¬ (lt x x)) →
-  ∀ da (f g : A → T) f' g' x₀,
-  left_derivative_at lt da rngl_distance f x₀ (f' x₀)
-  → left_derivative_at lt da rngl_distance g x₀ (g' x₀)
+  ∀ da (f g : A → T) u v x₀,
+  left_derivative_at lt da rngl_distance f x₀ u
+  → left_derivative_at lt da rngl_distance g x₀ v
   → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
-       x₀ (f x₀ * g' x₀ + f' x₀ * g x₀)%L.
+       x₀ (f x₀ * v + u * g x₀)%L.
 Proof.
 intros Hic Hon Hiv Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -491,7 +491,7 @@ specialize (Hg 1%L (rngl_0_lt_1 Hon Hos Hc1 Hor)) as H10.
 destruct H10 as (δ₁ & Hδ₁ & H10).
 cbn in H10.
 progress unfold rngl_dist in H10.
-set (K := (rngl_abs (g' x₀) + 1)%L).
+set (K := (rngl_abs v + 1)%L).
 generalize Hf; intros H11.
 apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H11;
   cycle 1. {
@@ -570,11 +570,11 @@ rewrite <- (rngl_mul_sub_distr_l Hop).
 remember (f x₀ - f x)%L as a.
 remember (g x₀ - g x)%L as b.
 rewrite (rngl_add_comm (_ * _ * _)).
-rewrite (rngl_mul_mul_swap Hic (f' x₀)).
+rewrite (rngl_mul_mul_swap Hic u).
 rewrite <- (rngl_mul_assoc (f x₀)).
 rewrite (rngl_mul_comm Hic (f x₀)).
-remember (f' x₀ * d_dist x x₀)%L as c.
-remember (g' x₀ * d_dist x x₀)%L as d.
+remember (u * d_dist x x₀)%L as c.
+remember (v * d_dist x x₀)%L as d.
 move x before x₀.
 move a before x; move b before a; move c before b; move d before c.
 move Heqb before Heqa.
@@ -710,7 +710,7 @@ assert (H : (rngl_abs a * rngl_abs b < ε * dx / 4)%L). {
     }
     rewrite <- (rngl_sub_opp_r Hop) in H.
     apply -> (rngl_sub_move_0_r Hop) in H.
-    specialize (rngl_abs_nonneg Hop Hor (g' x₀)) as H'.
+    specialize (rngl_abs_nonneg Hop Hor v) as H'.
     rewrite H in H'.
     apply rngl_nlt_ge in H'.
     apply H'; clear H'.
