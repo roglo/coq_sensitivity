@@ -495,14 +495,14 @@ destruct H10 as (δ₁ & Hδ₁ & H10).
 cbn in H10.
 progress unfold rngl_dist in H10.
 set (K := (rngl_abs (g' x₀) + 1)%L).
-generalize Hf; intros H12.
-apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H12;
+generalize Hf; intros H11.
+apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H11;
   cycle 1. {
   apply Hlti.
 } {
   easy.
 }
-specialize (H12 (ε / (4 * K))%L).
+specialize (H11 (ε / (4 * K))%L).
 assert (H : (0 < ε / (4 * K))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
   apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
@@ -511,11 +511,11 @@ assert (H : (0 < ε / (4 * K))%L). {
   apply (rngl_abs_nonneg Hop Hor).
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
-specialize (H12 H); clear H.
-destruct H12 as (δ₃ & Hδ₃ & H12).
-cbn in H12.
-progress unfold rngl_dist in H12.
-exists (rngl_min3 ηf ηg (rngl_min δ₁ δ₃)).
+specialize (H11 H); clear H.
+destruct H11 as (δ₂ & Hδ₂ & H11).
+cbn in H11.
+progress unfold rngl_dist in H11.
+exists (rngl_min3 ηf ηg (rngl_min δ₁ δ₂)).
 split. {
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
@@ -678,14 +678,14 @@ eapply (rngl_le_trans Hor). {
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 rewrite (rngl_abs_mul Hop Hi1 Hor).
 set (dx := d_dist x x₀).
-fold dx in H1, H2, H3, H4, Heqc, Heqd, Hzd, Hzed |-*.
+fold dx in H1, H2, H3, H4, H5, H6, Heqc, Heqd, Hzd, Hzed |-*.
 specialize (H10 x Hlt H5).
-specialize (H12 x Hlt H6).
+specialize (H11 x Hlt H6).
 move H10 at bottom.
-move H12 at bottom.
+move H11 at bottom.
 rewrite <- Heqb in H10.
-rewrite <- (rngl_abs_sub_comm Hop Hor) in H12.
-rewrite <- Heqa in H12.
+rewrite <- (rngl_abs_sub_comm Hop Hor) in H11.
+rewrite <- Heqa in H11.
 progress fold dx in H10.
 assert (Hbk : (rngl_abs b < K * dx)%L). {
   progress unfold K.
