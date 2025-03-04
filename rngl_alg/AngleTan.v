@@ -430,7 +430,6 @@ Theorem left_derivative_mul_at :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  rngl_has_eq_dec T = true →
   ∀ A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f g : A → T) u v x₀,
   left_derivative_at lt da rngl_distance f x₀ u
@@ -438,7 +437,7 @@ Theorem left_derivative_mul_at :
   → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
        x₀ (f x₀ * v + u * g x₀)%L.
 Proof.
-intros Hic Hon Hiv Hed.
+intros Hic Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -450,21 +449,23 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
-assert (Hz4 : (0 < 4)%L). {
+assert (Hz3 : (0 < 3)%L). {
   apply (rngl_lt_le_trans Hor _ 2); [ easy | ].
   apply (rngl_add_le_mono_r Hop Hor).
-  now apply (rngl_le_add_l Hor).
+  apply (rngl_le_add_l Hor).
+  apply (rngl_0_le_1 Hon Hos Hor).
 }
-assert (Hz4' : (0 ≤ 4)%L). {
+assert (Hz3' : (0 ≤ 3)%L). {
   apply (rngl_le_trans Hor _ 2); [ easy | ].
   apply (rngl_add_le_mono_r Hop Hor).
-  now apply (rngl_le_add_l Hor).
+  apply (rngl_le_add_l Hor).
+  apply (rngl_0_le_1 Hon Hos Hor).
 }
 intros * Hlti * Hf Hg *.
 apply (is_limit_lt_is_limit_le_iff Hon Hiv).
 intros ε Hε.
-specialize (Hf (ε / (4 * rngl_abs (g x₀) + 1)))%L as H1.
-assert (H : (0 < ε / (4 * rngl_abs (g x₀) + 1))%L). {
+specialize (Hf (ε / (3 * rngl_abs (g x₀) + 1)))%L as H1.
+assert (H : (0 < ε / (3 * rngl_abs (g x₀) + 1))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
   apply (rngl_add_nonneg_pos Hor).
   apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
@@ -472,8 +473,8 @@ assert (H : (0 < ε / (4 * rngl_abs (g x₀) + 1))%L). {
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 specialize (H1 H); clear H.
-specialize (Hg (ε / (4 * rngl_abs (f x₀) + 1)))%L as H2.
-assert (H : (0 < ε / (4 * rngl_abs (f x₀) + 1))%L). {
+specialize (Hg (ε / (3 * rngl_abs (f x₀) + 1)))%L as H2.
+assert (H : (0 < ε / (3 * rngl_abs (f x₀) + 1))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
   apply (rngl_add_nonneg_pos Hor).
   apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
@@ -499,8 +500,8 @@ apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H11;
 } {
   easy.
 }
-specialize (H11 (ε / (4 * K))%L).
-assert (H : (0 < ε / (4 * K))%L). {
+specialize (H11 (ε / (3 * K))%L).
+assert (H : (0 < ε / (3 * K))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
   apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
   progress unfold K.
@@ -619,7 +620,7 @@ rewrite (rngl_mul_mul_swap Hic).
 eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_r Hop Hor).
   apply (rngl_add_le_mono_r Hop Hor).
-  apply (rngl_le_trans Hor _ (ε * d_dist x x₀ / 4)). 2: {
+  apply (rngl_le_trans Hor _ (ε * d_dist x x₀ / 3)). 2: {
     apply (rngl_le_refl Hor).
   }
   rewrite <- (rngl_div_mul_mul_div Hic Hiv).
@@ -630,7 +631,7 @@ eapply (rngl_le_trans Hor). {
   rewrite (rngl_div_mul_mul_div Hic Hiv).
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
     apply (rngl_add_nonneg_pos Hor).
-    apply (rngl_mul_nonneg_nonneg Hos Hor _ _ Hz4').
+    apply (rngl_mul_nonneg_nonneg Hos Hor _ _ Hz3').
     apply (rngl_abs_nonneg Hop Hor).
     apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
   }
@@ -652,7 +653,7 @@ rewrite (rngl_mul_mul_swap Hic).
 eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_r Hop Hor).
   apply (rngl_add_le_mono_r Hop Hor).
-  apply (rngl_le_trans Hor _ (ε * d_dist x x₀ / 4)). 2: {
+  apply (rngl_le_trans Hor _ (ε * d_dist x x₀ / 3)). 2: {
     apply (rngl_le_refl Hor).
   }
   rewrite <- (rngl_div_mul_mul_div Hic Hiv).
@@ -663,7 +664,7 @@ eapply (rngl_le_trans Hor). {
   rewrite (rngl_div_mul_mul_div Hic Hiv).
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
     apply (rngl_add_nonneg_pos Hor).
-    apply (rngl_mul_nonneg_nonneg Hos Hor _ _ Hz4').
+    apply (rngl_mul_nonneg_nonneg Hos Hor _ _ Hz3').
     apply (rngl_abs_nonneg Hop Hor).
     apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
   }
@@ -692,21 +693,22 @@ assert (Hbk : (rngl_abs b < K * dx)%L). {
   apply (rngl_le_sub_le_add_r Hop Hor).
   eapply (rngl_le_trans Hor); [ | apply (rngl_abs_triangle Hop Hor) ].
   rewrite (rngl_sub_add Hop).
-  rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
-    intros H; rewrite H in Hzd.
-    now apply (rngl_lt_irrefl Hor) in Hzd.
-  }
-  rewrite (rngl_abs_nonneg_eq Hop Hor dx); [ | easy ].
-  apply (rngl_le_refl Hor).
+  apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor dx) at 2; [ | easy ].
+  rewrite <- (rngl_abs_mul Hop Hi1 Hor).
+  rewrite (rngl_div_mul Hon Hiv); [ apply (rngl_le_refl Hor) | ].
+  intros H.
+  rewrite H in Hzd.
+  now apply (rngl_lt_irrefl Hor) in Hzd.
 }
-assert (H : (rngl_abs a * rngl_abs b < ε * dx / 4)%L). {
-  rewrite <- (rngl_div_mul Hon Hiv ε (4 * K))%L. 2: {
+assert (H : (rngl_abs a * rngl_abs b < ε * dx / 3)%L). {
+  rewrite <- (rngl_div_mul Hon Hiv ε (3 * K))%L. 2: {
     progress unfold K.
     intros H.
     apply (rngl_eq_mul_0_r Hos Hii) in H. 2: {
       intros H'.
-      rewrite H' in Hz4.
-      now apply (rngl_lt_irrefl Hor) in Hz4.
+      rewrite H' in Hz3.
+      now apply (rngl_lt_irrefl Hor) in Hz3.
     }
     rewrite <- (rngl_sub_opp_r Hop) in H.
     apply -> (rngl_sub_move_0_r Hop) in H.
@@ -726,8 +728,8 @@ assert (H : (rngl_abs a * rngl_abs b < ε * dx / 4)%L). {
   rewrite rngl_mul_assoc.
   rewrite (rngl_div_mul Hon Hiv). 2: {
     intros H.
-    rewrite H in Hz4.
-    now apply (rngl_lt_irrefl Hor) in Hz4.
+    rewrite H in Hz3.
+    now apply (rngl_lt_irrefl Hor) in Hz3.
   }
   rewrite (rngl_mul_comm Hic).
   split; [ | easy ].
@@ -747,12 +749,6 @@ rewrite (rngl_mul_1_r Hon).
 apply (rngl_add_le_mono_r Hop Hor).
 rewrite rngl_mul_add_distr_l.
 rewrite (rngl_mul_1_r Hon).
-rewrite rngl_mul_add_distr_l.
-rewrite (rngl_mul_1_r Hon).
-eapply (rngl_le_trans Hor). 2: {
-  apply (rngl_le_add_r Hor).
-  now apply (rngl_lt_le_incl Hor).
-}
 apply (rngl_le_refl Hor).
 Qed.
 
