@@ -433,8 +433,7 @@ Theorem left_derivative_mul_at :
   rngl_has_eq_dec T = true →
   ∀ A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f g : A → T) f' g' x₀,
-  (∃ Df Mf, (0 < Mf ∧ ∀ x, d_dist x x₀ < Mf → rngl_abs (f' x) < Df)%L)
-  → (∃ Dg Mg, (0 < Mg ∧ ∀ x, d_dist x x₀ < Mg → rngl_abs (g' x) < Dg)%L)
+  (∃ Dg Mg, (0 < Mg ∧ ∀ x, d_dist x x₀ < Mg → rngl_abs (g' x) < Dg)%L)
   → left_derivative_at lt da rngl_distance f x₀ (f' x₀)
   → left_derivative_at lt da rngl_distance g x₀ (g' x₀)
   → left_derivative_at lt da rngl_distance (λ x : A, (f x * g x)%L)
@@ -448,7 +447,7 @@ specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hlti * Hbf Hbg Hf Hg * ε Hε.
+  intros * Hlti * Hbg Hf Hg * ε Hε.
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
@@ -465,20 +464,10 @@ assert (Hz4' : (0 ≤ 4)%L). {
   apply (rngl_add_le_mono_r Hop Hor).
   now apply (rngl_le_add_l Hor).
 }
-intros * Hlti * Hbf Hbg Hf Hg *.
+intros * Hlti * Hbg Hf Hg *.
 apply (is_limit_lt_is_limit_le_iff Hon Hiv).
 intros ε Hε.
-destruct Hbf as (Df & Mf & Hmf & Hbf).
 destruct Hbg as (Dg & Mg & Hmg & Hbg).
-move Dg before Df; move Mg before Mf.
-move Hmg before Hmf.
-assert (Hdf : (0 < Df)%L). {
-  specialize (Hbf x₀).
-  rewrite dist_diag in Hbf.
-  specialize (Hbf Hmf).
-  apply (rngl_le_lt_trans Hor _ (rngl_abs (f' x₀))); [ | easy ].
-  apply (rngl_abs_nonneg Hop Hor).
-}
 assert (Hdg : (0 < Dg)%L). {
   specialize (Hbg x₀).
   rewrite dist_diag in Hbg.
@@ -486,12 +475,8 @@ assert (Hdg : (0 < Dg)%L). {
   apply (rngl_le_lt_trans Hor _ (rngl_abs (g' x₀))); [ | easy ].
   apply (rngl_abs_nonneg Hop Hor).
 }
-move Hdf after Hmf; move Hdg after Hmf.
-set (ε' := rngl_min3 ε Df Dg).
-assert (Hε' : (0 < ε')%L). {
-  apply rngl_min_glb_lt; [ | easy ].
-  now apply rngl_min_glb_lt.
-}
+set (ε' := rngl_min ε Dg).
+assert (Hε' : (0 < ε')%L) by now apply rngl_min_glb_lt.
 specialize (Hf (ε' / (4 * rngl_abs (g x₀) + 1)))%L as H1.
 assert (H : (0 < ε' / (4 * rngl_abs (g x₀) + 1))%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
@@ -516,7 +501,6 @@ destruct H2 as (ηg & Hηg & H2).
 move ηf before ε.
 move ηg before ηf.
 move Hηg before Hηf.
-(**)
 specialize (Hg 1%L (rngl_0_lt_1 Hon Hos Hc1 Hor)) as H10.
 destruct H10 as (δ₁ & Hδ₁ & H10).
 cbn in H10.
@@ -535,7 +519,6 @@ specialize (H11 H); clear H.
 destruct H11 as (δ₂ & Hδ₂ & H11).
 cbn in H11.
 progress unfold rngl_dist in H11.
-(**)
 generalize Hf; intros H12.
 apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H12;
   cycle 1. {
@@ -556,12 +539,11 @@ specialize (H12 H); clear H.
 destruct H12 as (δ₃ & Hδ₃ & H12).
 cbn in H12.
 progress unfold rngl_dist in H12.
-exists (rngl_min3 ηf ηg (rngl_min3 Mf Mg (rngl_min3 δ₁ δ₂ δ₃))).
+exists (rngl_min3 ηf ηg (rngl_min Mg (rngl_min3 δ₁ δ₂ δ₃))).
 split. {
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
-  apply rngl_min_glb_lt.
-  now apply rngl_min_glb_lt.
+  apply rngl_min_glb_lt; [ easy | ].
   apply rngl_min_glb_lt; [ | easy ].
   now apply rngl_min_glb_lt.
 }
@@ -571,10 +553,9 @@ apply (rngl_min_glb_lt_iff Hor) in Hd.
 destruct Hd as (H3, H5).
 apply (rngl_min_glb_lt_iff Hor) in H3, H5.
 destruct H3 as (H3, H4).
-destruct H5 as (H5, H7).
-apply (rngl_min_glb_lt_iff Hor) in H5, H7.
 destruct H5 as (H5, H6).
-destruct H7 as (H7, H9).
+apply (rngl_min_glb_lt_iff Hor) in H6.
+destruct H6 as (H7, H9).
 apply (rngl_min_glb_lt_iff Hor) in H7.
 destruct H7 as (H7, H8).
 specialize (H1 x Hlt H3).
@@ -726,17 +707,12 @@ eapply (rngl_le_trans Hor). {
 }
 (* voilà. Mais il reste ce fichu terme rngl_abs (a * b) *)
 rewrite (rngl_abs_mul Hop Hi1 Hor).
-specialize (Hbf x H5) as Hbf1.
-specialize (Hbf x₀) as Hbf2.
-rewrite dist_diag in Hbf2.
-specialize (Hbf2 Hmf).
-specialize (Hbg x H6) as Hbg1.
+specialize (Hbg x H5) as Hbg1.
 specialize (Hbg x₀) as Hbg2.
 rewrite dist_diag in Hbg2.
 specialize (Hbg2 Hmg).
 set (dx := d_dist x x₀).
-fold dx in H1, H2, H3, H4, H5, H6, Heqc, Heqd, Hzd, Hzed |-*.
-(**)
+fold dx in H1, H2, H3, H4, H5, Heqc, Heqd, Hzd, Hzed |-*.
 specialize (H10 x Hlt H7).
 specialize (H11 x Hlt H8).
 specialize (H12 x Hlt H9).
@@ -820,8 +796,7 @@ eapply (rngl_le_trans Hor). 2: {
 }
 apply (rngl_add_le_compat Hor).
 apply (rngl_min_le_iff Hor); left.
-apply (rngl_le_min_l Hor).
-apply (rngl_min_le_iff Hor); left.
+apply (rngl_le_refl Hor).
 apply (rngl_le_min_l Hor).
 Qed.
 (* above: to be simplified *)
