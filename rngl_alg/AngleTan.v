@@ -169,9 +169,7 @@ eapply (rngl_lt_le_trans Hor). {
   apply Hd.
 }
 eapply (rngl_le_trans Hor). {
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
-    now apply (rl_sqrt_pos Hon Hos Hor).
-  }
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
   apply (rngl_lt_le_incl Hor), Hdε.
 }
 rewrite fold_rngl_squ.
@@ -179,7 +177,6 @@ rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-(* to be completed
 Theorem right_derivable_continuous_when_derivative_eq_0 :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -227,23 +224,15 @@ rewrite (rngl_mul_0_l Hos) in Hd.
 progress unfold rngl_dist in Hd.
 progress unfold rngl_dist.
 rewrite (rngl_sub_0_r Hos) in Hd.
-eapply (rngl_lt_le_trans Hor). {
-  rewrite <- (rngl_abs_opp Hop Hor).
-  rewrite (rngl_opp_sub_distr Hop).
-...
-  apply Hd.
-}
+eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
 eapply (rngl_le_trans Hor). {
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
-    now apply (rl_sqrt_pos Hon Hos Hor).
-  }
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
   apply (rngl_lt_le_incl Hor), Hdε.
 }
 rewrite fold_rngl_squ.
 rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
-*)
 
 Theorem left_derivable_continuous :
   rngl_mul_is_comm T = true →
