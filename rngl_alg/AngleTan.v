@@ -179,6 +179,72 @@ rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
+(* to be completed
+Theorem right_derivable_continuous_when_derivative_eq_0 :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, le x y → lt x y) →
+  ∀ da (f : A → T) x,
+  right_derivative_at lt da rngl_distance f x 0%L
+  → right_continuous_at le da rngl_distance f x.
+Proof.
+intros Hon Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hlti Hlet * Hd.
+rename x into x₀.
+intros ε Hε.
+specialize (Hd √ε).
+assert (Hsε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
+specialize (Hd Hsε).
+destruct Hd as (η & Hη & Hd).
+exists (rngl_min √ε η).
+split; [ now apply rngl_min_glb_lt | ].
+intros x Hle Hdxx.
+generalize Hle; intros Hlt.
+apply Hlet in Hlt.
+specialize (Hd x Hlt).
+apply (rngl_min_glb_lt_iff Hor) in Hdxx.
+destruct Hdxx as (Hdε, Hdη).
+specialize (Hd Hdη).
+assert (Hdz : d_dist x x₀ ≠ 0%L). {
+  intros H.
+  apply dist_separation in H; [ | apply d_prop ].
+  subst x.
+  now apply Hlti in Hlt.
+}
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
+  clear H.
+  apply (rngl_lt_iff Hor).
+  split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
+}
+cbn in Hd |-*.
+rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
+  apply (dist_nonneg Hon Hop Hiv Hor).
+}
+rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
+rewrite (rngl_mul_0_l Hos) in Hd.
+progress unfold rngl_dist in Hd.
+progress unfold rngl_dist.
+rewrite (rngl_sub_0_r Hos) in Hd.
+eapply (rngl_lt_le_trans Hor). {
+  rewrite <- (rngl_abs_opp Hop Hor).
+  rewrite (rngl_opp_sub_distr Hop).
+...
+  apply Hd.
+}
+eapply (rngl_le_trans Hor). {
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+    now apply (rl_sqrt_pos Hon Hos Hor).
+  }
+  apply (rngl_lt_le_incl Hor), Hdε.
+}
+rewrite fold_rngl_squ.
+rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
+now apply (rngl_lt_le_incl Hor).
+Qed.
+*)
+
 Theorem left_derivable_continuous :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
