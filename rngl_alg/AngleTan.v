@@ -536,12 +536,32 @@ destruct H11 as (δ₂ & Hδ₂ & H11).
 cbn in H11.
 progress unfold rngl_dist in H11.
 (**)
-exists (rngl_min3 ηf ηg (rngl_min3 Mf Mg (rngl_min δ₁ δ₂))).
+generalize Hf; intros H12.
+apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H12;
+  cycle 1. {
+  apply Hlti.
+} {
+  easy.
+}
+specialize (H12 (ε / K)%L).
+assert (H : (0 < ε / K)%L). {
+  apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+  progress unfold K.
+  apply (rngl_add_nonneg_pos Hor).
+  apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+}
+specialize (H12 H); clear H.
+destruct H12 as (δ₃ & Hδ₃ & H12).
+cbn in H12.
+progress unfold rngl_dist in H12.
+exists (rngl_min3 ηf ηg (rngl_min3 Mf Mg (rngl_min3 δ₁ δ₂ δ₃))).
 split. {
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
   apply rngl_min_glb_lt.
   now apply rngl_min_glb_lt.
+  apply rngl_min_glb_lt; [ | easy ].
   now apply rngl_min_glb_lt.
 }
 intros x Hlt Hd.
@@ -553,6 +573,8 @@ destruct H3 as (H3, H4).
 destruct H5 as (H5, H7).
 apply (rngl_min_glb_lt_iff Hor) in H5, H7.
 destruct H5 as (H5, H6).
+destruct H7 as (H7, H9).
+apply (rngl_min_glb_lt_iff Hor) in H7.
 destruct H7 as (H7, H8).
 specialize (H1 x Hlt H3).
 specialize (H2 x Hlt H4).
@@ -716,13 +738,17 @@ fold dx in H1, H2, H3, H4, H5, H6, Heqc, Heqd, Hzd, Hzed |-*.
 (**)
 specialize (H10 x Hlt H7).
 specialize (H11 x Hlt H8).
+specialize (H12 x Hlt H9).
 move H10 at bottom.
 move H11 at bottom.
+move H12 at bottom.
 rewrite <- Heqb in H10.
 rewrite <- Heqa in H11.
+rewrite <- rngl_abs_sub_comm in H12.
+rewrite <- Heqa in H12.
 progress fold dx in H10.
 progress fold dx in H11.
-assert (H : (rngl_abs b < K * dx)%L). {
+assert (Hbk : (rngl_abs b < K * dx)%L). {
   progress unfold K.
   apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
   apply (rngl_lt_sub_lt_add_l Hop Hor).
@@ -737,6 +763,17 @@ assert (H : (rngl_abs b < K * dx)%L). {
   rewrite (rngl_abs_nonneg_eq Hop Hor dx); [ | easy ].
   apply (rngl_le_refl Hor).
 }
+assert (Hak : (rngl_abs a < ε / K * dx)%L). {
+  apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
+...
+  eapply (rngl_le_lt_trans Hor); [ | apply H11 ].
+...
+  eapply (rngl_le_trans Hor); [ | apply (rngl_abs_triangle Hop Hor) ].
+...
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  eapply (rngl_le_lt_trans Hor); [ | apply H10 ].
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  eapply (rngl_le_trans Hor); [ | apply (rngl_abs_triangle Hop Hor) ].
 ...
 generalize Hf; intros H.
 apply (left_derivable_continuous Hic Hon Hiv) with (le := lt) in H; cycle 1. {
