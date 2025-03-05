@@ -474,7 +474,6 @@ now apply (rngl_lt_le_incl Hor).
 apply (dist_nonneg Hon Hop Hiv Hor).
 Qed.
 
-(* to be completed
 Theorem right_derivable_continuous :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -502,14 +501,9 @@ rename x into x₀.
 destruct (rngl_eq_dec Heo a 0) as [Hfz| Hfz]. {
   subst a.
   specialize (right_derivable_continuous_when_derivative_eq_0 Hon Hiv) as H1.
-...
-progress unfold right_continuous_at.
-progress unfold is_limit_when_tending_to_neighbourhood.
-eapply H1.
-  apply (H1 _ le lt Hlti).
   now apply (H1 _ le lt Hlti Hlet da f).
 }
-progress unfold left_derivative_at in Hd.
+progress unfold right_derivative_at in Hd.
 progress unfold is_limit_when_tending_to_neighbourhood in Hd.
 specialize (Hd (rngl_abs a))%L.
 assert (Haz : (0 < rngl_abs a)%L) by now apply (rngl_abs_pos Hop Hor).
@@ -551,18 +545,19 @@ progress unfold rngl_dist in Hd.
 progress unfold rngl_dist.
 progress unfold rngl_abs in Hd at 1.
 rewrite (rngl_leb_sub_0 Hop Hor) in Hd.
-remember (f x₀ - f x ≤? a * d_dist x x₀)%L as b eqn:Hb.
+remember (f x - f x₀ ≤? a * d_dist x x₀)%L as b eqn:Hb.
 symmetry in Hb.
 destruct b. {
   apply rngl_leb_le in Hb.
   rewrite (rngl_opp_sub_distr Hop) in Hd.
+  clear - Hb Hd Hop rp Hor Hii Hon Hiv Hdz Hos H2 Hic H2z Hfz Hz2 Hε Hi1.
   progress unfold rngl_abs.
   rewrite (rngl_leb_sub_0 Hop Hor).
   remember (f x ≤? f x₀)%L as c eqn:Hc.
   symmetry in Hc.
-  destruct c. {
-    apply rngl_leb_le in Hc.
-    rewrite (rngl_opp_sub_distr Hop).
+  destruct c. 2: {
+    apply (rngl_leb_gt Hor) in Hc.
+    clear - Hc Hor rp a Hb Hop Hii Hon Hiv Hdz Hos H2 Hic H2z Hfz Hz2 Hε.
     destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
       apply (rngl_nle_gt_iff Hor).
       intros Hea.
@@ -576,11 +571,7 @@ destruct b. {
         apply Hflz.
       }
       rewrite (rngl_mul_0_l Hos).
-      apply (rngl_lt_0_sub Hop Hor).
-      apply (rngl_lt_iff Hor).
-      split; [ easy | ].
-      intros H; rewrite H, (rngl_sub_diag Hos) in Hea.
-      now apply rngl_nlt_ge in Hea.
+      now apply (rngl_lt_0_sub Hop Hor).
     }
     apply (rngl_nle_gt_iff Hor) in Hflz.
     eapply (rngl_le_lt_trans Hor); [ apply Hb | ].
@@ -600,7 +591,8 @@ destruct b. {
     apply (rngl_le_add_l Hor).
     now apply (rngl_lt_le_incl Hor).
   }
-  apply (rngl_leb_gt Hor) in Hc.
+  apply rngl_leb_le in Hc.
+  rewrite (rngl_opp_sub_distr Hop).
   rewrite (rngl_sub_sub_distr Hop) in Hd.
   rewrite <- (rngl_add_sub_swap Hop) in Hd.
   rewrite <- (rngl_add_sub_assoc Hop) in Hd.
@@ -647,7 +639,6 @@ destruct b. {
   rewrite (rngl_sub_diag Hos) in Hd.
   rewrite (rngl_mul_0_l Hos) in Hd.
   apply -> (rngl_lt_sub_0 Hop Hor) in Hd.
-  apply (rngl_lt_le_incl Hor) in Hd.
   now apply rngl_nlt_ge in Hd.
 }
 apply (rngl_leb_gt Hor) in Hb.
@@ -655,9 +646,8 @@ progress unfold rngl_abs.
 rewrite (rngl_leb_sub_0 Hop Hor).
 remember (f x ≤? f x₀)%L as c eqn:Hc.
 symmetry in Hc.
-destruct c. {
-  apply rngl_leb_le in Hc.
-  rewrite (rngl_opp_sub_distr Hop).
+destruct c. 2: {
+  apply (rngl_leb_gt Hor) in Hc.
   destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
     rewrite (rngl_abs_nonpos_eq Hop Hor) in Hd; [ | easy ].
     apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
@@ -665,6 +655,7 @@ destruct c. {
     rewrite (rngl_add_opp_l Hop) in Hd.
     rewrite (rngl_sub_diag Hos) in Hd.
     apply -> (rngl_lt_sub_0 Hop Hor) in Hd.
+    apply (rngl_lt_le_incl Hor) in Hd.
     now apply rngl_nle_gt in Hd.
   }
   apply (rngl_nle_gt_iff Hor) in Hflz.
@@ -683,7 +674,8 @@ destruct c. {
   }
   now apply (rngl_lt_le_incl Hor).
 }
-apply (rngl_leb_gt Hor) in Hc.
+apply rngl_leb_le in Hc.
+rewrite (rngl_opp_sub_distr Hop).
 destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
   rewrite <- (rngl_opp_sub_distr Hop) in Hb.
   apply (rngl_lt_opp_r Hop Hor) in Hb.
@@ -712,14 +704,12 @@ exfalso.
 apply rngl_nle_gt in Hb.
 apply Hb; clear Hb.
 apply (rngl_le_trans Hor _ 0). {
-  apply (rngl_le_sub_0 Hop Hor).
-  now apply (rngl_lt_le_incl Hor).
+  now apply (rngl_le_sub_0 Hop Hor).
 }
 apply (rngl_mul_nonneg_nonneg Hos Hor).
 now apply (rngl_lt_le_incl Hor).
 apply (dist_nonneg Hon Hop Hiv Hor).
 Qed.
-*)
 
 Theorem dist_comm : ∀ A (d : distance A) x y, d_dist x y = d_dist y x.
 Proof.
