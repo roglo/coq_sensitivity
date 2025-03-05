@@ -1391,6 +1391,33 @@ specialize (Hg x₀).
 destruct Hf as (Hlfc & Hrfc & Hlfr & Hrfr).
 destruct Hg as (Hlgc & Hrgc & Hlgr & Hrgr).
 split. {
+  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+  move Hlfc at bottom.
+  move Hlgc at bottom.
+  (* lemma *)
+  intros ε Hε.
+  specialize (Hlfc ε Hε).
+  specialize (Hlgc ε Hε).
+  cbn in Hlfc, Hlgc |-*.
+  progress unfold rngl_dist in Hlfc.
+  progress unfold rngl_dist in Hlgc.
+  progress unfold rngl_dist.
+  destruct Hlfc as (η₁ & Hη₁ & Hlfc).
+  destruct Hlgc as (η₂ & Hη₂ & Hlgc).
+  exists (rngl_min η₁ η₂).
+  split; [ now apply rngl_min_glb_lt | ].
+  intros x Hle Hd.
+  move x before x₀.
+  apply (rngl_min_glb_lt_iff Hor) in Hd.
+  destruct Hd as (H1, H2).
+  rewrite <- (rngl_add_sub Hos (_ - _) (f x * g x₀)).
+  rewrite (rngl_add_sub_swap Hop).
+  rewrite (rngl_sub_sub_swap Hop).
+  rewrite <- (rngl_mul_sub_distr_l Hop).
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite <- (rngl_mul_sub_distr_r Hop).
+  (* ouais, chais pas *)
 ... ...
 split. {
   now apply (left_derivative_mul_at Hic Hon Hiv).
