@@ -1403,17 +1403,10 @@ apply (right_derivable_continuous Hic Hon Hiv _ le lt) in Hrgr.
 ... non "le" n'implique pas "lt"
 }
 *)
+(**)
 apply (right_derivable_continuous Hic Hon Hiv _ lt) in Hrgr.
 2, 3: easy.
 (* Hrgc ≠ Hrgr *)
-...
-apply (right_derivable_continuous Hic Hon Hiv _ lt le) in Hrgr.
-apply (right_derivable_continuous Hic Hon Hiv _ le lt) in Hrgr.
-2: easy.
-2: {
-  easy.
-}
-2: {
 ...
 apply left_derivable_continuous with (le := le) in Hlgr.
 (* donc c'est bien ça : si c'est dérivable à droite (resp. gauche)
