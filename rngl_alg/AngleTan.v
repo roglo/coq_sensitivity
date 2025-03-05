@@ -1374,14 +1374,14 @@ Theorem derivative_mul :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ A le lt, (∀ x, ¬ (lt x x)) →
+  ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, lt x y → le x y) →
   ∀ da (f g : A → T) f' g',
   is_derivative le lt da rngl_distance f f'
   → is_derivative le lt da rngl_distance g g'
   → is_derivative le lt da rngl_distance (λ x : A, (f x * g x)%L)
        (λ x, f x * g' x + f' x * g x)%L.
 Proof.
-intros Hic Hon Hiv * Hlt * Hf Hg.
+intros Hic Hon Hiv * Hlt Hle * Hf Hg.
 progress unfold is_derivative in Hf.
 progress unfold is_derivative in Hg.
 progress unfold is_derivative.
@@ -1391,8 +1391,31 @@ specialize (Hg x₀).
 destruct Hf as (Hlfc & Hrfc & Hlfr & Hrfr).
 destruct Hg as (Hlgc & Hrgc & Hlgr & Hrgr).
 (**)
-apply right_derivable_continuous with (le := le) in Hrgr.
 move Hrgc before Hrgr.
+move Hlgc before Hlgr.
+Check right_derivable_continuous.
+Check @is_derivative.
+(*
+apply (right_derivable_continuous Hic Hon Hiv _ le lt) in Hrgr.
+2: easy.
+(* Hrcg = Hrgr mais... *)
+2: {
+... non "le" n'implique pas "lt"
+}
+*)
+apply (right_derivable_continuous Hic Hon Hiv _ lt) in Hrgr.
+2, 3: easy.
+(* Hrgc ≠ Hrgr *)
+...
+apply (right_derivable_continuous Hic Hon Hiv _ lt le) in Hrgr.
+apply (right_derivable_continuous Hic Hon Hiv _ le lt) in Hrgr.
+2: easy.
+2: {
+  easy.
+}
+2: {
+...
+apply left_derivable_continuous with (le := le) in Hlgr.
 (* donc c'est bien ça : si c'est dérivable à droite (resp. gauche)
    c'est continu à droite (resp. gauche) ;
    donc ma définition de is_derivative ne devrait pas avoir à
