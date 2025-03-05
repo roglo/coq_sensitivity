@@ -1044,7 +1044,6 @@ rewrite (rngl_mul_1_r Hon).
 apply (rngl_le_refl Hor).
 Qed.
 
-(* to be completed
 Theorem right_derivative_mul_at :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1183,12 +1182,12 @@ rewrite rngl_mul_add_distr_r.
 rewrite <- (rngl_add_sub Hos (_ - _) (f x * g x₀)).
 rewrite (rngl_add_sub_swap Hop).
 rewrite (rngl_sub_sub_swap Hop).
-rewrite <- (rngl_mul_sub_distr_r Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
-rewrite <- (rngl_mul_sub_distr_l Hop).
-remember (f x₀ - f x)%L as a.
-remember (g x₀ - g x)%L as b.
+rewrite <- (rngl_mul_sub_distr_r Hop).
+remember (f x - f x₀)%L as a.
+remember (g x - g x₀)%L as b.
 rewrite (rngl_add_comm (_ * _ * _)).
 rewrite (rngl_mul_mul_swap Hic u).
 rewrite <- (rngl_mul_assoc (f x₀)).
@@ -1205,23 +1204,23 @@ progress unfold rngl_dist.
 progress unfold rngl_dist in H1.
 progress unfold rngl_dist in H2.
 rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_sub_swap Hop).
 rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_mul_sub_distr_r Hop).
 rewrite <- (rngl_add_sub Hos (_ - _) (b  * f x₀)).
-rewrite <- (rngl_add_sub_swap Hop).
-rewrite rngl_add_add_swap.
-rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_swap Hop (b * f x)).
 rewrite <- (rngl_add_sub_assoc Hop _ (b * f x₀)).
 rewrite <- (rngl_mul_sub_distr_r Hop).
 rewrite (rngl_add_sub_swap Hop).
-rewrite <- (rngl_sub_sub_distr Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite <- Heqa.
 rewrite (rngl_mul_comm Hic b).
+rewrite rngl_add_comm.
+rewrite (rngl_add_comm (a * b)).
+rewrite rngl_add_assoc.
 (* lemma *)
-rewrite <- (rngl_add_opp_r Hop).
 eapply (rngl_le_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
-rewrite (rngl_abs_opp Hop Hor).
 eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_r Hop Hor).
   apply (rngl_abs_triangle Hop Hor).
@@ -1301,7 +1300,6 @@ specialize (H11 x Hlt H6).
 move H10 at bottom.
 move H11 at bottom.
 rewrite <- Heqb in H10.
-rewrite <- (rngl_abs_sub_comm Hop Hor) in H11.
 rewrite <- Heqa in H11.
 progress fold dx in H10.
 assert (Hbk : (rngl_abs b < K * dx)%L). {
@@ -1371,6 +1369,7 @@ rewrite (rngl_mul_1_r Hon).
 apply (rngl_le_refl Hor).
 Qed.
 
+(* to be completed
 Theorem derivative_mul :
   ∀ A lt da db (f g f' g' : A → T),
   is_derivative lt da db f f'
