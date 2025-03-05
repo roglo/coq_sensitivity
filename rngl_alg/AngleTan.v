@@ -1394,6 +1394,7 @@ destruct Hg as (Hlgc & Hrgc & Hlgr & Hrgr).
 move Hrgc before Hrgr.
 move Hlgc before Hlgr.
 Check right_derivable_continuous.
+...
 Check @is_derivative.
 (*
 apply (right_derivable_continuous Hic Hon Hiv _ le lt) in Hrgr.
