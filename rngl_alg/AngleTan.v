@@ -1371,6 +1371,35 @@ Qed.
 
 (* to be completed
 Theorem derivative_mul :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  ∀ A le lt, (∀ x, ¬ (lt x x)) →
+  ∀ da (f g : A → T) f' g',
+  is_derivative le lt da rngl_distance f f'
+  → is_derivative le lt da rngl_distance g g'
+  → is_derivative le lt da rngl_distance (λ x : A, (f x * g x)%L)
+       (λ x, f x * g' x + f' x * g x)%L.
+Proof.
+intros Hic Hon Hiv * Hlt * Hf Hg.
+progress unfold is_derivative in Hf.
+progress unfold is_derivative in Hg.
+progress unfold is_derivative.
+intros x₀.
+specialize (Hf x₀).
+specialize (Hg x₀).
+destruct Hf as (Hlfc & Hrfc & Hlfr & Hrfr).
+destruct Hg as (Hlgc & Hrgc & Hlgr & Hrgr).
+split. {
+... ...
+split. {
+  now apply (left_derivative_mul_at Hic Hon Hiv).
+} {
+  now apply (right_derivative_mul_at Hic Hon Hiv).
+}
+...
+
+Theorem derivative_mul :
   ∀ A lt da db (f g f' g' : A → T),
   is_derivative lt da db f f'
   → is_derivative lt da db g g'
