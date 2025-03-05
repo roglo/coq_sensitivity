@@ -1390,64 +1390,68 @@ specialize (Hf x₀).
 specialize (Hg x₀).
 destruct Hf as (Hlfc & Hrfc & Hlfr & Hrfr).
 destruct Hg as (Hlgc & Hrgc & Hlgr & Hrgr).
-(**)
+(*
 move Hrgc before Hrgr.
 move Hlgc before Hlgr.
-Check right_derivable_continuous.
-...
-Check @is_derivative.
-(*
-apply (right_derivable_continuous Hic Hon Hiv _ le lt) in Hrgr.
-2: easy.
-(* Hrcg = Hrgr mais... *)
-2: {
-... non "le" n'implique pas "lt"
-}
 *)
-(**)
-apply (right_derivable_continuous Hic Hon Hiv _ lt) in Hrgr.
-2, 3: easy.
-(* Hrgc ≠ Hrgr *)
-...
-apply left_derivable_continuous with (le := le) in Hlgr.
-(* donc c'est bien ça : si c'est dérivable à droite (resp. gauche)
-   c'est continu à droite (resp. gauche) ;
-   donc ma définition de is_derivative ne devrait pas avoir à
-   imposer la continuité, puisqu'elle est impliquée ;
-   néanmoins ça peut être dérivable à droite (resp. gauche) sans
-   être continu ! c'est bizarre ;
-   par exemple f(x)=1 si x≥0 et 0 si x<0 est dérivable en 0 à droite
-   et à gauche mais n'est pas continue en 0 *)
-...
-(**)
 split. {
   specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
   move Hlfc at bottom.
   move Hlgc at bottom.
   (* lemma *)
+  destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+    specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+    intros ε Hε.
+    rewrite (H1 ε) in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
   intros ε Hε.
-  specialize (Hlfc ε Hε).
-  specialize (Hlgc ε Hε).
-  cbn in Hlfc, Hlgc |-*.
-  progress unfold rngl_dist in Hlfc.
-  progress unfold rngl_dist in Hlgc.
+  specialize (Hlfc (ε / (2 * rngl_abs (g x₀) + 1)))%L as H1.
+  assert (H : (0 < ε / (2 * rngl_abs (g x₀) + 1))%L). {
+    apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+    apply (rngl_add_nonneg_pos Hor). 2: {
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+    apply (rngl_abs_nonneg Hop Hor).
+  }
+  specialize (H1 H); clear H.
+  specialize (Hlgc (ε / (2 * rngl_abs (f x₀) + 1)))%L as H2.
+  assert (H : (0 < ε / (2 * rngl_abs (f x₀) + 1))%L). {
+    apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+    apply (rngl_add_nonneg_pos Hor). 2: {
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+    apply (rngl_abs_nonneg Hop Hor).
+  }
+  specialize (H2 H); clear H.
+  cbn in H1, H2 |-*.
+  progress unfold rngl_dist in H1.
+  progress unfold rngl_dist in H2.
   progress unfold rngl_dist.
-  destruct Hlfc as (η₁ & Hη₁ & Hlfc).
-  destruct Hlgc as (η₂ & Hη₂ & Hlgc).
+  destruct H1 as (η₁ & Hη₁ & H1).
+  destruct H2 as (η₂ & Hη₂ & H2).
   exists (rngl_min η₁ η₂).
   split; [ now apply rngl_min_glb_lt | ].
-  intros x Hle Hd.
+  intros x Hxx Hd.
   move x before x₀.
   apply (rngl_min_glb_lt_iff Hor) in Hd.
-  destruct Hd as (H1, H2).
-  rewrite <- (rngl_add_sub Hos (_ - _) (f x * g x₀)).
+  destruct Hd as (H3, H4).
+  rewrite <- (rngl_add_sub Hos (_ - _) (f x₀ * g x)).
   rewrite (rngl_add_sub_swap Hop).
   rewrite (rngl_sub_sub_swap Hop).
-  rewrite <- (rngl_mul_sub_distr_l Hop).
+  rewrite <- (rngl_mul_sub_distr_r Hop).
   rewrite <- (rngl_add_sub_swap Hop).
   rewrite <- (rngl_add_sub_assoc Hop).
-  rewrite <- (rngl_mul_sub_distr_r Hop).
+  rewrite <- (rngl_mul_sub_distr_l Hop).
   (* ouais, chais pas *)
+  specialize (H1 x Hxx H3).
+  specialize (H2 x Hxx H4).
+  remember (f x - f x₀)%L as a.
+  remember (g x - g x₀)%L as b.
+  move b before a.
 ... ...
 split. {
   now apply (left_derivative_mul_at Hic Hon Hiv).
