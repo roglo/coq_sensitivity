@@ -1417,6 +1417,12 @@ split. {
     apply (rngl_abs_nonneg Hop Hor).
   }
   specialize (H1 H); clear H.
+  specialize (Hlgc 1%L) as H50.
+  specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
+  specialize (H50 H); clear H.
+  destruct H50 as (δ & Hδ & H50).
+  cbn in H50.
+  progress unfold rngl_dist in H50.
   specialize (Hlgc (ε / (2 * rngl_abs (f x₀) + 1)))%L as H2.
   assert (H : (0 < ε / (2 * rngl_abs (f x₀) + 1))%L). {
     apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
@@ -1433,12 +1439,17 @@ split. {
   progress unfold rngl_dist.
   destruct H1 as (η₁ & Hη₁ & H1).
   destruct H2 as (η₂ & Hη₂ & H2).
-  exists (rngl_min η₁ η₂).
-  split; [ now apply rngl_min_glb_lt | ].
+  exists (rngl_min3 η₁ η₂ δ).
+  split. {
+    apply rngl_min_glb_lt; [ | easy ].
+    now apply rngl_min_glb_lt.
+  }
   intros x Hxx Hd.
   move x before x₀.
   apply (rngl_min_glb_lt_iff Hor) in Hd.
-  destruct Hd as (H3, H4).
+  destruct Hd as (H3, H5).
+  apply (rngl_min_glb_lt_iff Hor) in H3.
+  destruct H3 as (H3, H4).
   rewrite <- (rngl_add_sub Hos (_ - _) (f x₀ * g x)).
   rewrite (rngl_add_sub_swap Hop).
   rewrite (rngl_sub_sub_swap Hop).
@@ -1446,12 +1457,21 @@ split. {
   rewrite <- (rngl_add_sub_swap Hop).
   rewrite <- (rngl_add_sub_assoc Hop).
   rewrite <- (rngl_mul_sub_distr_l Hop).
-  (* ouais, chais pas *)
   specialize (H1 x Hxx H3).
   specialize (H2 x Hxx H4).
   remember (f x - f x₀)%L as a.
   remember (g x - g x₀)%L as b.
   move b before a.
+  specialize (H50 x Hxx H5).
+  assert (H51 : (rngl_abs (g x) < 1 + rngl_abs (g x₀))%L). {
+    apply (rngl_lt_sub_lt_add_r Hop Hor).
+    eapply (rngl_le_lt_trans Hor); [ | apply H50 ].
+    apply (rngl_le_sub_le_add_r Hop Hor).
+    eapply (rngl_le_trans Hor); [ | apply (rngl_abs_triangle Hop Hor) ].
+    rewrite (rngl_sub_add Hop).
+    apply (rngl_le_refl Hor).
+  }
+(* ouais, bon, je vois à peu près *)
 ... ...
 split. {
   now apply (left_derivative_mul_at Hic Hon Hiv).
