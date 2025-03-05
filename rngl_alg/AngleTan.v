@@ -1390,6 +1390,19 @@ specialize (Hf x₀).
 specialize (Hg x₀).
 destruct Hf as (Hlfc & Hrfc & Hlfr & Hrfr).
 destruct Hg as (Hlgc & Hrgc & Hlgr & Hrgr).
+(**)
+apply right_derivable_continuous with (le := le) in Hrgr.
+move Hrgc before Hrgr.
+(* donc c'est bien ça : si c'est dérivable à droite (resp. gauche)
+   c'est continu à droite (resp. gauche) ;
+   donc ma définition de is_derivative ne devrait pas avoir à
+   imposer la continuité, puisqu'elle est impliquée ;
+   néanmoins ça peut être dérivable à droite (resp. gauche) sans
+   être continu ! c'est bizarre ;
+   par exemple f(x)=1 si x≥0 et 0 si x<0 est dérivable en 0 à droite
+   et à gauche mais n'est pas continue en 0 *)
+...
+(**)
 split. {
   specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
   move Hlfc at bottom.
