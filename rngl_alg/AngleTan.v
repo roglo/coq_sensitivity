@@ -1399,6 +1399,8 @@ split. {
   move Hlfc at bottom.
   move Hlgc at bottom.
   (* lemma *)
+  specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+  specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
   destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
     specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
     intros ε Hε.
@@ -1471,7 +1473,27 @@ split. {
     rewrite (rngl_sub_add Hop).
     apply (rngl_le_refl Hor).
   }
-(* ouais, bon, je vois à peu près *)
+  eapply (rngl_le_lt_trans Hor). {
+    apply (rngl_abs_triangle Hop Hor).
+  }
+  do 2 rewrite (rngl_abs_mul Hop Hi1 Hor).
+  eapply (rngl_lt_le_trans Hor). {
+    apply (rngl_add_lt_mono_r Hop Hor).
+    apply (rngl_mul_lt_mono_nonneg Hop Hor Hii). {
+      split; [ | apply H1 ].
+      apply (rngl_abs_nonneg Hop Hor).
+    } {
+      split; [ | apply H51 ].
+      apply (rngl_abs_nonneg Hop Hor).
+    }
+  }
+  eapply (rngl_le_trans Hor). {
+    apply (rngl_add_le_mono_l Hop Hor).
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+      apply (rngl_abs_nonneg Hop Hor).
+    }
+    apply (rngl_lt_le_incl Hor), H2.
+  }
 ... ...
 split. {
   now apply (left_derivative_mul_at Hic Hon Hiv).
