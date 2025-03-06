@@ -1494,6 +1494,36 @@ split. {
     }
     apply (rngl_lt_le_incl Hor), H2.
   }
+  eapply (rngl_le_trans Hor). {
+    apply (rngl_add_le_mono_r Hop Hor).
+    rewrite (rngl_div_mul_mul_div Hic Hiv).
+    rewrite <- (rngl_mul_div_assoc Hiv).
+    apply (rngl_le_trans Hor _ (ε * (1 / 2))); [ | apply (rngl_le_refl Hor) ].
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+      now apply (rngl_lt_le_incl Hor).
+    }
+    apply (rngl_le_div_l Hon Hop Hiv Hor). {
+      apply (rngl_add_nonneg_pos Hor). 2: {
+        apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+      }
+      apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+      apply (rngl_abs_nonneg Hop Hor).
+    }
+    rewrite (rngl_div_mul_mul_div Hic Hiv).
+    rewrite (rngl_mul_1_l Hon).
+(* eh merde *)
+...
+    remember (rngl_abs (g x₀)) as u.
+    rewrite <- (rngl_add_sub Hos u u) at 2.
+    rewrite <- (rngl_mul_2_l Hon u).
+    rewrite (rngl_add_sub_assoc Hop).
+
+(*
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | apply (rngl_le_refl Hor) ].
+*)
+    rewrite (rngl_div_mul_mul_div Hic Hiv).
+    apply (rngl_le_trans Hor _ (ε / 2)); [ | apply (rngl_le_refl Hor) ].
+Search (_ / _
 ... ...
 split. {
   now apply (left_derivative_mul_at Hic Hon Hiv).
