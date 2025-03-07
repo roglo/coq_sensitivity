@@ -551,64 +551,6 @@ Definition angle_lt θ1 θ2 :=
 Definition angle_le θ1 θ2 :=
   (θ1 ≤ θ2)%A.
 
-(* special cases where the contraint "θ2 - θ1 ≤ angle_straight" is not
-   compulsory ; not used in the final proof but interesting to know *)
-
-Theorem angle_le_straight_is_limit_if :
-  ∀ (is_left : bool) f θ₀ θ₀',
-  (if is_left then θ₀ ≤ angle_straight else angle_straight ≤ θ₀)%A
-  → is_limit_when_tending_to_neighbourhood is_left angle_lt_for_deriv
-      angle_eucl_distance rngl_distance f θ₀ θ₀'
-  → is_limit_when_tending_to_neighbourhood is_left angle_lt
-      angle_eucl_distance rngl_distance f θ₀ θ₀'.
-Proof.
-destruct_ac.
-intros * Hts Hd.
-intros ε Hε.
-specialize (Hd ε Hε).
-destruct Hd as (η & Hη & Hd).
-exists η.
-split; [ easy | ].
-intros θ Hθ Hθη.
-destruct is_left. {
-  apply Hd; try easy.
-  destruct (angle_le_dec (θ₀ - θ) angle_straight) as [Htts| Htts]; [ easy | ].
-  exfalso.
-  apply Htts; clear Htts.
-  progress unfold angle_lt in Hθ.
-  eapply angle_le_trans; [ | apply Hts ].
-  now apply angle_lt_angle_le_straight_angle_sub_le.
-} {
-  apply Hd; try easy.
-  destruct (angle_le_dec (θ - θ₀) angle_straight) as [Htts| Htts]; [ easy | ].
-  exfalso.
-  apply Htts; clear Htts.
-  now apply angle_straight_le_lt_sub_le_straight.
-}
-Qed.
-
-Theorem angle_le_straight_left_derivative_if :
-  ∀ f θ₀ θ₀',
-  (θ₀ ≤ angle_straight)%A
-  → left_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-       f θ₀ θ₀'
-  → left_derivative_at angle_lt angle_eucl_distance rngl_distance f θ₀ θ₀'.
-Proof.
-intros * Hts Hd.
-now apply angle_le_straight_is_limit_if.
-Qed.
-
-Theorem angle_le_straight_right_derivative_if :
-  ∀ f θ₀ θ₀',
-  (angle_straight ≤ θ₀)%A
-  → right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-      f θ₀ θ₀'
-  → right_derivative_at angle_lt angle_eucl_distance rngl_distance f θ₀ θ₀'.
-Proof.
-intros * Hts Hd.
-now apply angle_le_straight_is_limit_if.
-Qed.
-
 (* *)
 
 Theorem angle_sub_div_2_diag :
@@ -1122,10 +1064,10 @@ destruct is_left. {
 }
 Qed.
 
-(* ... *)
-
-Theorem rngl_cos_right_derivative_at_0 :
-  right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
+Theorem rngl_cos_left_or_right_derivative_at_0 :
+  ∀ is_left,
+  left_or_right_derivative_at is_left (angle T) angle_lt_for_deriv
+    angle_eucl_distance rngl_distance
     rngl_cos 0%A ((rngl_opp ° rngl_sin) 0%A).
 Proof.
 destruct_ac.
@@ -1133,17 +1075,25 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros ε Hε; rewrite (H1 ε) in Hε.
+  intros * ε Hε; rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
-intros ε Hε; cbn.
+intros * ε Hε; cbn.
 progress unfold "°".
 cbn.
 rewrite (rngl_opp_0 Hop).
 exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
+progress unfold angle_lt_for_deriv in Hlt.
+destruct is_left. {
+  exfalso.
+  destruct Hlt as (Ht, Hlt).
+  apply angle_nle_gt in Ht.
+  apply Ht.
+  apply angle_nonneg.
+}
 rewrite (rngl_mul_opp_l Hop).
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_opp_sub_distr Hop).
@@ -1175,6 +1125,8 @@ apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
 apply (rngl_le_add_l Hor).
 apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
+
+(* ... *)
 
 Theorem rngl_cos_right_derivative_at_straight :
   right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
@@ -1563,7 +1515,7 @@ specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 intros θ₀.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
-  apply rngl_cos_right_derivative_at_0.
+  apply rngl_cos_left_or_right_derivative_at_0.
 }
 destruct (angle_eq_dec θ₀ angle_straight) as [Hts| Hts]. {
   subst θ₀.
