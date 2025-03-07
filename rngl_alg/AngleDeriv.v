@@ -1417,6 +1417,22 @@ destruct is_left. {
 }
 Qed.
 
+Theorem angle_eucl_dist_sub_div2_le :
+  ∀ θ1 θ2,
+  angle_lt_for_deriv θ1 θ2
+  → (angle_eucl_dist (θ2 /₂ - θ1 /₂) 0 ≤ angle_eucl_dist (θ2 - θ1) 0)%L.
+Proof.
+intros * Htt.
+rewrite angle_div_2_sub'.
+destruct Htt as (Hlt, Htt).
+apply angle_lt_le_incl in Hlt.
+rewrite Hlt.
+apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
+  apply angle_div_2_le_straight.
+}
+apply angle_div_2_le.
+Qed.
+
 (* ... simplification to do *)
 
 Theorem rngl_cos_left_or_right_derivative :
@@ -1531,65 +1547,30 @@ progress replace (rngl_abs _) with
 }
 rewrite angle_add_comm.
 assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
-  destruct is_left; destruct Htt as (Hlt, Htt). {
-    rewrite angle_eucl_dist_move_0_r.
-    rewrite (angle_eucl_dist_move_0_r θ).
-    rewrite angle_add_sub_swap.
-    rewrite <- angle_sub_sub_distr.
-    rewrite angle_sub_div_2_diag.
+  rewrite angle_eucl_dist_move_0_r.
+  rewrite (angle_eucl_dist_move_0_r θ).
+  rewrite angle_add_sub_swap.
+  rewrite <- angle_sub_sub_distr.
+  rewrite angle_sub_div_2_diag.
+  clear - Htt.
+  destruct is_left. {
     do 2 rewrite <- (angle_eucl_dist_opp_opp _ 0).
     do 2 rewrite angle_opp_sub_distr.
     rewrite angle_opp_0.
-    rewrite angle_div_2_sub'.
-    generalize Hlt; intros H.
-    apply angle_lt_le_incl in H.
-    rewrite H; clear H.
-    apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
-      apply angle_div_2_le_straight.
-    }
-    apply angle_div_2_le.
+    now apply angle_eucl_dist_sub_div2_le.
   } {
-    rewrite angle_eucl_dist_move_0_r.
-    rewrite (angle_eucl_dist_move_0_r θ).
-    rewrite angle_add_sub_swap.
-    rewrite <- angle_sub_sub_distr.
-    rewrite angle_sub_div_2_diag.
-    rewrite angle_div_2_sub'.
-    generalize Hlt; intros H.
-    apply angle_lt_le_incl in H.
-    rewrite H; clear H.
-    apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
-      apply angle_div_2_le_straight.
-    }
-    apply angle_div_2_le.
+    now apply angle_eucl_dist_sub_div2_le.
   }
 }
-destruct is_left. {
-  destruct Htt as (Hlt, Htt).
-  destruct (angle_le_dec (θ /₂ + θ₀ /₂) θ₀) as [Httt| Httt]. {
-    apply (Hss _ Httt).
-    eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
-    easy.
-  } {
-    apply angle_nle_gt in Httt.
-    apply angle_lt_le_incl in Httt.
-    apply (Hss' _ Httt).
-    eapply (rngl_le_lt_trans Hor); [ | apply H5 ].
-    easy.
-  }
+clear - Hss Hss' Hor H4 H5 H.
+destruct (angle_le_dec (θ /₂ + θ₀ /₂) θ₀) as [Httt| Httt]. {
+  apply (Hss _ Httt).
+  eapply (rngl_le_lt_trans Hor); [ apply H | apply H4 ].
 } {
-  destruct Htt as (Hlt, Htt).
-  destruct (angle_le_dec (θ /₂ + θ₀ /₂) θ₀) as [Httt| Httt]. {
-    apply (Hss _ Httt).
-    eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
-    easy.
-  } {
-    apply angle_nle_gt in Httt.
-    apply angle_lt_le_incl in Httt.
-    apply (Hss' _ Httt).
-    eapply (rngl_le_lt_trans Hor); [ | apply H5 ].
-    easy.
-  }
+  apply angle_nle_gt in Httt.
+  apply angle_lt_le_incl in Httt.
+  apply (Hss' _ Httt).
+  eapply (rngl_le_lt_trans Hor); [ apply H | apply H5 ].
 }
 Qed.
 
