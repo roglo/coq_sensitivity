@@ -1481,14 +1481,15 @@ progress unfold rngl_dist.
 progress unfold "°".
 rewrite (rngl_sub_opp_r Hop).
 rewrite rngl_cos_sub_cos.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_div_opp_l Hop Hiv).
+rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
+rewrite (rngl_mul_div_assoc Hiv).
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_comm Hic 2).
+rewrite (rngl_mul_div Hi1); [ | easy ].
 destruct is_left. {
   rewrite (rngl_mul_1_l Hon).
-  rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
-  rewrite (rngl_mul_div_assoc Hiv).
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic 2).
-  rewrite (rngl_mul_div Hi1); [ | easy ].
-  rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_mul_assoc.
   rewrite angle_eucl_dist_symmetry.
   rewrite (rngl_mul_div Hi1). 2: {
@@ -1555,12 +1556,8 @@ destruct is_left. {
 } {
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_div_opp_l Hop Hiv).
   rewrite (rngl_opp_involutive Hop).
-  rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
-  rewrite (rngl_mul_div_assoc Hiv).
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic 2).
-  rewrite (rngl_mul_div Hi1); [ | easy ].
   rewrite rngl_mul_assoc.
   rewrite angle_eucl_dist_symmetry.
   rewrite (rngl_mul_div Hi1). 2: {
@@ -1595,13 +1592,6 @@ destruct is_left. {
   }
   rewrite angle_add_comm.
   assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
-  clear - Hlt Htt.
-  (*
-    Hlt : (θ₀ < θ)%A
-    Htt : (θ - θ₀ ≤ angle_straight)%A
-    ============================
-    (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L
-  *)
     rewrite angle_eucl_dist_move_0_r.
     rewrite (angle_eucl_dist_move_0_r θ).
     rewrite angle_add_sub_swap.
