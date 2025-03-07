@@ -1497,12 +1497,9 @@ rewrite (rngl_mul_div Hi1). 2: {
   destruct is_left; destruct Htt as (Htt, _);
   now apply angle_lt_irrefl in Htt.
 }
+rewrite (rngl_add_opp_l Hop).
 destruct is_left. {
   rewrite (rngl_mul_1_l Hon).
-  rewrite <- (rngl_abs_opp Hop Hor).
-  rewrite (rngl_opp_add_distr Hop).
-  rewrite (rngl_sub_opp_r Hop).
-  rewrite (rngl_add_opp_l Hop).
   destruct Htt as (Hlt, Htt).
   generalize Hlt; intros H.
   apply angle_lt_le_incl in H.
@@ -1513,6 +1510,8 @@ destruct is_left. {
   rewrite angle_div_2_add.
   progress replace (rngl_abs _) with
     (rngl_abs (rngl_sin (θ₀ /₂ + θ /₂) - rngl_sin θ₀)). 2: {
+    rewrite <- (rngl_abs_opp Hop Hor).
+    rewrite (rngl_opp_sub_distr Hop).
     remember (angle_add_overflow θ₀ θ) as ovt eqn:Hovt.
     symmetry in Hovt.
     destruct ovt. {
@@ -1557,10 +1556,11 @@ destruct is_left. {
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
   rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_opp_involutive Hop).
+  rewrite (rngl_sub_opp_r Hop).
   destruct Htt as (Hlt, Htt).
   rewrite Hlt.
   rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_add_opp_r Hop).
   rewrite (rngl_mul_1_r Hon).
   rewrite angle_div_2_add.
   progress replace (rngl_abs _) with
@@ -1573,13 +1573,11 @@ destruct is_left. {
       rewrite angle_straight_add_straight.
       rewrite angle_add_0_r.
       rewrite <- (rngl_abs_opp Hop Hor).
-      rewrite (rngl_opp_sub_distr Hop).
-      now rewrite (rngl_add_opp_l Hop).
+      now rewrite (rngl_opp_sub_distr Hop).
     }
     rewrite angle_add_0_r.
     rewrite <- (rngl_abs_opp Hop Hor).
-    rewrite (rngl_opp_sub_distr Hop).
-    now rewrite (rngl_add_opp_l Hop).
+    now rewrite (rngl_opp_sub_distr Hop).
   }
   rewrite angle_add_comm.
   assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
