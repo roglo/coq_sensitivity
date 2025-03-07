@@ -1488,17 +1488,17 @@ rewrite (rngl_mul_div_assoc Hiv).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_comm Hic 2).
 rewrite (rngl_mul_div Hi1); [ | easy ].
+do 2 rewrite rngl_mul_assoc.
+rewrite angle_eucl_dist_symmetry.
+rewrite (rngl_mul_div Hi1). 2: {
+  intros H.
+  apply angle_eucl_dist_separation in H.
+  rewrite H in Htt.
+  destruct is_left; destruct Htt as (Htt, _);
+  now apply angle_lt_irrefl in Htt.
+}
 destruct is_left. {
   rewrite (rngl_mul_1_l Hon).
-  rewrite rngl_mul_assoc.
-  rewrite angle_eucl_dist_symmetry.
-  rewrite (rngl_mul_div Hi1). 2: {
-    intros H.
-    apply angle_eucl_dist_separation in H.
-    destruct Htt as (Htt, _).
-    rewrite H in Htt.
-    now apply angle_lt_irrefl in Htt.
-  }
   rewrite <- (rngl_abs_opp Hop Hor).
   rewrite (rngl_opp_add_distr Hop).
   rewrite (rngl_sub_opp_r Hop).
@@ -1556,17 +1556,8 @@ destruct is_left. {
 } {
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_div_opp_l Hop Hiv).
+  rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_opp_involutive Hop).
-  rewrite rngl_mul_assoc.
-  rewrite angle_eucl_dist_symmetry.
-  rewrite (rngl_mul_div Hi1). 2: {
-    intros H.
-    apply angle_eucl_dist_separation in H.
-    destruct Htt as (Htt, _).
-    rewrite H in Htt.
-    now apply angle_lt_irrefl in Htt.
-  }
   destruct Htt as (Hlt, Htt).
   rewrite Hlt.
   rewrite (rngl_mul_opp_r Hop).
