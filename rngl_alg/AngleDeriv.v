@@ -1273,18 +1273,23 @@ rewrite (rngl_mul_div_assoc Hiv).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_comm Hic 2).
 rewrite (rngl_mul_div Hi1); [ | easy ].
+rewrite angle_eucl_dist_symmetry.
+do 2 rewrite rngl_mul_assoc.
+rewrite (rngl_mul_div Hi1). 2: {
+  intros H.
+  apply angle_eucl_dist_separation in H.
+  subst θ₀.
+  destruct is_left. {
+    destruct Htt as (Htt, _).
+    now apply angle_lt_irrefl in Htt.
+  } {
+    destruct Htt as (Htt, _).
+    now apply angle_lt_irrefl in Htt.
+  }
+}
 (**)
 destruct is_left. {
   rewrite (rngl_mul_1_l Hon).
-  rewrite rngl_mul_assoc.
-  rewrite angle_eucl_dist_symmetry.
-  rewrite (rngl_mul_div Hi1). 2: {
-    intros H.
-    apply angle_eucl_dist_separation in H.
-    destruct Htt as (Htt, _).
-    rewrite H in Htt.
-    now apply angle_lt_irrefl in Htt.
-  }
   destruct Htt as (Hlt, Htt).
   generalize Hlt; intros H.
   apply angle_lt_le_incl in H.
@@ -1338,21 +1343,11 @@ destruct is_left. {
 } {
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
-  rewrite rngl_mul_assoc.
-  rewrite angle_eucl_dist_symmetry.
-  rewrite <- (rngl_mul_opp_l Hop).
-  rewrite (rngl_mul_div Hi1). 2: {
-    intros H.
-    apply angle_eucl_dist_separation in H.
-    destruct Htt as (Htt, _).
-    rewrite H in Htt.
-    now apply angle_lt_irrefl in Htt.
-  }
   destruct Htt as (Hlt, Htt).
   rewrite Hlt.
   rewrite (rngl_mul_opp_r Hop).
-  rewrite (rngl_opp_involutive Hop).
   rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_opp_involutive Hop).
   rewrite angle_div_2_add.
   progress replace (rngl_abs _) with
     (rngl_abs (rngl_cos (θ /₂ + θ₀ /₂) - rngl_cos θ₀)). 2: {
