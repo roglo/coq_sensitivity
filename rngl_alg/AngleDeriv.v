@@ -1258,7 +1258,6 @@ split. {
   }
 }
 intros θ Htt H2.
-(**)
 move θ before θ₀.
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
@@ -1268,15 +1267,15 @@ apply (rngl_min_glb_lt_iff Hor) in H4.
 destruct H4 as (H4, H5).
 cbn.
 progress unfold rngl_dist.
+rewrite rngl_sin_sub_sin.
+rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
+rewrite (rngl_mul_div_assoc Hiv).
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_comm Hic 2).
+rewrite (rngl_mul_div Hi1); [ | easy ].
 (**)
 destruct is_left. {
   rewrite (rngl_mul_1_l Hon).
-  rewrite rngl_sin_sub_sin.
-  rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
-  rewrite (rngl_mul_div_assoc Hiv).
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic 2).
-  rewrite (rngl_mul_div Hi1); [ | easy ].
   rewrite rngl_mul_assoc.
   rewrite angle_eucl_dist_symmetry.
   rewrite (rngl_mul_div Hi1). 2: {
@@ -1337,14 +1336,8 @@ destruct is_left. {
     easy.
   }
 } {
-  rewrite rngl_sin_sub_sin.
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
-  rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
-  rewrite (rngl_mul_div_assoc Hiv).
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic 2).
-  rewrite (rngl_mul_div Hi1); [ | easy ].
   rewrite rngl_mul_assoc.
   rewrite angle_eucl_dist_symmetry.
   rewrite <- (rngl_mul_opp_l Hop).
