@@ -1530,6 +1530,36 @@ progress replace (rngl_abs _) with
   now rewrite angle_add_0_r.
 }
 rewrite angle_add_comm.
+(*
+  assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
+    rewrite angle_eucl_dist_move_0_r.
+    rewrite (angle_eucl_dist_move_0_r θ).
+    rewrite angle_add_sub_swap.
+    rewrite <- angle_sub_sub_distr.
+    rewrite angle_sub_div_2_diag.
+    do 2 rewrite <- (angle_eucl_dist_opp_opp _ 0).
+    do 2 rewrite angle_opp_sub_distr.
+    rewrite angle_opp_0.
+    rewrite angle_div_2_sub'.
+destruct is_left; destruct Htt as (Hlt, Htt). {
+    generalize Hlt; intros H.
+    apply angle_lt_le_incl in H.
+    rewrite H; clear H.
+    apply angle_le_angle_eucl_dist_le; [ | easy | ]. {
+      apply angle_div_2_le_straight.
+    }
+    apply angle_div_2_le.
+} {
+apply angle_nle_gt in Hlt.
+apply Bool.not_true_iff_false in Hlt.
+rewrite Hlt.
+(*
+    generalize Hlt; intros H.
+    apply angle_lt_le_incl in H.
+    rewrite H; clear H.
+*)
+Check angle_le_angle_eucl_dist_le.
+*)
 destruct is_left. {
   destruct Htt as (Hlt, Htt).
   assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
