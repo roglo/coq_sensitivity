@@ -1515,25 +1515,24 @@ replace ((if is_left then _ else _) * _)%L with 1%L. 2: {
   }
 }
 rewrite (rngl_mul_1_l Hon).
-destruct is_left. {
-  destruct Htt as (Hlt, Htt).
-  rewrite angle_div_2_add.
-  progress replace (rngl_abs _) with
-    (rngl_abs (rngl_sin (θ₀ /₂ + θ /₂) - rngl_sin θ₀)). 2: {
-    rewrite <- (rngl_abs_opp Hop Hor).
-    rewrite (rngl_opp_sub_distr Hop).
-    remember (angle_add_overflow θ₀ θ) as ovt eqn:Hovt.
-    symmetry in Hovt.
-    destruct ovt. {
-      rewrite <- angle_add_assoc.
-      rewrite angle_straight_add_straight.
-      now rewrite angle_add_0_r.
-    }
+rewrite angle_div_2_add.
+progress replace (rngl_abs _) with
+  (rngl_abs (rngl_sin (θ₀ /₂ + θ /₂) - rngl_sin θ₀)). 2: {
+  rewrite <- (rngl_abs_opp Hop Hor).
+  rewrite (rngl_opp_sub_distr Hop).
+  remember (angle_add_overflow θ₀ θ) as ovt eqn:Hovt.
+  symmetry in Hovt.
+  destruct ovt. {
+    rewrite <- angle_add_assoc.
+    rewrite angle_straight_add_straight.
     now rewrite angle_add_0_r.
   }
-  rewrite angle_add_comm.
+  now rewrite angle_add_0_r.
+}
+rewrite angle_add_comm.
+destruct is_left. {
+  destruct Htt as (Hlt, Htt).
   assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
-    clear - Hlt Htt.
     rewrite angle_eucl_dist_move_0_r.
     rewrite (angle_eucl_dist_move_0_r θ).
     rewrite angle_add_sub_swap.
@@ -1564,24 +1563,6 @@ destruct is_left. {
   }
 } {
   destruct Htt as (Hlt, Htt).
-  rewrite angle_div_2_add.
-  progress replace (rngl_abs _) with
-    (rngl_abs (rngl_sin (θ /₂ + θ₀ /₂) - rngl_sin θ₀)). 2: {
-    remember (angle_add_overflow θ₀ θ) as ovt eqn:Hovt.
-    symmetry in Hovt.
-    rewrite angle_add_comm.
-    destruct ovt. {
-      rewrite <- angle_add_assoc.
-      rewrite angle_straight_add_straight.
-      rewrite angle_add_0_r.
-      rewrite <- (rngl_abs_opp Hop Hor).
-      now rewrite (rngl_opp_sub_distr Hop).
-    }
-    rewrite angle_add_0_r.
-    rewrite <- (rngl_abs_opp Hop Hor).
-    now rewrite (rngl_opp_sub_distr Hop).
-  }
-  rewrite angle_add_comm.
   assert (H : (angle_eucl_dist (θ /₂ + θ₀ /₂) θ₀ ≤ angle_eucl_dist θ θ₀)%L). {
     rewrite angle_eucl_dist_move_0_r.
     rewrite (angle_eucl_dist_move_0_r θ).
@@ -1597,7 +1578,6 @@ destruct is_left. {
     }
     apply angle_div_2_le.
   }
-  rewrite angle_add_comm.
   destruct (angle_le_dec (θ /₂ + θ₀ /₂) θ₀) as [Httt| Httt]. {
     apply (Hss _ Httt).
     eapply (rngl_le_lt_trans Hor); [ | apply H4 ].
