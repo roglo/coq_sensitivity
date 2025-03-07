@@ -1003,6 +1003,9 @@ intros ε Hε; cbn.
 exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_opp_sub_distr Hop).
 rewrite (rngl_sub_0_r Hos).
 rewrite rngl_sin_angle_eucl_dist_0_r.
 destruct Hlt as (Hlt, Htt).
@@ -1040,6 +1043,9 @@ intros ε Hε; cbn.
 exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_opp_sub_distr Hop).
 rewrite (rngl_sub_0_r Hos).
 destruct Hlt as (Hlt, Htt).
 rewrite rngl_sin_angle_eucl_dist_straight_r'. 2: {
@@ -1079,6 +1085,7 @@ intros ε Hε; cbn.
 exists √ε.
 split; [ now apply (rl_sqrt_pos Hon Hos Hor) | ].
 intros θ Hlt Hθ.
+rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_sub_0_l Hop).
 progress unfold rngl_dist.
 rewrite (rngl_sub_opp_r Hop).
@@ -1147,6 +1154,9 @@ rewrite (rngl_opp_0 Hop).
 exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_opp_sub_distr Hop).
 rewrite rngl_cos_angle_eucl_dist_0_r.
 rewrite (rngl_sub_sub_swap Hop).
 rewrite (rngl_sub_diag Hos).
@@ -1193,6 +1203,9 @@ intros ε Hε; cbn.
 exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_opp_sub_distr Hop).
 rewrite (rngl_sub_opp_r Hop).
 progress unfold "°".
 cbn.
@@ -1239,6 +1252,7 @@ intros ε Hε; cbn.
 exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
+rewrite (rngl_mul_1_l Hon).
 rewrite <- (rngl_opp_add_distr Hop).
 progress unfold "°".
 cbn.
@@ -1322,6 +1336,9 @@ split. {
   }
 }
 intros θ Htt H2.
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_opp_sub_distr Hop).
 move θ before θ₀.
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
@@ -1459,6 +1476,7 @@ split. {
   }
 }
 intros θ Htt H2.
+rewrite (rngl_mul_1_l Hon).
 move θ before θ₀.
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
@@ -1585,6 +1603,9 @@ split. {
   }
 }
 intros θ Htt H2.
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_opp_sub_distr Hop).
 move θ before θ₀.
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).
@@ -1733,6 +1754,7 @@ split. {
   }
 }
 intros θ Htt H2.
+rewrite (rngl_mul_1_l Hon).
 move θ before θ₀.
 apply (rngl_min_glb_lt_iff Hor) in H2.
 destruct H2 as (H2, H4).

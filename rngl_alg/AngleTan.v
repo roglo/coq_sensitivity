@@ -140,6 +140,7 @@ intros x Hle Hdxx.
 generalize Hle; intros Hlt.
 apply Hlet in Hlt.
 specialize (Hd x Hlt).
+rewrite (rngl_mul_1_l Hon) in Hd.
 apply (rngl_min_glb_lt_iff Hor) in Hdxx.
 destruct Hdxx as (Hdε, Hdη).
 specialize (Hd Hdη).
@@ -224,6 +225,9 @@ rewrite (rngl_mul_0_l Hos) in Hd.
 progress unfold rngl_dist in Hd.
 progress unfold rngl_dist.
 rewrite (rngl_sub_0_r Hos) in Hd.
+rewrite (rngl_mul_opp_l Hop) in Hd.
+rewrite (rngl_mul_1_l Hon) in Hd.
+rewrite (rngl_opp_sub_distr Hop) in Hd.
 eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
 eapply (rngl_le_trans Hor). {
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
@@ -264,6 +268,7 @@ destruct (rngl_eq_dec Heo a 0) as [Hfz| Hfz]. {
   now apply (H1 _ le lt Hlti Hlet da f).
 }
 progress unfold left_derivative_at in Hd.
+progress unfold left_or_right_derivative_at in Hd.
 progress unfold is_limit_when_tending_to_neighbourhood in Hd.
 specialize (Hd (rngl_abs a))%L.
 assert (Haz : (0 < rngl_abs a)%L) by now apply (rngl_abs_pos Hop Hor).
@@ -282,6 +287,7 @@ generalize Hle; intros Hlt.
 apply Hlet in Hlt.
 move Hlt before Hle.
 specialize (Hd x Hlt).
+rewrite (rngl_mul_1_l Hon) in Hd.
 apply (rngl_min_glb_lt_iff Hor) in Hdxx.
 destruct Hdxx as (H1, H2).
 specialize (Hd H1).
@@ -504,6 +510,7 @@ destruct (rngl_eq_dec Heo a 0) as [Hfz| Hfz]. {
   now apply (H1 _ le lt Hlti Hlet da f).
 }
 progress unfold right_derivative_at in Hd.
+progress unfold left_or_right_derivative_at in Hd.
 progress unfold is_limit_when_tending_to_neighbourhood in Hd.
 specialize (Hd (rngl_abs a))%L.
 assert (Haz : (0 < rngl_abs a)%L) by now apply (rngl_abs_pos Hop Hor).
@@ -522,6 +529,9 @@ generalize Hle; intros Hlt.
 apply Hlet in Hlt.
 move Hlt before Hle.
 specialize (Hd x Hlt).
+rewrite (rngl_mul_opp_l Hop) in Hd.
+rewrite (rngl_mul_1_l Hon) in Hd.
+rewrite (rngl_opp_sub_distr Hop) in Hd.
 apply (rngl_min_glb_lt_iff Hor) in Hdxx.
 destruct Hdxx as (H1, H2).
 specialize (Hd H1).
@@ -821,6 +831,7 @@ destruct H5 as (H5, H6).
 specialize (H1 x Hlt H3).
 specialize (H2 x Hlt H4).
 cbn.
+rewrite (rngl_mul_1_l Hon) in H1, H2 |-*.
 assert (Hzd : (0 < d_dist x x₀)%L). {
   apply (rngl_lt_iff Hor).
   destruct da as (da, dap).
@@ -971,6 +982,7 @@ set (dx := d_dist x x₀).
 fold dx in H1, H2, H3, H4, H5, H6, Heqc, Heqd, Hzd, Hzed |-*.
 specialize (H10 x Hlt H5).
 specialize (H11 x Hlt H6).
+rewrite (rngl_mul_1_l Hon) in H10.
 move H10 at bottom.
 move H11 at bottom.
 rewrite <- Heqb in H10.
@@ -1146,6 +1158,9 @@ destruct H3 as (H3, H4).
 destruct H5 as (H5, H6).
 specialize (H1 x Hlt H3).
 specialize (H2 x Hlt H4).
+rewrite (rngl_mul_opp_l Hop) in H1, H2 |-*.
+rewrite (rngl_mul_1_l Hon) in H1, H2 |-*.
+rewrite (rngl_opp_sub_distr Hop) in H1, H2 |-*.
 cbn.
 assert (Hzd : (0 < d_dist x x₀)%L). {
   apply (rngl_lt_iff Hor).
@@ -1297,6 +1312,9 @@ set (dx := d_dist x x₀).
 fold dx in H1, H2, H3, H4, H5, H6, Heqc, Heqd, Hzd, Hzed |-*.
 specialize (H10 x Hlt H5).
 specialize (H11 x Hlt H6).
+rewrite (rngl_mul_opp_l Hop) in H10.
+rewrite (rngl_mul_1_l Hon) in H10.
+rewrite (rngl_opp_sub_distr Hop) in H10.
 move H10 at bottom.
 move H11 at bottom.
 rewrite <- Heqb in H10.
