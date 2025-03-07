@@ -1498,15 +1498,25 @@ rewrite (rngl_mul_div Hi1). 2: {
   now apply angle_lt_irrefl in Htt.
 }
 rewrite (rngl_add_opp_l Hop).
+rewrite (rngl_mul_mul_swap Hic).
+replace ((if is_left then _ else _) * _)%L with 1%L. 2: {
+  symmetry.
+  destruct is_left; destruct Htt as (Hlt, Htt). {
+    apply angle_lt_le_incl in Hlt.
+    apply angle_nlt_ge in Hlt.
+    apply Bool.not_true_iff_false in Hlt.
+    rewrite Hlt.
+    apply (rngl_mul_1_l Hon).
+  } {
+    rewrite Hlt.
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_opp_involutive Hop).
+  }
+}
+rewrite (rngl_mul_1_l Hon).
 destruct is_left. {
-  rewrite (rngl_mul_1_l Hon).
   destruct Htt as (Hlt, Htt).
-  generalize Hlt; intros H.
-  apply angle_lt_le_incl in H.
-  apply angle_nlt_ge in H.
-  apply Bool.not_true_iff_false in H.
-  rewrite H; clear H.
-  rewrite (rngl_mul_1_r Hon).
   rewrite angle_div_2_add.
   progress replace (rngl_abs _) with
     (rngl_abs (rngl_sin (θ₀ /₂ + θ /₂) - rngl_sin θ₀)). 2: {
@@ -1553,15 +1563,7 @@ destruct is_left. {
     easy.
   }
 } {
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_sub_opp_r Hop).
   destruct Htt as (Hlt, Htt).
-  rewrite Hlt.
-  rewrite (rngl_mul_opp_r Hop).
-  rewrite (rngl_add_opp_r Hop).
-  rewrite (rngl_mul_1_r Hon).
   rewrite angle_div_2_add.
   progress replace (rngl_abs _) with
     (rngl_abs (rngl_sin (θ /₂ + θ₀ /₂) - rngl_sin θ₀)). 2: {
