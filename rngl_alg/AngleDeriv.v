@@ -1417,6 +1417,8 @@ destruct is_left. {
 }
 Qed.
 
+(* ... simplification to do *)
+
 Theorem rngl_cos_left_or_right_derivative :
   ∀ is_left θ₀,
   left_or_right_derivative_at is_left (angle T) angle_lt_for_deriv
@@ -1467,20 +1469,20 @@ split. {
   }
 }
 intros θ Htt H2.
+move θ before θ₀.
+apply (rngl_min_glb_lt_iff Hor) in H2.
+destruct H2 as (H2, H4).
+apply (rngl_min_glb_lt_iff Hor) in H2.
+destruct H2 as (H2, H3).
+apply (rngl_min_glb_lt_iff Hor) in H4.
+destruct H4 as (H4, H5).
+cbn.
+progress unfold rngl_dist.
+progress unfold "°".
+rewrite (rngl_sub_opp_r Hop).
+rewrite rngl_cos_sub_cos.
 destruct is_left. {
   rewrite (rngl_mul_1_l Hon).
-  move θ before θ₀.
-  apply (rngl_min_glb_lt_iff Hor) in H2.
-  destruct H2 as (H2, H4).
-  apply (rngl_min_glb_lt_iff Hor) in H2.
-  destruct H2 as (H2, H3).
-  apply (rngl_min_glb_lt_iff Hor) in H4.
-  destruct H4 as (H4, H5).
-  cbn.
-  progress unfold rngl_dist.
-  progress unfold "°".
-  rewrite (rngl_sub_opp_r Hop).
-  rewrite rngl_cos_sub_cos.
   rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
   rewrite (rngl_mul_div_assoc Hiv).
   rewrite <- rngl_mul_assoc.
@@ -1553,26 +1555,14 @@ destruct is_left. {
 } {
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_opp_sub_distr Hop).
-  move θ before θ₀.
-  apply (rngl_min_glb_lt_iff Hor) in H2.
-  destruct H2 as (H2, H4).
-  apply (rngl_min_glb_lt_iff Hor) in H2.
-  destruct H2 as (H2, H3).
-  apply (rngl_min_glb_lt_iff Hor) in H4.
-  destruct H4 as (H4, H5).
-  cbn.
-  progress unfold rngl_dist.
-  progress unfold "°".
-  rewrite (rngl_sub_opp_r Hop).
-  rewrite rngl_cos_sub_cos.
+  rewrite (rngl_opp_involutive Hop).
   rewrite rngl_sin_add_div_2_if_angle_eucl_dist.
   rewrite (rngl_mul_div_assoc Hiv).
   rewrite <- rngl_mul_assoc.
   rewrite (rngl_mul_comm Hic 2).
   rewrite (rngl_mul_div Hi1); [ | easy ].
-  rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_mul_assoc.
+  rewrite angle_eucl_dist_symmetry.
   rewrite (rngl_mul_div Hi1). 2: {
     intros H.
     apply angle_eucl_dist_separation in H.
@@ -1581,17 +1571,15 @@ destruct is_left. {
     now apply angle_lt_irrefl in Htt.
   }
   destruct Htt as (Hlt, Htt).
-  generalize Hlt; intros H.
-  apply angle_lt_le_incl in H.
-  apply angle_nlt_ge in H.
-  apply Bool.not_true_iff_false in H.
-  rewrite H; clear H.
+  rewrite Hlt.
+  rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_mul_1_r Hon).
   rewrite angle_div_2_add.
   progress replace (rngl_abs _) with
     (rngl_abs (rngl_sin (θ /₂ + θ₀ /₂) - rngl_sin θ₀)). 2: {
-    remember (angle_add_overflow θ θ₀) as ovt eqn:Hovt.
+    remember (angle_add_overflow θ₀ θ) as ovt eqn:Hovt.
     symmetry in Hovt.
+    rewrite angle_add_comm.
     destruct ovt. {
       rewrite <- angle_add_assoc.
       rewrite angle_straight_add_straight.
