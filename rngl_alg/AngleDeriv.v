@@ -985,45 +985,76 @@ Qed.
 
 (* *)
 
-Theorem rngl_sin_right_derivative_at_0 :
-  right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_sin 0%A (rngl_cos 0).
+Theorem rngl_sin_left_or_right_derivative_at_0 :
+  ∀ is_left,
+  left_or_right_derivative_at is_left (angle T) angle_lt_for_deriv
+    angle_eucl_distance rngl_distance rngl_sin 0%A (rngl_cos 0).
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros ε Hε; rewrite (H1 ε) in Hε.
+  intros * ε Hε; rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as H20.
-intros ε Hε; cbn.
+intros * ε Hε; cbn.
 exists ε.
 split; [ easy | ].
 intros θ Hlt Hθ.
-rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_opp_sub_distr Hop).
-rewrite (rngl_sub_0_r Hos).
+rewrite (rngl_sub_0_l Hop).
 rewrite rngl_sin_angle_eucl_dist_0_r.
-destruct Hlt as (Hlt, Htt).
-rewrite angle_sub_0_r in Htt.
+progress unfold angle_lt_for_deriv in Hlt.
+rewrite (rngl_mul_opp_r Hop).
+rewrite <- (rngl_mul_opp_l Hop).
+rewrite rngl_mul_assoc.
 rewrite (rngl_mul_div Hi1). 2: {
   intros H.
   apply angle_eucl_dist_separation in H.
   rewrite H in Hlt.
+  destruct is_left; destruct Hlt as (Hlt, Htt);
   now apply angle_lt_irrefl in Hlt.
 }
 progress unfold rngl_dist.
 rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
+  destruct is_left. {
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_le_opp_l Hop Hor).
+    rewrite rngl_add_comm.
+    apply (rngl_le_opp_l Hop Hor).
+    apply rngl_cos_bound.
+  }
+  do 2 rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_opp_involutive Hop).
+  rewrite (rngl_mul_1_l Hon).
   apply rngl_cos_bound.
 }
+destruct is_left. {
+  exfalso.
+  destruct Hlt as (Ht, Hlt).
+  apply angle_nle_gt in Ht.
+  apply Ht.
+  apply angle_nonneg.
+}
+rewrite angle_sub_0_r in Hlt.
 rewrite (rngl_opp_sub_distr Hop).
 eapply (rngl_le_lt_trans Hor); [ | apply Hθ ].
+do 2 rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
 now apply rngl_1_sub_cos_div_2_le_angle_eucl_dist_0_r.
+Qed.
+
+Theorem rngl_sin_right_derivative_at_0 :
+  right_derivative_at angle_lt_for_deriv angle_eucl_distance rngl_distance
+    rngl_sin 0%A (rngl_cos 0).
+Proof.
+apply rngl_sin_left_or_right_derivative_at_0.
 Qed.
 
 Theorem rngl_sin_right_derivative_at_straight :
