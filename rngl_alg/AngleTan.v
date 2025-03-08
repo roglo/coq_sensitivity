@@ -61,7 +61,8 @@ symmetry.
 apply (rngl_opp_0 Hop).
 Qed.
 
-Definition is_limit_when_tending_to_neighbourhood_le (is_left : bool) {A B} lt
+Definition is_limit_when_tending_to_neighbourhood_le (is_left : bool) {A B}
+  (lt : A → A → Prop)
   (da : distance A) (db : distance B) (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε : T, 0 < ε →
    ∃ η : T, (0 < η)%L ∧ ∀ x : A,
@@ -118,13 +119,16 @@ Definition rngl_distance :=
 
 (* ... to be simplified *)
 
-Theorem left_derivable_continuous_when_derivative_eq_0 :
+Theorem left_or_right_derivable_continuous_when_derivative_eq_0 :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, le x y → lt x y) →
-  ∀ da (f : A → T) x,
-  left_derivative_at lt da rngl_distance f x 0%L
-  → left_continuous_at le da rngl_distance f x.
+  ∀ is_left A (le : A → A → Prop) lt,
+  (∀ x, ¬ (lt x x))
+  → (∀ x y, le x y → lt x y)
+  → ∀ da (f : A → T) x,
+  left_or_right_derivative_at is_left A lt da rngl_distance f x 0%L
+  → is_limit_when_tending_to_neighbourhood is_left le da
+       rngl_distance f x (f x).
 Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -139,10 +143,10 @@ destruct Hd as (η & Hη & Hd).
 exists (rngl_min √ε η).
 split; [ now apply rngl_min_glb_lt | ].
 intros x Hle Hdxx.
-generalize Hle; intros Hlt.
-apply Hlet in Hlt.
+assert (Hlt : if is_left then lt x x₀ else lt x₀ x). {
+  now destruct is_left; apply Hlet.
+}
 specialize (Hd x Hlt).
-rewrite (rngl_mul_1_l Hon) in Hd.
 apply (rngl_min_glb_lt_iff Hor) in Hdxx.
 destruct Hdxx as (Hdε, Hdη).
 specialize (Hd Hdη).
@@ -150,7 +154,7 @@ assert (Hdz : d_dist x x₀ ≠ 0%L). {
   intros H.
   apply dist_separation in H; [ | apply d_prop ].
   subst x.
-  now apply Hlti in Hlt.
+  now destruct is_left; apply Hlti in Hlt.
 }
 apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
   clear H.
@@ -166,78 +170,33 @@ rewrite (rngl_mul_0_l Hos) in Hd.
 progress unfold rngl_dist in Hd.
 progress unfold rngl_dist.
 rewrite (rngl_sub_0_r Hos) in Hd.
-eapply (rngl_lt_le_trans Hor). {
-  rewrite <- (rngl_abs_opp Hop Hor).
-  rewrite (rngl_opp_sub_distr Hop).
-  apply Hd.
+destruct is_left. {
+  rewrite (rngl_mul_1_l Hon) in Hd.
+  eapply (rngl_lt_le_trans Hor). {
+    rewrite <- (rngl_abs_opp Hop Hor).
+    rewrite (rngl_opp_sub_distr Hop).
+    apply Hd.
+  }
+  eapply (rngl_le_trans Hor). {
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+    apply (rngl_lt_le_incl Hor), Hdε.
+  }
+  rewrite fold_rngl_squ.
+  rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
+  now apply (rngl_lt_le_incl Hor).
+} {
+  rewrite (rngl_mul_opp_l Hop) in Hd.
+  rewrite (rngl_mul_1_l Hon) in Hd.
+  rewrite (rngl_opp_sub_distr Hop) in Hd.
+  eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
+  eapply (rngl_le_trans Hor). {
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+    apply (rngl_lt_le_incl Hor), Hdε.
+  }
+  rewrite fold_rngl_squ.
+  rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
+  now apply (rngl_lt_le_incl Hor).
 }
-eapply (rngl_le_trans Hor). {
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-  apply (rngl_lt_le_incl Hor), Hdε.
-}
-rewrite fold_rngl_squ.
-rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
-now apply (rngl_lt_le_incl Hor).
-Qed.
-
-Theorem right_derivable_continuous_when_derivative_eq_0 :
-  rngl_has_1 T = true →
-  rngl_has_inv T = true →
-  ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, le x y → lt x y) →
-  ∀ da (f : A → T) x,
-  right_derivative_at lt da rngl_distance f x 0%L
-  → right_continuous_at le da rngl_distance f x.
-Proof.
-intros Hon Hiv.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Hlti Hlet * Hd.
-rename x into x₀.
-intros ε Hε.
-specialize (Hd √ε).
-assert (Hsε : (0 < √ε)%L) by now apply (rl_sqrt_pos Hon Hos Hor).
-specialize (Hd Hsε).
-destruct Hd as (η & Hη & Hd).
-exists (rngl_min √ε η).
-split; [ now apply rngl_min_glb_lt | ].
-intros x Hle Hdxx.
-generalize Hle; intros Hlt.
-apply Hlet in Hlt.
-specialize (Hd x Hlt).
-apply (rngl_min_glb_lt_iff Hor) in Hdxx.
-destruct Hdxx as (Hdε, Hdη).
-specialize (Hd Hdη).
-assert (Hdz : d_dist x x₀ ≠ 0%L). {
-  intros H.
-  apply dist_separation in H; [ | apply d_prop ].
-  subst x.
-  now apply Hlti in Hlt.
-}
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
-  clear H.
-  apply (rngl_lt_iff Hor).
-  split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
-}
-cbn in Hd |-*.
-rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
-  apply (dist_nonneg Hon Hop Hiv Hor).
-}
-rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
-rewrite (rngl_mul_0_l Hos) in Hd.
-progress unfold rngl_dist in Hd.
-progress unfold rngl_dist.
-rewrite (rngl_sub_0_r Hos) in Hd.
-rewrite (rngl_mul_opp_l Hop) in Hd.
-rewrite (rngl_mul_1_l Hon) in Hd.
-rewrite (rngl_opp_sub_distr Hop) in Hd.
-eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
-eapply (rngl_le_trans Hor). {
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-  apply (rngl_lt_le_incl Hor), Hdε.
-}
-rewrite fold_rngl_squ.
-rewrite (rngl_squ_sqrt Hon); [ apply (rngl_le_refl Hor) | ].
-now apply (rngl_lt_le_incl Hor).
 Qed.
 
 Theorem left_derivable_continuous :
@@ -266,8 +225,8 @@ intros * Hlti Hlet * Hd.
 rename x into x₀.
 destruct (rngl_eq_dec Heo a 0) as [Hfz| Hfz]. {
   subst a.
-  specialize (left_derivable_continuous_when_derivative_eq_0 Hon Hiv) as H1.
-  now apply (H1 _ le lt Hlti Hlet da f).
+  specialize left_or_right_derivable_continuous_when_derivative_eq_0 as H1.
+  now apply (H1 Hon Hiv _ _ le lt Hlti Hlet da f).
 }
 progress unfold left_derivative_at in Hd.
 progress unfold left_or_right_derivative_at in Hd.
@@ -508,8 +467,8 @@ intros * Hlti Hlet * Hd.
 rename x into x₀.
 destruct (rngl_eq_dec Heo a 0) as [Hfz| Hfz]. {
   subst a.
-  specialize (right_derivable_continuous_when_derivative_eq_0 Hon Hiv) as H1.
-  now apply (H1 _ le lt Hlti Hlet da f).
+  specialize left_or_right_derivable_continuous_when_derivative_eq_0 as H1.
+  now apply (H1 Hon Hiv _ _ le lt Hlti Hlet da f).
 }
 progress unfold right_derivative_at in Hd.
 progress unfold left_or_right_derivative_at in Hd.

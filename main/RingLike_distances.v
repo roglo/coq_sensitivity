@@ -73,7 +73,8 @@ Definition is_complete A (dist : distance A) :=
   ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
 
-Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B} lt
+Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B}
+  (lt : A → A → Prop)
   (da : distance A) (db : distance B) (f : A → B) (x₀ : A) (L : B) :=
   (∀ ε : T, 0 < ε →
    ∃ η : T, (0 < η)%L ∧ ∀ x : A,
