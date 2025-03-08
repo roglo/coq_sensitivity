@@ -237,7 +237,6 @@ specialize (Hd Haz).
 destruct Hd as (η & Hη & Hd).
 intros ε Hε.
 exists (rngl_min η (ε / (2 * rngl_abs a)))%L.
-(**)
 split. {
   apply rngl_min_glb_lt; [ easy | ].
   apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
@@ -245,34 +244,36 @@ split. {
   now apply (rngl_abs_pos Hop Hor).
 }
 intros x Hle Hdxx.
+assert (Hlt : if is_left then lt x x₀ else lt x₀ x). {
+  now destruct is_left; apply Hlet.
+}
+move Hlt before Hle.
+specialize (Hd x Hlt).
+apply (rngl_min_glb_lt_iff Hor) in Hdxx.
+destruct Hdxx as (H1, H2).
+specialize (Hd H1).
+assert (Hdz : d_dist x x₀ ≠ 0%L). {
+  intros H.
+  apply dist_separation in H; [ | apply d_prop ].
+  subst x.
+  now destruct is_left; apply Hlti in Hlt.
+}
+cbn in Hd |-*.
+(**)
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
+  clear H.
+  apply (rngl_lt_iff Hor).
+  split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
+}
+rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
+  apply (dist_nonneg Hon Hop Hiv Hor).
+}
+rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
+progress unfold rngl_dist in Hd.
+progress unfold rngl_dist.
+progress unfold rngl_abs in Hd at 1.
 destruct is_left. {
-  generalize Hle; intros Hlt.
-  apply Hlet in Hlt.
-  move Hlt before Hle.
-  specialize (Hd x Hlt).
   rewrite (rngl_mul_1_l Hon) in Hd.
-  apply (rngl_min_glb_lt_iff Hor) in Hdxx.
-  destruct Hdxx as (H1, H2).
-  specialize (Hd H1).
-  assert (Hdz : d_dist x x₀ ≠ 0%L). {
-    intros H.
-    apply dist_separation in H; [ | apply d_prop ].
-    subst x.
-    now apply Hlti in Hlt.
-  }
-  cbn in Hd |-*.
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
-    clear H.
-    apply (rngl_lt_iff Hor).
-    split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
-  }
-  rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
-    apply (dist_nonneg Hon Hop Hiv Hor).
-  }
-  rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
-  progress unfold rngl_dist in Hd.
-  progress unfold rngl_dist.
-  progress unfold rngl_abs in Hd at 1.
   rewrite (rngl_leb_sub_0 Hop Hor) in Hd.
   remember (f x₀ - f x ≤? a * d_dist x x₀)%L as b eqn:Hb.
   symmetry in Hb.
@@ -442,35 +443,9 @@ destruct is_left. {
   now apply (rngl_lt_le_incl Hor).
   apply (dist_nonneg Hon Hop Hiv Hor).
 } {
-  generalize Hle; intros Hlt.
-  apply Hlet in Hlt.
-  move Hlt before Hle.
-  specialize (Hd x Hlt).
   rewrite (rngl_mul_opp_l Hop) in Hd.
   rewrite (rngl_mul_1_l Hon) in Hd.
   rewrite (rngl_opp_sub_distr Hop) in Hd.
-  apply (rngl_min_glb_lt_iff Hor) in Hdxx.
-  destruct Hdxx as (H1, H2).
-  specialize (Hd H1).
-  assert (Hdz : d_dist x x₀ ≠ 0%L). {
-    intros H.
-    apply dist_separation in H; [ | apply d_prop ].
-    subst x.
-    now apply Hlti in Hlt.
-  }
-  cbn in Hd |-*.
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (d_dist x x₀)) in Hd. 2: {
-    clear H.
-    apply (rngl_lt_iff Hor).
-    split; [ apply (dist_nonneg Hon Hop Hiv Hor) | easy ].
-  }
-  rewrite (rngl_dist_mul_distr_r Hii) in Hd. 2: {
-    apply (dist_nonneg Hon Hop Hiv Hor).
-  }
-  rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
-  progress unfold rngl_dist in Hd.
-  progress unfold rngl_dist.
-  progress unfold rngl_abs in Hd at 1.
   rewrite (rngl_leb_sub_0 Hop Hor) in Hd.
   remember (f x - f x₀ ≤? a * d_dist x x₀)%L as b eqn:Hb.
   symmetry in Hb.
