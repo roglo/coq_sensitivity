@@ -277,8 +277,6 @@ set (σ := (if is_left then 1 else -1)%L) in Hd.
 remember (σ * (f x₀ - f x) ≤? a * d_dist x x₀)%L as b eqn:Hb.
 symmetry in Hb.
 destruct is_left. {
-  subst σ.
-  rewrite (rngl_mul_1_l Hon) in Hb, Hd.
   destruct b. {
     apply rngl_leb_le in Hb.
     rewrite (rngl_opp_sub_distr Hop) in Hd.
@@ -302,6 +300,7 @@ destruct is_left. {
           apply Hflz.
         }
         rewrite (rngl_mul_0_l Hos).
+        rewrite (rngl_mul_1_l Hon).
         apply (rngl_lt_0_sub Hop Hor).
         apply (rngl_lt_iff Hor).
         split; [ easy | ].
@@ -309,6 +308,7 @@ destruct is_left. {
         now apply rngl_nlt_ge in Hea.
       }
       apply (rngl_nle_gt_iff Hor) in Hflz.
+      rewrite (rngl_mul_1_l Hon) in Hb.
       eapply (rngl_le_lt_trans Hor); [ apply Hb | ].
       rewrite (rngl_abs_nonneg_eq Hop Hor) in H2. 2: {
         now apply (rngl_lt_le_incl Hor).
@@ -327,6 +327,7 @@ destruct is_left. {
       now apply (rngl_lt_le_incl Hor).
     }
     apply (rngl_leb_gt Hor) in Hc.
+    rewrite (rngl_mul_1_l Hon) in Hd.
     rewrite (rngl_sub_sub_distr Hop) in Hd.
     rewrite <- (rngl_add_sub_swap Hop) in Hd.
     rewrite <- (rngl_add_sub_assoc Hop) in Hd.
@@ -390,6 +391,7 @@ destruct is_left. {
       rewrite (rngl_mul_opp_l Hop) in Hd.
       rewrite (rngl_add_opp_l Hop) in Hd.
       rewrite (rngl_sub_diag Hos) in Hd.
+      rewrite (rngl_mul_1_l Hon) in Hd.
       apply -> (rngl_lt_sub_0 Hop Hor) in Hd.
       now apply rngl_nle_gt in Hd.
     }
@@ -401,6 +403,7 @@ destruct is_left. {
     }
     apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
     rewrite <- (rngl_mul_2_l Hon) in Hd.
+    rewrite (rngl_mul_1_l Hon) in Hd.
     eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
     rewrite rngl_mul_assoc.
     rewrite (rngl_mul_comm Hic).
@@ -412,6 +415,7 @@ destruct is_left. {
   apply (rngl_leb_gt Hor) in Hc.
   destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
     rewrite <- (rngl_opp_sub_distr Hop) in Hb.
+    rewrite (rngl_mul_1_l Hon) in Hb.
     apply (rngl_lt_opp_r Hop Hor) in Hb.
     rewrite rngl_add_comm in Hb.
     apply (rngl_lt_opp_r Hop Hor) in Hb.
@@ -438,6 +442,7 @@ destruct is_left. {
   apply rngl_nle_gt in Hb.
   apply Hb; clear Hb.
   apply (rngl_le_trans Hor _ 0). {
+    rewrite (rngl_mul_1_l Hon).
     apply (rngl_le_sub_0 Hop Hor).
     now apply (rngl_lt_le_incl Hor).
   }
