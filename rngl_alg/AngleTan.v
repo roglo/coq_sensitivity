@@ -275,15 +275,14 @@ rewrite (rngl_leb_sub_0 Hop Hor) in Hd.
 set (σ := (if is_left then 1 else -1)%L) in Hd.
 remember (σ * (f x₀ - f x) ≤? a * d_dist x x₀)%L as b eqn:Hb.
 symmetry in Hb.
-(**)
 destruct b. {
+  apply rngl_leb_le in Hb.
+  progress unfold rngl_abs.
+  rewrite (rngl_leb_sub_0 Hop Hor).
+  remember (f x ≤? f x₀)%L as c eqn:Hc.
+  symmetry in Hc.
   destruct is_left. {
-    apply rngl_leb_le in Hb.
     rewrite (rngl_opp_sub_distr Hop) in Hd.
-    progress unfold rngl_abs.
-    rewrite (rngl_leb_sub_0 Hop Hor).
-    remember (f x ≤? f x₀)%L as c eqn:Hc.
-    symmetry in Hc.
     destruct c. {
       apply rngl_leb_le in Hc.
       rewrite (rngl_opp_sub_distr Hop).
@@ -377,12 +376,6 @@ destruct b. {
     apply (rngl_lt_le_incl Hor) in Hd.
     now apply rngl_nlt_ge in Hd.
   } {
-    apply rngl_leb_le in Hb.
-    clear - Hb Hd Hop rp Hor Hii Hon Hiv Hdz Hos H2 Hic H2z Hfz Hz2 Hε Hi1.
-    progress unfold rngl_abs.
-    rewrite (rngl_leb_sub_0 Hop Hor).
-    remember (f x ≤? f x₀)%L as c eqn:Hc.
-    symmetry in Hc.
     destruct c. 2: {
       apply (rngl_leb_gt Hor) in Hc.
       clear - Hc Hor rp a Hb Hop Hii Hon Hiv Hdz Hos H2 Hic H2z Hfz Hz2 Hε.
