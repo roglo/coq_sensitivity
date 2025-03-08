@@ -272,11 +272,13 @@ rewrite (rngl_div_mul Hon Hiv) in Hd; [ | easy ].
 progress unfold rngl_dist in Hd.
 progress unfold rngl_dist.
 progress unfold rngl_abs in Hd at 1.
+rewrite (rngl_leb_sub_0 Hop Hor) in Hd.
+set (σ := (if is_left then 1 else -1)%L) in Hd.
+remember (σ * (f x₀ - f x) ≤? a * d_dist x x₀)%L as b eqn:Hb.
+symmetry in Hb.
 destruct is_left. {
-  rewrite (rngl_mul_1_l Hon) in Hd.
-  rewrite (rngl_leb_sub_0 Hop Hor) in Hd.
-  remember (f x₀ - f x ≤? a * d_dist x x₀)%L as b eqn:Hb.
-  symmetry in Hb.
+  subst σ.
+  rewrite (rngl_mul_1_l Hon) in Hb, Hd.
   destruct b. {
     apply rngl_leb_le in Hb.
     rewrite (rngl_opp_sub_distr Hop) in Hd.
@@ -443,15 +445,15 @@ destruct is_left. {
   now apply (rngl_lt_le_incl Hor).
   apply (dist_nonneg Hon Hop Hiv Hor).
 } {
+  subst σ.
+  rewrite (rngl_mul_opp_l Hop) in Hb.
+  rewrite (rngl_mul_1_l Hon) in Hb.
+  rewrite (rngl_opp_sub_distr Hop) in Hb.
   rewrite (rngl_mul_opp_l Hop) in Hd.
   rewrite (rngl_mul_1_l Hon) in Hd.
-  rewrite (rngl_opp_sub_distr Hop) in Hd.
-  rewrite (rngl_leb_sub_0 Hop Hor) in Hd.
-  remember (f x - f x₀ ≤? a * d_dist x x₀)%L as b eqn:Hb.
-  symmetry in Hb.
+  do 2 rewrite (rngl_opp_sub_distr Hop) in Hd.
   destruct b. {
     apply rngl_leb_le in Hb.
-    rewrite (rngl_opp_sub_distr Hop) in Hd.
     clear - Hb Hd Hop rp Hor Hii Hon Hiv Hdz Hos H2 Hic H2z Hfz Hz2 Hε Hi1.
     progress unfold rngl_abs.
     rewrite (rngl_leb_sub_0 Hop Hor).
