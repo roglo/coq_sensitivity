@@ -229,22 +229,23 @@ destruct (rngl_eq_dec Heo a 0) as [Hfz| Hfz]. {
   specialize left_or_right_derivable_continuous_when_derivative_eq_0 as H1.
   now apply (H1 Hon Hiv _ _ le lt Hlti Hlet da f).
 }
+progress unfold left_or_right_derivative_at in Hd.
+progress unfold is_limit_when_tending_to_neighbourhood in Hd.
+specialize (Hd (rngl_abs a))%L.
+assert (Haz : (0 < rngl_abs a)%L) by now apply (rngl_abs_pos Hop Hor).
+specialize (Hd Haz).
+destruct Hd as (η & Hη & Hd).
+intros ε Hε.
+exists (rngl_min η (ε / (2 * rngl_abs a)))%L.
+(**)
+split. {
+  apply rngl_min_glb_lt; [ easy | ].
+  apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+  apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
+  now apply (rngl_abs_pos Hop Hor).
+}
+intros x Hle Hdxx.
 destruct is_left. {
-  progress unfold left_or_right_derivative_at in Hd.
-  progress unfold is_limit_when_tending_to_neighbourhood in Hd.
-  specialize (Hd (rngl_abs a))%L.
-  assert (Haz : (0 < rngl_abs a)%L) by now apply (rngl_abs_pos Hop Hor).
-  specialize (Hd Haz).
-  destruct Hd as (η & Hη & Hd).
-  intros ε Hε.
-  exists (rngl_min η (ε / (2 * rngl_abs a)))%L.
-  split. {
-    apply rngl_min_glb_lt; [ easy | ].
-    apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
-    apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
-    now apply (rngl_abs_pos Hop Hor).
-  }
-  intros x Hle Hdxx.
   generalize Hle; intros Hlt.
   apply Hlet in Hlt.
   move Hlt before Hle.
@@ -441,21 +442,6 @@ destruct is_left. {
   now apply (rngl_lt_le_incl Hor).
   apply (dist_nonneg Hon Hop Hiv Hor).
 } {
-  progress unfold left_or_right_derivative_at in Hd.
-  progress unfold is_limit_when_tending_to_neighbourhood in Hd.
-  specialize (Hd (rngl_abs a))%L.
-  assert (Haz : (0 < rngl_abs a)%L) by now apply (rngl_abs_pos Hop Hor).
-  specialize (Hd Haz).
-  destruct Hd as (η & Hη & Hd).
-  intros ε Hε.
-  exists (rngl_min η (ε / (2 * rngl_abs a)))%L.
-  split. {
-    apply rngl_min_glb_lt; [ easy | ].
-    apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
-    apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
-    now apply (rngl_abs_pos Hop Hor).
-  }
-  intros x Hle Hdxx.
   generalize Hle; intros Hlt.
   apply Hlet in Hlt.
   move Hlt before Hle.
