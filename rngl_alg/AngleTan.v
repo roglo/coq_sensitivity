@@ -116,6 +116,8 @@ Qed.
 Definition rngl_distance :=
   {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
 
+(* ... to be simplified *)
+
 Theorem left_derivable_continuous_when_derivative_eq_0 :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
