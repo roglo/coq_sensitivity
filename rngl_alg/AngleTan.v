@@ -326,14 +326,14 @@ destruct b. {
         now apply (rngl_lt_le_incl Hor).
       }
     } {
-      subst σ.
-      rewrite (rngl_mul_opp_l Hop) in Hd.
-      rewrite (rngl_mul_1_l Hon) in Hd.
-      rewrite (rngl_opp_sub_distr Hop) in Hd.
-      rewrite (rngl_sub_opp_r Hop) in Hd.
-      apply (rngl_lt_add_lt_sub_l Hop Hor) in Hd.
-      rewrite <- (rngl_mul_sub_distr_r Hop) in Hd.
       destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
+        subst σ.
+        rewrite (rngl_mul_opp_l Hop) in Hd.
+        rewrite (rngl_mul_1_l Hon) in Hd.
+        rewrite (rngl_opp_sub_distr Hop) in Hd.
+        rewrite (rngl_sub_opp_r Hop) in Hd.
+        apply (rngl_lt_add_lt_sub_l Hop Hor) in Hd.
+        rewrite <- (rngl_mul_sub_distr_r Hop) in Hd.
         rewrite (rngl_abs_nonpos_eq Hop Hor) in Hd; [ | easy ].
         rewrite (rngl_abs_nonpos_eq Hop Hor) in H2; [ | easy ].
         eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
@@ -373,6 +373,13 @@ destruct b. {
         rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd. 2: {
           now apply (rngl_lt_iff Hor).
         }
+        subst σ.
+        rewrite (rngl_mul_opp_l Hop) in Hd.
+        rewrite (rngl_mul_1_l Hon) in Hd.
+        rewrite (rngl_opp_sub_distr Hop) in Hd.
+        rewrite (rngl_sub_opp_r Hop) in Hd.
+        apply (rngl_lt_add_lt_sub_l Hop Hor) in Hd.
+        rewrite <- (rngl_mul_sub_distr_r Hop) in Hd.
         rewrite (rngl_sub_diag Hos) in Hd.
         rewrite (rngl_mul_0_l Hos) in Hd.
         apply -> (rngl_lt_sub_0 Hop Hor) in Hd.
