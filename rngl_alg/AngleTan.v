@@ -282,9 +282,9 @@ destruct b. {
   remember (f x ≤? f x₀)%L as c eqn:Hc.
   symmetry in Hc.
   destruct c. {
-(**)
     apply rngl_leb_le in Hc.
     rewrite (rngl_opp_sub_distr Hop).
+(**)
     destruct is_left. {
       destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
         apply (rngl_nle_gt_iff Hor).
@@ -332,9 +332,7 @@ destruct b. {
       rewrite (rngl_sub_opp_r Hop) in Hd.
       apply (rngl_lt_add_lt_sub_l Hop Hor) in Hd.
       rewrite <- (rngl_mul_sub_distr_r Hop) in Hd.
-      destruct (rngl_lt_dec Hor a 0) as [Hflz| Hflz]. {
-        generalize Hflz; intros Haz''.
-        apply (rngl_lt_le_incl Hor) in Haz''.
+      destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
         rewrite (rngl_abs_nonpos_eq Hop Hor) in Hd; [ | easy ].
         rewrite (rngl_abs_nonpos_eq Hop Hor) in H2; [ | easy ].
         eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
@@ -343,10 +341,12 @@ destruct b. {
             rewrite <- (rngl_opp_add_distr Hop).
             apply (rngl_opp_pos_neg Hop Hor).
             rewrite <- (rngl_mul_2_l Hon).
-            apply (rngl_mul_pos_neg Hop Hor); [ | easy | easy ].
-            rewrite Bool.orb_true_iff; right.
-            rewrite Hi1; cbn.
-            apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+            apply (rngl_mul_pos_neg Hop Hor); [ | easy | ]. {
+              rewrite Bool.orb_true_iff; right.
+              rewrite Hi1; cbn.
+              apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+            }
+            now apply (rngl_lt_iff Hor).
           }
           apply (rngl_lt_le_incl Hor), H2.
         }
@@ -368,8 +368,10 @@ destruct b. {
         }
         apply (rngl_le_refl Hor).
       }
-      apply (rngl_nlt_ge_iff Hor) in Hflz.
-      rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd; [ | easy ].
+      apply (rngl_nle_gt_iff Hor) in Hflz.
+      rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd. 2: {
+        now apply (rngl_lt_iff Hor).
+      }
       rewrite (rngl_sub_diag Hos) in Hd.
       rewrite (rngl_mul_0_l Hos) in Hd.
       apply -> (rngl_lt_sub_0 Hop Hor) in Hd.
