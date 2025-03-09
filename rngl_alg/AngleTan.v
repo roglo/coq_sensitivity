@@ -284,7 +284,6 @@ destruct b. {
   destruct c. {
     apply rngl_leb_le in Hc.
     rewrite (rngl_opp_sub_distr Hop).
-(**)
     destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
       destruct is_left. {
         apply (rngl_nle_gt_iff Hor).
@@ -349,8 +348,8 @@ destruct b. {
         apply (rngl_le_refl Hor).
       }
     } {
+      apply (rngl_nle_gt_iff Hor) in Hflz.
       destruct is_left. {
-        apply (rngl_nle_gt_iff Hor) in Hflz.
         rewrite (rngl_mul_1_l Hon) in Hb.
         eapply (rngl_le_lt_trans Hor); [ apply Hb | ].
         rewrite (rngl_abs_nonneg_eq Hop Hor) in H2. 2: {
@@ -369,7 +368,6 @@ destruct b. {
         apply (rngl_le_add_l Hor).
         now apply (rngl_lt_le_incl Hor).
       } {
-        apply (rngl_nle_gt_iff Hor) in Hflz.
         rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd. 2: {
           now apply (rngl_lt_iff Hor).
         }
@@ -387,8 +385,9 @@ destruct b. {
       }
     }
   } {
+    apply (rngl_leb_gt Hor) in Hc.
+(**)
     destruct is_left. {
-      apply (rngl_leb_gt Hor) in Hc.
       rewrite (rngl_mul_1_l Hon) in Hd.
       rewrite (rngl_opp_sub_distr Hop) in Hd.
       rewrite (rngl_sub_sub_distr Hop) in Hd.
@@ -396,9 +395,7 @@ destruct b. {
       rewrite <- (rngl_add_sub_assoc Hop) in Hd.
       apply (rngl_lt_add_lt_sub_l Hop Hor) in Hd.
       rewrite <- (rngl_mul_sub_distr_r Hop) in Hd.
-      destruct (rngl_lt_dec Hor a 0) as [Haz'| Haz']. {
-        generalize Haz'; intros Haz''.
-        apply (rngl_lt_le_incl Hor) in Haz''.
+      destruct (rngl_le_dec Hor a 0) as [Haz'| Haz']. {
         rewrite (rngl_abs_nonpos_eq Hop Hor) in Hd; [ | easy ].
         rewrite (rngl_abs_nonpos_eq Hop Hor) in H2; [ | easy ].
         eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
@@ -407,10 +404,12 @@ destruct b. {
             rewrite <- (rngl_opp_add_distr Hop).
             apply (rngl_opp_pos_neg Hop Hor).
             rewrite <- (rngl_mul_2_l Hon).
-            apply (rngl_mul_pos_neg Hop Hor); [ | easy | easy ].
-            rewrite Bool.orb_true_iff; right.
-            rewrite Hi1; cbn.
-            apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+            apply (rngl_mul_pos_neg Hop Hor); [ | easy | ]. {
+              rewrite Bool.orb_true_iff; right.
+              rewrite Hi1; cbn.
+              apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+            }
+            now apply (rngl_lt_iff Hor).
           }
           apply (rngl_lt_le_incl Hor), H2.
         }
@@ -432,7 +431,8 @@ destruct b. {
         }
         apply (rngl_le_refl Hor).
       }
-      apply (rngl_nlt_ge_iff Hor) in Haz'.
+      apply (rngl_nle_gt_iff Hor) in Haz'.
+      apply (rngl_lt_le_incl Hor) in Haz'.
       rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd; [ | easy ].
       rewrite (rngl_sub_diag Hos) in Hd.
       rewrite (rngl_mul_0_l Hos) in Hd.
@@ -440,8 +440,6 @@ destruct b. {
       apply (rngl_lt_le_incl Hor) in Hd.
       now apply rngl_nlt_ge in Hd.
     } {
-      apply (rngl_leb_gt Hor) in Hc.
-      clear - Hc Hor rp a Hb Hop Hii Hon Hiv Hdz Hos H2 Hic H2z Hfz Hz2 Hε.
       destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
         apply (rngl_nle_gt_iff Hor).
         intros Hea.
