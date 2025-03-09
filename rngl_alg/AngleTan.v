@@ -282,9 +282,10 @@ destruct b. {
   remember (f x ≤? f x₀)%L as c eqn:Hc.
   symmetry in Hc.
   destruct c. {
+(**)
+    apply rngl_leb_le in Hc.
+    rewrite (rngl_opp_sub_distr Hop).
     destruct is_left. {
-      apply rngl_leb_le in Hc.
-      rewrite (rngl_opp_sub_distr Hop).
       destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
         apply (rngl_nle_gt_iff Hor).
         intros Hea.
@@ -324,8 +325,6 @@ destruct b. {
       apply (rngl_le_add_l Hor).
       now apply (rngl_lt_le_incl Hor).
     } {
-      apply rngl_leb_le in Hc.
-      rewrite (rngl_opp_sub_distr Hop).
       subst σ.
       rewrite (rngl_mul_opp_l Hop) in Hd.
       rewrite (rngl_mul_1_l Hon) in Hd.
@@ -333,8 +332,8 @@ destruct b. {
       rewrite (rngl_sub_opp_r Hop) in Hd.
       apply (rngl_lt_add_lt_sub_l Hop Hor) in Hd.
       rewrite <- (rngl_mul_sub_distr_r Hop) in Hd.
-      destruct (rngl_lt_dec Hor a 0) as [Haz'| Haz']. {
-        generalize Haz'; intros Haz''.
+      destruct (rngl_lt_dec Hor a 0) as [Hflz| Hflz]. {
+        generalize Hflz; intros Haz''.
         apply (rngl_lt_le_incl Hor) in Haz''.
         rewrite (rngl_abs_nonpos_eq Hop Hor) in Hd; [ | easy ].
         rewrite (rngl_abs_nonpos_eq Hop Hor) in H2; [ | easy ].
@@ -369,7 +368,7 @@ destruct b. {
         }
         apply (rngl_le_refl Hor).
       }
-      apply (rngl_nlt_ge_iff Hor) in Haz'.
+      apply (rngl_nlt_ge_iff Hor) in Hflz.
       rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd; [ | easy ].
       rewrite (rngl_sub_diag Hos) in Hd.
       rewrite (rngl_mul_0_l Hos) in Hd.
