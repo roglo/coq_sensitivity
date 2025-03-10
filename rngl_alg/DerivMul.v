@@ -1277,7 +1277,7 @@ Qed.
 Theorem left_or_right_continuous_bounded :
   rngl_has_1 T = true →
   rngl_characteristic T ≠ 1 →
-  ∀ is_left A (da : distance A) le f x₀ u,
+  ∀ is_left {A} (da : distance A) le f x₀ u,
   is_limit_when_tending_to_neighbourhood is_left le da rngl_distance f x₀ u
   → ∃ δ M,
     (0 < δ)%L ∧ (0 < M)%L ∧ ∀ x,
@@ -1334,7 +1334,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 intros ε Hε.
-specialize (left_or_right_continuous_bounded Hon Hc1 is_left A da) as H50.
+specialize (left_or_right_continuous_bounded Hon Hc1 is_left da) as H50.
 specialize (H50 le g x₀ _ Hlgc).
 destruct H50 as (δ & M & Hδ & HM & H50).
 specialize (Hlfc (ε / (2 * M)))%L as H1.
@@ -1532,19 +1532,11 @@ split. {
   cbn in H1 |-*.
   progress unfold rngl_dist in H1.
   progress unfold rngl_dist.
-(*
-  specialize (Hlfc 1%L) as H50.
-  specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
-  specialize (H50 H); clear H.
-  destruct H50 as (δ & Hδ & H50).
-  cbn in H50.
-  progress unfold rngl_dist in H50.
-  assert (H : ∀ x, le x x₀ → (d_dist x x₀ < δ)%L → (rngl_abs (f x) < 1 + rngl_abs (f x₀))%L).
-*)
-Check left_or_right_continuous_bounded.
-...
-  exists η.
-  split; [ easy | ].
+  specialize (left_or_right_continuous_bounded Hon Hc1 true da) as H50.
+  specialize (H50 le f x₀ _ Hlfc).
+  destruct H50 as (δ & M & Hδ & HM & H50).
+  exists (rngl_min δ η).
+  split; [ now apply rngl_min_glb_lt | ].
   intros x Hxx Hdxx.
   rewrite <- (rngl_mul_div Hi1 (f x)⁻¹ (f x₀)); [ | apply Hfz ].
   rewrite <- (rngl_mul_div Hi1 (f x₀)⁻¹ (f x)); [ | apply Hfz ].
