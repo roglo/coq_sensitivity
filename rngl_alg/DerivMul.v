@@ -1306,6 +1306,7 @@ assert (H : (0 < ε / (2 * rngl_abs v + 2))%L). {
   apply (rngl_abs_nonneg Hop Hor).
 }
 specialize (H1 H); clear H.
+(**)
 specialize (Hlgc 1%L) as H50.
 specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
 specialize (H50 H); clear H.
@@ -1489,6 +1490,25 @@ Proof.
 intros Hic Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hlt Hle * Hfz Hf x₀.
+  split. {
+    intros ε Hε; rewrite H1 in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  split. {
+    intros ε Hε; rewrite H1 in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  split. {
+    intros ε Hε; rewrite H1 in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  } {
+    intros ε Hε; rewrite H1 in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+}
 intros * Hlt Hle * Hfz Hf.
 intros x₀.
 destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
@@ -1498,6 +1518,49 @@ split. {
   cbn in H1 |-*.
   progress unfold rngl_dist in H1.
   progress unfold rngl_dist.
+  specialize (Hlfc 1%L) as H50.
+  specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
+  specialize (H50 H); clear H.
+  destruct H50 as (δ & Hδ & H50).
+  cbn in H50.
+  progress unfold rngl_dist in H50.
+  assert (H : ∀ x, le x x₀ → (d_dist x x₀ < δ)%L → (rngl_abs (f x) < 1 + rngl_abs (f x₀))%L).
+Theorem continuous_bounded :
+  rngl_has_1 T = true →
+  ∀ da f x₀,
+  left_continuous_at le da rngl_distance f x₀
+  → ∃ δ M, ∀ x, le x x₀ → (d_dist x x₀ < δ)%L → (rngl_abs (f x) < M)%L.
+Proof.
+intros Hon.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hlfc.
+  exists 0%L, 0%L.
+  intros x Hxx Hdxx.
+  rewrite (H1 (d_dist _ _)) in Hdxx.
+  now apply (rngl_lt_irrefl Hor) in Hdxx.
+}
+intros * Hlfc.
+specialize (Hlfc 1%L).
+specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
+specialize (Hlfc H); clear H.
+destruct Hlfc as (δ & Hδ & H1).
+exists δ, (1 + rngl_abs (f x₀))%L.
+intros x Hxx Hdxx.
+specialize (H1 x Hxx Hdxx).
+cbn in H1.
+progress unfold rngl_dist in H1.
+apply (rngl_lt_sub_lt_add_r Hop Hor).
+eapply (rngl_le_lt_trans Hor); [ | apply H1 ].
+apply (rngl_le_sub_le_add_r Hop Hor).
+eapply (rngl_le_trans Hor); [ | apply (rngl_abs_triangle Hop Hor) ].
+rewrite (rngl_sub_add Hop).
+apply (rngl_le_refl Hor).
+Qed.
+(* à remonter avant left_or_right_continuous_mul_at
+   et l'utiliser dans ce théorème *)
+...
   exists η.
   split; [ easy | ].
   intros x Hxx Hdxx.
