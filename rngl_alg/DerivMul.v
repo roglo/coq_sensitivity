@@ -1476,18 +1476,20 @@ Qed.
 
 (* to be completed
 Theorem derivative_inv :
-(*
   rngl_mul_is_comm T = true →
-*)
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, lt x y → le x y) →
   ∀ da (f : A → T) f',
-  is_derivative le lt da rngl_distance f f'
+  (∀ x, f x ≠ 0%L)
+  → is_derivative le lt da rngl_distance f f'
   → is_derivative le lt da rngl_distance (λ x : A, (f x)⁻¹)
        (λ x, (- f' x / rngl_squ (f x))%L).
 Proof.
-intros Hon Hiv * Hlt Hle * Hf.
+intros Hic Hon Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+intros * Hlt Hle * Hfz Hf.
 intros x₀.
 destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
 split. {
@@ -1499,8 +1501,14 @@ split. {
   exists η.
   split; [ easy | ].
   intros x Hxx Hdxx.
-  do 2 rewrite <- (rngl_div_1_l Hon Hiv).
-Search (_ / _ - _ / _)%L.
+  rewrite <- (rngl_mul_div Hi1 (f x)⁻¹ (f x₀)); [ | apply Hfz ].
+  rewrite <- (rngl_mul_div Hi1 (f x₀)⁻¹ (f x)); [ | apply Hfz ].
+  do 2 rewrite (rngl_mul_comm Hic _⁻¹).
+  do 2 rewrite (rngl_mul_inv_r Hiv).
+  rewrite (rngl_div_div Hos Hon Hiv); [ | apply Hfz | apply Hfz ].
+  rewrite (rngl_div_div Hos Hon Hiv); [ | apply Hfz | apply Hfz ].
+  rewrite (rngl_mul_comm Hic).
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
 ...
 *)
 
