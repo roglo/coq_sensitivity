@@ -1474,4 +1474,34 @@ split. {
 }
 Qed.
 
+(* to be completed
+Theorem derivative_inv :
+(*
+  rngl_mul_is_comm T = true →
+*)
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, lt x y → le x y) →
+  ∀ da (f : A → T) f',
+  is_derivative le lt da rngl_distance f f'
+  → is_derivative le lt da rngl_distance (λ x : A, (f x)⁻¹)
+       (λ x, (- f' x / rngl_squ (f x))%L).
+Proof.
+intros Hon Hiv * Hlt Hle * Hf.
+intros x₀.
+destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
+split. {
+  intros ε Hε.
+  destruct (Hlfc ε Hε) as (η & Hη & H1).
+  cbn in H1 |-*.
+  progress unfold rngl_dist in H1.
+  progress unfold rngl_dist.
+  exists η.
+  split; [ easy | ].
+  intros x Hxx Hdxx.
+  do 2 rewrite <- (rngl_div_1_l Hon Hiv).
+Search (_ / _ - _ / _)%L.
+...
+*)
+
 End a.

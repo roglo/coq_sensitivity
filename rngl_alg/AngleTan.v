@@ -17,7 +17,4 @@ Context {rl : real_like_prop T}.
 
 Definition rngl_tan θ := (rngl_sin θ / rngl_cos θ)%L.
 
-Context {Hop : rngl_has_opp T = true}.
-Context {Hor : rngl_is_ordered T = true}.
-
 End a.
