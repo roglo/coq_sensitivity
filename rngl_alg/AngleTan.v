@@ -487,8 +487,8 @@ rewrite (rngl_leb_sub_0 Hop Hor).
 remember (f x ≤? f x₀)%L as c eqn:Hc.
 symmetry in Hc.
 (**)
-destruct is_left. {
-  destruct c. {
+destruct c. {
+  destruct is_left. {
     apply rngl_leb_le in Hc.
     rewrite (rngl_opp_sub_distr Hop).
     destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
@@ -519,47 +519,6 @@ destruct is_left. {
       now apply (rngl_lt_le_incl Hor).
     }
   } {
-    apply (rngl_leb_gt Hor) in Hc.
-    destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
-      rewrite <- (rngl_opp_sub_distr Hop) in Hb.
-      rewrite (rngl_mul_1_l Hon) in Hb.
-      apply (rngl_lt_opp_r Hop Hor) in Hb.
-      rewrite rngl_add_comm in Hb.
-      apply (rngl_lt_opp_r Hop Hor) in Hb.
-      eapply (rngl_lt_le_trans Hor); [ apply Hb | ].
-      rewrite <- (rngl_mul_opp_l Hop).
-      rewrite <- (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
-      rewrite (rngl_mul_comm Hic).
-      apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
-      eapply (rngl_le_trans Hor). {
-        apply (rngl_lt_le_incl Hor), H2.
-      }
-      rewrite <- (rngl_div_div Hos Hon Hiv); [ | | easy ]. 2: {
-        intros H.
-        now apply (eq_rngl_abs_0 Hop) in H.
-      }
-      apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
-      rewrite (rngl_mul_2_r Hon).
-      apply (rngl_le_add_l Hor).
-      apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
-      now apply (rngl_lt_le_incl Hor).
-    } {
-      apply (rngl_nle_gt_iff Hor) in Hflz.
-      exfalso.
-      apply rngl_nle_gt in Hb.
-      apply Hb; clear Hb.
-      apply (rngl_le_trans Hor _ 0). {
-        rewrite (rngl_mul_1_l Hon).
-        apply (rngl_le_sub_0 Hop Hor).
-        now apply (rngl_lt_le_incl Hor).
-      }
-      apply (rngl_mul_nonneg_nonneg Hos Hor).
-      now apply (rngl_lt_le_incl Hor).
-      apply (dist_nonneg Hon Hop Hiv Hor).
-    }
-  }
-} {
-  destruct c. {
     apply rngl_leb_le in Hc.
     rewrite (rngl_opp_sub_distr Hop).
     destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
@@ -599,6 +558,47 @@ destruct is_left. {
         rewrite (rngl_mul_1_l Hon).
         rewrite (rngl_opp_sub_distr Hop).
         now apply (rngl_le_sub_0 Hop Hor).
+      }
+      apply (rngl_mul_nonneg_nonneg Hos Hor).
+      now apply (rngl_lt_le_incl Hor).
+      apply (dist_nonneg Hon Hop Hiv Hor).
+    }
+  }
+} {
+  destruct is_left. {
+    apply (rngl_leb_gt Hor) in Hc.
+    destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
+      rewrite <- (rngl_opp_sub_distr Hop) in Hb.
+      rewrite (rngl_mul_1_l Hon) in Hb.
+      apply (rngl_lt_opp_r Hop Hor) in Hb.
+      rewrite rngl_add_comm in Hb.
+      apply (rngl_lt_opp_r Hop Hor) in Hb.
+      eapply (rngl_lt_le_trans Hor); [ apply Hb | ].
+      rewrite <- (rngl_mul_opp_l Hop).
+      rewrite <- (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
+      rewrite (rngl_mul_comm Hic).
+      apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+      eapply (rngl_le_trans Hor). {
+        apply (rngl_lt_le_incl Hor), H2.
+      }
+      rewrite <- (rngl_div_div Hos Hon Hiv); [ | | easy ]. 2: {
+        intros H.
+        now apply (eq_rngl_abs_0 Hop) in H.
+      }
+      apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
+      rewrite (rngl_mul_2_r Hon).
+      apply (rngl_le_add_l Hor).
+      apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+      now apply (rngl_lt_le_incl Hor).
+    } {
+      apply (rngl_nle_gt_iff Hor) in Hflz.
+      exfalso.
+      apply rngl_nle_gt in Hb.
+      apply Hb; clear Hb.
+      apply (rngl_le_trans Hor _ 0). {
+        rewrite (rngl_mul_1_l Hon).
+        apply (rngl_le_sub_0 Hop Hor).
+        now apply (rngl_lt_le_incl Hor).
       }
       apply (rngl_mul_nonneg_nonneg Hos Hor).
       now apply (rngl_lt_le_incl Hor).
