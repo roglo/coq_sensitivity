@@ -489,9 +489,9 @@ symmetry in Hc.
 destruct c. {
   apply rngl_leb_le in Hc.
   rewrite (rngl_opp_sub_distr Hop).
+  destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
 (**)
-  destruct is_left. {
-    destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
+    destruct is_left. {
       rewrite (rngl_abs_nonpos_eq Hop Hor) in Hd; [ | easy ].
       apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
       rewrite (rngl_mul_opp_l Hop) in Hd.
@@ -501,25 +501,6 @@ destruct c. {
       apply -> (rngl_lt_sub_0 Hop Hor) in Hd.
       now apply rngl_nle_gt in Hd.
     } {
-      apply (rngl_nle_gt_iff Hor) in Hflz.
-      rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd, H2; cycle 1. {
-        now apply (rngl_lt_le_incl Hor).
-      } {
-        now apply (rngl_lt_le_incl Hor).
-      }
-      apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
-      rewrite <- (rngl_mul_2_l Hon) in Hd.
-      rewrite (rngl_mul_1_l Hon) in Hd.
-      eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
-      rewrite rngl_mul_assoc.
-      rewrite (rngl_mul_comm Hic).
-      apply (rngl_le_div_r Hon Hop Hiv Hor). {
-        now apply (rngl_mul_pos_pos Hos Hor Hii).
-      }
-      now apply (rngl_lt_le_incl Hor).
-    }
-  } {
-    destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
       rewrite <- (rngl_opp_sub_distr Hop) in Hb.
       subst σ.
       rewrite (rngl_mul_opp_l Hop) in Hb.
@@ -544,6 +525,25 @@ destruct c. {
       rewrite (rngl_mul_2_r Hon).
       apply (rngl_le_add_l Hor).
       apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+      now apply (rngl_lt_le_incl Hor).
+    }
+  } {
+    destruct is_left. {
+      apply (rngl_nle_gt_iff Hor) in Hflz.
+      rewrite (rngl_abs_nonneg_eq Hop Hor) in Hd, H2; cycle 1. {
+        now apply (rngl_lt_le_incl Hor).
+      } {
+        now apply (rngl_lt_le_incl Hor).
+      }
+      apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
+      rewrite <- (rngl_mul_2_l Hon) in Hd.
+      rewrite (rngl_mul_1_l Hon) in Hd.
+      eapply (rngl_lt_le_trans Hor); [ apply Hd | ].
+      rewrite rngl_mul_assoc.
+      rewrite (rngl_mul_comm Hic).
+      apply (rngl_le_div_r Hon Hop Hiv Hor). {
+        now apply (rngl_mul_pos_pos Hos Hor Hii).
+      }
       now apply (rngl_lt_le_incl Hor).
     } {
       apply (rngl_nle_gt_iff Hor) in Hflz.
