@@ -486,11 +486,11 @@ progress unfold rngl_abs.
 rewrite (rngl_leb_sub_0 Hop Hor).
 remember (f x ≤? f x₀)%L as c eqn:Hc.
 symmetry in Hc.
-(**)
 destruct c. {
+  apply rngl_leb_le in Hc.
+  rewrite (rngl_opp_sub_distr Hop).
+(**)
   destruct is_left. {
-    apply rngl_leb_le in Hc.
-    rewrite (rngl_opp_sub_distr Hop).
     destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
       rewrite (rngl_abs_nonpos_eq Hop Hor) in Hd; [ | easy ].
       apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
@@ -519,8 +519,6 @@ destruct c. {
       now apply (rngl_lt_le_incl Hor).
     }
   } {
-    apply rngl_leb_le in Hc.
-    rewrite (rngl_opp_sub_distr Hop).
     destruct (rngl_le_dec Hor a 0) as [Hflz| Hflz]. {
       rewrite <- (rngl_opp_sub_distr Hop) in Hb.
       subst σ.
