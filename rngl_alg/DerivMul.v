@@ -1703,18 +1703,21 @@ split; [ now apply left_or_right_continuous_inv | ].
 split; [ now apply left_or_right_continuous_inv | ].
 split. {
   intros ε Hε.
-  specialize (Hlfc ε Hε).
-  destruct Hlfc as (η & Hη & H1).
+  specialize (Hlfr ε Hε).
+  destruct Hlfr as (η & Hη & H1).
   cbn in H1.
   progress unfold rngl_dist in H1.
   exists η.
   split; [ easy | ].
   intros x Hxx Hdxx.
+  specialize (H1 x Hxx Hdxx).
+  rewrite (rngl_mul_1_l Hon) in H1.
   rewrite (rngl_mul_1_l Hon).
   cbn.
   progress unfold rngl_dist.
+  rewrite (rngl_abs_sub_comm Hop Hor).
   rewrite (rngl_div_opp_l Hop Hiv).
-  rewrite (rngl_sub_opp_r Hop).
+  rewrite (rngl_opp_sub_swap Hop).
   (* lemma? *)
   rewrite <- (rngl_mul_div Hi1 (f x)⁻¹ (f x₀)); [ | apply Hfz ].
   rewrite <- (rngl_mul_div Hi1 (f x₀)⁻¹ (f x)); [ | apply Hfz ].
@@ -1724,6 +1727,9 @@ split. {
   rewrite (rngl_div_div Hos Hon Hiv); [ | apply Hfz | apply Hfz ].
   rewrite (rngl_mul_comm Hic).
   rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  do 2 rewrite <- (rngl_div_opp_l Hop Hiv).
+  rewrite (rngl_opp_sub_distr Hop).
+  rewrite (rngl_div_div_swap Hic Hiv).
 ...
   rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
   intros H.
