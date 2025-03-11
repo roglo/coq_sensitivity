@@ -1546,9 +1546,10 @@ split. {
 *)
 Theorem left_or_right_continuous_lower_bounded :
   rngl_has_1 T = true →
-  rngl_characteristic T ≠ 1 →
-  ∀ is_left {A} (da : distance A) le f x₀ u,
-  is_limit_when_tending_to_neighbourhood is_left le da rngl_distance f x₀ u
+  rngl_has_inv T = true →
+  ∀ is_left {A} (da : distance A) le f x₀,
+  is_limit_when_tending_to_neighbourhood is_left le da rngl_distance f x₀
+    (f x₀)
   → (∀ x, f x ≠ 0%L)
   → ∃ δ M,
     (0 < δ)%L ∧ (0 < M)%L ∧ ∀ x,
@@ -1556,14 +1557,40 @@ Theorem left_or_right_continuous_lower_bounded :
     → (d_dist x x₀ < δ)%L
     → (M < rngl_abs (f x))%L.
 Proof.
-intros Hon Hc1.
+intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hlfc Hfz.
+  specialize (Hfz x₀).
+  now rewrite (H1 (f x₀)) in Hfz.
+}
 intros * Hlfc Hfz.
-specialize (Hlfc 1%L).
-specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
-specialize (Hlfc H); clear H.
+specialize (Hlfc (rngl_abs (f x₀) / 2)%L).
+assert (Ha2 : (0 < rngl_abs (f x₀) / 2)%L). {
+  apply (rngl_div_pos Hon Hop Hiv Hor). {
+    apply (rngl_abs_pos Hop Hor).
+    apply Hfz.
+  }
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+specialize (Hlfc Ha2).
 destruct Hlfc as (δ & Hδ & H1).
-exists δ, (1 + rngl_abs u)%L.
+exists δ, (rngl_abs (f x₀) / 2)%L.
+split; [ easy | ].
+split; [ easy | ].
+intros x Hxx Hdxx.
+cbn in H1.
+progress unfold rngl_dist in H1.
+specialize (H1 x Hxx Hdxx).
+...
+apply (rngl_nle_gt_iff Hor).
+intros H.
+apply rngl_nle_gt in H1.
+apply H1; clear H1.
+apply (rngl_le_div_l Hon Hop Hiv Hor). {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
 ... ...
   specialize (left_or_right_continuous_lower_bounded Hon Hc1) as H50.
   specialize (H50 true A da le f x₀ _ Hlfc Hfz).
