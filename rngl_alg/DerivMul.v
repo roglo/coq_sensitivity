@@ -1281,11 +1281,11 @@ Theorem left_or_right_continuous_lower_bounded :
   is_limit_when_tending_to_neighbourhood is_left le da rngl_distance f x₀
     (f x₀)
   → (∀ x, f x ≠ 0%L)
-  → ∃ δ M,
-    (0 < δ)%L ∧ (0 < M)%L ∧ ∀ x,
+  → ∃ δ,
+    (0 < δ)%L ∧ ∀ x,
     (if is_left then le x x₀ else le x₀ x)
     → (d_dist x x₀ < δ)%L
-    → (M < rngl_abs (f x))%L.
+    → (rngl_abs (f x₀) / 2 < rngl_abs (f x))%L.
 Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -1306,8 +1306,7 @@ assert (Ha2 : (0 < rngl_abs (f x₀) / 2)%L). {
 }
 specialize (Hlfc Ha2).
 destruct Hlfc as (δ & Hδ & H1).
-exists δ, (rngl_abs (f x₀) / 2)%L.
-split; [ easy | ].
+exists δ.
 split; [ easy | ].
 intros x Hxx Hdxx.
 (* bizarre que ce soit si compliqué *)
@@ -1595,72 +1594,109 @@ intros * Hlt Hle * Hfz Hf.
 intros x₀.
 destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
 split. {
-  intros ε Hε.
-(*
-  specialize (left_or_right_continuous_bounded Hon Hc1 true da) as H50.
-  specialize (H50 le f x₀ _ Hlfc).
-  destruct H50 as (δ & M & Hδ & HM & H50).
-  specialize (Hlfc (ε * M²)%L) as H1.
-*)
-  specialize (left_or_right_continuous_lower_bounded Hon Hiv) as H50.
-  specialize (H50 true A da le f x₀ Hlfc Hfz).
-  destruct H50 as (δ & M & Hδ & HM & H50).
-  specialize (Hlfc (ε * M²)%L) as H1.
-  assert (H : (0 < ε * M²)%L). {
-    apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
-    (* lemma *)
-    now apply (rngl_mul_pos_pos Hos Hor Hii).
+clear - Hon Hiv Hlfc Hfz Hos Hc1 Hii Hi1 Hic Hed Hio rl.
+progress unfold left_continuous_at in Hlfc.
+progress unfold left_continuous_at.
+Theorem left_or_right_continuous_inv :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_has_eq_dec T = true →
+  ∀ A le (da : distance A) f x₀,
+  (∀ x, f x ≠ 0%L)
+  → is_limit_when_tending_to_neighbourhood true le
+      da rngl_distance f x₀ (f x₀)
+  → is_limit_when_tending_to_neighbourhood true le da rngl_distance
+      (λ x, (f x)⁻¹) x₀ (f x₀)⁻¹.
+Proof.
+intros Hic Hon Hiv Hed.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hfz Hflc.
+  intros ε Hε; rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros * Hfz Hlfc.
+intros ε Hε.
+specialize (left_or_right_continuous_lower_bounded Hon Hiv) as H50.
+specialize (H50 true A da le f x₀ Hlfc Hfz).
+destruct H50 as (δ & Hδ & H50).
+set (M := (rngl_abs (f x₀) / 2)%L) in H50.
+assert (HM : (0 < M)%L). {
+  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   }
-  specialize (H1 H); clear H.
-  destruct H1 as (η & Hη & H1).
-  cbn in H1 |-*.
-  progress unfold rngl_dist in H1.
-  progress unfold rngl_dist.
-  exists (rngl_min δ η).
-  split; [ now apply rngl_min_glb_lt | ].
-  intros x Hxx Hdxx.
-  apply (rngl_min_glb_lt_iff Hor) in Hdxx.
-  destruct Hdxx as (Hdδ, Hdη).
-  rewrite <- (rngl_mul_div Hi1 (f x)⁻¹ (f x₀)); [ | apply Hfz ].
-  rewrite <- (rngl_mul_div Hi1 (f x₀)⁻¹ (f x)); [ | apply Hfz ].
-  do 2 rewrite (rngl_mul_comm Hic _⁻¹).
-  do 2 rewrite (rngl_mul_inv_r Hiv).
-  rewrite (rngl_div_div Hos Hon Hiv); [ | apply Hfz | apply Hfz ].
-  rewrite (rngl_div_div Hos Hon Hiv); [ | apply Hfz | apply Hfz ].
-  rewrite (rngl_mul_comm Hic).
-  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
-  rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
-    intros H.
-    apply (rngl_integral Hos Hio) in H.
-    now destruct H; apply Hfz in H.
-  }
-  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_abs_pos Hop Hor).
-    intros H.
-    apply (rngl_integral Hos Hio) in H.
-    now destruct H; apply Hfz in H.
-  }
-  rewrite (rngl_abs_sub_comm Hop Hor).
-  eapply (rngl_lt_le_trans Hor); [ now apply H1 | ].
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
-    now apply (rngl_lt_le_incl Hor).
-  }
-  progress unfold rngl_squ.
-  rewrite (rngl_abs_mul Hop Hi1 Hor).
-  apply (rngl_mul_le_compat_nonneg Hor). {
-    split; [ now apply (rngl_lt_le_incl Hor) | ].
-    apply (rngl_lt_le_incl Hor).
-    now apply H50.
-  } {
-    split; [ now apply (rngl_lt_le_incl Hor) | ].
-(* soit j'ajoute que le est réflexive,
-   soit je dis que, en fait, M, c'est rngl_abs (f x₀) / 2
-   dans left_or_right_continuous_lower_bounded *)
-...
-    apply (rngl_lt_le_incl Hor).
-    apply H50; [ | now rewrite dist_diag ].
-...
-  }
+  apply (rngl_abs_pos Hop Hor).
+  apply Hfz.
+}
+specialize (Hlfc (ε * M²)%L) as H1.
+assert (H : (0 < ε * M²)%L). {
+  apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
+  (* lemma *)
+  now apply (rngl_mul_pos_pos Hos Hor Hii).
+}
+specialize (H1 H); clear H.
+destruct H1 as (η & Hη & H1).
+cbn in H1 |-*.
+progress unfold rngl_dist in H1.
+progress unfold rngl_dist.
+exists (rngl_min δ η).
+split; [ now apply rngl_min_glb_lt | ].
+intros x Hxx Hdxx.
+apply (rngl_min_glb_lt_iff Hor) in Hdxx.
+destruct Hdxx as (Hdδ, Hdη).
+rewrite <- (rngl_mul_div Hi1 (f x)⁻¹ (f x₀)); [ | apply Hfz ].
+rewrite <- (rngl_mul_div Hi1 (f x₀)⁻¹ (f x)); [ | apply Hfz ].
+do 2 rewrite (rngl_mul_comm Hic _⁻¹).
+do 2 rewrite (rngl_mul_inv_r Hiv).
+rewrite (rngl_div_div Hos Hon Hiv); [ | apply Hfz | apply Hfz ].
+rewrite (rngl_div_div Hos Hon Hiv); [ | apply Hfz | apply Hfz ].
+rewrite (rngl_mul_comm Hic).
+rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
+  intros H.
+  apply (rngl_integral Hos Hio) in H.
+  now destruct H; apply Hfz in H.
+}
+apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+  apply (rngl_abs_pos Hop Hor).
+  intros H.
+  apply (rngl_integral Hos Hio) in H.
+  now destruct H; apply Hfz in H.
+}
+rewrite (rngl_abs_sub_comm Hop Hor).
+eapply (rngl_lt_le_trans Hor); [ now apply H1 | ].
+apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+  now apply (rngl_lt_le_incl Hor).
+}
+progress unfold rngl_squ.
+rewrite (rngl_abs_mul Hop Hi1 Hor).
+apply (rngl_mul_le_compat_nonneg Hor). {
+  split; [ now apply (rngl_lt_le_incl Hor) | ].
+  apply (rngl_lt_le_incl Hor).
+  now apply H50.
+} {
+  split; [ now apply (rngl_lt_le_incl Hor) | ].
+  progress unfold M.
+  apply (rngl_le_div_l Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  rewrite (rngl_mul_2_r Hon).
+  apply (rngl_le_add_l Hor).
+  apply (rngl_abs_nonneg Hop Hor).
+}
+Qed.
+  now apply left_or_right_continuous_inv.
 }
 ...
 *)
