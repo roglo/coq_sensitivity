@@ -1274,7 +1274,7 @@ destruct is_left. {
 }
 Qed.
 
-Theorem left_or_right_continuous_bounded :
+Theorem left_or_right_continuous_upper_bounded :
   rngl_has_1 T = true →
   rngl_characteristic T ≠ 1 →
   ∀ is_left {A} (da : distance A) le f x₀ u,
@@ -1334,8 +1334,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 intros ε Hε.
-specialize (left_or_right_continuous_bounded Hon Hc1 is_left da) as H50.
-specialize (H50 le g x₀ _ Hlgc).
+specialize (left_or_right_continuous_upper_bounded Hon Hc1) as H50.
+specialize (H50 is_left A da le g x₀ _ Hlgc).
 destruct H50 as (δ & M & Hδ & HM & H50).
 specialize (Hlfc (ε / (2 * M)))%L as H1.
 assert (H : (0 < ε / (2 * M))%L). {
@@ -1538,8 +1538,35 @@ intros x₀.
 destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
 split. {
   intros ε Hε.
+(*
   specialize (left_or_right_continuous_bounded Hon Hc1 true da) as H50.
   specialize (H50 le f x₀ _ Hlfc).
+  destruct H50 as (δ & M & Hδ & HM & H50).
+  specialize (Hlfc (ε * M²)%L) as H1.
+*)
+Theorem left_or_right_continuous_lower_bounded :
+  rngl_has_1 T = true →
+  rngl_characteristic T ≠ 1 →
+  ∀ is_left {A} (da : distance A) le f x₀ u,
+  is_limit_when_tending_to_neighbourhood is_left le da rngl_distance f x₀ u
+  → (∀ x, f x ≠ 0%L)
+  → ∃ δ M,
+    (0 < δ)%L ∧ (0 < M)%L ∧ ∀ x,
+    (if is_left then le x x₀ else le x₀ x)
+    → (d_dist x x₀ < δ)%L
+    → (M < rngl_abs (f x))%L.
+Proof.
+intros Hon Hc1.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hlfc Hfz.
+specialize (Hlfc 1%L).
+specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H.
+specialize (Hlfc H); clear H.
+destruct Hlfc as (δ & Hδ & H1).
+exists δ, (1 + rngl_abs u)%L.
+... ...
+  specialize (left_or_right_continuous_lower_bounded Hon Hc1) as H50.
+  specialize (H50 true A da le f x₀ _ Hlfc Hfz).
   destruct H50 as (δ & M & Hδ & HM & H50).
   specialize (Hlfc (ε * M²)%L) as H1.
   assert (H : (0 < ε * M²)%L). {
@@ -1549,9 +1576,6 @@ split. {
   }
   specialize (H1 H); clear H.
   destruct H1 as (η & Hη & H1).
-(*
-  destruct (Hlfc ε Hε) as (η & Hη & H1).
-*)
   cbn in H1 |-*.
   progress unfold rngl_dist in H1.
   progress unfold rngl_dist.
@@ -1581,7 +1605,6 @@ split. {
   }
   rewrite (rngl_abs_sub_comm Hop Hor).
   eapply (rngl_lt_le_trans Hor); [ now apply H1 | ].
-(* ah oui mais non *)
 ...
 *)
 
