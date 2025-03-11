@@ -1663,8 +1663,11 @@ Theorem derivative_inv :
 Proof.
 intros Hic Hon Hiv Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+(*
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+*)
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+(*
 assert (Hio :
   (rngl_is_integral_domain T ||
      rngl_has_inv_and_1_or_quot T &&
@@ -1692,11 +1695,67 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
 }
+*)
 intros * Hlt Hle * Hfz Hf.
 intros x₀.
 destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
 split; [ now apply left_or_right_continuous_inv | ].
 split; [ now apply left_or_right_continuous_inv | ].
+split. {
+  intros ε Hε.
+  specialize (Hlfc ε Hε).
+  destruct Hlfc as (η & Hη & H1).
+  cbn in H1.
+  progress unfold rngl_dist in H1.
+  exists η.
+  split; [ easy | ].
+  intros x Hxx Hdxx.
+  rewrite (rngl_mul_1_l Hon).
+  cbn.
+  progress unfold rngl_dist.
+  rewrite (rngl_div_opp_l Hop Hiv).
+  rewrite (rngl_sub_opp_r Hop).
+  (* lemma? *)
+  rewrite <- (rngl_mul_div Hi1 (f x)⁻¹ (f x₀)); [ | apply Hfz ].
+  rewrite <- (rngl_mul_div Hi1 (f x₀)⁻¹ (f x)); [ | apply Hfz ].
+  do 2 rewrite (rngl_mul_comm Hic _⁻¹).
+  do 2 rewrite (rngl_mul_inv_r Hiv).
+  rewrite (rngl_div_div Hos Hon Hiv); [ | apply Hfz | apply Hfz ].
+  rewrite (rngl_div_div Hos Hon Hiv); [ | apply Hfz | apply Hfz ].
+  rewrite (rngl_mul_comm Hic).
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+...
+  rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
+  intros H.
+  apply (rngl_integral Hos Hio) in H.
+  now destruct H; apply Hfz in H.
+}
+apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+  apply (rngl_abs_pos Hop Hor).
+  intros H.
+  apply (rngl_integral Hos Hio) in H.
+  now destruct H; apply Hfz in H.
+}
+rewrite (rngl_abs_sub_comm Hop Hor).
+eapply (rngl_lt_le_trans Hor); [ now apply H1 | ].
+apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+  now apply (rngl_lt_le_incl Hor).
+}
+progress unfold rngl_squ.
+rewrite (rngl_abs_mul Hop Hi1 Hor).
+apply (rngl_mul_le_compat_nonneg Hor). {
+  split; [ now apply (rngl_lt_le_incl Hor) | ].
+  apply (rngl_lt_le_incl Hor).
+  now apply H50.
+} {
+  split; [ now apply (rngl_lt_le_incl Hor) | ].
+  progress unfold M.
+  apply (rngl_le_div_l Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  rewrite (rngl_mul_2_r Hon).
+  apply (rngl_le_add_l Hor).
+  apply (rngl_abs_nonneg Hop Hor).
+}
 ...
 *)
 
