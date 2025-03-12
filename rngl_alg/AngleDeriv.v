@@ -872,8 +872,8 @@ destruct_ac.
 intros a.
 assert (H :
   ∀ is_left le,
-  is_limit_when_tending_to_neighbourhood is_left le
-    angle_eucl_distance rngl_distance rngl_cos a (rngl_cos a)). {
+  left_or_right_continuous_at is_left le angle_eucl_distance rngl_distance
+    rngl_cos a). {
   intros * ε Hε.
   exists ε.
   split; [ easy | ].
@@ -902,8 +902,8 @@ destruct_ac.
 intros a.
 assert (H :
   ∀ is_left le,
-  is_limit_when_tending_to_neighbourhood is_left le
-    angle_eucl_distance rngl_distance rngl_sin a (rngl_sin a)). {
+  left_or_right_continuous_at is_left le
+    angle_eucl_distance rngl_distance rngl_sin a). {
   intros * ε Hε.
   exists ε.
   split; [ easy | ].
