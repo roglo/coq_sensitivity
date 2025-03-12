@@ -124,8 +124,7 @@ Theorem left_or_right_derivable_continuous_when_derivative_eq_0 :
   → (∀ x y, le x y → lt x y)
   → ∀ da (f : A → T) x,
   left_or_right_derivative_at is_left A lt da rngl_distance f x 0%L
-  → is_limit_when_tending_to_neighbourhood is_left le da
-       rngl_distance f x (f x).
+  → left_or_right_continuous_at is_left A T le da rngl_distance f x.
 Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
