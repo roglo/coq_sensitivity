@@ -1698,7 +1698,10 @@ split; [ now apply left_or_right_continuous_inv | ].
 split; [ now apply left_or_right_continuous_inv | ].
 split. {
   intros ε Hε.
-  set (M := (rngl_abs (f x₀) / 2)%L).
+  specialize (left_or_right_continuous_lower_bounded Hon Hiv) as H1.
+  specialize (H1 true A da le f x₀ Hlfc Hfz).
+  destruct H1 as (δ & Hδ & H1).
+  set (M := (rngl_abs (f x₀) / 2)%L) in H1.
   assert (HM : (0 < M)%L). {
     apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
       apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
@@ -1712,21 +1715,26 @@ split. {
     now apply (rngl_mul_pos_pos Hos Hor Hii).
   }
   specialize (Hlfr (ε * M²)%L Hem).
-  destruct Hlfr as (η & Hη & H1).
-  cbn in H1.
-  progress unfold rngl_dist in H1.
-  specialize (Hlfc (ε * M²)%L Hem) as H2.
-  destruct H2 as (δ & Hδ & H2).
-  cbn in H2 |-*.
+  destruct Hlfr as (η & Hη & H2).
+  cbn in H2.
   progress unfold rngl_dist in H2.
+  specialize (Hlfc (ε * M²)%L Hem) as H3.
+  destruct H3 as (δ' & Hδ' & H3).
+  cbn in H3 |-*.
+  progress unfold rngl_dist in H3.
   progress unfold rngl_dist.
-  exists (rngl_min δ η).
-  split; [ now apply rngl_min_glb_lt | ].
+  exists (rngl_min3 δ δ' η).
+  split. {
+    apply rngl_min_glb_lt; [ | easy ].
+    now apply rngl_min_glb_lt.
+  }
   intros x Hxx Hdxx.
   apply (rngl_min_glb_lt_iff Hor) in Hdxx.
   destruct Hdxx as (Hdδ, Hdη).
-  specialize (H1 x Hxx Hdη).
-  rewrite (rngl_mul_1_l Hon) in H1.
+  apply (rngl_min_glb_lt_iff Hor) in Hdδ.
+  destruct Hdδ as (Hdδ, Hdδ').
+  specialize (H2 x Hxx Hdη).
+  rewrite (rngl_mul_1_l Hon) in H2.
   rewrite (rngl_mul_1_l Hon).
   cbn.
   rewrite (rngl_abs_sub_comm Hop Hor).
@@ -1764,11 +1772,24 @@ split. {
       now destruct H; apply Hfz in H.
     }
     eapply (rngl_le_trans Hor). {
-      apply (rngl_lt_le_incl Hor), H1.
+      apply (rngl_lt_le_incl Hor), H2.
     }
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
     rewrite (rngl_abs_mul Hop Hi1 Hor).
     progress unfold rngl_squ.
+    apply (rngl_mul_le_compat_nonneg Hor). {
+      split; [ now apply (rngl_lt_le_incl Hor) | ].
+      progress unfold M.
+      apply (rngl_le_div_l Hon Hop Hiv Hor).
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      rewrite (rngl_mul_2_r Hon).
+      apply (rngl_le_add_l Hor).
+      apply (rngl_abs_nonneg Hop Hor).
+    } {
+      split; [ now apply (rngl_lt_le_incl Hor) | ].
+      apply (rngl_lt_le_incl Hor), H1; [ now apply Hle | easy ].
+    }
+  }
 ...
 }
 apply (rngl_lt_div_l Hon Hop Hiv Hor). {
