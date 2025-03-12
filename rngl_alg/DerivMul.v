@@ -1662,9 +1662,7 @@ Theorem derivative_inv :
 Proof.
 intros Hic Hon Hiv Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-(*
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-*)
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert (Hio :
   (rngl_is_integral_domain T ||
@@ -1674,7 +1672,6 @@ assert (Hio :
   rewrite Hi1; cbn.
   now apply rngl_has_eq_dec_or_is_ordered_r.
 }
-(*
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hlt Hle * Hfz Hf x₀.
@@ -1694,7 +1691,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
 }
-*)
 intros * Hlt Hle * Hfz Hf.
 intros x₀.
 destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
@@ -1706,14 +1702,34 @@ split. {
   destruct Hlfr as (η & Hη & H1).
   cbn in H1.
   progress unfold rngl_dist in H1.
-  exists η.
-  split; [ easy | ].
+  set (M := (rngl_abs (f x₀) / 2)%L).
+  assert (HM : (0 < M)%L). {
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_abs_pos Hop Hor).
+    apply Hfz.
+  }
+  specialize (Hlfc (ε * M²)%L) as H2.
+  assert (H : (0 < ε * M²)%L). {
+    apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
+    (* lemma *)
+    now apply (rngl_mul_pos_pos Hos Hor Hii).
+  }
+  specialize (H2 H); clear H.
+  destruct H2 as (δ & Hδ & H2).
+  cbn in H2 |-*.
+  progress unfold rngl_dist in H2.
+  progress unfold rngl_dist.
+  exists (rngl_min δ η).
+  split; [ now apply rngl_min_glb_lt | ].
   intros x Hxx Hdxx.
-  specialize (H1 x Hxx Hdxx).
+  apply (rngl_min_glb_lt_iff Hor) in Hdxx.
+  destruct Hdxx as (Hdδ, Hdη).
+  specialize (H1 x Hxx Hdη).
   rewrite (rngl_mul_1_l Hon) in H1.
   rewrite (rngl_mul_1_l Hon).
   cbn.
-  progress unfold rngl_dist.
   rewrite (rngl_abs_sub_comm Hop Hor).
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite (rngl_opp_sub_swap Hop).
@@ -1740,28 +1756,6 @@ split. {
     apply (rngl_integral Hos Hio) in H.
     now destruct H; apply Hfz in H.
   }
-(* à voir, ceci :
-set (M := (rngl_abs (f x₀) / 2)%L) in H50.
-assert (HM : (0 < M)%L). {
-  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-  }
-  apply (rngl_abs_pos Hop Hor).
-  apply Hfz.
-}
-specialize (Hlfc (ε * M²)%L) as H1.
-assert (H : (0 < ε * M²)%L). {
-  apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
-  (* lemma *)
-  now apply (rngl_mul_pos_pos Hos Hor Hii).
-}
-specialize (H1 H); clear H.
-destruct H1 as (η & Hη & H1).
-cbn in H1 |-*.
-progress unfold rngl_dist in H1.
-progress unfold rngl_dist.
-exists (rngl_min δ η).
-*)
 ...
   rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
   intros H.
