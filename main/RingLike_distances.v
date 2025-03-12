@@ -84,11 +84,11 @@ Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B}
 
 (* continuity *)
 
-Definition left_continuous_at {A B} le da db (f : A → B) a :=
-  is_limit_when_tending_to_neighbourhood true le da db f a (f a).
+Definition left_or_right_continuous_at (is_left : bool) A B le da db (f : A → B) a :=
+  is_limit_when_tending_to_neighbourhood is_left le da db f a (f a).
 
-Definition right_continuous_at {A B} le da db (f : A → B) a :=
-  is_limit_when_tending_to_neighbourhood false le da db f a (f a).
+Definition left_continuous_at {A B} := left_or_right_continuous_at true A B.
+Definition right_continuous_at {A B} := left_or_right_continuous_at false A B.
 
 Definition is_continuous {A B} lt da db (f : A → B) :=
   ∀ a, left_continuous_at lt da db f a ∧ right_continuous_at lt da db f a.
