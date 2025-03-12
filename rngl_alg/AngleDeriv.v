@@ -929,7 +929,7 @@ Qed.
 
 Theorem rngl_cos_left_or_right_derivative_at_0 :
   ∀ is_left,
-  left_or_right_derivative_at is_left (angle T) angle_lt_for_deriv
+  left_or_right_derivative_at is_left angle_lt_for_deriv
     angle_eucl_distance rngl_distance
     rngl_cos 0%A ((rngl_opp ° rngl_sin) 0%A).
 Proof.
@@ -991,7 +991,7 @@ Qed.
 
 Theorem rngl_cos_left_or_right_derivative_at_straight :
   ∀ is_left,
-  left_or_right_derivative_at is_left (angle T) angle_lt_for_deriv
+  left_or_right_derivative_at is_left angle_lt_for_deriv
     angle_eucl_distance rngl_distance
     rngl_cos angle_straight ((rngl_opp ° rngl_sin) angle_straight).
 Proof.
@@ -1072,7 +1072,7 @@ Qed.
 
 Theorem rngl_sin_left_or_right_derivative_at_0 :
   ∀ is_left,
-  left_or_right_derivative_at is_left (angle T) angle_lt_for_deriv
+  left_or_right_derivative_at is_left angle_lt_for_deriv
     angle_eucl_distance rngl_distance rngl_sin 0%A (rngl_cos 0).
 Proof.
 destruct_ac.
@@ -1137,7 +1137,7 @@ Qed.
 
 Theorem rngl_sin_left_or_right_derivative_at_straight :
   ∀ is_left,
-  left_or_right_derivative_at is_left (angle T) angle_lt_for_deriv
+  left_or_right_derivative_at is_left angle_lt_for_deriv
     angle_eucl_distance rngl_distance rngl_sin angle_straight
     (rngl_cos angle_straight).
 Proof.
@@ -1225,7 +1225,7 @@ Qed.
 
 Theorem rngl_cos_left_or_right_derivative :
   ∀ is_left θ₀,
-  left_or_right_derivative_at is_left (angle T) angle_lt_for_deriv
+  left_or_right_derivative_at is_left angle_lt_for_deriv
     angle_eucl_distance rngl_distance rngl_cos θ₀
     ((rngl_opp ° rngl_sin) θ₀).
 Proof.
@@ -1364,7 +1364,7 @@ Qed.
 
 Theorem rngl_sin_left_or_right_derivative :
   ∀ is_left θ₀,
-  left_or_right_derivative_at is_left (angle T) angle_lt_for_deriv
+  left_or_right_derivative_at is_left angle_lt_for_deriv
     angle_eucl_distance rngl_distance rngl_sin θ₀ (rngl_cos θ₀).
 Proof.
 destruct_ac.

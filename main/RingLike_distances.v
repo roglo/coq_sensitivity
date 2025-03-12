@@ -84,25 +84,28 @@ Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B}
 
 (* continuity *)
 
-Definition left_or_right_continuous_at (is_left : bool) A B le da db (f : A → B) a :=
+Definition left_or_right_continuous_at (is_left : bool) {A B} le
+    da db (f : A → B) a :=
   is_limit_when_tending_to_neighbourhood is_left le da db f a (f a).
 
-Definition left_continuous_at {A B} := left_or_right_continuous_at true A B.
-Definition right_continuous_at {A B} := left_or_right_continuous_at false A B.
+Definition left_continuous_at {A B} :=
+  @left_or_right_continuous_at true A B.
+Definition right_continuous_at {A B} :=
+  @left_or_right_continuous_at false A B.
 
 Definition is_continuous {A B} lt da db (f : A → B) :=
   ∀ a, left_continuous_at lt da db f a ∧ right_continuous_at lt da db f a.
 
 (* derivability *)
 
-Definition left_or_right_derivative_at (is_left : bool) A lt
+Definition left_or_right_derivative_at (is_left : bool) {A} lt
     (da : distance A) (db : distance T) f a a' :=
   let σ := (if is_left then 1 else -1)%L in
   let g x := (σ * (f a - f x) / d_dist x a)%L in
   is_limit_when_tending_to_neighbourhood is_left lt da db g a a'.
 
-Definition left_derivative_at {A} := left_or_right_derivative_at true A.
-Definition right_derivative_at {A} := left_or_right_derivative_at false A.
+Definition left_derivative_at {A} := @left_or_right_derivative_at true A.
+Definition right_derivative_at {A} := @left_or_right_derivative_at false A.
 
 Definition is_derivative {A} le lt (da : distance A) (db : distance T) f f' :=
   ∀ a,

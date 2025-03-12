@@ -123,8 +123,8 @@ Theorem left_or_right_derivable_continuous_when_derivative_eq_0 :
   (∀ x, ¬ (lt x x))
   → (∀ x y, le x y → lt x y)
   → ∀ da (f : A → T) x,
-  left_or_right_derivative_at is_left A lt da rngl_distance f x 0%L
-  → left_or_right_continuous_at is_left A T le da rngl_distance f x.
+  left_or_right_derivative_at is_left lt da rngl_distance f x 0%L
+  → left_or_right_continuous_at is_left le da rngl_distance f x.
 Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -203,9 +203,8 @@ Theorem left_or_right_derivable_continuous :
   rngl_has_inv T = true →
   ∀ is_left A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, le x y → lt x y) →
   ∀ da (f : A → T) x a,
-  left_or_right_derivative_at is_left A lt da rngl_distance f x a
-  → is_limit_when_tending_to_neighbourhood is_left le
-      da rngl_distance f x (f x).
+  left_or_right_derivative_at is_left lt da rngl_distance f x a
+  → left_or_right_continuous_at is_left le da rngl_distance f x.
 Proof.
 intros Hic Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -655,9 +654,9 @@ Theorem left_or_right_derivative_mul_at :
   rngl_has_inv T = true →
   ∀ is_left A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f g : A → T) u v x₀,
-  left_or_right_derivative_at is_left A lt da rngl_distance f x₀ u
-  → left_or_right_derivative_at is_left A lt da rngl_distance g x₀ v
-  -> left_or_right_derivative_at is_left A lt da rngl_distance
+  left_or_right_derivative_at is_left lt da rngl_distance f x₀ u
+  → left_or_right_derivative_at is_left lt da rngl_distance g x₀ v
+  -> left_or_right_derivative_at is_left lt da rngl_distance
        (λ x : A, (f x * g x)%L) x₀ (f x₀ * v + u * g x₀)%L.
 Proof.
 intros Hic Hon Hiv.
@@ -718,8 +717,8 @@ destruct is_left. {
   progress unfold rngl_dist in H10.
   set (K := (rngl_abs v + 1)%L).
   generalize Hf; intros H11.
-  apply (left_or_right_derivable_continuous Hic Hon Hiv) with (le := lt) in H11;
-    cycle 1. {
+  apply (left_or_right_derivable_continuous Hic Hon Hiv) with (le := lt)
+    in H11; cycle 1. {
     apply Hlti.
   } {
     easy.
@@ -1277,8 +1276,7 @@ Theorem left_or_right_continuous_lower_bounded :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ is_left {A} (da : distance A) le f x₀,
-  is_limit_when_tending_to_neighbourhood is_left le da rngl_distance f x₀
-    (f x₀)
+  left_or_right_continuous_at is_left le da rngl_distance f x₀
   → (∀ x, f x ≠ 0%L)
   → ∃ δ,
     (0 < δ)%L ∧ ∀ x,
@@ -1334,6 +1332,9 @@ Theorem left_or_right_continuous_upper_bounded :
   rngl_has_1 T = true →
   rngl_characteristic T ≠ 1 →
   ∀ is_left {A} (da : distance A) le f x₀ u,
+(*
+  left_or_right_continuous_at is_left le da rngl_distance f x₀
+*)
   is_limit_when_tending_to_neighbourhood is_left le da rngl_distance f x₀ u
   → ∃ δ M,
     (0 < δ)%L ∧ (0 < M)%L ∧ ∀ x,
@@ -1523,10 +1524,9 @@ Theorem left_or_right_continuous_inv :
   rngl_has_eq_dec T = true →
   ∀ is_left A le (da : distance A) f x₀,
   (∀ x, f x ≠ 0%L)
-  → is_limit_when_tending_to_neighbourhood is_left le
-      da rngl_distance f x₀ (f x₀)
-  → is_limit_when_tending_to_neighbourhood is_left le da rngl_distance
-      (λ x, (f x)⁻¹) x₀ (f x₀)⁻¹.
+  → left_or_right_continuous_at is_left le da rngl_distance f x₀
+  → left_or_right_continuous_at is_left le da rngl_distance
+      (λ x, (f x)⁻¹) x₀.
 Proof.
 intros Hic Hon Hiv Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
