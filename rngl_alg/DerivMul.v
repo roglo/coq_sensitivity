@@ -1698,10 +1698,6 @@ split; [ now apply left_or_right_continuous_inv | ].
 split; [ now apply left_or_right_continuous_inv | ].
 split. {
   intros ε Hε.
-  specialize (Hlfr ε Hε).
-  destruct Hlfr as (η & Hη & H1).
-  cbn in H1.
-  progress unfold rngl_dist in H1.
   set (M := (rngl_abs (f x₀) / 2)%L).
   assert (HM : (0 < M)%L). {
     apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
@@ -1710,13 +1706,16 @@ split. {
     apply (rngl_abs_pos Hop Hor).
     apply Hfz.
   }
-  specialize (Hlfc (ε * M²)%L) as H2.
-  assert (H : (0 < ε * M²)%L). {
+  assert (Hem : (0 < ε * M²)%L). {
     apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
     (* lemma *)
     now apply (rngl_mul_pos_pos Hos Hor Hii).
   }
-  specialize (H2 H); clear H.
+  specialize (Hlfr (ε * M²)%L Hem).
+  destruct Hlfr as (η & Hη & H1).
+  cbn in H1.
+  progress unfold rngl_dist in H1.
+  specialize (Hlfc (ε * M²)%L Hem) as H2.
   destruct H2 as (δ & Hδ & H2).
   cbn in H2 |-*.
   progress unfold rngl_dist in H2.
@@ -1756,11 +1755,21 @@ split. {
     apply (rngl_integral Hos Hio) in H.
     now destruct H; apply Hfz in H.
   }
+  eapply (rngl_le_lt_trans Hor). {
+    apply (rngl_add_le_mono_r Hop Hor).
+    apply -> (rngl_le_div_l Hon Hop Hiv Hor). 2: {
+      apply (rngl_abs_pos Hop Hor).
+      intros H.
+      apply (rngl_integral Hos Hio) in H.
+      now destruct H; apply Hfz in H.
+    }
+    eapply (rngl_le_trans Hor). {
+      apply (rngl_lt_le_incl Hor), H1.
+    }
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+    rewrite (rngl_abs_mul Hop Hi1 Hor).
+    progress unfold rngl_squ.
 ...
-  rewrite (rngl_abs_div Hon Hop Hiv Hed Hor). 2: {
-  intros H.
-  apply (rngl_integral Hos Hio) in H.
-  now destruct H; apply Hfz in H.
 }
 apply (rngl_lt_div_l Hon Hop Hiv Hor). {
   apply (rngl_abs_pos Hop Hor).
