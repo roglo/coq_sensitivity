@@ -1728,6 +1728,8 @@ split. {
   destruct H4 as (δ'' & Hδ'' & H4).
   cbn in H4 |-*.
   progress unfold rngl_dist in H4.
+clear H4.
+(* cf plus bas pour une bonne borne pour H4 *)
   progress unfold rngl_dist.
   exists (rngl_min3 η δ (rngl_min δ' δ'')).
   split. {
@@ -1809,6 +1811,35 @@ split. {
   rewrite <- (rngl_mul_sub_distr_r Hop).
   rewrite rngl_mul_assoc.
   rewrite <- (rngl_mul_mul_swap Hic).
+  rewrite <- (rngl_div_1_l Hon Hiv) at 2.
+  rewrite <- (rngl_div_1_l Hon Hiv (f x)).
+  rewrite <- (rngl_div_mul Hon Hiv (1 / f x₀) (f x)); [ | apply Hfz ].
+  rewrite <- (rngl_div_mul Hon Hiv (1 / f x) (f x₀)); [ | apply Hfz ].
+  rewrite (rngl_mul_comm Hic _ (f x₀)).
+  rewrite (rngl_mul_comm Hic _ (f x)).
+  rewrite (rngl_div_div_swap Hic Hiv).
+  rewrite <- (rngl_mul_sub_distr_r Hop).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_mul_swap Hic).
+  rewrite (rngl_div_1_l Hon Hiv).
+  rewrite <- (rngl_mul_inv_r Hiv _ (f x)).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hic _ (f x)⁻¹).
+  rewrite <- (rngl_mul_assoc (f' x₀)).
+  rewrite fold_rngl_squ.
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_abs_mul Hop Hi1 Hor).
+  rewrite (rngl_abs_sub_comm Hop Hor).
+(* (f x)⁻¹ < M⁻¹
+   f' x₀ ≤ itself
+   ((f x₀)⁻¹)² ≤ itself
+   f x - f x₀ < ε * M² / 2
+tout le bordel ≤ ε * f' x₀ * ((f x₀)⁻¹)² * M / 2
+il faut que H4 soit borné non pas par ε * M² / 2
+mais par 1 / (M⁻¹ * f' x₀ * ((f x₀)⁻¹)²
+*)
+...
+Search (_⁻¹ - _⁻¹)%L.
 ...
 }
 apply (rngl_lt_div_l Hon Hop Hiv Hor). {

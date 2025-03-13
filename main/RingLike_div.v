@@ -769,4 +769,5 @@ End a.
 
 Arguments rngl_div_add_distr_r {T ro rp} Hiv (a b c)%_L.
 Arguments rngl_div_diag {T ro rp} Hon Hiq a%_L.
+Arguments rngl_div_mul {T ro rp} Hon Hiv (a b)%_L.
 Arguments rngl_mul_div {T ro rp} Hiv (a b)%_L.
