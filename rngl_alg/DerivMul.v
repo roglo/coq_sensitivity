@@ -1797,6 +1797,14 @@ split. {
       apply (rngl_lt_le_incl Hor), H1; [ now apply Hle | easy ].
     }
   }
+  do 2 rewrite <- (rngl_mul_inv_r Hiv (f' x₀)).
+  rewrite <- (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_inv_mul_distr Hon Hos Hiv); [ | apply Hfz | apply Hfz ].
+  rewrite <- (rngl_squ_inv Hon Hos Hiv); [ | apply Hfz ].
+  progress unfold rngl_squ.
+  rewrite <- (rngl_mul_sub_distr_r Hop).
+  rewrite rngl_mul_assoc.
+  rewrite <- (rngl_mul_mul_swap Hic).
 ...
 }
 apply (rngl_lt_div_l Hon Hop Hiv Hor). {
