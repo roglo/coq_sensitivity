@@ -1684,6 +1684,8 @@ destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
 split; [ now apply left_or_right_continuous_inv | ].
 split; [ now apply left_or_right_continuous_inv | ].
 split. {
+(* to be completed if the solution with rngl_abs (f' x₀) + 1 does
+   not work
   destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hf'z| Hf'z]. {
     specialize left_or_right_derivable_continuous_when_derivative_eq_0 as H1.
     specialize (H1 Hon Hiv true A lt Hlt da f).
@@ -1695,6 +1697,7 @@ split. {
       now specialize (Hfz x₀).
     }
 ...
+*)
   intros ε Hε.
   specialize (left_or_right_continuous_lower_bounded Hon Hiv) as H1.
   specialize (H1 true A da le f x₀ Hlfc Hfz).
@@ -1722,12 +1725,21 @@ split. {
   destruct Hlfr as (η & Hη & H3).
   cbn in H3.
   progress unfold rngl_dist in H3.
-  specialize (Hlfc _ Hem) as H4.
+  specialize (Hlfc (M / (rngl_abs (f' x₀) * ((f x₀)⁻¹)² + 1))%L) as H4.
+  assert (H : (0 < M / (rngl_abs (f' x₀) * ((f x₀)⁻¹)² + 1))%L). {
+    apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+    apply (rngl_add_nonneg_pos Hor). 2: {
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_mul_nonneg_nonneg Hos Hor). {
+      apply (rngl_abs_nonneg Hop Hor).
+    }
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  specialize (H4 H); clear H.
   destruct H4 as (δ'' & Hδ'' & H4).
   cbn in H4 |-*.
   progress unfold rngl_dist in H4.
-clear H4.
-(* cf plus bas pour une bonne borne pour H4 *)
   progress unfold rngl_dist.
   exists (rngl_min3 η δ (rngl_min δ' δ'')).
   split. {
@@ -1828,16 +1840,6 @@ clear H4.
   rewrite rngl_mul_assoc.
   rewrite (rngl_abs_mul Hop Hi1 Hor).
   rewrite (rngl_abs_sub_comm Hop Hor).
-(* (f x)⁻¹ < M⁻¹
-   f' x₀ ≤ itself
-   ((f x₀)⁻¹)² ≤ itself
-   f x - f x₀ < ε * M² / 2
-tout le bordel ≤ ε * f' x₀ * ((f x₀)⁻¹)² * M / 2
-il faut que H4 soit borné non pas par ε * M² / 2
-mais par M / (f' x₀ * ((f x₀)⁻¹)²
-*)
-...
-Search (_⁻¹ - _⁻¹)%L.
 ...
 }
 apply (rngl_lt_div_l Hon Hop Hiv Hor). {
