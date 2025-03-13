@@ -1709,16 +1709,19 @@ split. {
     apply (rngl_abs_pos Hop Hor).
     apply Hfz.
   }
-  assert (Hem : (0 < ε * M²)%L). {
+  assert (Hem : (0 < ε * M² / 2)%L). {
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
     apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
     (* lemma *)
     now apply (rngl_mul_pos_pos Hos Hor Hii).
   }
-  specialize (Hlfr (ε * M²)%L Hem).
+  specialize (Hlfr _ Hem).
   destruct Hlfr as (η & Hη & H2).
   cbn in H2.
   progress unfold rngl_dist in H2.
-  specialize (Hlfc (ε * M²)%L Hem) as H3.
+  specialize (Hlfc _ Hem) as H3.
   destruct H3 as (δ' & Hδ' & H3).
   cbn in H3 |-*.
   progress unfold rngl_dist in H3.
@@ -1774,7 +1777,11 @@ split. {
     eapply (rngl_le_trans Hor). {
       apply (rngl_lt_le_incl Hor), H2.
     }
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+    rewrite <- (rngl_div_mul_mul_div Hic Hiv).
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+      apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
     rewrite (rngl_abs_mul Hop Hi1 Hor).
     progress unfold rngl_squ.
     apply (rngl_mul_le_compat_nonneg Hor). {
