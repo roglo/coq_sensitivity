@@ -119,17 +119,16 @@ Definition rngl_distance :=
 Theorem left_or_right_derivable_continuous_when_derivative_eq_0 :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ is_left A (le : A → A → Prop) lt,
+  ∀ is_left A lt,
   (∀ x, ¬ (lt x x))
-  → (∀ x y, le x y → lt x y)
   → ∀ da (f : A → T) x,
   left_or_right_derivative_at is_left lt da rngl_distance f x 0%L
-  → left_or_right_continuous_at is_left le da rngl_distance f x.
+  → left_or_right_continuous_at is_left lt da rngl_distance f x.
 Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Hlti Hlet * Hd.
+intros * Hlti * Hd.
 rename x into x₀.
 intros ε Hε.
 specialize (Hd √ε).
@@ -138,10 +137,7 @@ specialize (Hd Hsε).
 destruct Hd as (η & Hη & Hd).
 exists (rngl_min √ε η).
 split; [ now apply rngl_min_glb_lt | ].
-intros x Hle Hdxx.
-assert (Hlt : if is_left then lt x x₀ else lt x₀ x). {
-  now destruct is_left; apply Hlet.
-}
+intros x Hlt Hdxx.
 specialize (Hd x Hlt).
 apply (rngl_min_glb_lt_iff Hor) in Hdxx.
 destruct Hdxx as (Hdε, Hdη).
@@ -201,10 +197,10 @@ Theorem left_or_right_derivable_continuous :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ is_left A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, le x y → lt x y) →
+  ∀ is_left A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f : A → T) x a,
   left_or_right_derivative_at is_left lt da rngl_distance f x a
-  → left_or_right_continuous_at is_left le da rngl_distance f x.
+  → left_or_right_continuous_at is_left lt da rngl_distance f x.
 Proof.
 intros Hic Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -213,18 +209,18 @@ specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hlti Hlet * Hd ε Hε.
+  intros * Hlti * Hd ε Hε.
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
 specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H2z.
-intros * Hlti Hlet * Hd.
+intros * Hlti * Hd.
 rename x into x₀.
 destruct (rngl_eq_dec Heo a 0) as [Hfz| Hfz]. {
   subst a.
   specialize left_or_right_derivable_continuous_when_derivative_eq_0 as H1.
-  now apply (H1 Hon Hiv _ _ le lt Hlti Hlet da f).
+  now apply (H1 Hon Hiv _ _ lt Hlti da f).
 }
 progress unfold left_or_right_derivative_at in Hd.
 progress unfold is_limit_when_tending_to_neighbourhood in Hd.
@@ -240,11 +236,7 @@ split. {
   apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
   now apply (rngl_abs_pos Hop Hor).
 }
-intros x Hle Hdxx.
-assert (Hlt : if is_left then lt x x₀ else lt x₀ x). {
-  now destruct is_left; apply Hlet.
-}
-move Hlt before Hle.
+intros x Hlt Hdxx.
 specialize (Hd x Hlt).
 apply (rngl_min_glb_lt_iff Hor) in Hdxx.
 destruct Hdxx as (H1, H2).
@@ -717,11 +709,8 @@ destruct is_left. {
   progress unfold rngl_dist in H10.
   set (K := (rngl_abs v + 1)%L).
   generalize Hf; intros H11.
-  apply (left_or_right_derivable_continuous Hic Hon Hiv) with (le := lt)
-    in H11; cycle 1. {
+  apply (left_or_right_derivable_continuous Hic Hon Hiv) in H11; cycle 1. {
     apply Hlti.
-  } {
-    easy.
   }
   specialize (H11 (ε / (3 * K))%L).
   assert (H : (0 < ε / (3 * K))%L). {
@@ -1008,11 +997,8 @@ destruct is_left. {
   progress unfold rngl_dist in H10.
   set (K := (rngl_abs v + 1)%L).
   generalize Hf; intros H11.
-  apply (left_or_right_derivable_continuous Hic Hon Hiv) with (le := lt) in H11;
-    cycle 1. {
+  apply (left_or_right_derivable_continuous Hic Hon Hiv) in H11; cycle 1. {
     apply Hlti.
-  } {
-    easy.
   }
   specialize (H11 (ε / (3 * K))%L).
   assert (H : (0 < ε / (3 * K))%L). {
@@ -1663,6 +1649,7 @@ Proof.
 intros Hic Hon Hiv Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert (Hio :
   (rngl_is_integral_domain T ||
@@ -1697,6 +1684,17 @@ destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
 split; [ now apply left_or_right_continuous_inv | ].
 split; [ now apply left_or_right_continuous_inv | ].
 split. {
+  destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hf'z| Hf'z]. {
+    specialize left_or_right_derivable_continuous_when_derivative_eq_0 as H1.
+    specialize (H1 Hon Hiv true A lt Hlt da f).
+    rewrite Hf'z.
+    rewrite (rngl_opp_0 Hop).
+    rewrite (rngl_div_0_l Hos Hi1). 2: {
+      intros H.
+      apply (eq_rngl_squ_0 Hos Hio) in H.
+      now specialize (Hfz x₀).
+    }
+...
   intros ε Hε.
   specialize (left_or_right_continuous_lower_bounded Hon Hiv) as H1.
   specialize (H1 true A da le f x₀ Hlfc Hfz).
@@ -1836,7 +1834,7 @@ clear H4.
    f x - f x₀ < ε * M² / 2
 tout le bordel ≤ ε * f' x₀ * ((f x₀)⁻¹)² * M / 2
 il faut que H4 soit borné non pas par ε * M² / 2
-mais par 1 / (M⁻¹ * f' x₀ * ((f x₀)⁻¹)²
+mais par M / (f' x₀ * ((f x₀)⁻¹)²
 *)
 ...
 Search (_⁻¹ - _⁻¹)%L.
