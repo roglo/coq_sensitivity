@@ -1342,6 +1342,7 @@ Qed.
 End a.
 
 Arguments rngl_div_le_mono_pos_r {T ro rp} Hon Hop Hiv Hor Hii (a b c)%_L.
+Arguments rngl_middle_sub_r {T ro rp} Hon Hop Hiv Hor (a b)%_L.
 Arguments rngl_mul_le_mono_pos_l {T ro rp} Hop Hor Hii (a b c)%_L.
 Arguments rngl_mul_le_mono_pos_r {T ro rp} Hop Hor Hii (a b c)%_L.
 Arguments rngl_pow_div_pow {T ro rp} Hic Hon Hos Hiv a%_L (m n)%_nat.
