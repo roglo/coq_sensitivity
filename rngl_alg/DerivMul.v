@@ -1698,7 +1698,7 @@ destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
 split; [ now apply left_or_right_continuous_inv | ].
 split; [ now apply left_or_right_continuous_inv | ].
 split. {
-Theorem left_or_right_derivative_inv :
+Theorem left_derivative_inv :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -1706,9 +1706,9 @@ Theorem left_or_right_derivative_inv :
   ∀ A lt le (da : distance A) f f' x₀,
   (∀ x y, lt x y → le x y)
   → (∀ x, f x ≠ 0%L)
-  → left_continuous_at le da rngl_distance f x₀
-  → left_derivative_at lt da rngl_distance f x₀ (f' x₀)
-  → left_derivative_at lt da rngl_distance (λ x : A, (f x)⁻¹) x₀
+  → left_or_right_continuous_at true le da rngl_distance f x₀
+  → left_or_right_derivative_at true lt da rngl_distance f x₀ (f' x₀)
+  → left_or_right_derivative_at true lt da rngl_distance (λ x : A, (f x)⁻¹) x₀
       (- f' x₀ / (f x₀)²)%L.
 Proof.
 intros Hic Hon Hiv Hed.
