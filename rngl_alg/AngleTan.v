@@ -6,7 +6,9 @@ Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import Trigo.RealLike.
 Require Import Trigo.Angle.
+(*
 Require Import Trigo.AngleTypeIsComplete.
+*)
 Require Import DerivMul.
 Require Import AngleDeriv.
 
@@ -45,7 +47,9 @@ rngl_distance is transparent
 Expands to: Constant Trigo.AngleTypeIsComplete.rngl_distance
 Check @rngl_distance.
 ...
+*)
 
+(* to be completed
 Theorem rngl_tan_derivative :
   is_derivative angle_le angle_lt_for_deriv angle_eucl_distance rngl_distance
     rngl_tan (λ θ, (1 - (rngl_cos θ)²)%L).
