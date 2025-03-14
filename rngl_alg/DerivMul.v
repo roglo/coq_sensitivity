@@ -113,8 +113,7 @@ split; intros H1 ε Hε. {
 }
 Qed.
 
-Definition rngl_distance :=
-  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
+Definition rngl_distance' := rngl_distance Hop Hor.
 
 Theorem left_or_right_derivable_continuous_when_derivative_eq_0 :
   rngl_has_1 T = true →
@@ -122,8 +121,8 @@ Theorem left_or_right_derivable_continuous_when_derivative_eq_0 :
   ∀ is_left A lt,
   (∀ x, ¬ (lt x x))
   → ∀ da (f : A → T) x,
-  left_or_right_derivative_at is_left lt da rngl_distance f x 0%L
-  → left_or_right_continuous_at is_left lt da rngl_distance f x.
+  left_or_right_derivative_at is_left lt da rngl_distance' f x 0%L
+  → left_or_right_continuous_at is_left lt da rngl_distance' f x.
 Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -199,8 +198,8 @@ Theorem left_or_right_derivable_continuous :
   rngl_has_inv T = true →
   ∀ is_left A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f : A → T) x a,
-  left_or_right_derivative_at is_left lt da rngl_distance f x a
-  → left_or_right_continuous_at is_left lt da rngl_distance f x.
+  left_or_right_derivative_at is_left lt da rngl_distance' f x a
+  → left_or_right_continuous_at is_left lt da rngl_distance' f x.
 Proof.
 intros Hic Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -646,9 +645,9 @@ Theorem left_or_right_derivative_mul_at :
   rngl_has_inv T = true →
   ∀ is_left A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f g : A → T) u v x₀,
-  left_or_right_derivative_at is_left lt da rngl_distance f x₀ u
-  → left_or_right_derivative_at is_left lt da rngl_distance g x₀ v
-  -> left_or_right_derivative_at is_left lt da rngl_distance
+  left_or_right_derivative_at is_left lt da rngl_distance' f x₀ u
+  → left_or_right_derivative_at is_left lt da rngl_distance' g x₀ v
+  -> left_or_right_derivative_at is_left lt da rngl_distance'
        (λ x : A, (f x * g x)%L) x₀ (f x₀ * v + u * g x₀)%L.
 Proof.
 intros Hic Hon Hiv.
@@ -1262,7 +1261,7 @@ Theorem left_or_right_continuous_lower_bounded :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ is_left {A} (da : distance A) le f x₀,
-  left_or_right_continuous_at is_left le da rngl_distance f x₀
+  left_or_right_continuous_at is_left le da rngl_distance' f x₀
   → (∀ x, f x ≠ 0%L)
   → ∃ δ,
     (0 < δ)%L ∧ ∀ x,
@@ -1321,7 +1320,7 @@ Theorem left_or_right_continuous_upper_bounded :
 (*
   left_or_right_continuous_at is_left le da rngl_distance f x₀
 *)
-  is_limit_when_tending_to_neighbourhood is_left le da rngl_distance f x₀ u
+  is_limit_when_tending_to_neighbourhood is_left le da rngl_distance' f x₀ u
   → ∃ δ M,
     (0 < δ)%L ∧ (0 < M)%L ∧ ∀ x,
     (if is_left then le x x₀ else le x₀ x)
@@ -1359,9 +1358,9 @@ Theorem left_or_right_continuous_mul_at :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ is_left A le da (f g : A → T) x₀ u v,
-  is_limit_when_tending_to_neighbourhood is_left le da rngl_distance f x₀ u
-  → is_limit_when_tending_to_neighbourhood is_left le da rngl_distance g x₀ v
-  → is_limit_when_tending_to_neighbourhood is_left le da rngl_distance
+  is_limit_when_tending_to_neighbourhood is_left le da rngl_distance' f x₀ u
+  → is_limit_when_tending_to_neighbourhood is_left le da rngl_distance' g x₀ v
+  → is_limit_when_tending_to_neighbourhood is_left le da rngl_distance'
        (λ x : A, (f x * g x)%L) x₀ (u * v)%L.
 Proof.
 intros Hic Hon Hiv * Hlfc Hlgc.
@@ -1510,8 +1509,8 @@ Theorem left_or_right_continuous_inv :
   rngl_has_eq_dec T = true →
   ∀ is_left A le (da : distance A) f x₀,
   (∀ x, f x ≠ 0%L)
-  → left_or_right_continuous_at is_left le da rngl_distance f x₀
-  → left_or_right_continuous_at is_left le da rngl_distance
+  → left_or_right_continuous_at is_left le da rngl_distance' f x₀
+  → left_or_right_continuous_at is_left le da rngl_distance'
       (λ x, (f x)⁻¹) x₀.
 Proof.
 intros Hic Hon Hiv Hed.
@@ -1624,9 +1623,9 @@ Theorem left_or_right_derivative_inv :
   ∀ {A} le lt is_left (da : distance A) f f' x₀,
   (∀ x y, lt x y → le x y)
   → (∀ x, f x ≠ 0%L)
-  → left_or_right_continuous_at is_left le da rngl_distance f x₀
-  → left_or_right_derivative_at is_left lt da rngl_distance f x₀ (f' x₀)
-  → left_or_right_derivative_at is_left lt da rngl_distance (λ x : A, (f x)⁻¹)
+  → left_or_right_continuous_at is_left le da rngl_distance' f x₀
+  → left_or_right_derivative_at is_left lt da rngl_distance' f x₀ (f' x₀)
+  → left_or_right_derivative_at is_left lt da rngl_distance' (λ x : A, (f x)⁻¹)
       x₀ (- f' x₀ / (f x₀)²)%L.
 Proof.
 intros Hic Hon Hiv Hed.
@@ -1904,9 +1903,9 @@ Theorem derivative_mul :
   rngl_has_inv T = true →
   ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, lt x y → le x y) →
   ∀ da (f g : A → T) f' g',
-  is_derivative le lt da rngl_distance f f'
-  → is_derivative le lt da rngl_distance g g'
-  → is_derivative le lt da rngl_distance (λ x : A, (f x * g x)%L)
+  is_derivative le lt da rngl_distance' f f'
+  → is_derivative le lt da rngl_distance' g g'
+  → is_derivative le lt da rngl_distance' (λ x : A, (f x * g x)%L)
        (λ x, f x * g' x + f' x * g x)%L.
 Proof.
 intros Hic Hon Hiv * Hlt Hle * Hf Hg.
@@ -1935,8 +1934,8 @@ Theorem derivative_inv :
   ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, lt x y → le x y) →
   ∀ da (f : A → T) f',
   (∀ x, f x ≠ 0%L)
-  → is_derivative le lt da rngl_distance f f'
-  → is_derivative le lt da rngl_distance (λ x : A, (f x)⁻¹)
+  → is_derivative le lt da rngl_distance' f f'
+  → is_derivative le lt da rngl_distance' (λ x : A, (f x)⁻¹)
        (λ x, (- f' x / rngl_squ (f x))%L).
 Proof.
 intros Hic Hon Hiv Hed.

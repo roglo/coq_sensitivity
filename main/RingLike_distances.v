@@ -60,6 +60,9 @@ split. {
 }
 Qed.
 
+Definition rngl_distance Hop Hor :=
+  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist Hop Hor |}.
+
 (* limits *)
 
 Definition is_Cauchy_sequence {A} (dist : distance A) (u : nat → A) :=

@@ -75,8 +75,7 @@ rewrite <- angle_eucl_dist_move_0_r.
 apply (rngl_le_refl Hor).
 Qed.
 
-Definition rngl_distance :=
-  {| d_dist := rngl_dist; d_prop := rngl_dist_is_dist ac_op ac_or |}.
+Definition rngl_distance' := rngl_distance ac_op ac_or.
 
 Definition angle_eucl_distance :=
   {| d_dist := angle_eucl_dist; d_prop := angle_eucl_dist_is_dist |}.
@@ -84,7 +83,7 @@ Definition angle_eucl_distance :=
 Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
   ∀ θ,
   is_Cauchy_sequence angle_eucl_distance θ
-  → is_Cauchy_sequence rngl_distance (λ i, rngl_cos (θ i)).
+  → is_Cauchy_sequence rngl_distance' (λ i, rngl_cos (θ i)).
 Proof.
 destruct_ac.
 intros * Hcs.
@@ -115,7 +114,7 @@ Qed.
 Theorem rngl_is_Cauchy_angle_is_Cauchy_sin :
   ∀ θ,
   is_Cauchy_sequence angle_eucl_distance θ
-  → is_Cauchy_sequence rngl_distance (λ i, rngl_sin (θ i)).
+  → is_Cauchy_sequence rngl_distance' (λ i, rngl_sin (θ i)).
 Proof.
 destruct_ac.
 intros * Hcs.
@@ -150,7 +149,7 @@ Theorem rngl_dist_to_limit_bounded :
   rngl_is_ordered T = true →
   rngl_characteristic T ≠ 1 →
   ∀ u l,
-  is_limit_when_tending_to_inf rngl_distance u l
+  is_limit_when_tending_to_inf rngl_distance' u l
   → ∃ N, ∀ n, N ≤ n → (rngl_dist (u n) l < 1)%L.
 Proof.
 intros Hon Hop Hor Hc1.
@@ -167,7 +166,7 @@ Theorem rngl_converging_seq_bounded :
   rngl_is_ordered T = true →
   rngl_characteristic T ≠ 1 →
   ∀ u l,
-  is_limit_when_tending_to_inf rngl_distance u l
+  is_limit_when_tending_to_inf rngl_distance' u l
   → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n) < rngl_abs l + 1)%L.
 Proof.
 intros Hon Hop Hor Hc1.
@@ -192,7 +191,7 @@ Theorem rngl_converging_seq_add_limit_bounded :
   rngl_is_ordered T = true →
   rngl_characteristic T ≠ 1 →
   ∀ u k,
-  is_limit_when_tending_to_inf rngl_distance u k
+  is_limit_when_tending_to_inf rngl_distance' u k
   → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n + k) < 2 * rngl_abs k + 1)%L.
 Proof.
 intros Hon Hop Hor Hc1.
@@ -218,8 +217,8 @@ Theorem rngl_limit_limit_squ :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ u l,
-  is_limit_when_tending_to_inf rngl_distance u l
-  → is_limit_when_tending_to_inf rngl_distance (λ i, (u i)²)%L l²%L.
+  is_limit_when_tending_to_inf rngl_distance' u l
+  → is_limit_when_tending_to_inf rngl_distance' (λ i, (u i)²)%L l²%L.
 Proof.
 intros Hon Hop Hic Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -312,9 +311,9 @@ Qed.
 
 Theorem limit_cos_cos_sin_sin :
   ∀ u θ,
-  is_limit_when_tending_to_inf rngl_distance
+  is_limit_when_tending_to_inf rngl_distance'
     (λ i, rngl_cos (u i)) (rngl_cos θ)
-  → is_limit_when_tending_to_inf rngl_distance
+  → is_limit_when_tending_to_inf rngl_distance'
       (λ i, rngl_sin (u i)) (rngl_sin θ)
   → is_limit_when_tending_to_inf angle_eucl_distance u θ.
 Proof.
@@ -397,7 +396,7 @@ Theorem limit_const :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ c lim,
-  is_limit_when_tending_to_inf rngl_distance (λ _, c) lim
+  is_limit_when_tending_to_inf rngl_distance' (λ _, c) lim
   → lim = c.
 Proof.
 intros Hop Hor * Hlim.
@@ -435,7 +434,7 @@ apply (rngl_le_antisymm Hor _ _ Hlc Hcl).
 Qed.
 
 Theorem rngl_is_complete_angle_is_complete :
-  is_complete T rngl_distance
+  is_complete T rngl_distance'
   → is_complete (angle T) angle_eucl_distance.
 Proof.
 destruct_ac.
@@ -466,7 +465,7 @@ specialize (H2 H); clear H.
 destruct H2 as (s, Hs).
 move s before c.
 generalize Hc; intros Hci.
-specialize (rngl_limit_interv Hon Hop Hiv Hor rngl_distance) as H1.
+specialize (rngl_limit_interv Hon Hop Hiv Hor rngl_distance') as H1.
 specialize (rngl_dist_left_mono Hop Hor) as H.
 specialize (H1 H); clear H.
 specialize (rngl_dist_right_mono Hop Hor) as H.
@@ -484,7 +483,7 @@ assert (Hcs1 : (c² + s² = 1)%L). {
   generalize Hs; intros H2.
   apply (rngl_limit_limit_squ Hon Hop Hic Hiv Hor) in H1.
   apply (rngl_limit_limit_squ Hon Hop Hic Hiv Hor) in H2.
-  specialize (limit_add Hon Hop Hiv Hor rngl_distance) as H.
+  specialize (limit_add Hon Hop Hiv Hor rngl_distance') as H.
   specialize (H (rngl_dist_add_add_le Hop Hor)).
   specialize (H _ _ _ _ H1 H2).
   cbn in H.

@@ -87,7 +87,7 @@ Theorem gc_has_nth_root :
   rngl_is_ordered T = true →
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
-  is_complete T rngl_distance →
+  is_complete T rngl_distance' →
   ∀ z : GComplex T, ∀ n, n ≠ 0 → ∃ z', (z' ^ n)%C = z.
 Proof.
 intros Hic Hop Hor Hcz Har Hco.
