@@ -1621,7 +1621,7 @@ Theorem left_or_right_derivative_inv :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
-  ∀ is_left A lt le (da : distance A) f f' x₀,
+  ∀ {A} le lt is_left (da : distance A) f f' x₀,
   (∀ x y, lt x y → le x y)
   → (∀ x, f x ≠ 0%L)
   → left_or_right_continuous_at is_left le da rngl_distance f x₀
@@ -1946,9 +1946,9 @@ destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
 split; [ now apply left_or_right_continuous_inv | ].
 split; [ now apply left_or_right_continuous_inv | ].
 split. {
-  now apply (left_or_right_derivative_inv Hic Hon Hiv Hed) with (le := le).
+  now apply (left_or_right_derivative_inv Hic Hon Hiv Hed le).
 } {
-  now apply (left_or_right_derivative_inv Hic Hon Hiv Hed) with (le := le).
+  now apply (left_or_right_derivative_inv Hic Hon Hiv Hed le).
 }
 Qed.
 
