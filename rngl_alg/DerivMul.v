@@ -1602,6 +1602,20 @@ apply (rngl_mul_le_compat_nonneg Hor). {
 }
 Qed.
 
+Theorem rngl_abs_inv :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_has_eq_dec T = true →
+  ∀ a, a ≠ 0%L → (rngl_abs a⁻¹ = (rngl_abs a)⁻¹)%L.
+Proof.
+intros Hon Hiv Hed.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Haz.
+do 2 rewrite <- (rngl_div_1_l Hon Hiv).
+rewrite (rngl_abs_div Hon Hop Hiv Hed Hor); [ | easy ].
+now rewrite (rngl_abs_1 Hon Hos Hor).
+Qed.
+
 (* *)
 
 Theorem derivative_mul :
@@ -1902,6 +1916,47 @@ split. {
   apply (rngl_div_lt_mono_pos_r Hon Hop Hiv Hor Hii). {
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   }
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    apply (rngl_add_nonneg_pos Hor). {
+      apply (rngl_mul_nonneg_nonneg Hos Hor).
+      apply (rngl_abs_nonneg Hop Hor).
+      apply (rngl_squ_nonneg Hos Hor).
+    }
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  }
+  rewrite (rngl_mul_1_l Hon).
+  do 2 rewrite (rngl_abs_mul Hop Hi1 Hor).
+  rewrite (rngl_abs_nonneg_eq Hop Hor _²). 2: {
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  rewrite (rngl_mul_comm Hic).
+  rewrite (rngl_mul_comm Hic (rngl_abs (f x)⁻¹)).
+  do 2 rewrite <- rngl_mul_assoc.
+  assert (H : (rngl_abs (f x)⁻¹ * M < 1)%L). {
+    rewrite (rngl_abs_inv Hon Hiv Hed); [ | apply Hfz ].
+    rewrite (rngl_mul_comm Hic).
+    rewrite (rngl_mul_inv_r Hiv).
+    apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+      apply (rngl_abs_pos Hop Hor), Hfz.
+    }
+    rewrite (rngl_mul_1_l Hon).
+    apply H1; [ now apply Hle | easy ].
+  }
+  eapply (rngl_lt_le_trans Hor). {
+    rewrite rngl_mul_assoc.
+    apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ | apply H ].
+    apply (rngl_mul_pos_pos Hos Hor Hii). {
+      now apply (rngl_abs_pos Hop Hor).
+    }
+    apply (rngl_lt_iff Hor).
+    split; [ apply (rngl_squ_nonneg Hos Hor) | ].
+    symmetry.
+    intros H'.
+    apply (eq_rngl_squ_0 Hos Hio) in H'.
+    apply (rngl_inv_neq_0 Hon Hos Hiv) in H'; [ easy | ].
+    apply Hfz.
+  }
+  rewrite (rngl_mul_1_r Hon).
 ...
 *)
 
