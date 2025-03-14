@@ -1957,6 +1957,10 @@ split. {
     apply Hfz.
   }
   rewrite (rngl_mul_1_r Hon).
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  rewrite (rngl_sub_diag Hos).
+  apply (rngl_0_le_1 Hon Hos Hor).
+}
 ...
 *)
 
