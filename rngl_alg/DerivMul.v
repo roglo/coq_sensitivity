@@ -1743,9 +1743,6 @@ assert (HM : (0 < M)%L). {
   apply (rngl_abs_pos Hop Hor).
   apply Hfz.
 }
-specialize (left_or_right_continuous_upper_bounded Hon Hc1) as H2.
-specialize (H2 true A da le f x₀ (f x₀) Hlfc).
-destruct H2 as (δ' & N & Hδ' & HN & H2).
 assert (Hem : (0 < ε * M² / 2)%L). {
   apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
@@ -1777,21 +1774,20 @@ assert (H : (0 < ε')%L). {
   apply (rngl_squ_nonneg Hos Hor).
 }
 specialize (H4 H); clear H.
-destruct H4 as (δ'' & Hδ'' & H4).
+destruct H4 as (δ' & Hδ' & H4).
 cbn in H4 |-*.
 progress unfold rngl_dist in H4.
 progress unfold rngl_dist.
-exists (rngl_min3 η δ (rngl_min δ' δ'')).
+exists (rngl_min3 η δ δ').
 split. {
-  now apply rngl_min_glb_lt; apply rngl_min_glb_lt.
+  apply rngl_min_glb_lt; [ | easy ].
+  now apply rngl_min_glb_lt.
 }
 intros x Hxx Hdxx.
 apply (rngl_min_glb_lt_iff Hor) in Hdxx.
 destruct Hdxx as (Hdη, Hdδ').
 apply (rngl_min_glb_lt_iff Hor) in Hdη.
 destruct Hdη as (Hdη, Hdδ).
-apply (rngl_min_glb_lt_iff Hor) in Hdδ'.
-destruct Hdδ' as (Hdδ', Hdδ'').
 specialize (H3 x Hxx Hdη).
 rewrite (rngl_mul_1_l Hon) in H3.
 rewrite (rngl_mul_1_l Hon).
