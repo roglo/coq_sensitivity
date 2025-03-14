@@ -1885,23 +1885,23 @@ split. {
   rewrite <- (rngl_mul_inv_r Hiv _ 2).
   apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
   rewrite <- (rngl_div_1_l Hon Hiv 2).
-  rewrite <- (rngl_div_div Hos Hon Hiv). 2: {
+  rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
     intros H.
-...
-    apply (rngl_integral Hos Hio) in H.
-      destruct H as [H| H]; [ | easy ].
-      now apply (rngl_inv_neq_0 Hon Hos Hiv) in H.
-...
-  rewrite (rngl_abs_mul Hop Hi1 Hor).
-  rewrite rngl_mul_assoc.
-  do 3 rewrite <- (rngl_div_mul_mul_div Hic Hiv).
-...
-  rewrite <- (rngl_mul_div_assoc Hiv).
-2: {
-  rewrite rngl_abs_div.
-Search (_ * _ / _)%L.
-
-  rewrite (rngl_mul_div_assoc Hiv).
+    apply (rngl_eq_add_0 Hor) in H; cycle 1. {
+      apply (rngl_mul_nonneg_nonneg Hos Hor).
+      apply (rngl_abs_nonneg Hop Hor).
+      apply (rngl_squ_nonneg Hos Hor).
+    } {
+      apply (rngl_0_le_1 Hon Hos Hor).
+    }
+    destruct H as (_, H).
+    now apply (rngl_1_eq_0_iff Hon Hos) in H.
+  } {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_div_lt_mono_pos_r Hon Hop Hiv Hor Hii). {
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
 ...
 *)
 
