@@ -1631,10 +1631,9 @@ Theorem left_or_right_derivative_inv :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
-  ∀ {A} le lt is_left (da : distance A) f f' x₀,
-  (∀ x y, lt x y → le x y)
-  → f x₀ ≠ 0%L
-  → left_or_right_continuous_at is_left le da rngl_distance' f x₀
+  ∀ {A} lt is_left (da : distance A) f f' x₀,
+  f x₀ ≠ 0%L
+  → left_or_right_continuous_at is_left lt da rngl_distance' f x₀
   → left_or_right_derivative_at is_left lt da rngl_distance' f x₀ (f' x₀)
   → left_or_right_derivative_at is_left lt da rngl_distance' (λ x : A, (f x)⁻¹)
       x₀ (- f' x₀ / (f x₀)²)%L.
@@ -1654,14 +1653,14 @@ assert (Hio :
 }
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hle Hfzz Hlfc Hlfr ε Hε.
+  intros * Hfzz Hlfc Hlfr ε Hε.
   rewrite H1 in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-intros * Hle Hfzz Hlfc Hlfr.
+intros * Hfzz Hlfc Hlfr.
 intros ε Hε.
 specialize (left_or_right_continuous_lower_bounded Hon Hiv) as H1.
-specialize (H1 is_left A da le f x₀ Hlfc Hfzz).
+specialize (H1 is_left A da lt f x₀ Hlfc Hfzz).
 destruct H1 as (δ & Hδ & H1).
 set (M := (rngl_abs (f x₀) / 2)%L) in H1.
 assert (HM : (0 < M)%L). {
@@ -1720,11 +1719,13 @@ move δ before ε.
 move η before ε.
 move HM before Hδ.
 move Hη before Hδ.
+(*
 assert (Hxxl : if is_left then le x x₀ else le x₀ x). {
   now destruct is_left; apply Hle.
 }
+*)
 assert (Hfz : f x ≠ 0%L). {
-  specialize (H1 x Hxxl Hdδ).
+  specialize (H1 x Hxx Hdδ).
   intros H; rewrite H in H1.
   rewrite (rngl_abs_0 Hop) in H1.
   apply (rngl_lt_le_incl Hor) in H1.
@@ -1788,8 +1789,7 @@ eapply (rngl_le_lt_trans Hor). {
     apply (rngl_abs_nonneg Hop Hor).
   } {
     split; [ now apply (rngl_lt_le_incl Hor) | ].
-    apply (rngl_lt_le_incl Hor), H1; [ | easy ].
-    now destruct is_left; apply Hle.
+    now apply (rngl_lt_le_incl Hor), H1.
   }
 }
 apply (rngl_lt_add_lt_sub_l Hop Hor).
@@ -1835,8 +1835,7 @@ destruct (rngl_eq_dec Heo (f' x₀) 0) as [Hf'z| Hf'z]. {
 }
 eapply (rngl_le_lt_trans Hor). {
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii). 2: {
-    apply (rngl_lt_le_incl Hor), H4; [ | easy ].
-    now destruct is_left; apply Hle.
+    now apply (rngl_lt_le_incl Hor), H4.
   }
   apply (rngl_abs_pos Hop Hor).
   intros H.
@@ -1898,7 +1897,7 @@ assert (H : (rngl_abs (f x)⁻¹ * M < 1)%L). {
     apply (rngl_abs_pos Hop Hor), Hfz.
   }
   rewrite (rngl_mul_1_l Hon).
-  apply H1; [ now destruct is_left; apply Hle | easy ].
+  now apply H1.
 }
 eapply (rngl_lt_le_trans Hor). {
   rewrite rngl_mul_assoc.
@@ -1925,14 +1924,14 @@ Theorem derivative_mul :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, lt x y → le x y) →
+  ∀ A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f g : A → T) f' g',
-  is_derivative le lt da rngl_distance' f f'
-  → is_derivative le lt da rngl_distance' g g'
-  → is_derivative le lt da rngl_distance' (λ x : A, (f x * g x)%L)
+  is_derivative lt da rngl_distance' f f'
+  → is_derivative lt da rngl_distance' g g'
+  → is_derivative lt da rngl_distance' (λ x : A, (f x * g x)%L)
        (λ x, f x * g' x + f' x * g x)%L.
 Proof.
-intros Hic Hon Hiv * Hlt Hle * Hf Hg.
+intros Hic Hon Hiv * Hlt * Hf Hg.
 progress unfold is_derivative in Hf.
 progress unfold is_derivative in Hg.
 progress unfold is_derivative.
@@ -1955,22 +1954,36 @@ Theorem derivative_inv :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
-  ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, lt x y → le x y) →
+  ∀ A lt, (∀ x, ¬ (lt x x)) →
   ∀ da (f : A → T) f' x₀,
   f x₀ ≠ 0%L
-  → is_derivative_at le lt da rngl_distance' f f' x₀
-  → is_derivative_at le lt da rngl_distance' (λ x : A, (f x)⁻¹)
+  → is_derivative_at lt da rngl_distance' f f' x₀
+  → is_derivative_at lt da rngl_distance' (λ x : A, (f x)⁻¹)
        (λ x, (- f' x / rngl_squ (f x))%L) x₀.
 Proof.
 intros Hic Hon Hiv Hed.
-intros * Hlt Hle * Hfz Hf.
+intros * Hlt * Hfz Hf.
 destruct Hf as (Hlfc & Hrfc & Hlfr & Hrfr).
 split; [ now apply (left_or_right_continuous_inv Hic Hon Hiv Hed) | ].
 split; [ now apply (left_or_right_continuous_inv Hic Hon Hiv Hed) | ].
 split. {
-  now apply (left_or_right_derivative_inv Hic Hon Hiv Hed le).
+  apply (left_or_right_derivative_inv Hic Hon Hiv Hed lt); [ easy | | easy ].
+  intros ε Hε.
+  destruct (Hlfc ε Hε) as (η & Hη & H1).
+  exists η.
+  split; [ easy | ].
+  intros x Hx Hd.
+  apply H1; [ | easy ].
+  now left.
 } {
-  now apply (left_or_right_derivative_inv Hic Hon Hiv Hed le).
+  apply (left_or_right_derivative_inv Hic Hon Hiv Hed lt); [ easy | | easy ].
+  intros ε Hε.
+  destruct (Hrfc ε Hε) as (η & Hη & H1).
+  exists η.
+  split; [ easy | ].
+  intros x Hx Hd.
+  apply H1; [ | easy ].
+  now left.
 }
 Qed.
 

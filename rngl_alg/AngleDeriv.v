@@ -1501,24 +1501,72 @@ Qed.
 (* *)
 
 Theorem rngl_cos_derivative :
-  is_derivative angle_le angle_lt_for_deriv angle_eucl_distance rngl_distance
+  is_derivative angle_lt_for_deriv angle_eucl_distance rngl_distance
     rngl_cos (rngl_opp ° rngl_sin)%L.
 Proof.
 intros θ₀.
-split; [ apply rngl_cos_is_continuous | ].
-split; [ apply rngl_cos_is_continuous | ].
+split. {
+  specialize (rngl_cos_is_continuous θ₀) as (H1, _).
+  intros ε Hε.
+  specialize (H1 ε Hε).
+  destruct H1 as (η & Hη & H1).
+  exists η.
+  split; [ easy | ].
+  intros θ Hθ Hd.
+  apply H1; [ | easy ].
+  destruct Hθ as [(Hθ, _) | Hθ]; [ now apply angle_lt_le_incl | ].
+  subst θ.
+  apply angle_le_refl.
+}
+split. {
+  specialize (rngl_cos_is_continuous θ₀) as (_, H1).
+  intros ε Hε.
+  specialize (H1 ε Hε).
+  destruct H1 as (η & Hη & H1).
+  exists η.
+  split; [ easy | ].
+  intros θ Hθ Hd.
+  apply H1; [ | easy ].
+  destruct Hθ as [(Hθ, _) | Hθ]; [ now apply angle_lt_le_incl | ].
+  subst θ.
+  apply angle_le_refl.
+}
 split.
 apply rngl_cos_left_or_right_derivative.
 apply rngl_cos_left_or_right_derivative.
 Qed.
 
 Theorem rngl_sin_derivative :
-  is_derivative angle_le angle_lt_for_deriv angle_eucl_distance rngl_distance
+  is_derivative angle_lt_for_deriv angle_eucl_distance rngl_distance
     rngl_sin rngl_cos.
 Proof.
 intros θ₀.
-split; [ apply rngl_sin_is_continuous | ].
-split; [ apply rngl_sin_is_continuous | ].
+split. {
+  specialize (rngl_sin_is_continuous θ₀) as (H1, _).
+  intros ε Hε.
+  specialize (H1 ε Hε).
+  destruct H1 as (η & Hη & H1).
+  exists η.
+  split; [ easy | ].
+  intros θ Hθ Hd.
+  apply H1; [ | easy ].
+  destruct Hθ as [(Hθ, _) | Hθ]; [ now apply angle_lt_le_incl | ].
+  subst θ.
+  apply angle_le_refl.
+}
+split. {
+  specialize (rngl_sin_is_continuous θ₀) as (_, H1).
+  intros ε Hε.
+  specialize (H1 ε Hε).
+  destruct H1 as (η & Hη & H1).
+  exists η.
+  split; [ easy | ].
+  intros θ Hθ Hd.
+  apply H1; [ | easy ].
+  destruct Hθ as [(Hθ, _) | Hθ]; [ now apply angle_lt_le_incl | ].
+  subst θ.
+  apply angle_le_refl.
+}
 split.
 apply rngl_sin_left_or_right_derivative.
 apply rngl_sin_left_or_right_derivative.

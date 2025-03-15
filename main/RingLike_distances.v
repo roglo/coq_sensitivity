@@ -110,15 +110,16 @@ Definition left_or_right_derivative_at (is_left : bool) {A} lt
 Definition left_derivative_at {A} := @left_or_right_derivative_at true A.
 Definition right_derivative_at {A} := @left_or_right_derivative_at false A.
 
-Definition is_derivative_at {A} le lt
+Definition is_derivative_at {A} lt
   (da : distance A) (db : distance T) f f' a :=
+  let le x y := lt x y ∨ x = y in
   left_continuous_at le da db f a ∧
   right_continuous_at le da db f a ∧
   left_derivative_at lt da db f a (f' a) ∧
   right_derivative_at lt da db f a (f' a).
 
-Definition is_derivative {A} le lt (da : distance A) (db : distance T) f f' :=
-  ∀ a, is_derivative_at le lt da db f f' a.
+Definition is_derivative {A} lt (da : distance A) (db : distance T) f f' :=
+  ∀ a, is_derivative_at lt da db f f' a.
 
 (* properties of distances and limits *)
 
