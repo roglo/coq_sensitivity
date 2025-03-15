@@ -32,7 +32,8 @@ Theorem rngl_tan_derivative :
     rngl_distance rngl_tan (λ θ, (1 - (rngl_cos θ)²)%L) x₀.
 Proof.
 destruct_ac.
-intros * Hcz.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+intros * Hczz.
 progress unfold rngl_tan.
 specialize (@derivative_inv _ _ _ Hop Hor Hic Hon Hiv Heq) as H1.
 specialize (H1 _ angle_lt_for_deriv).
@@ -49,13 +50,26 @@ specialize (H2 H); clear H.
 specialize (H1 angle_eucl_distance).
 specialize (H2 angle_eucl_distance).
 specialize (H1 rngl_cos (rngl_opp ° rngl_sin)).
-specialize (H2 rngl_sin (rngl_inv ° rngl_cos)).
+specialize (H2 rngl_sin).
+set (g := λ θ, if rngl_eq_dec Heo (rngl_cos θ) 0 then 1%L else rngl_cos θ).
+specialize (H2 (rngl_inv ° g)).
 specialize (H2 rngl_cos (λ x, (- (rngl_opp ° rngl_sin) x / (rngl_cos x)²)%L)).
 progress unfold "°" in H2 at 1.
 specialize (H2 rngl_sin_derivative).
-...
+(*
 specialize (H1 x₀ Hcz).
 specialize (H1 (rngl_cos_derivative x₀)).
+*)
+assert (H :
+  is_derivative angle_lt_for_deriv angle_eucl_distance
+    (@rngl_distance' T ro rp Hop Hor) (λ x : angle T, (g x)⁻¹)
+    (λ x : angle T, (- (rngl_opp ° rngl_sin) x / (rngl_cos x)²)%L)). {
+  intros θ.
+  destruct (rngl_eq_dec Heo (rngl_cos θ) 0) as [Hcz| Hcz]. {
+    split. {
+      progress unfold g.
+(* oui, mais non, ça, ça va pas, ça *)
+...
 specialize (H2 H1).
 progress unfold "°" in H2 at 1.
 ...
