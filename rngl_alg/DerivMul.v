@@ -1950,23 +1950,21 @@ split. {
 }
 Qed.
 
-(* try to not having to add ∀ x, f x ≠ 0%L *)
 Theorem derivative_inv :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
   ∀ A le lt, (∀ x, ¬ (lt x x)) → (∀ x y, lt x y → le x y) →
-  ∀ da (f : A → T) f',
-  (∀ x, f x ≠ 0%L)
-  → is_derivative le lt da rngl_distance' f f'
-  → is_derivative le lt da rngl_distance' (λ x : A, (f x)⁻¹)
-       (λ x, (- f' x / rngl_squ (f x))%L).
+  ∀ da (f : A → T) f' x₀,
+  f x₀ ≠ 0%L
+  → is_derivative_at le lt da rngl_distance' f f' x₀
+  → is_derivative_at le lt da rngl_distance' (λ x : A, (f x)⁻¹)
+       (λ x, (- f' x / rngl_squ (f x))%L) x₀.
 Proof.
 intros Hic Hon Hiv Hed.
 intros * Hlt Hle * Hfz Hf.
-intros x₀.
-destruct (Hf x₀) as (Hlfc & Hrfc & Hlfr & Hrfr).
+destruct Hf as (Hlfc & Hrfc & Hlfr & Hrfr).
 split; [ now apply (left_or_right_continuous_inv Hic Hon Hiv Hed) | ].
 split; [ now apply (left_or_right_continuous_inv Hic Hon Hiv Hed) | ].
 split. {
