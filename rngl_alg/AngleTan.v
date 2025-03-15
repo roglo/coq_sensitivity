@@ -35,9 +35,9 @@ destruct_ac.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 intros * Hczz.
 progress unfold rngl_tan.
-specialize (@derivative_inv _ _ _ Hop Hor Hic Hon Hiv Heq) as H1.
+specialize (@derivative_inv_at _ _ _ Hop Hor Hic Hon Hiv Heq) as H1.
 specialize (H1 _ angle_lt_for_deriv).
-specialize (@derivative_mul _ _ _ _ Hop Hor Hic Hon Hiv) as H2.
+specialize (@derivative_mul_at _ _ _ _ Hop Hor Hic Hon Hiv) as H2.
 specialize (H2 _ angle_lt_for_deriv).
 assert (H : ∀ x, ¬ angle_lt_for_deriv x x). {
   intros x.
@@ -51,11 +51,15 @@ specialize (H1 angle_eucl_distance).
 specialize (H2 angle_eucl_distance).
 specialize (H1 rngl_cos (rngl_opp ° rngl_sin)).
 specialize (H2 rngl_sin).
+(**)
+specialize (H1 x₀ Hczz).
+...
 set (g := λ θ, if rngl_eq_dec Heo (rngl_cos θ) 0 then 1%L else rngl_cos θ).
 specialize (H2 (rngl_inv ° g)).
 specialize (H2 rngl_cos (λ x, (- (rngl_opp ° rngl_sin) x / (rngl_cos x)²)%L)).
 progress unfold "°" in H2 at 1.
-specialize (H2 rngl_sin_derivative).
+specialize (H1 x₀ Hczz).
+specialize (H2 x₀ (rngl_sin_derivative _)).
 (*
 specialize (H1 x₀ Hcz).
 specialize (H1 (rngl_cos_derivative x₀)).

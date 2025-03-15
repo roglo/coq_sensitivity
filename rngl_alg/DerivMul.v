@@ -1920,24 +1920,18 @@ Qed.
 
 (* *)
 
-Theorem derivative_mul :
+Theorem derivative_mul_at :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ A lt, (∀ x, ¬ (lt x x)) →
-  ∀ da (f g : A → T) f' g',
-  is_derivative lt da rngl_distance' f f'
-  → is_derivative lt da rngl_distance' g g'
-  → is_derivative lt da rngl_distance' (λ x : A, (f x * g x)%L)
-       (λ x, f x * g' x + f' x * g x)%L.
+  ∀ da (f g : A → T) f' g' x₀,
+  is_derivative_at lt da rngl_distance' f f' x₀
+  → is_derivative_at lt da rngl_distance' g g' x₀
+  → is_derivative_at lt da rngl_distance' (λ x : A, (f x * g x)%L)
+       (λ x, f x * g' x + f' x * g x)%L x₀.
 Proof.
 intros Hic Hon Hiv * Hlt * Hf Hg.
-progress unfold is_derivative in Hf.
-progress unfold is_derivative in Hg.
-progress unfold is_derivative.
-intros x₀.
-specialize (Hf x₀).
-specialize (Hg x₀).
 destruct Hf as (Hlfc & Hrfc & Hlfr & Hrfr).
 destruct Hg as (Hlgc & Hrgc & Hlgr & Hrgr).
 split; [ now apply (left_or_right_continuous_mul_at Hic Hon Hiv) | ].
@@ -1949,7 +1943,22 @@ split. {
 }
 Qed.
 
-Theorem derivative_inv :
+Theorem derivative_mul :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  ∀ A lt, (∀ x, ¬ (lt x x)) →
+  ∀ da (f g : A → T) f' g',
+  is_derivative lt da rngl_distance' f f'
+  → is_derivative lt da rngl_distance' g g'
+  → is_derivative lt da rngl_distance' (λ x : A, (f x * g x)%L)
+       (λ x, f x * g' x + f' x * g x)%L.
+Proof.
+intros Hic Hon Hiv * Hlt * Hf Hg x₀.
+now apply (derivative_mul_at Hic Hon Hiv).
+Qed.
+
+Theorem derivative_inv_at :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_inv T = true →
