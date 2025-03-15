@@ -27,10 +27,12 @@ Definition rngl_tan θ := (rngl_sin θ / rngl_cos θ)%L.
 
 (* to be completed
 Theorem rngl_tan_derivative :
-  is_derivative angle_le angle_lt_for_deriv angle_eucl_distance rngl_distance
-    rngl_tan (λ θ, (1 - (rngl_cos θ)²)%L).
+  ∀ x₀, (rngl_cos x₀ ≠ 0%L) →
+  is_derivative_at angle_le angle_lt_for_deriv angle_eucl_distance
+    rngl_distance rngl_tan (λ θ, (1 - (rngl_cos θ)²)%L) x₀.
 Proof.
 destruct_ac.
+intros * Hcz.
 progress unfold rngl_tan.
 specialize (@derivative_inv _ _ _ Hop Hor Hic Hon Hiv Heq) as H1.
 specialize (H1 _ angle_le angle_lt_for_deriv).
@@ -57,12 +59,9 @@ specialize (H2 rngl_sin (rngl_inv ° rngl_cos)).
 specialize (H2 rngl_cos (λ x, (- (rngl_opp ° rngl_sin) x / (rngl_cos x)²)%L)).
 progress unfold "°" in H2 at 1.
 specialize (H2 rngl_sin_derivative).
-assert (H : ∀ x, rngl_cos x ≠ 0%L). {
-  (* c'est pas vrai, mais bon *)
-  admit.
-}
-specialize (H1 H); clear H.
-specialize (H1 rngl_cos_derivative).
+...
+specialize (H1 x₀ Hcz).
+specialize (H1 (rngl_cos_derivative x₀)).
 specialize (H2 H1).
 progress unfold "°" in H2 at 1.
 ...
