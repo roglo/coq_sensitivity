@@ -1516,14 +1516,7 @@ intros Hic Hon Hiv Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hfzz Hflc.

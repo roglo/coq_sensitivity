@@ -134,14 +134,7 @@ Proof.
 intros Hon Hop Hiv Hor * Hz.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 apply (rngl_div_nonneg Hon Hop Hiv Hor). {
   apply rl_sqrt_nonneg.
   apply (rngl_add_squ_nonneg Hos Hor).
@@ -632,14 +625,7 @@ intros Hic Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 intros * Habz Hbz.
 progress unfold gc_div in Habz.
 progress unfold gc_mul in Habz.
@@ -730,16 +716,7 @@ Theorem gc_eq_mul_0_l :
 Proof.
 intros Hic Hop Hor Hii.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff in Hii.
-  apply Bool.orb_true_iff.
-  destruct Hii as [Hii| Hii]; [ now left | right ].
-  rewrite Hii; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 intros * Hab Hbz.
 apply eq_gc_eq in Hab.
 cbn in Hab.
@@ -1005,14 +982,7 @@ specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hn1 * HM Hz.
