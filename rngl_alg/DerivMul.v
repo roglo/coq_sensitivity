@@ -85,7 +85,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
-intros.
 split; intros H1 ε Hε. {
   specialize (H1 ε Hε).
   destruct H1 as (η & Hη & H1).
@@ -1712,11 +1711,6 @@ move δ before ε.
 move η before ε.
 move HM before Hδ.
 move Hη before Hδ.
-(*
-assert (Hxxl : if is_left then le x x₀ else le x₀ x). {
-  now destruct is_left; apply Hle.
-}
-*)
 assert (Hfz : f x ≠ 0%L). {
   specialize (H1 x Hxx Hdδ).
   intros H; rewrite H in H1.
@@ -1970,22 +1964,12 @@ split; [ now apply (left_or_right_continuous_inv Hic Hon Hiv Hed) | ].
 split; [ now apply (left_or_right_continuous_inv Hic Hon Hiv Hed) | ].
 split. {
   apply (left_or_right_derivative_inv Hic Hon Hiv Hed lt); [ easy | | easy ].
-  intros ε Hε.
-  destruct (Hlfc ε Hε) as (η & Hη & H1).
-  exists η.
-  split; [ easy | ].
-  intros x Hx Hd.
-  apply H1; [ | easy ].
-  now left.
+  eapply (is_limit_neighbourhood_eq_compat _ f); [ easy | | apply Hlfc ].
+  now intros; left.
 } {
   apply (left_or_right_derivative_inv Hic Hon Hiv Hed lt); [ easy | | easy ].
-  intros ε Hε.
-  destruct (Hrfc ε Hε) as (η & Hη & H1).
-  exists η.
-  split; [ easy | ].
-  intros x Hx Hd.
-  apply H1; [ | easy ].
-  now left.
+  eapply (is_limit_neighbourhood_eq_compat _ f); [ easy | | apply Hrfc ].
+  now intros; left.
 }
 Qed.
 

@@ -412,13 +412,14 @@ do 2 rewrite (rngl_opp_sub_distr Hop).
 now apply (rngl_sub_le_mono_l Hop Hor).
 Qed.
 
-Theorem is_limit_when_tending_to_neighbourhood_eq_compat :
-  ∀ is_left {A} (f g : A → T) lt da db a u,
+Theorem is_limit_neighbourhood_eq_compat :
+  ∀ is_left {A B} (f g : A → B) lt₁ lt₂ da db a u,
   (∀ x, f x = g x)
-  → is_limit_when_tending_to_neighbourhood is_left lt da db f a u
-  → is_limit_when_tending_to_neighbourhood is_left lt da db g a u.
+  → (∀ x y, lt₂ x y → lt₁ x y)
+  → is_limit_when_tending_to_neighbourhood is_left lt₁ da db f a u
+  → is_limit_when_tending_to_neighbourhood is_left lt₂ da db g a u.
 Proof.
-intros * Hfg Hf.
+intros * Hfg Hlti Hf.
 intros x₀ Hx.
 specialize (Hf x₀ Hx).
 destruct Hf as (η & Hη & Hf).
@@ -426,7 +427,8 @@ exists η.
 split; [ easy | ].
 intros x Hlt Hxa.
 rewrite <- Hfg.
-now apply Hf.
+apply Hf; [ | easy ].
+now destruct is_left; apply Hlti.
 Qed.
 
 Theorem is_derivative_at_eq_compat :
@@ -438,22 +440,23 @@ Theorem is_derivative_at_eq_compat :
 Proof.
 intros * Hfg Hf'g' Hff.
 destruct Hff as (H1 & H2 & H3 & H4).
+set (lt' := λ x y, lt x y ∨ x = y).
 split. {
-  apply (is_limit_when_tending_to_neighbourhood_eq_compat _ f); [ easy | ].
+  apply (is_limit_neighbourhood_eq_compat _ f _ lt'); [ easy | easy | ].
   now rewrite <- Hfg.
 }
 split. {
-  apply (is_limit_when_tending_to_neighbourhood_eq_compat _ f); [ easy | ].
+  apply (is_limit_neighbourhood_eq_compat _ f _ lt'); [ easy | easy | ].
   now rewrite <- Hfg.
 }
 split. {
   rewrite <- Hf'g'.
-  eapply is_limit_when_tending_to_neighbourhood_eq_compat; [ | apply H3 ].
+  eapply (is_limit_neighbourhood_eq_compat _ _ _ lt); [ | easy | apply H3 ].
   intros x.
   now do 2 rewrite Hfg.
 } {
   rewrite <- Hf'g'.
-  eapply is_limit_when_tending_to_neighbourhood_eq_compat; [ | apply H4 ].
+  eapply (is_limit_neighbourhood_eq_compat _ _ _ lt); [ | easy | apply H4 ].
   intros x.
   now do 2 rewrite Hfg.
 }
