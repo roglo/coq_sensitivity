@@ -72,14 +72,24 @@ split. {
 }
 Qed.
 
-(* to be completed
+(* *)
+
 Theorem rngl_tan_derivative :
   ∀ θ₀, (rngl_cos θ₀ ≠ 0%L) →
   is_derivative_at angle_lt_for_deriv angle_eucl_distance
-    rngl_distance rngl_tan (λ θ, (1 - (rngl_cos θ)²)%L) θ₀.
+    rngl_distance rngl_tan (λ θ, (1 / (rngl_cos θ)²)%L) θ₀.
 Proof.
 destruct_ac.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
 intros * Hczz.
 progress unfold rngl_tan.
 specialize (@derivative_inv_at _ _ _ Hop Hor Hic Hon Hiv Heq) as H1.
@@ -98,7 +108,6 @@ specialize (H1 angle_eucl_distance).
 specialize (H2 angle_eucl_distance).
 specialize (H1 rngl_cos (rngl_opp ° rngl_sin)).
 specialize (H2 rngl_sin).
-(**)
 specialize (H1 θ₀ Hczz).
 specialize (H1 (rngl_cos_derivative _)).
 specialize (H2 (rngl_inv ° rngl_cos)).
@@ -107,53 +116,43 @@ specialize (H2 (λ x, (- (rngl_opp ° rngl_sin) x / (rngl_cos x)²)%L)).
 specialize (H2 θ₀ (rngl_sin_derivative _)).
 specialize (H2 H1).
 cbn in H2.
-
 eapply is_derivative_at_eq_compat; [ | | apply H2 ]. {
   intros θ.
   apply (rngl_mul_inv_r Hiv).
 } {
   intros θ; cbn.
+  destruct (rngl_eq_dec Heo (rngl_cos θ) 0) as [Hcz| Hcz]. {
+    rewrite Hcz.
+    rewrite (rngl_squ_0 Hos).
+    rewrite (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_r.
+    progress unfold "°".
+    rewrite (rngl_opp_involutive Hop).
+    apply eq_rngl_cos_0 in Hcz.
+    destruct Hcz; subst θ; cbn. {
+      apply (rngl_mul_1_l Hon).
+    } {
+      rewrite (rngl_mul_div_assoc Hiv).
+      f_equal.
+      apply (rngl_squ_opp_1 Hon Hop).
+    }
+  }
   progress unfold "°".
   rewrite (rngl_opp_involutive Hop).
   rewrite (rngl_mul_div_assoc Hiv).
   rewrite fold_rngl_squ.
-  rewrite (rngl_mul_inv_diag_r Hon Hiv). 2: {
-...
-Search (1 / _)%L.
-  rewrite <- (rngl_div_1_l Hon Hiv).
-Search (_ * (1 / _))%L.
-...
-apply H2.
-progress unfold "°" in H2.
-apply H2.
-progress unfold is_derivative_at in H2.
-progress unfold left_continuous_at in H2.
-progress unfold left_or_right_continuous_at in H2.
-Search is_limit_when_tending_to_neighbourhood.
-...
-set (g := λ θ, if rngl_eq_dec Heo (rngl_cos θ) 0 then 1%L else rngl_cos θ).
-specialize (H2 (rngl_inv ° g)).
-specialize (H2 rngl_cos (λ x, (- (rngl_opp ° rngl_sin) x / (rngl_cos x)²)%L)).
-progress unfold "°" in H2 at 1.
-specialize (H1 x₀ Hczz).
-specialize (H2 x₀ (rngl_sin_derivative _)).
-(*
-specialize (H1 x₀ Hcz).
-specialize (H1 (rngl_cos_derivative x₀)).
-*)
-assert (H :
-  is_derivative angle_lt_for_deriv angle_eucl_distance
-    (@rngl_distance' T ro rp Hop Hor) (λ x : angle T, (g x)⁻¹)
-    (λ x : angle T, (- (rngl_opp ° rngl_sin) x / (rngl_cos x)²)%L)). {
-  intros θ.
-  destruct (rngl_eq_dec Heo (rngl_cos θ) 0) as [Hcz| Hcz]. {
-    split. {
-      progress unfold g.
-(* oui, mais non, ça, ça va pas, ça *)
-...
-specialize (H2 H1).
-progress unfold "°" in H2 at 1.
-...
-*)
+  rewrite (rngl_mul_inv_diag_r Hon Hiv); [ | easy ].
+  assert (Hcz2 : (rngl_cos θ)² ≠ 0%L). {
+    intros H; apply Hcz.
+    now apply (eq_rngl_squ_0 Hos Hio) in H.
+  }
+  apply (rngl_mul_move_r Hi1); [ easy | ].
+  rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+  rewrite (rngl_mul_1_l Hon).
+  rewrite rngl_add_comm.
+  apply cos2_sin2_1.
+}
+Qed.
 
 End a.
