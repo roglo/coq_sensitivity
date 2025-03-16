@@ -25,11 +25,58 @@ Context {Heq : rngl_has_eq_dec T = true}.
 
 Definition rngl_tan θ := (rngl_sin θ / rngl_cos θ)%L.
 
+Theorem is_limit_when_tending_to_neighbourhood_eq_compat :
+  ∀ is_left {A} (f g : A → T) lt da db a u,
+  (∀ x, f x = g x)
+  → is_limit_when_tending_to_neighbourhood is_left lt da db f a u
+  → is_limit_when_tending_to_neighbourhood is_left lt da db g a u.
+Proof.
+intros * Hfg Hf.
+intros x₀ Hx.
+specialize (Hf x₀ Hx).
+destruct Hf as (η & Hη & Hf).
+exists η.
+split; [ easy | ].
+intros x Hlt Hxa.
+rewrite <- Hfg.
+now apply Hf.
+Qed.
+
+Theorem is_derivative_at_eq_compat :
+  ∀ {A} (f f' g g' : A → T) lt da db a,
+  (∀ x, f x = g x)
+  → (∀ x, f' x = g' x)
+  → is_derivative_at lt da db f f' a
+  → is_derivative_at lt da db g g' a.
+Proof.
+intros * Hfg Hf'g' Hff.
+destruct Hff as (H1 & H2 & H3 & H4).
+split. {
+  apply (is_limit_when_tending_to_neighbourhood_eq_compat _ f); [ easy | ].
+  now rewrite <- Hfg.
+}
+split. {
+  apply (is_limit_when_tending_to_neighbourhood_eq_compat _ f); [ easy | ].
+  now rewrite <- Hfg.
+}
+split. {
+  rewrite <- Hf'g'.
+  eapply is_limit_when_tending_to_neighbourhood_eq_compat; [ | apply H3 ].
+  intros x.
+  now do 2 rewrite Hfg.
+} {
+  rewrite <- Hf'g'.
+  eapply is_limit_when_tending_to_neighbourhood_eq_compat; [ | apply H4 ].
+  intros x.
+  now do 2 rewrite Hfg.
+}
+Qed.
+
 (* to be completed
 Theorem rngl_tan_derivative :
-  ∀ x₀, (rngl_cos x₀ ≠ 0%L) →
+  ∀ θ₀, (rngl_cos θ₀ ≠ 0%L) →
   is_derivative_at angle_lt_for_deriv angle_eucl_distance
-    rngl_distance rngl_tan (λ θ, (1 - (rngl_cos θ)²)%L) x₀.
+    rngl_distance rngl_tan (λ θ, (1 - (rngl_cos θ)²)%L) θ₀.
 Proof.
 destruct_ac.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
@@ -52,7 +99,37 @@ specialize (H2 angle_eucl_distance).
 specialize (H1 rngl_cos (rngl_opp ° rngl_sin)).
 specialize (H2 rngl_sin).
 (**)
-specialize (H1 x₀ Hczz).
+specialize (H1 θ₀ Hczz).
+specialize (H1 (rngl_cos_derivative _)).
+specialize (H2 (rngl_inv ° rngl_cos)).
+specialize (H2 rngl_cos).
+specialize (H2 (λ x, (- (rngl_opp ° rngl_sin) x / (rngl_cos x)²)%L)).
+specialize (H2 θ₀ (rngl_sin_derivative _)).
+specialize (H2 H1).
+cbn in H2.
+
+eapply is_derivative_at_eq_compat; [ | | apply H2 ]. {
+  intros θ.
+  apply (rngl_mul_inv_r Hiv).
+} {
+  intros θ; cbn.
+  progress unfold "°".
+  rewrite (rngl_opp_involutive Hop).
+  rewrite (rngl_mul_div_assoc Hiv).
+  rewrite fold_rngl_squ.
+  rewrite (rngl_mul_inv_diag_r Hon Hiv). 2: {
+...
+Search (1 / _)%L.
+  rewrite <- (rngl_div_1_l Hon Hiv).
+Search (_ * (1 / _))%L.
+...
+apply H2.
+progress unfold "°" in H2.
+apply H2.
+progress unfold is_derivative_at in H2.
+progress unfold left_continuous_at in H2.
+progress unfold left_or_right_continuous_at in H2.
+Search is_limit_when_tending_to_neighbourhood.
 ...
 set (g := λ θ, if rngl_eq_dec Heo (rngl_cos θ) 0 then 1%L else rngl_cos θ).
 specialize (H2 (rngl_inv ° g)).
