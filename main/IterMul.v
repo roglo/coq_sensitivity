@@ -6,7 +6,7 @@ Require Import Utf8 Arith.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
-Require Import Misc PermutationFun.
+Require Import Misc1 PermutationFun.
 
 Notation "'∏' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c * g)%L) 1%L)

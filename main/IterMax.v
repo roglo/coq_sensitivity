@@ -2,7 +2,7 @@
 
 Require Import Utf8.
 Require Import RingLike.RingLike.
-Require Import Misc.
+Require Import Misc1.
 Import List.ListNotations.
 Open Scope list.
 
