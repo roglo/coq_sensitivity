@@ -14,7 +14,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List.ListNotations Init.Nat.
 
-Require Import Misc RingLike IterAdd IterMul.
+Require Import RingLike.RingLike.
+Require Import Misc IterAdd IterMul.
 Require Import PermutationFun SortingFun SortRank.
 Require Import PermutSeq Signature Matrix Determinant.
 Import matrix_Notations.

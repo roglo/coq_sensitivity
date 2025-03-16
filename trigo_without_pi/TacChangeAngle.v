@@ -2,7 +2,7 @@
    the first quadrant (sin > 0 and cos > 0) where reflexion is easier
    to do. *)
 
-Require Import Main.RingLike.
+Require Import RingLike.RingLike.
 Require Import Angle.
 
 Ltac change_angle_add_r θ a :=

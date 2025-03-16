@@ -6,8 +6,9 @@ Require Import Utf8 Arith.
 Import Init.Nat.
 Import List.ListNotations.
 
+Require Import RingLike.RingLike.
 Require Import Misc.
-Require Import RingLike IterAdd.
+Require Import IterAdd.
 
 Record vector T := mk_vect
   { vect_list : list T }.

@@ -1,7 +1,7 @@
 (* RingLike on angles *)
 
 Require Import Utf8.
-Require Import Main.RingLike.
+Require Import RingLike.RingLike.
 Require Import Trigo.Angle.
 
 Section a.

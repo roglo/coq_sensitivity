@@ -17,7 +17,8 @@ Set Implicit Arguments.
 Require Import Utf8 ZArith.
 Import List.ListNotations.
 
-Require Import Main.Misc Main.RingLike Misc.
+Require Import RingLike.RingLike.
+Require Import Main.Misc Misc.
 Open Scope Z_scope.
 
 Record quad_int (d : Z) := mk_qi { qi_re : Z; qi_im : Z }.

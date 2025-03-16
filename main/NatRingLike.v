@@ -5,7 +5,8 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
-Require Import Misc RingLike.
+Require Import RingLike.RingLike.
+Require Import Misc.
 
 Instance nat_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 0;

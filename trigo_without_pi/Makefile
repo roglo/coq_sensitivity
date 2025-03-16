@@ -13,14 +13,14 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	coqdep -Q ../main Main $(FILESFORDEP) | LC_ALL=C sort | \
+	coqdep -Q ../ring_like RingLike -Q ../main Main $(FILESFORDEP) | LC_ALL=C sort | \
 	sed -e 's/  *$$//' > .depend
 
 .SUFFIXES: .v .vo
 
 .v.vo:
 	@$(TEST_DIR)
-	coqc -R . Trigo -Q ../main Main $<
+	coqc -R . Trigo -Q ../ring_like RingLike -Q ../main Main $<
 
 .PHONY: all clean depend
 

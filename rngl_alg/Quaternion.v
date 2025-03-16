@@ -7,7 +7,8 @@ Require Import Utf8 Arith.
 Import List.ListNotations.
 Import Init.Nat.
 
-Require Import Main.Misc Main.RingLike.
+Require Import RingLike.RingLike.
+Require Import Main.Misc.
 Require Import Main.IterAdd Main.MyVector.
 
 Fixpoint comb_elem_rest A (la : list A) :=

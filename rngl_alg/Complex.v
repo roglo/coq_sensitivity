@@ -3,7 +3,8 @@ Require Import Utf8 ZArith.
 Require Import Init.Nat.
 Import List.ListNotations.
 
-Require Import Main.Misc Main.RingLike Main.IterAdd.
+Require Import RingLike.RingLike.
+Require Import Main.Misc Main.IterAdd.
 Require Import Trigo.TacChangeAngle.
 Require Import Trigo.RealLike.
 Require Import Trigo.Angle Trigo.TrigoWithoutPiExt.

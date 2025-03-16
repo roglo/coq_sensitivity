@@ -4,7 +4,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8.
 Require Import ZArith.
 
-Require Import Main.RingLike.
+Require Import RingLike.RingLike.
 
 Notation "x ≤ y" := (x <= y)%Z (at level 70, y at next level) : Z_scope.
 Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%Z (at level 70, y at next level) :

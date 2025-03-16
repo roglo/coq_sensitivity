@@ -5,8 +5,9 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith Bool.
 Import List.ListNotations.
 
+Require Import RingLike.RingLike.
 Require Import Main.Misc.
-Require Import Main.RingLike Main.IterAdd.
+Require Import Main.IterAdd.
 Require Import Main.Matrix.
 Require Import Main.Determinant.
 Require Import Main.Comatrix.

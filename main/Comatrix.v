@@ -5,7 +5,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List.ListNotations.
 
-Require Import Misc RingLike IterAdd IterMul Pigeonhole.
+Require Import RingLike.RingLike.
+Require Import Misc IterAdd IterMul Pigeonhole.
 Require Import PermutationFun SortingFun SortRank.
 Require Import Matrix PermutSeq Signature Determinant.
 Require Import MyVector.

@@ -1,6 +1,6 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
-Require Import Main.RingLike.
+Require Import RingLike.RingLike.
 Require Import RealLike.
 Require Import Angle.
 

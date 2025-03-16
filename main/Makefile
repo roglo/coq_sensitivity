@@ -1,6 +1,7 @@
 TARGET=IterMax.vo Polynomial.vo CauchyBinet.vo Lemma_2_2.vo Lemma_2_1.vo \
        Sensitivity.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
+TEST_DIR=test `basename "$<"` = "$<" || { echo "File \"$<\" needs to be recompiled."; echo "Please run 'make' in directory '$$(dirname "$<")' first."; exit 1; }
 
 all: $(TARGET)
 
@@ -13,14 +14,15 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	coqdep $(FILESFORDEP) | LC_ALL=C sort > .depend | \
+	coqdep -Q ../ring_like RingLike $(FILESFORDEP) | LC_ALL=C sort | \
 	sed -e 's/  *$$//' > .depend
 
 
 .SUFFIXES: .v .vo
 
 .v.vo:
-	coqc -R . Main -Q ../rngl_alg RnglAlg $<
+	@$(TEST_DIR)
+	coqc -R . Main -Q ../ring_like RingLike -Q ../rngl_alg RnglAlg $<
 
 .PHONY: all clean depend
 

@@ -16,7 +16,8 @@ Require Import Utf8 Arith.
 Import Init.Nat List List.ListNotations.
 Require Import Sorted.
 
-Require Import Misc RingLike IterAdd IterMul MyVector.
+Require Import RingLike.RingLike.
+Require Import Misc IterAdd IterMul MyVector.
 Require Import Matrix Signature Determinant Comatrix.
 Require Import CauchyBinet.
 Import matrix_Notations.

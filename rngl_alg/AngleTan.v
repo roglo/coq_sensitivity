@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
-Require Import Main.RingLike.
+Require Import RingLike.RingLike.
 Require Import Trigo.RealLike.
 Require Import Trigo.Angle.
 Require Import Trigo.AngleDiv2.

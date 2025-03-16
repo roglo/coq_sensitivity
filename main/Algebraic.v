@@ -6,7 +6,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List.ListNotations Init.Nat.
 
-Require Import Misc RingLike IterAdd IterMul IterAnd.
+Require Import RingLike.RingLike.
+Require Import Misc IterAdd IterMul IterAnd.
 Require Import LapPolyn Polynomial Matrix Determinant Comatrix.
 Require Import Signature PermutSeq MyVector.
 Import matrix_Notations.

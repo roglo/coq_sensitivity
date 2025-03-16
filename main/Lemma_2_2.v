@@ -17,7 +17,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List.ListNotations.
 
-Require Import Misc RingLike MyVector Matrix.
+Require Import RingLike.RingLike.
+Require Import Misc MyVector Matrix.
 Require Import IterAdd.
 Import matrix_Notations.
 

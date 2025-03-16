@@ -6,8 +6,9 @@ Require Import Utf8 Arith Bool.
 Import List.ListNotations.
 Require Import Init.Nat.
 
+Require Import RingLike.RingLike.
 Require Import Misc.
-Require Import RingLike IterAdd IterMul IterAnd.
+Require Import IterAdd IterMul IterAnd.
 Require Import MyVector Signature.
 
 (* matrices *)

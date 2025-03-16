@@ -8,7 +8,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List.ListNotations Init.Nat.
 
-Require Import Misc RingLike IterAdd.
+Require Import RingLike.RingLike.
+Require Import Misc IterAdd.
 
 (* (lap : list as polynomial) *)
 (* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)

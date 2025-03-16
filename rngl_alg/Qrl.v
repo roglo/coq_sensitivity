@@ -4,7 +4,8 @@
 Set Implicit Arguments.
 Require Import Utf8.
 
-Require Import Main.RingLike Rational.
+Require Import RingLike.RingLike.
+Require Import Rational.
 Import Q.Notations.
 
 Definition Q_leb (x y : Q) :=
