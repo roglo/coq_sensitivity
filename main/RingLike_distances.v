@@ -412,6 +412,53 @@ do 2 rewrite (rngl_opp_sub_distr Hop).
 now apply (rngl_sub_le_mono_l Hop Hor).
 Qed.
 
+Theorem is_limit_when_tending_to_neighbourhood_eq_compat :
+  ∀ is_left {A} (f g : A → T) lt da db a u,
+  (∀ x, f x = g x)
+  → is_limit_when_tending_to_neighbourhood is_left lt da db f a u
+  → is_limit_when_tending_to_neighbourhood is_left lt da db g a u.
+Proof.
+intros * Hfg Hf.
+intros x₀ Hx.
+specialize (Hf x₀ Hx).
+destruct Hf as (η & Hη & Hf).
+exists η.
+split; [ easy | ].
+intros x Hlt Hxa.
+rewrite <- Hfg.
+now apply Hf.
+Qed.
+
+Theorem is_derivative_at_eq_compat :
+  ∀ {A} (f f' g g' : A → T) lt da db a,
+  (∀ x, f x = g x)
+  → (∀ x, f' x = g' x)
+  → is_derivative_at lt da db f f' a
+  → is_derivative_at lt da db g g' a.
+Proof.
+intros * Hfg Hf'g' Hff.
+destruct Hff as (H1 & H2 & H3 & H4).
+split. {
+  apply (is_limit_when_tending_to_neighbourhood_eq_compat _ f); [ easy | ].
+  now rewrite <- Hfg.
+}
+split. {
+  apply (is_limit_when_tending_to_neighbourhood_eq_compat _ f); [ easy | ].
+  now rewrite <- Hfg.
+}
+split. {
+  rewrite <- Hf'g'.
+  eapply is_limit_when_tending_to_neighbourhood_eq_compat; [ | apply H3 ].
+  intros x.
+  now do 2 rewrite Hfg.
+} {
+  rewrite <- Hf'g'.
+  eapply is_limit_when_tending_to_neighbourhood_eq_compat; [ | apply H4 ].
+  intros x.
+  now do 2 rewrite Hfg.
+}
+Qed.
+
 End a.
 
 Arguments rngl_dist {T ro} (a b)%_L.
