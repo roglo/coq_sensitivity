@@ -7,7 +7,6 @@ Require Import Main.RingLike.
 Require Import Trigo.RealLike.
 Require Import Trigo.Angle.
 Require Import Trigo.AngleDiv2.
-Require Import Trigo.AngleTypeIsComplete.
 Require Import Trigo.Angle_order.
 Require Import Trigo.TrigoWithoutPiExt.
 Require Import DerivMul.
