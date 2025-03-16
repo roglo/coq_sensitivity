@@ -525,6 +525,20 @@ rewrite Hor.
 apply Bool.orb_true_r.
 Qed.
 
+Theorem rngl_integral_or_inv_1_quot_eq_dec_order :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true.
+Proof.
+intros Hon Hiv Hor.
+apply Bool.orb_true_iff; right.
+rewrite (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv); cbn.
+apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+Qed.
+
 Theorem fold_rngl_squ : ∀ a : T, (a * a)%L = rngl_squ a.
 Proof. easy. Qed.
 
@@ -539,50 +553,6 @@ destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
 clear Hed.
 now destruct (rngl_eq_dec a b).
 Qed.
-
-(*
-Theorem rngl_eqb_eq' :
-  rngl_has_eq_dec_or_order T = true →
-  ∀ a b : T, (a =? b)%L = true ↔ a = b.
-Proof.
-intros Heo *.
-progress unfold rngl_has_eq_dec_or_order in Heo.
-remember (rngl_has_eq_dec T) as ed eqn:Hed.
-symmetry in Hed.
-destruct ed. {
-  progress unfold rngl_has_eq_dec in Hed.
-  progress unfold rngl_eqb.
-  destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
-  now destruct (rngl_eq_dec a b).
-}
-cbn in Heo.
-rename Heo into Hor.
-destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
-  destruct (rngl_le_dec Hor b a) as [Hba| Hba]. {
-    apply (rngl_le_antisymm Hor) in Hab; [ subst b | easy ].
-    split; [ easy | intros _ ].
-Search ((_ =? _)%L).
-(* tiens ? ça marche pas *)
-(* pour qu'on puisse considérer "a =? b", il faut
-   que rngl_has_eq_dec *)
-...
-Check rngl_leb_le.
-...
-intros Heo *.
-...
-  }
-  apply (rngl_nle_gt Hor) in Hba.
-  right.
-  intros H; subst b.
-  now apply (rngl_lt_irrefl Hor) in Hba.
-}
-apply (rngl_nle_gt Hor) in Hab.
-right.
-intros H; subst b.
-now apply (rngl_lt_irrefl Hor) in Hab.
-Qed.
-...
-*)
 
 Theorem rngl_eqb_neq :
   rngl_has_eq_dec T = true →

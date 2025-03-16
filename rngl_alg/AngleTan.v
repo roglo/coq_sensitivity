@@ -31,14 +31,7 @@ Proof.
 destruct_ac.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 intros * Hczz.
 progress unfold rngl_tan.
 specialize (@derivative_inv_at _ _ _ Hop Hor Hic Hon Hiv Hed) as H1.
