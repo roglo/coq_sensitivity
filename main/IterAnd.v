@@ -2,9 +2,9 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 Bool.
+Require Import Utf8 Arith.
+Import List.ListNotations.
 Require Import Misc.
-Import List.
 
 Notation "'⋀' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c && g)%bool) true)
@@ -21,13 +21,13 @@ Proof.
 intros.
 induction l as [| b]; [ easy | ].
 rewrite iter_list_cons; cycle 1. {
-  apply andb_true_l.
+  apply Bool.andb_true_l.
 } {
-  apply andb_true_r.
+  apply Bool.andb_true_r.
 } {
-  apply andb_assoc.
+  apply Bool.andb_assoc.
 }
-rewrite andb_true_iff.
+rewrite Bool.andb_true_iff.
 split. {
   intros Hb.
   split; [ now apply Hb; left | ].
@@ -46,10 +46,10 @@ Theorem and_list_cons : ∀ A (a : A) la f,
 Proof.
 intros.
 apply iter_list_cons. {
-  apply andb_true_l.
+  apply Bool.andb_true_l.
 } {
-  apply andb_true_r.
+  apply Bool.andb_true_r.
 } {
-  apply andb_assoc.
+  apply Bool.andb_assoc.
 }
 Qed.
