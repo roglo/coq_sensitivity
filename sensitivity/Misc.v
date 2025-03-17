@@ -128,9 +128,6 @@ apply Nat.succ_le_mono in Hpm.
 now apply IHp.
 Qed.
 
-Theorem Nat_succ_sub_succ_r : ∀ a b, b < a → a - b = S (a - S b).
-Proof. intros * Hba; flia Hba. Qed.
-
 Theorem Nat_1_le_sub_lt : ∀ i j, 1 ≤ i ≤ j → i - 1 < j.
 Proof.
 intros * Hij.

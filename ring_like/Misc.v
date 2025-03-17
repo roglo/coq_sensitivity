@@ -1181,3 +1181,6 @@ Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
 Theorem Nat_fact_succ : ∀ n, fact (S n) = S n * fact n.
 Proof. easy. Qed.
+
+Theorem Nat_succ_sub_succ_r : ∀ a b, b < a → a - b = S (a - S b).
+Proof. intros * Hba; flia Hba. Qed.

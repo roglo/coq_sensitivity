@@ -5,10 +5,10 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
-Require Import Sensitivity.Misc Misc FermatLittle.
+Require Import RingLike.Misc Misc FermatLittle.
 
 (*
-have been moved to NatRingLike.v in directory ../main
+have been moved to NatRingLike.v in directory ../sensitivity
 *)
 
 (* primes, for ℤn, following *)
@@ -271,7 +271,6 @@ replace (at_least_1 n) with n. 2: {
 }
 unfold at_least_1.
 destruct a as (a, Ha); cbn - [ "mod" ].
-rewrite <- Nat_succ_sub_succ_r; [ rewrite Nat.sub_0_r | flia Hn2 ].
 apply prime_mul_inv_l_mod; [ easy | ].
 intros H; apply Haz; clear Haz.
 apply Zn_eq; cbn; symmetry.
@@ -376,6 +375,7 @@ split. {
   subst roz.
   progress unfold Zn in H.
   cbn - [ "mod" ] in H1.
+  cbn in H.
   rewrite H in H1.
   cbn - [ "mod" ] in H1.
   symmetry in H1.
