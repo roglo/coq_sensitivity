@@ -5,7 +5,7 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import RingLike.RingLike.
-Require Import Main.Misc Main.IterAdd.
+Require Import Sensitivity.Misc Sensitivity.IterAdd.
 Require Import Misc.
 
 Section a.

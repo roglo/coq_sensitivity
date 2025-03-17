@@ -22,7 +22,7 @@ depend:
 
 .v.vo:
 	@$(TEST_DIR)
-	coqc -R . Main -Q ../ring_like RingLike -Q ../rngl_alg RnglAlg $<
+	coqc -R . Sensitivity -Q ../ring_like RingLike -Q ../rngl_alg RnglAlg $<
 
 .PHONY: all clean depend
 

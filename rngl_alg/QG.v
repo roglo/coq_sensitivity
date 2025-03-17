@@ -14,7 +14,7 @@ Notation "x ≤ y" := (Qle x y) : Q_scope.
 Notation "x ≤ y" := (Nat.le x y) : nat_scope.
 Notation "x ≤ y" := (Pos.le x y) : positive_scope.
 
-Require Import Main.Misc.
+Require Import Sensitivity.Misc.
 
 Definition Z_pos_gcd z p :=
   match z with

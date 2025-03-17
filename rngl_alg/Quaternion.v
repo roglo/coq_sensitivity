@@ -8,8 +8,8 @@ Import List.ListNotations.
 Import Init.Nat.
 
 Require Import RingLike.RingLike.
-Require Import Main.Misc.
-Require Import Main.IterAdd Main.MyVector.
+Require Import Sensitivity.Misc.
+Require Import Sensitivity.IterAdd Sensitivity.MyVector.
 
 Fixpoint comb_elem_rest A (la : list A) :=
   match la with

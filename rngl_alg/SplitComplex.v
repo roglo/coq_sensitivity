@@ -4,8 +4,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8.
 
 Require Import RingLike.RingLike.
-Require Import Main.Misc.
-Require Import Main.MyVector.
+Require Import Sensitivity.Misc.
+Require Import Sensitivity.MyVector.
 Require Import Misc.
 
 (* numbers of the form a+ib+jc+kd with i, j, k such that

@@ -2,7 +2,7 @@
 (* allowing us to use Leibnitz' equality. *)
 
 Require Import Utf8 Arith Morphisms Init.Nat.
-Require Import Main.Misc PQ Nat_ggcd.
+Require Import Sensitivity.Misc PQ Nat_ggcd.
 Import PQ_Notations.
 
 Set Nested Proofs Allowed.

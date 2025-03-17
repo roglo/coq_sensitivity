@@ -5,7 +5,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Init.Nat.
 Require Import RingLike.RingLike.
-Require Import Main.Misc.
+Require Import Sensitivity.Misc.
 
 Class excl_midd := { em_prop : ∀ P, P + notT P }.
 

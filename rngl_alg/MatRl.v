@@ -6,11 +6,11 @@ Require Import Utf8 Arith Bool.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
-Require Import Main.Misc.
-Require Import Main.IterAdd.
-Require Import Main.Matrix.
-Require Import Main.Determinant.
-Require Import Main.Comatrix.
+Require Import Sensitivity.Misc.
+Require Import Sensitivity.IterAdd.
+Require Import Sensitivity.Matrix.
+Require Import Sensitivity.Determinant.
+Require Import Sensitivity.Comatrix.
 Import matrix_Notations.
 
 (* to be moved to RingLike_mul.v perhaps *)

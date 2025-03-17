@@ -5,7 +5,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
-Require Import Main.Misc Misc FermatLittle.
+Require Import Sensitivity.Misc Misc FermatLittle.
 
 (*
 have been moved to NatRingLike.v in directory ../main

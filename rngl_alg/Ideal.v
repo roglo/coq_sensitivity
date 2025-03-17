@@ -4,7 +4,7 @@
 
 Require Import Utf8 Arith.
 Require Import RingLike.RingLike.
-Require Import Main.Misc.
+Require Import Sensitivity.Misc.
 
 Record ideal {T} (P : T → bool) := mk_I
   { i_val : T;
