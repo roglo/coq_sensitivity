@@ -14,6 +14,8 @@ Notation "x '∈' l" := (List.In x l) (at level 70).
 Notation "x '∉' l" := (¬ List.In x l) (at level 70).
 Notation "E ⊂ F" := (List.incl E F) (at level 70).
 
+Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
+
 (* "fast" lia, to improve compilation speed *)
 Tactic Notation "flia" hyp_list(Hs) := clear - Hs; lia.
 

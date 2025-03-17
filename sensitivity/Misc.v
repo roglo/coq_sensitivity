@@ -17,8 +17,6 @@ Notation "∃! x .. y , p" :=
 
 Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
 
-Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
-
 Theorem fold_not : ∀ (P : Prop), not P → P → False.
 Proof. easy. Qed.
 
