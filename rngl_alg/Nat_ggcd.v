@@ -1,7 +1,7 @@
 (* gcd a b with computation of a/gcd a b and b/gcd a b on the fly *)
 
 Require Import Utf8 Arith Psatz.
-Require Import Sensitivity.Misc Misc.
+Require Import RingLike.Misc Misc.
 
 Set Nested Proofs Allowed.
 
