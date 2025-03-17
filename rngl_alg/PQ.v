@@ -1,6 +1,6 @@
 (* Implementation of positive (non zero) rationals using only nat *)
 
-Require Import Utf8 Arith Morphisms Psatz.
+Require Import Utf8 Arith Morphisms.
 Require Import RingLike.Misc Misc.
 
 Set Nested Proofs Allowed.
