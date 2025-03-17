@@ -6,7 +6,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List.ListNotations.
 Require Import RingLike.RingLike.
-Require Import Main.Misc1.
+Require Import RingLike.Misc.
 Require Import Trigo.RealLike.
 
 Section a.

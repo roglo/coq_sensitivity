@@ -8,7 +8,7 @@ DerivMul.vo DerivMul.glob DerivMul.v.beautified DerivMul.required_vo: DerivMul.v
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v ../main/Misc.vo ../main/PermutationFun.vo Misc.vo
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v ../main/Misc.vo PQ.vo Nat_ggcd.vo
 GaussIntRl.vo GaussIntRl.glob GaussIntRl.v.beautified GaussIntRl.required_vo: GaussIntRl.v ../ring_like/RingLike.vo
-HyperbolicTrigo.vo HyperbolicTrigo.glob HyperbolicTrigo.v.beautified HyperbolicTrigo.required_vo: HyperbolicTrigo.v ../ring_like/RingLike.vo ../main/Misc1.vo ../trigo_without_pi/RealLike.vo ../trigo_without_pi/Angle.vo ../trigo_without_pi/AngleDiv2.vo
+HyperbolicTrigo.vo HyperbolicTrigo.glob HyperbolicTrigo.v.beautified HyperbolicTrigo.required_vo: HyperbolicTrigo.v ../ring_like/RingLike.vo ../ring_like/Misc.vo ../trigo_without_pi/RealLike.vo ../trigo_without_pi/Angle.vo ../trigo_without_pi/AngleDiv2.vo
 Ideal.vo Ideal.glob Ideal.v.beautified Ideal.required_vo: Ideal.v ../ring_like/RingLike.vo ../main/Misc.vo
 IntermVal.vo IntermVal.glob IntermVal.v.beautified IntermVal.required_vo: IntermVal.v ../ring_like/RingLike.vo ../main/Misc.vo
 MatRl.vo MatRl.glob MatRl.v.beautified MatRl.required_vo: MatRl.v ../ring_like/RingLike.vo ../main/Misc.vo ../main/IterAdd.vo ../main/Matrix.vo ../main/Determinant.vo ../main/Comatrix.vo

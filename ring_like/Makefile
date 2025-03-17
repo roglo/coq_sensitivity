@@ -1,4 +1,4 @@
-TARGET=RingLike.vo
+TARGET=RingLike.vo Misc.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 
 all: $(TARGET)

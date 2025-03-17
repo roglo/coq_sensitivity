@@ -1,1 +1,1 @@
--R . Trigo -Q ../ring_like RingLike -Q ../main Main
+-R . Trigo -Q ../ring_like RingLike

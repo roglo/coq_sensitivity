@@ -4,7 +4,7 @@ Require Import Utf8 Arith Psatz.
 Import List.ListNotations Init.Nat.
 Open Scope list.
 
-Require Export Misc1.
+Require Export RingLike.Misc.
 
 Notation "n !" := (fact n) (at level 1, format "n !").
 
