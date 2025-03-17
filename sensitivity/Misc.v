@@ -167,9 +167,6 @@ Qed.
 Theorem Nat_fact_succ : ∀ n, fact (S n) = S n * fact n.
 Proof. easy. Qed.
 
-Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
-Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
-
 Theorem List_hd_nth_0 {A} : ∀ l (d : A), List.hd d l = List.nth 0 l d.
 Proof. intros; now destruct l. Qed.
 

@@ -27,6 +27,9 @@ Notation "x ≤ y < z" := (x ≤ y ∧ y < z)%nat (at level 70, y at next level)
                           nat_scope.
 Notation "x < y < z" := (x < y ∧ y < z)%nat (at level 70, y at next level).
 
+Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
+Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
+
 Theorem Nat_mod_add_l_mul_r : ∀ a b c,
   (c * b + a) mod b = a mod b.
 Proof.

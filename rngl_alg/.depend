@@ -12,7 +12,7 @@ HyperbolicTrigo.vo HyperbolicTrigo.glob HyperbolicTrigo.v.beautified HyperbolicT
 Ideal.vo Ideal.glob Ideal.v.beautified Ideal.required_vo: Ideal.v ../ring_like/RingLike.vo ../ring_like/Misc.vo
 IntermVal.vo IntermVal.glob IntermVal.v.beautified IntermVal.required_vo: IntermVal.v ../ring_like/RingLike.vo ../ring_like/Misc.vo
 MatRl.vo MatRl.glob MatRl.v.beautified MatRl.required_vo: MatRl.v ../ring_like/RingLike.vo ../ring_like/IterAdd.vo ../sensitivity/Misc.vo ../sensitivity/Matrix.vo ../sensitivity/Determinant.vo ../sensitivity/Comatrix.vo
-Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v ../ring_like/PermutationFun.vo ../sensitivity/Misc.vo
+Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v ../ring_like/PermutationFun.vo ../ring_like/Misc.vo
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v ../ring_like/Misc.vo Misc.vo
 NewtonBinomial.vo NewtonBinomial.glob NewtonBinomial.v.beautified NewtonBinomial.required_vo: NewtonBinomial.v ../ring_like/RingLike.vo ../ring_like/IterAdd.vo ../sensitivity/Misc.vo Misc.vo
 Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v ../sensitivity/Misc.vo Misc.vo FermatLittle.vo ../ring_like/RingLike.vo
