@@ -156,9 +156,6 @@ apply Nat.add_lt_le_mono; [ easy | ].
 apply IHn.
 Qed.
 
-Theorem Nat_fact_succ : ∀ n, fact (S n) = S n * fact n.
-Proof. easy. Qed.
-
 Theorem List_hd_nth_0 {A} : ∀ l (d : A), List.hd d l = List.nth 0 l d.
 Proof. intros; now destruct l. Qed.
 

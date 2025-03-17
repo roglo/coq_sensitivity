@@ -1178,3 +1178,6 @@ Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
 
 Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
+
+Theorem Nat_fact_succ : ∀ n, fact (S n) = S n * fact n.
+Proof. easy. Qed.

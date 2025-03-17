@@ -4,7 +4,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith SetoidList.
 
 Require Import RingLike.PermutationFun.
-Require Import Sensitivity.Misc Misc.
+Require Import RingLike.Misc Misc.
 Import ListNotations.
 
 Fixpoint prime_test cnt n d :=
