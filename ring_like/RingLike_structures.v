@@ -345,9 +345,7 @@ Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_is_archimedean T {ro ring_like_prop}.
 Arguments rngl_abs {T ro} a%_L.
 
-(*
-Notation "‖ x ‖" := (rngl_abs x) (at level 35, x at level 30).
-*)
+Notation "∣ x ∣" := (rngl_abs x) (at level 35, x at level 30).
 
 Section a.
 
