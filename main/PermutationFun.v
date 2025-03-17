@@ -7,7 +7,7 @@ Require FinFun.
 Import Init.Nat.
 Import List.ListNotations.
 
-Require Import Misc.
+Require Import Misc1.
 
 Definition reflexive {A} (rel : A → A → bool) :=
   ∀ a, rel a a = true.
@@ -25,39 +25,6 @@ Fixpoint is_permutation {A} (eqb : A → A → bool) (la lb : list A) :=
 Definition permutation {A} (eqb : A → _) la lb :=
   is_permutation eqb la lb = true.
 
-(*
-Require Import Relations.
-
-(* allows to use "reflexivity" (or "easy"), "symmetry" and "transitivity"
-   on goals eqb x y = true, without having to add "apply Heqb" before *)
-Section a.
-
-Context {A : Type}.
-Context {eqb : A → A → bool}.
-Context {Heqb : equality eqb}.
-
-Definition eqp a b := eqb a b = true.
-
-Theorem eqp_refl : reflexive _ eqp.
-Proof. now intros x; apply Heqb. Qed.
-
-Theorem eqp_sym : symmetric _ eqp.
-Proof. now intros x y Hxy; apply Heqb in Hxy; apply Heqb; symmetry. Qed.
-
-Theorem eqp_trans : transitive _ eqp.
-Proof.
-intros x y z Hxy Hyz.
-apply Heqb in Hxy, Hyz; apply Heqb.
-now transitivity y.
-Qed.
-
-Add Parametric Relation : A eqp
- reflexivity proved by eqp_refl
- symmetry proved by eqp_sym
- transitivity proved by eqp_trans
- as eqp_rel.
-*)
-
 Theorem permutation_cons_l_iff : ∀ A (eqb : A → _) a la lb,
   permutation eqb (a :: la) lb
   ↔ match extract (eqb a) lb with
@@ -70,49 +37,6 @@ unfold permutation; cbn.
 remember (extract (eqb a) lb) as lxl eqn:Hlxl.
 now destruct lxl as [((bef, x), aft)| ].
 Qed.
-
-(*
-Definition symmetric A (rel : A → A → bool) :=
-  ∀ a b, rel a b = true ↔ rel b a = true.
-
-Theorem permutation_cons_r_iff : ∀ A (eqb : A → _),
-  symmetric eqb →
-  ∀ b la lb,
-  permutation eqb la (b :: lb)
-  ↔ match extract (eqb b) la with
-     | Some (bef, _, aft) => permutation eqb (bef ++ aft) lb
-     | None => False
-     end.
-Proof.
-intros * Hsym *.
-destruct la as [| a]; [ easy | ].
-unfold permutation; cbn.
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-remember (eqb b a) as ba eqn:Hba; symmetry in Hba.
-move ba before ab.
-destruct ab. {
-  destruct ba; [ easy | ].
-  apply Hsym in Hab; congruence.
-}
-destruct ba. {
-  apply Hsym in Hba; congruence.
-}
-remember (extract (eqb b) la) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. {
-  apply extract_Some_iff in Hlxl.
-  destruct Hlxl as (Hbef & Hbx & Haft).
-  subst la.
-  cbn.
-  remember (extract (eqb a) lb) as lxl eqn:Hlxl.
-  symmetry in Hlxl.
-  destruct lxl as [((bef', x'), aft')| ]. {
-    apply extract_Some_iff in Hlxl.
-    destruct Hlxl as (Hbef' & Hax & Haft').
-    subst lb; cbn.
-(* marche pas *)
-...
-*)
 
 (* *)
 
@@ -496,26 +420,6 @@ clear Hbef Hbef'.
 clear la IHla Hpab.
 now apply permutation_app_inv_aux in Hpbc.
 Qed.
-
-(* *)
-
-(*
-(* allows to use "reflexivity" (or "easy"), "symmetry" and "transitivity"
-   on goals "permutation eqb la lb", instead of applying
-   "permutation_refl", "permutation_sym" and "permutation_trans".
-*)
-Section a.
-
-Context {A : Type}.
-Context {eqb : A → A → bool}.
-Context {Heqb : equality eqb}.
-
-Add Parametric Relation : (list A) (permutation eqb)
- reflexivity proved by (permutation_refl Heqb)
- symmetry proved by (permutation_sym Heqb)
- transitivity proved by (permutation_trans Heqb)
- as permutation_rel.
-*)
 
 (* theorems equivalent to Permutation type *)
 

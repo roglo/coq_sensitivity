@@ -15,7 +15,7 @@ Misc1.vo Misc1.glob Misc1.v.beautified Misc1.required_vo: Misc1.v
 MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v ../ring_like/RingLike.vo Misc.vo IterAdd.vo
 NatRingLike.vo NatRingLike.glob NatRingLike.v.beautified NatRingLike.required_vo: NatRingLike.v ../ring_like/RingLike.vo Misc.vo
 PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo PermutationFun.vo SortingFun.vo SortRank.vo IterAnd.vo Pigeonhole.vo
-PermutationFun.vo PermutationFun.glob PermutationFun.v.beautified PermutationFun.required_vo: PermutationFun.v Misc.vo
+PermutationFun.vo PermutationFun.glob PermutationFun.v.beautified PermutationFun.required_vo: PermutationFun.v Misc1.vo
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
 Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v ../ring_like/RingLike.vo Misc.vo IterAdd.vo IterAnd.vo PermutationFun.vo SortingFun.vo LapPolyn.vo
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo SortingFun.vo IterAdd.vo NatRingLike.vo
