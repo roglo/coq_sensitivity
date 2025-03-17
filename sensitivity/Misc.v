@@ -1881,21 +1881,6 @@ Qed.
 
 (* *)
 
-Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
-  match P with
-  | left _ _ => true
-  | right _ _ => false
-  end.
-
-Definition sumbool_or {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
-  orb (bool_of_sumbool P) (bool_of_sumbool Q).
-
-Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
-  andb (bool_of_sumbool P) (bool_of_sumbool Q).
-
-Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
-Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
-
 Arguments "<?" : simpl never.
 
 Global Hint Resolve Nat_mod_fact_upper_bound : core.
