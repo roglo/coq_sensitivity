@@ -27,6 +27,17 @@ specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros Hii.
 intros * Hzc.
 progress unfold rngl_dist.
+(*
+...
+(* 35,30 *)
+  ============================
+  (∣ (a - b) ∣ * c)%L = ∣ (a * c - b * c) ∣
+...
+(* 60,50 *)
+  ============================
+  ((∣ a - b ∣) * c)%L = ∣ a * c - b * c ∣
+...
+*)
 rewrite <- (rngl_mul_sub_distr_r Hop).
 progress unfold rngl_abs.
 rewrite (rngl_mul_sub_distr_r Hop).
