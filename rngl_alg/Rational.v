@@ -2,7 +2,7 @@
 (* allowing us to use Leibnitz' equality. *)
 
 Require Import Utf8 Arith Psatz Init.Nat.
-Require Import Sensitivity.Misc Misc GQ.
+Require Import RingLike.Misc Misc GQ.
 Import GQ_Notations.
 
 Set Nested Proofs Allowed.

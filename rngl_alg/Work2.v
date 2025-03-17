@@ -7,7 +7,7 @@ Require Import Init.Nat.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
-Require Import Sensitivity.Misc.
+Require Import RingLike.Misc.
 Require Import Trigo.TacChangeAngle.
 Require Import Trigo.RealLike.
 Require Import Trigo.Angle Trigo.TrigoWithoutPiExt.

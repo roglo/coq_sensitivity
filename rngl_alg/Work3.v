@@ -8,7 +8,7 @@ Import List.ListNotations.
 Require Import RingLike.RingLike.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterMax.
-Require Import Sensitivity.Misc.
+Require Import RingLike.Misc.
 Require Import Trigo.RealLike.
 Require Import Trigo.Angle Trigo.TrigoWithoutPiExt.
 Require Import Trigo.AngleAddLeMonoL.

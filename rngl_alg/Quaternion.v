@@ -9,7 +9,7 @@ Import Init.Nat.
 
 Require Import RingLike.RingLike.
 Require Import RingLike.IterAdd.
-Require Import Sensitivity.Misc.
+Require Import RingLike.Misc.
 Require Import Sensitivity.MyVector.
 
 Fixpoint comb_elem_rest A (la : list A) :=
