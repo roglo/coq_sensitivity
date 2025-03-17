@@ -1223,3 +1223,6 @@ apply binomial_lt; flia.
 Qed.
 
 (* end binomial *)
+
+Theorem fold_not : ∀ (P : Prop), not P → P → False.
+Proof. easy. Qed.

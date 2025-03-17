@@ -15,9 +15,6 @@ Notation "∃! x .. y , p" :=
     (at level 200, x binder, right associativity)
   : type_scope.
 
-Theorem fold_not : ∀ (P : Prop), not P → P → False.
-Proof. easy. Qed.
-
 Theorem Tauto_match_nat_same : ∀ A a (b : A),
   match a with 0 => b | S _ => b end = b.
 Proof. now intros; destruct a. Qed.
