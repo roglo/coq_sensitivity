@@ -6,8 +6,8 @@ Require Import Utf8 Arith Bool.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
+Require Import RingLike.IterAdd.
 Require Import Sensitivity.Misc.
-Require Import Sensitivity.IterAdd.
 Require Import Sensitivity.Matrix.
 Require Import Sensitivity.Determinant.
 Require Import Sensitivity.Comatrix.

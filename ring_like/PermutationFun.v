@@ -7,7 +7,7 @@ Require FinFun.
 Import Init.Nat.
 Import List.ListNotations.
 
-Require Import RingLike.Misc.
+Require Import Misc.
 
 Definition reflexive {A} (rel : A → A → bool) :=
   ∀ a, rel a a = true.

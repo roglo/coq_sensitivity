@@ -18,8 +18,8 @@ Require Import Utf8 Arith.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
+Require Import RingLike.IterAdd.
 Require Import Misc MyVector Matrix.
-Require Import IterAdd.
 Import matrix_Notations.
 
 Section a.

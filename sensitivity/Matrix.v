@@ -7,8 +7,10 @@ Import List.ListNotations.
 Require Import Init.Nat.
 
 Require Import RingLike.RingLike.
+Require Import RingLike.IterAdd.
+Require Import RingLike.IterAnd.
+Require Import RingLike.IterMul.
 Require Import Misc.
-Require Import IterAdd IterMul IterAnd.
 Require Import MyVector Signature.
 
 (* matrices *)

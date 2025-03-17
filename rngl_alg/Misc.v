@@ -3,7 +3,8 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
-Require Import Sensitivity.Misc Sensitivity.PermutationFun.
+Require Import RingLike.PermutationFun.
+Require Import Sensitivity.Misc.
 Import List.
 
 (* (a ^ b) mod c defined like that so that we can use "Compute"

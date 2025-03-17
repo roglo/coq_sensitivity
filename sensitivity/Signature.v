@@ -6,9 +6,11 @@ Require Import Utf8 Arith Init.Nat.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
+Require Import RingLike.PermutationFun.
+Require Import RingLike.IterMul.
 Require Import Misc.
-Require Import SortingFun SortRank PermutationFun.
-Require Import IterMul PermutSeq.
+Require Import SortingFun SortRank.
+Require Import PermutSeq.
 
 Section a.
 

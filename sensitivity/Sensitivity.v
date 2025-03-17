@@ -8,7 +8,9 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List.ListNotations.
 Require Import Init.Nat.
-Require Import Misc SortingFun IterAdd.
+
+Require Import RingLike.IterAdd.
+Require Import Misc SortingFun.
 Require Import NatRingLike.
 
 (* adjacent vertices of a cube graph in any dimension;

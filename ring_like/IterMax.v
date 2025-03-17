@@ -1,8 +1,8 @@
 (* maximum of a list or of a sequence *)
 
 Require Import Utf8.
-Require Import RingLike.RingLike.
-Require Import RingLike.Misc.
+Require Import RingLike.
+Require Import Misc.
 Import List.ListNotations.
 Open Scope list.
 

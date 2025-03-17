@@ -3,7 +3,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List.ListNotations.
 
-Require Import Misc PermutationFun.
+Require Import RingLike.PermutationFun.
+Require Import Misc.
 Require Import SortingFun_common.
 
 Theorem strongly_sorted_sorted : ∀ A (rel : A → A → bool),

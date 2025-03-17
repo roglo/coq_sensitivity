@@ -7,7 +7,10 @@ Require Import Utf8 Arith.
 Import List.ListNotations Init.Nat.
 
 Require Import RingLike.RingLike.
-Require Import Misc IterAdd IterMul IterAnd.
+Require Import RingLike.IterAdd.
+Require Import RingLike.IterAnd.
+Require Import RingLike.IterMul.
+Require Import Misc.
 Require Import LapPolyn Polynomial Matrix Determinant Comatrix.
 Require Import Signature PermutSeq MyVector.
 Import matrix_Notations.

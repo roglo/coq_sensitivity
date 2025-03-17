@@ -8,8 +8,11 @@ Require Import Utf8 Arith.
 Import List.ListNotations Init.Nat.
 
 Require Import RingLike.RingLike.
-Require Import Misc IterAdd IterAnd.
-Require Import PermutationFun SortingFun.
+Require Import RingLike.PermutationFun.
+Require Import RingLike.IterAdd.
+Require Import RingLike.IterAnd.
+Require Import Misc.
+Require Import SortingFun.
 Require Import LapPolyn.
 
 Section a.

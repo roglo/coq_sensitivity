@@ -6,8 +6,11 @@ Require Import Utf8 Arith.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
-Require Import Misc IterAdd IterMul Pigeonhole.
-Require Import PermutationFun SortingFun SortRank.
+Require Import RingLike.PermutationFun.
+Require Import RingLike.IterAdd.
+Require Import RingLike.IterMul.
+Require Import Misc Pigeonhole.
+Require Import SortingFun SortRank.
 Require Import Matrix PermutSeq Signature Determinant.
 Require Import MyVector.
 Import matrix_Notations.

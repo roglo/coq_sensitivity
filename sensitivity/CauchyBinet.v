@@ -15,8 +15,11 @@ Require Import Utf8 Arith.
 Import List.ListNotations Init.Nat.
 
 Require Import RingLike.RingLike.
-Require Import Misc IterAdd IterMul.
-Require Import PermutationFun SortingFun SortRank.
+Require Import RingLike.PermutationFun.
+Require Import RingLike.IterAdd.
+Require Import RingLike.IterMul.
+Require Import Misc.
+Require Import SortingFun SortRank.
 Require Import PermutSeq Signature Matrix Determinant.
 Import matrix_Notations.
 

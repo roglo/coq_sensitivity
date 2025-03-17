@@ -5,7 +5,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List.ListNotations.
 
-Require Import Misc PermutationFun.
+Require Import RingLike.PermutationFun.
+Require Import Misc.
 Require Import SortingFun_common.
 
 Fixpoint merge_loop {A} (rel : A → A → bool) it la lb :=

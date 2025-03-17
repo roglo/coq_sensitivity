@@ -9,7 +9,8 @@ Require Import Utf8 Arith.
 Import List.ListNotations Init.Nat.
 
 Require Import RingLike.RingLike.
-Require Import Misc IterAdd.
+Require Import RingLike.IterAdd.
+Require Import Misc.
 
 (* (lap : list as polynomial) *)
 (* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
