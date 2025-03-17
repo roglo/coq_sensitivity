@@ -212,7 +212,6 @@ Notation "x ≤ y ≤ z" := (le x y ∧ le y z) : Q_scope.
 Notation "- x" := (opp x) : Q_scope.
 Notation "x + y" := (add x y) : Q_scope.
 Notation "x - y" := (sub x y) : Q_scope.
-Notation "‖ x ‖" := (abs x) (at level 60) : Q_scope.
 Notation "x * y" := (mul x y) : Q_scope.
 Notation "x / y" := (div x y) : Q_scope.
 Notation "¹/ x" := (inv x) (at level 35, right associativity) : Q_scope.
