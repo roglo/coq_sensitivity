@@ -112,14 +112,6 @@ apply Nat.leb_gt.
 now apply Nat.add_lt_mono_l.
 Qed.
 
-Theorem Nat_sub_sub_swap : ∀ a b c, a - b - c = a - c - b.
-Proof.
-intros.
-rewrite <- Nat.sub_add_distr.
-rewrite Nat.add_comm.
-now rewrite Nat.sub_add_distr.
-Qed.
-
 Theorem Nat_sub_sub_distr : ∀ n m p, p ≤ m → n - (m - p) = n + p - m.
 Proof.
 intros n m p Hpm.

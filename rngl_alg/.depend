@@ -16,7 +16,7 @@ Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v ../ring_like/Permut
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v ../ring_like/Misc.vo Misc.vo
 NewtonBinomial.vo NewtonBinomial.glob NewtonBinomial.v.beautified NewtonBinomial.required_vo: NewtonBinomial.v ../ring_like/RingLike.vo ../ring_like/IterAdd.vo ../sensitivity/Misc.vo Misc.vo
 Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v ../sensitivity/Misc.vo Misc.vo FermatLittle.vo ../ring_like/RingLike.vo
-PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v ../sensitivity/Misc.vo Misc.vo Nat_ggcd.vo
+PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v ../ring_like/Misc.vo Misc.vo Nat_ggcd.vo
 ProjGeom.vo ProjGeom.glob ProjGeom.v.beautified ProjGeom.required_vo: ProjGeom.v ../ring_like/RingLike.vo ../trigo_without_pi/RealLike.vo
 QG.vo QG.glob QG.v.beautified QG.required_vo: QG.v ../ring_like/Misc.vo ../ring_like/RingLike.vo
 Qrl.vo Qrl.glob Qrl.v.beautified Qrl.required_vo: Qrl.v ../ring_like/RingLike.vo Rational.vo

@@ -1,11 +1,10 @@
 (* Implementation of positive (non zero) rationals using only nat *)
 
 Require Import Utf8 Arith Morphisms Psatz.
-Require Import Sensitivity.Misc Misc.
+Require Import RingLike.Misc Misc.
 
 Set Nested Proofs Allowed.
 
-Tactic Notation "flia" hyp_list(Hs) := clear - Hs; lia.
 Reserved Notation "a // b" (at level 32, format "a // b").
 
 (* Non null natural

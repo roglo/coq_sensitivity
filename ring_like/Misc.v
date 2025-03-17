@@ -30,6 +30,14 @@ Notation "x < y < z" := (x < y ∧ y < z)%nat (at level 70, y at next level).
 Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
 Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
 
+Theorem Nat_sub_sub_swap : ∀ a b c, a - b - c = a - c - b.
+Proof.
+intros.
+rewrite <- Nat.sub_add_distr.
+rewrite Nat.add_comm.
+now rewrite Nat.sub_add_distr.
+Qed.
+
 Theorem Nat_mod_add_l_mul_r : ∀ a b c,
   (c * b + a) mod b = a mod b.
 Proof.
