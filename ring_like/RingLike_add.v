@@ -604,7 +604,7 @@ Proof. easy. Qed.
 
 Theorem rngl_abs_0 :
   rngl_has_opp T = true →
-  rngl_abs 0%L = 0%L.
+  ∣ 0 ∣ = 0%L.
 Proof.
 intros Hop.
 progress unfold rngl_abs.
