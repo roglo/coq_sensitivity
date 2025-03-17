@@ -1,5 +1,6 @@
 TARGET=AngleDivNat.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
+QDIRS=-Q ../ring_like RingLike
 TEST_DIR=test `basename "$<"` = "$<" || { echo "File \"$<\" needs to be recompiled."; echo "Please run 'make' in directory '$$(dirname "$<")' first."; exit 1; }
 
 all: $(TARGET)
@@ -13,14 +14,14 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	coqdep -Q ../ring_like RingLike $(FILESFORDEP) | LC_ALL=C sort | \
+	coqdep $(QDIRS) $(FILESFORDEP) | LC_ALL=C sort | \
 	sed -e 's/  *$$//' > .depend
 
 .SUFFIXES: .v .vo
 
 .v.vo:
 	@$(TEST_DIR)
-	coqc -R . Trigo -Q ../ring_like RingLike $<
+	coqc -R . Trigo $(QDIRS) $<
 
 .PHONY: all clean depend
 

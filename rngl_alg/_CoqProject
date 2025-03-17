@@ -1,1 +1,1 @@
--R . RnglAlg -Q ../ring_like RingLike -Q ../main Main -Q ../trigo_without_pi Trigo
+-R . RnglAlg -Q ../ring_like RingLike -Q ../trigo_without_pi Trigo -Q ../main Main
