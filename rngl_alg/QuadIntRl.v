@@ -18,7 +18,7 @@ Require Import Utf8 ZArith.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
-Require Import Sensitivity.Misc Misc.
+Require Import RingLike.Misc Misc.
 Open Scope Z_scope.
 
 Record quad_int (d : Z) := mk_qi { qi_re : Z; qi_im : Z }.

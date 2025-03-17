@@ -13,6 +13,8 @@ Notation "x '∈' l" := (List.In x l) (at level 70).
 Notation "x '∉' l" := (¬ List.In x l) (at level 70).
 Notation "E ⊂ F" := (List.incl E F) (at level 70).
 
+Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
+
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
 
 (* "fast" lia, to improve compilation speed *)
@@ -1184,3 +1186,40 @@ Proof. easy. Qed.
 
 Theorem Nat_succ_sub_succ_r : ∀ a b, b < a → a - b = S (a - S b).
 Proof. intros * Hba; flia Hba. Qed.
+
+(* binomial *)
+(* code borrowed from my work "coq_euler_prod_form" *)
+
+Fixpoint binomial n k :=
+  match k with
+  | 0 => 1
+  | S k' =>
+      match n with
+      | 0 => 0
+      | S n' => binomial n' k' + binomial n' k
+     end
+  end.
+
+Theorem binomial_succ_succ : ∀ n k,
+  binomial (S n) (S k) = binomial n k + binomial n (S k).
+Proof. easy. Qed.
+
+Theorem binomial_lt : ∀ n k, n < k → binomial n k = 0.
+Proof.
+intros * Hnk.
+revert k Hnk.
+induction n; intros; [ now destruct k | cbn ].
+destruct k; [ flia Hnk | ].
+apply Nat.succ_lt_mono in Hnk.
+rewrite IHn; [ | easy ].
+rewrite Nat.add_0_l.
+apply IHn; flia Hnk.
+Qed.
+
+Theorem binomial_succ_diag_r : ∀ n, binomial n (S n) = 0.
+Proof.
+intros.
+apply binomial_lt; flia.
+Qed.
+
+(* end binomial *)
