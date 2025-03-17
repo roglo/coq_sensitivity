@@ -812,14 +812,8 @@ Definition rngl_ring_theory
 
 (* code to be added to be able to use the Coq tactic "ring"
 
-Context {T : Type}.
-Context {ro : ring_like_op T}.
-Context {rp : ring_like_prop T}.
-Context {Hic : @rngl_mul_is_comm T ro rp = true}.
-Context {Hop : @rngl_has_opp T T ro = true}.
-
 Require Import Ring.
-Add Ring rngl_ring : (@rngl_ring_theory T ro rp Hic Hop).
+Add Ring rngl_ring : rngl_ring_theory.
 
 (* example *)
 
