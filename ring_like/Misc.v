@@ -1,6 +1,5 @@
-(* Misc1.v *)
+(* Misc.v *)
 (* Theorems of general usage, which could be (or not) in Coq library *)
-(* Used in ../trigo_without_pi *)
 
 Require Import Utf8 Arith Psatz.
 Import List.ListNotations.
