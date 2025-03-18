@@ -6,8 +6,8 @@ Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
 
-Require Import RingLike.RingLike.
-Require Import RingLike.RealLike.
+Require Import RingLike.
+Require Import RealLike.
 
 Section a.
 

@@ -6,13 +6,13 @@ Require Import Utf8 Arith.
 
 Require Import RingLike.RingLike.
 Require Import RingLike.RealLike.
+Require Import RingLike.DerivMul.
 
 Require Import Trigo.Angle.
 Require Import Trigo.AngleDiv2.
 Require Import Trigo.Angle_order.
 Require Import Trigo.TrigoWithoutPiExt.
 
-Require Import DerivMul.
 Require Import AngleDeriv.
 
 Section a.

@@ -1,3 +1,4 @@
+DerivMul.vo DerivMul.glob DerivMul.v.beautified DerivMul.required_vo: DerivMul.v RingLike.vo RealLike.vo
 IterAdd.vo IterAdd.glob IterAdd.v.beautified IterAdd.required_vo: IterAdd.v RingLike.vo Misc.vo PermutationFun.vo
 IterAnd.vo IterAnd.glob IterAnd.v.beautified IterAnd.required_vo: IterAnd.v Misc.vo
 IterMax.vo IterMax.glob IterMax.v.beautified IterMax.required_vo: IterMax.v RingLike.vo Misc.vo
