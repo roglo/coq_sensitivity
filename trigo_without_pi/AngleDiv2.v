@@ -3,8 +3,8 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import RingLike.RingLike.
+Require Import RingLike.RealLike.
 Require Import RingLike.Misc.
-Require Import RealLike.
 Require Import Angle.
 Require Import TrigoWithoutPiExt.
 Require Import Angle_order.

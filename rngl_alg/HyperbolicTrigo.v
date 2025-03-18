@@ -3,11 +3,13 @@
    but with "x²-y²=1" instead of "x²+y²=1" *)
 
 Set Nested Proofs Allowed.
+
 Require Import Utf8 Arith.
 Import List.ListNotations.
+
 Require Import RingLike.RingLike.
+Require Import RingLike.RealLike.
 Require Import RingLike.Misc.
-Require Import Trigo.RealLike.
 
 Section a.
 

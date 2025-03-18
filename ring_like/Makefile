@@ -1,4 +1,4 @@
-TARGET=RingLike.vo IterMul.vo IterAnd.vo IterMax.vo
+TARGET=RingLike.vo RealLike.vo IterMul.vo IterAnd.vo IterMax.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 
 all: $(TARGET)

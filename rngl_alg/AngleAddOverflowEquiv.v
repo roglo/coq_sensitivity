@@ -1,14 +1,18 @@
 (* equivalent definition of angle_add_overflow *)
 Set Nested Proofs Allowed.
+
 Require Import Utf8 ZArith.
+
 Require Import RingLike.RingLike.
-Require Import Trigo.RealLike.
+Require Import RingLike.RealLike.
+
 Require Import Trigo.Angle Trigo.TrigoWithoutPiExt.
 Require Import Trigo.AngleAddOverflowLe Trigo.AngleAddLeMonoL.
 Require Import Trigo.Angle_order.
 Require Import Trigo.AngleDiv2.
 Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.TacChangeAngle.
+
 Require Import Complex.
 
 Section a.

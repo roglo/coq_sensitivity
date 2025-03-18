@@ -4,6 +4,7 @@ IterMax.vo IterMax.glob IterMax.v.beautified IterMax.required_vo: IterMax.v Ring
 IterMul.vo IterMul.glob IterMul.v.beautified IterMul.required_vo: IterMul.v RingLike.vo Misc.vo PermutationFun.vo IterAdd.vo
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
 PermutationFun.vo PermutationFun.glob PermutationFun.v.beautified PermutationFun.required_vo: PermutationFun.v Misc.vo
+RealLike.vo RealLike.glob RealLike.v.beautified RealLike.required_vo: RealLike.v RingLike.vo
 RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v RingLike_structures.vo RingLike_order.vo RingLike_add.vo RingLike_mul.vo RingLike_div.vo RingLike_add_with_order.vo RingLike_mul_with_order.vo RingLike_div_with_order.vo RingLike_distances.vo
 RingLike_add.vo RingLike_add.glob RingLike_add.v.beautified RingLike_add.required_vo: RingLike_add.v RingLike_structures.vo
 RingLike_add_with_order.vo RingLike_add_with_order.glob RingLike_add_with_order.v.beautified RingLike_add_with_order.required_vo: RingLike_add_with_order.v RingLike_structures.vo RingLike_order.vo RingLike_add.vo

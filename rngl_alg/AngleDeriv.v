@@ -1,11 +1,13 @@
 (* derivation of trigonometric functions *)
 
 Set Nested Proofs Allowed.
+
 Require Import Utf8 Arith.
+
 Require Import RingLike.RingLike.
+Require Import RingLike.RealLike.
 Require Import RingLike.Misc.
 
-Require Import Trigo.RealLike.
 Require Import Trigo.Angle.
 Require Import Trigo.AngleDiv2.
 Require Import Trigo.TrigoWithoutPiExt.

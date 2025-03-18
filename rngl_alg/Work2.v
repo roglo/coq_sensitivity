@@ -7,9 +7,10 @@ Require Import Init.Nat.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
+Require Import RingLike.RealLike.
 Require Import RingLike.Misc.
+
 Require Import Trigo.TacChangeAngle.
-Require Import Trigo.RealLike.
 Require Import Trigo.Angle Trigo.TrigoWithoutPiExt.
 Require Import Trigo.Angle_order.
 Require Import Trigo.AngleDiv2.
@@ -17,6 +18,7 @@ Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.SeqAngleIsCauchy.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleAddLeMonoL.
+
 Require Import Misc.
 Require Import AngleEuclDistLtAngleLtLt.
 Require Import Complex.

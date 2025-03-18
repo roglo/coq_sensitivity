@@ -6,16 +6,18 @@ Require Import Utf8 Arith.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
+Require Import RingLike.RealLike.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterMax.
 Require Import RingLike.Misc.
-Require Import Trigo.RealLike.
+
 Require Import Trigo.Angle Trigo.TrigoWithoutPiExt.
 Require Import Trigo.AngleAddLeMonoL.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleTypeIsComplete.
 Require Import Trigo.SeqAngleIsCauchy.
 Require Import Trigo.AngleDivNat.
+
 Require Import Misc.
 Require Import Complex.
 Require Import Work.

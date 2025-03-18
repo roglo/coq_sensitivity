@@ -1,10 +1,10 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import RingLike.RingLike.
+Require Import RingLike.RealLike.
 Require Import RingLike.Misc.
 Require Import Angle.
 Require Import Angle_order.
-Require Import RealLike.
 Require Import TacChangeAngle.
 
 Section a.
