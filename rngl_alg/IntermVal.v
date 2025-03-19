@@ -1073,7 +1073,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 (* Proof in
    https://en.wikipedia.org/wiki/Least-upper-bound_property#
      Proof_using_Cauchy_sequences *)
-unfold is_supremum.
+progress unfold is_supremum.
 set (u := λ n, fst (AnBn P a b n)).
 set (v := λ n, snd (AnBn P a b n)).
 specialize (An_Bn_are_Cauchy_sequences Hon Hiv Har P) as H1.
@@ -1271,6 +1271,265 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
   now apply Nat.pow_gt_lin_r.
 }
 Qed.
+
+(* to be completed
+Theorem exists_infimum :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_is_archimedean T = true →
+  is_complete T rngl_distance →
+  ∀ (P : T → Prop) a b,
+  P a
+  → (∀ x, P x → (b < x)%L)
+  → ∃ c, is_infimum P c ∧ (b ≤ c)%L ∧
+    is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn P a b n)) c ∧
+    is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn P a b n)) c.
+Proof.
+intros Hon Hiv Har Hco * Ha Hs.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+move Hos before Har.
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+move Hiq before Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+move Hii before Hiq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
+  exists 0%L.
+  rewrite (H b).
+  split. {
+    progress unfold is_infimum.
+    destruct (is_lower_bound P 0%L) as [H1| H1]. {
+      intros.
+      rewrite (H c').
+      destruct (is_lower_bound P 0%L); [ | easy ].
+      apply (rngl_le_refl Hor).
+    } {
+      destruct H1 as (x, Hx); apply Hx.
+      intros Hpx.
+      rewrite (H x).
+      apply (rngl_le_refl Hor).
+    }
+  }
+  split; [ apply (rngl_le_refl Hor) | ].
+  rewrite (H a).
+  split. {
+    intros ε Hε.
+    rewrite H in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  } {
+    intros ε Hε.
+    rewrite H in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+}
+(* Proof in
+   https://en.wikipedia.org/wiki/Least-upper-bound_property#
+     Proof_using_Cauchy_sequences *)
+progress unfold is_infimum.
+set (u := λ n, fst (AnBn P b a n)).
+set (v := λ n, snd (AnBn P b a n)).
+specialize (An_Bn_are_Cauchy_sequences Hon Hiv Har P) as H1.
+assert (Hba : (b ≤ a)%L) by now apply (rngl_lt_le_incl Hor), Hs.
+specialize (H1 b a Hba).
+progress fold u in H1.
+progress fold v in H1.
+destruct H1 as (Hcsu, Hcsv).
+specialize (Hco _ Hcsu) as Hac.
+specialize (Hco _ Hcsv) as Hbc.
+destruct Hac as (lima, Hal).
+destruct Hbc as (limb, Hbl).
+move limb before lima.
+assert
+  (Hl : (is_limit_when_tending_to_inf rngl_distance (λ n, (u n - v n)) 0)%L). {
+  intros ε Hε.
+  progress unfold u.
+  progress unfold v.
+  specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+  specialize (H1 ((a - b) / ε)%L).
+  destruct H1 as (N, HN).
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+    now apply (rngl_le_0_sub Hop Hor).
+  }
+  exists (N + 1).
+  intros n Hn.
+  cbn.
+  progress unfold rngl_dist.
+  rewrite (rngl_sub_0_r Hos).
+  eapply (rngl_le_lt_trans Hor). {
+    apply (rngl_abs_An_Bn_le Hon Hiv _ _ Hba P n).
+    apply surjective_pairing.
+  }
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
+  rewrite <- (rngl_of_nat_pow Hon Hos).
+  rewrite <- (rngl_mul_nat_comm Hon Hos).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
+  eapply (rngl_lt_le_trans Hor); [ apply HN | ].
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  eapply Nat.le_trans; [ apply Hn | ].
+  apply Nat.log2_up_le_pow2; [ flia Hn | ].
+  now apply Nat.log2_up_le_lin.
+}
+assert (Hlab : lima = limb). {
+  generalize Hbl; intros Hblv.
+  apply limit_opp in Hbl.
+  specialize (limit_add Hon Hop Hiv Hor rngl_distance) as H1.
+  specialize (H1 (rngl_dist_add_add_le Hop Hor)).
+  specialize (H1 _ _ _ _ Hal Hbl).
+  rewrite (rngl_add_opp_r Hop) in H1.
+  eapply gen_limit_ext_in in H1. 2: {
+    now intros; rewrite (rngl_add_opp_r Hop).
+  }
+  apply (rngl_sub_move_0_r Hop).
+  eapply (limit_unique Hon Hop Hiv Hor _ rngl_distance).
+  apply H1.
+  apply Hl.
+}
+subst limb; rename lima into lim.
+exists lim.
+move lim before b.
+clear Hl.
+destruct (is_lower_bound P lim) as [H1| H1]. {
+  split. {
+    intros c.
+    move c before b.
+    destruct (is_lower_bound P c) as [H2| H2]; [ | easy ].
+    apply (rngl_nlt_ge_iff Hor).
+    intros Hc.
+    specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
+Check limit_between_An_and_Bn.
+...
+    specialize (Hl Ha Hs Hal Hbl).
+    specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
+    specialize (in_AnBn Hon Hiv P a b) as Hin.
+    specialize (Hin Ha Hs).
+    (* if (b - a) / 2 ^ n < lim - c, then c < an < lim,
+       we have a y between an and bn with P y, but
+       therefore greater than c, what contredicts H2 *)
+    (* (b - a) / 2 ^ n < lim - c, if
+       (b - a) < (lim - c) * 2 ^ n, if
+       (b - a) / (lim - c) < 2 ^ n, if
+       (b - a) / (lim - c) < n *)
+    set (x := ((b - a) / (lim - c))%L).
+    destruct (int_part Hon Hop Hc1 Hor Har x) as (n & Hnx & Hxn1).
+    destruct (Hin n _ _ (surjective_pairing _)) as (y & (Hny & Hyn) & Hy).
+    assert (Hcy : (c < y)%L). {
+      eapply (rngl_lt_le_trans Hor); [ | apply Hny ].
+      specialize (Hl n _ _ (surjective_pairing _)) as H3.
+      destruct (Hi n _ _ (surjective_pairing _)) as (Hanb, H4).
+      set (an := fst (AnBn P a b n)) in *.
+      set (bn := snd (AnBn P a b n)) in *.
+      symmetry in H4.
+      apply (rngl_add_sub_eq_r Hos) in H4.
+      rewrite <- H4.
+      apply (rngl_lt_add_lt_sub_l Hop Hor).
+      rewrite rngl_add_comm.
+      apply (rngl_lt_add_lt_sub_l Hop Hor).
+      apply (rngl_lt_le_trans Hor _ (lim - c)). 2: {
+        now apply (rngl_sub_le_mono_r Hop Hor).
+      }
+      apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+        apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+        apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      }
+      replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
+      rewrite <- (rngl_mul_nat_pow_comm Hon Hos).
+      apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+        now apply (rngl_lt_0_sub Hop Hor).
+      }
+      progress fold x.
+      rewrite <- (rngl_abs_nonneg_eq Hop Hor x). 2: {
+        progress unfold x.
+        apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+          now apply (rngl_le_0_sub Hop Hor).
+        } {
+          now apply (rngl_lt_0_sub Hop Hor).
+        }
+      }
+      rewrite <- (rngl_of_nat_pow Hon Hos).
+      eapply (rngl_lt_le_trans Hor); [ apply Hxn1 | ].
+      apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+      rewrite Nat.add_1_r.
+      apply Nat.le_succ_l.
+      now apply Nat.pow_gt_lin_r.
+    }
+    apply H2 in Hy.
+    now apply rngl_nlt_ge in Hy.
+  } {
+    specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
+    specialize (Hl Ha Hs Hal Hbl).
+    now specialize (Hl 0 _ _ (surjective_pairing _)).
+  }
+} {
+  exfalso.
+  destruct H1 as (c, Hc).
+  apply Hc; clear Hc.
+  intros Hc.
+  apply (rngl_nlt_ge_iff Hor).
+  intros Hlc.
+  specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
+  specialize (Hl Ha Hs Hal Hbl).
+  specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
+  specialize (in_AnBn Hon Hiv P a b) as Hin.
+  specialize (Hin Ha Hs).
+  specialize (after_AnBn Hon Hiv P a b Ha Hs) as Han.
+  (* faut que je trouve un n tel que bn < c,
+     (qui contradira Hc avec Han),
+     c'est-à-dire an + (b - a) / 2 ^ n < c
+     qui marche si lim + (b - a) / 2 ^ n < c
+     c'est-à-dire (b - a) / 2 ^ n < c - lim,
+     c'est-à-dire (b - a) / (c - lim) < 2 ^ n
+     ça marche si (b - a) / (c - lim) < n *)
+  set (x := ((b - a) / (c - lim))%L).
+  destruct (int_part Hon Hop Hc1 Hor Har x) as (n & Hnx & Hxn1).
+  remember (AnBn P a b n) as abn eqn:Habn; symmetry in Habn.
+  destruct abn as (an, bn).
+  specialize (Han n _ _ Habn c) as H1.
+  apply H1; [ clear H1 | apply Hc ].
+  destruct (Hi n _ _ Habn) as (Haabb & Hbn).
+  rewrite Hbn.
+  apply (rngl_le_lt_trans Hor _ (lim + (b - a) / 2 ^ n)%L). {
+    apply (rngl_add_le_compat Hor); [ | apply (rngl_le_refl Hor) ].
+    apply (Hl n _ _ Habn).
+  }
+  apply (rngl_lt_add_lt_sub_l Hop Hor).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
+  rewrite <- (rngl_mul_nat_pow_comm Hon Hos).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    now apply (rngl_lt_0_sub Hop Hor).
+  }
+  progress fold x.
+  replace (rngl_of_nat 2) with 2%L by now cbn; rewrite rngl_add_0_r.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor x). 2: {
+    progress unfold x.
+    apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+      now apply (rngl_le_0_sub Hop Hor).
+    } {
+      now apply (rngl_lt_0_sub Hop Hor).
+    }
+  }
+  replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
+  rewrite <- (rngl_of_nat_pow Hon Hos).
+  eapply (rngl_lt_le_trans Hor); [ apply Hxn1 | ].
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  rewrite Nat.add_1_r.
+  apply Nat.le_succ_l.
+  now apply Nat.pow_gt_lin_r.
+}
+Qed.
+
+...
+*)
 
 (* to be completed
 Theorem exists_infimum :
