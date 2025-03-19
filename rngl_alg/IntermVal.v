@@ -1307,6 +1307,26 @@ split. {
   symmetry in Hlb.
   destruct lb as [Hlb1| Hlb1]. {
     intros c'.
+    remember (is_lower_bound P c')%L as lbc eqn:Hlbc.
+    symmetry in Hlbc.
+    destruct lbc as [Hlbc1| Hlbc1]. {
+      remember (is_upper_bound (λ x, P (- x)%L) c) as ub eqn:Hub.
+      symmetry in Hub.
+      destruct ub as [Hub1| Hub1]. {
+        specialize (Hc c').
+        remember (is_upper_bound (λ x, P (- x)%L) c') as ub' eqn:Hub'.
+        symmetry in Hub'.
+        destruct ub' as [Hub'1| Hub'1]. {
+          progress unfold is_upper_bound in Hub'.
+          progress unfold rl_forall_or_exist_not in Hub'.
+(* quel bordel ! bon, à part refaire toute la preuve, je vois pas
+   comment *)
+Check @rl_forall_or_exist_not.
+specialize (Hub' excl_midd).
+...
+      apply (rngl_le_trans Hor _ a); [ now apply Hlbc1 | ].
+...
+2: {
 ...
 *)
 
