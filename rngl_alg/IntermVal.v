@@ -1010,8 +1010,6 @@ apply (rngl_lt_sub_lt_add_l Hop Hor).
 now apply (rngl_lt_add_l Hos Hor).
 Qed.
 
-(* *)
-
 Theorem exists_supremum :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -1584,6 +1582,23 @@ apply (rngl_le_antisymm Hor); apply (rngl_nlt_ge_iff Hor); intros Hu. {
   rewrite (rngl_sub_diag Hos), rngl_add_0_l in H4.
   revert H4; apply (rngl_lt_irrefl Hor).
 }
+Qed.
+
+(* *)
+
+Theorem upper_bound_property :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_is_archimedean T = true →
+  is_complete T rngl_distance →
+  ∀ (P : T → Prop) a b,
+  P a
+  → (∀ x, P x → (x < b)%L)
+  → ∃ c, is_supremum P c.
+Proof.
+intros Hon Hiv Har Hco * Ha Hs.
+destruct (exists_supremum Hon Hiv Har Hco P a b Ha Hs) as (c & Hc).
+now exists c.
 Qed.
 
 Theorem intermediate_value :
