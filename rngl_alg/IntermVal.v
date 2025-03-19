@@ -44,9 +44,18 @@ Context {em : excl_midd}.
 Definition is_upper_bound (Q : T → Type) c :=
   rl_forall_or_exist_not (λ x : T, Q x → (x ≤ c)%L).
 
+Definition is_lower_bound (Q : T → Type) c :=
+  rl_forall_or_exist_not (λ x : T, Q x → (c ≤ x)%L).
+
 Definition is_supremum (Q : T → Type) c :=
   match is_upper_bound Q c with
   | left _ => ∀ c', if is_upper_bound Q c' then (c ≤ c')%L else True
+  | right _ => False
+  end.
+
+Definition is_infimum (Q : T → Type) c :=
+  match is_lower_bound Q c with
+  | left _ => ∀ c', if is_lower_bound Q c' then (c' ≤ c)%L else True
   | right _ => False
   end.
 
@@ -1263,6 +1272,44 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
 }
 Qed.
 
+(* to be completed
+Theorem exists_infimum :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_is_archimedean T = true →
+  is_complete T rngl_distance →
+  ∀ (P : T → Prop) a b,
+  P a
+  → (∀ x, P x → (b < x)%L)
+  → ∃ c, is_infimum P c ∧ (b ≤ c)%L ∧
+    is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn P a b n)) c ∧
+    is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn P a b n)) c.
+Proof.
+intros Hon Hiv Har Hco * Ha Hs.
+specialize (exists_supremum Hon Hiv Har Hco (λ x, P (- x)%L)) as H1.
+specialize (H1 (- a)%L (- b)%L).
+cbn in H1.
+rewrite (rngl_opp_involutive Hop) in H1.
+specialize (H1 Ha).
+assert (H : ∀ x, (P (- x) → x < - b)%L). {
+  intros x Hx.
+  apply (rngl_opp_lt_compat Hop Hor).
+  rewrite (rngl_opp_involutive Hop).
+  now apply Hs.
+}
+specialize (H1 H); clear H.
+destruct H1 as (c & Hc & Hcb & H1 & H2).
+exists (- c)%L.
+split. {
+  progress unfold is_supremum in Hc.
+  progress unfold is_infimum.
+  remember (is_lower_bound P (- c))%L as lb eqn:Hlb.
+  symmetry in Hlb.
+  destruct lb as [Hlb1| Hlb1]. {
+    intros c'.
+...
+*)
+
 (* https://en.wikipedia.org/wiki/Intermediate_value_theorem#Proof *)
 Theorem intermediate_value_le :
   rngl_has_1 T = true →
@@ -1600,6 +1647,23 @@ intros Hon Hiv Har Hco * Ha Hs.
 destruct (exists_supremum Hon Hiv Har Hco P a b Ha Hs) as (c & Hc).
 now exists c.
 Qed.
+
+(* to be completed
+Theorem lower_bound_property :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_is_archimedean T = true →
+  is_complete T rngl_distance →
+  ∀ (P : T → Prop) a b,
+  P a
+  → (∀ x, P x → (b < x)%L)
+  → ∃ c, is_infimum P c.
+Proof.
+intros Hon Hiv Har Hco * Ha Hs.
+destruct (exists_infimum Hon Hiv Har Hco P a b Ha Hs) as (c & Hc).
+now exists c.
+Qed.
+*)
 
 Theorem intermediate_value :
   rngl_has_1 T = true →
