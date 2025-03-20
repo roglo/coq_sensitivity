@@ -41,23 +41,20 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {em : excl_midd}.
 
-Definition is_upper_bound (Q : T → Type) c :=
-  rl_forall_or_exist_not (λ x : T, Q x → (x ≤ c)%L).
+Definition is_bound (le : T → T → Prop) (Q : T → Type) c :=
+  rl_forall_or_exist_not (λ x : T, Q x → le x c).
 
-Definition is_lower_bound (Q : T → Type) c :=
-  rl_forall_or_exist_not (λ x : T, Q x → (c ≤ x)%L).
+Definition is_upper_bound := is_bound (λ a b, (a ≤ b)%L).
+Definition is_lower_bound := is_bound (λ a b, (b ≤ a)%L).
 
-Definition is_supremum (Q : T → Type) c :=
-  match is_upper_bound Q c with
-  | left _ => ∀ c', if is_upper_bound Q c' then (c ≤ c')%L else True
+Definition is_extremum le (Q : T → Type) c :=
+  match is_bound le Q c with
+  | left _ => ∀ c', if is_bound le Q c' then le c c' else True
   | right _ => False
   end.
 
-Definition is_infimum (Q : T → Type) c :=
-  match is_lower_bound Q c with
-  | left _ => ∀ c', if is_lower_bound Q c' then (c' ≤ c)%L else True
-  | right _ => False
-  end.
+Definition is_supremum := is_extremum (λ a b, (a ≤ b)%L).
+Definition is_infimum := is_extremum (λ a b, (b ≤ a)%L).
 
 Fixpoint bisection (P : T → bool) lb ub n :=
   match n with
@@ -1046,10 +1043,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H b).
   split. {
     progress unfold is_supremum.
-    destruct (is_upper_bound P 0%L) as [H1| H1]. {
+    progress unfold is_extremum.
+    destruct (is_bound _ P 0%L) as [H1| H1]. {
       intros.
       rewrite (H c').
-      destruct (is_upper_bound P 0%L); [ | easy ].
+      destruct (is_bound _ P 0%L); [ | easy ].
       apply (rngl_le_refl Hor).
     } {
       destruct H1 as (x, Hx); apply Hx.
@@ -1141,11 +1139,12 @@ subst limb; rename lima into lim.
 exists lim.
 move lim before b.
 clear Hl.
-destruct (is_upper_bound P lim) as [H1| H1]. {
+progress unfold is_extremum.
+destruct (is_bound _ P lim) as [H1| H1]. {
   split. {
     intros c.
     move c before b.
-    destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
+    destruct (is_bound _ P c) as [H2| H2]; [ | easy ].
     apply (rngl_nlt_ge_iff Hor).
     intros Hc.
     specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
@@ -1664,9 +1663,10 @@ assert (H : (∀ x, P x → (x < b)%L)). {
 specialize (H1 H); clear H.
 destruct H1 as (c & Hc & H1 & Hlima & Hlimb).
 progress unfold is_supremum in Hc.
-remember (is_upper_bound _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
+progress unfold is_extremum in Hc.
+remember (is_bound _ _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
 destruct Hub1 as [Hub1| ]; [ | easy ].
-progress unfold is_upper_bound in Hub2.
+progress unfold is_bound in Hub2.
 destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
 clear Hub2 Hub3.
 enough (H : ∃ d, _) by apply H.
@@ -1747,7 +1747,7 @@ assert
     clear Hx; rename Hx' into Hx.
     set (x := ((c - rngl_min3 η1 η2 η3 / 2)%L)).
     specialize (Hc x) as H2.
-    destruct (is_upper_bound P x) as [Hpx| Hpx]. 2: {
+    destruct (is_bound _ P x) as [Hpx| Hpx]. 2: {
       destruct Hpx as (y & Hy); clear H2.
       apply Hy; clear Hy; intros Hpy.
       apply (rngl_nlt_ge_iff Hor); intros Hxy.
@@ -1790,7 +1790,7 @@ assert
     clear Hx; rename Hx' into Hx.
     set (x := ((c + rngl_min3 η1 η2 η3 / 2)%L)).
     specialize (Hc x) as H2.
-    destruct (is_upper_bound P x) as [Hpx| Hpx]. 2: {
+    destruct (is_bound _ P x) as [Hpx| Hpx]. 2: {
       destruct Hpx as (y & Hy); clear H2.
       apply Hy; clear Hy; intros Hpy.
       apply (rngl_le_trans Hor _ c); [ now apply Hub1 | ].
