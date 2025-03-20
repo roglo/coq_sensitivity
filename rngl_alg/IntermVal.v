@@ -715,76 +715,19 @@ split. {
 }
 Qed.
 
-(* to be generalized with any "le", not only "rngl_le"
-   to be able to use the same theorem for upper bounds
-   and lower bounds *)
-(* there is a problem of decidability somewhere *)
 Theorem AnBn_exists_P :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ (P : _ → Prop) a b x,
-  (∀ x : T, P x → (x ≤ b)%L)
-  → (a ≤ x ≤ b)%L
-  → P x
-  → ∀ n an bn,
-  AnBn rngl_le P a b n = (an, bn)
-  → ∃ y, (an ≤ y ≤ bn ∧ P y)%L.
-Proof.
-intros Hon Hiv * Hs Hab Hx * Habn.
-revert a b x Hs Hab Hx an bn Habn.
-induction n; intros; cbn in Habn. {
-  injection Habn; clear Habn; intros; subst an bn.
-  now exists x.
-}
-destruct (is_bound _ _ _) as [H1| H1]. {
-  specialize (IHn a ((a + b) / 2)%L x H1) as H2.
-  assert (H : (a ≤ x ≤ (a + b) / 2)%L). {
-    split; [ easy | now apply H1 ].
-  }
-  now specialize (H2 H Hx _ _ Habn).
-} {
-  specialize (IHn ((a + b) / 2)%L b) as H2.
-  destruct (rngl_le_dec Hor ((a + b) / 2)%L x) as [Habx| Habx]. {
-    specialize (H2 x Hs).
-    assert (H : ((a + b) / 2 ≤ x ≤ b)%L) by easy.
-    now specialize (H2 H Hx _ _ Habn); clear H.
-  }
-  apply (rngl_nle_gt_iff Hor) in Habx.
-  destruct H1 as (z & Hz).
-  specialize (H2 z Hs).
-  assert (Hpz : P z). {
-    specialize (em_prop (P z)) as H3.
-    destruct H3 as [H3| H3]; [ easy | ].
-    exfalso.
-    apply Hz.
-    now intros H.
-  }
-  assert (H : ((a + b) / 2 ≤ z ≤ b)%L). {
-    split; [ | now apply Hs ].
-    apply (rngl_nlt_ge_iff Hor).
-    intros H3.
-    apply Hz; clear Hz.
-    intros H4.
-    now apply (rngl_lt_le_incl Hor).
-  }
-  now specialize (H2 H Hpz _ _ Habn); clear H.
-}
-Qed.
-
-(*
-Theorem AnBn_exists_P :
-  rngl_has_1 T = true →
-  rngl_has_inv T = true →
-  ∀ le (dle : ∀ x y, {le x y} + {¬ le x y}),
+  ∀ le, (∀ a b, ¬ le a b → le b a) →
   ∀ (P : _ → Prop) a b x,
   (∀ x : T, P x → le x b)
   → le a x ∧ le x b
   → P x
   → ∀ n an bn,
   AnBn le P a b n = (an, bn)
-  → ∃ y, (le an y ∧ le y bn ∧ P y)%L.
+  → ∃ y, le an y ∧ le y bn ∧ P y.
 Proof.
-intros Hon Hiv * dle * Hs Hab Hx * Habn.
+intros Hon Hiv * Hll * Hs Hab Hx * Habn.
 revert a b x Hs Hab Hx an bn Habn.
 induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
@@ -798,9 +741,10 @@ destruct (is_bound _ _ _) as [H1| H1]. {
   now specialize (H2 H Hx _ _ Habn).
 } {
   specialize (IHn ((a + b) / 2)%L b) as H2.
-  destruct (dle ((a + b) / 2)%L x) as [Habx| Habx]. {
+  destruct (rl_forall_or_exist_not (le ((a + b) / 2)%L)) as [Habx| Habx]. {
+    specialize (H2 x Hs).
     assert (H : le ((a + b) / 2)%L x ∧ le x b) by easy.
-    now specialize (H2 x Hs H Hx _ _ Habn).
+    now specialize (H2 H Hx _ _ Habn).
   }
 (*
   apply (rngl_nle_gt_iff Hor) in Habx.
@@ -814,19 +758,22 @@ destruct (is_bound _ _ _) as [H1| H1]. {
     apply Hz.
     now intros H.
   }
-  assert (H : le ((a + b) / 2)%L z ∧le z b). {
+  assert (H : le ((a + b) / 2)%L z ∧ le z b). {
     split; [ | now apply Hs ].
-    apply (rngl_nlt_ge_iff Hor).
-    intros H3.
+    specialize (em_prop (le ((a + b) / 2)%L z)) as H3.
+    destruct H3 as [H3| H3]; [ easy | ].
+    exfalso.
     apply Hz; clear Hz.
     intros H4.
-    now apply (rngl_lt_le_incl Hor).
+    now apply Hll.
   }
   now specialize (H2 H Hpz _ _ Habn); clear H.
 }
 Qed.
-*)
 
+(* to be generalized with any "le", not only "rngl_le"
+   to be able to use the same theorem for upper bounds
+   and lower bounds *)
 Theorem in_AnBn :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -838,7 +785,13 @@ Theorem in_AnBn :
   → ∃ y : T, (an ≤ y ≤ bn)%L ∧ P y.
 Proof.
 intros Hon Hiv * Ha Hs * Habn.
-specialize (AnBn_exists_P Hon Hiv P) as H1.
+specialize (AnBn_exists_P Hon Hiv rngl_le) as H1.
+assert (H : ∀ a b, ¬ (a ≤ b)%L → (b ≤ a)%L). {
+  intros x y Hxy.
+  apply (rngl_nle_gt_iff Hor) in Hxy.
+  now apply (rngl_lt_le_incl Hor).
+}
+specialize (H1 H P); clear H.
 specialize (H1 a b a).
 assert (H : ∀ x : T, P x → (x ≤ b)%L). {
   now intros; apply (rngl_lt_le_incl Hor), Hs.
@@ -848,7 +801,9 @@ assert (H : (a ≤ a ≤ b)%L). {
   split; [ apply (rngl_le_refl Hor) | ].
   now apply (rngl_lt_le_incl Hor), Hs.
 }
-apply (H1 H Ha n an bn Habn).
+specialize (H1 H Ha n an bn Habn) as H2.
+destruct H2 as (y & Hy).
+now exists y.
 Qed.
 
 Theorem AnBn_not_P :
