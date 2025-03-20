@@ -715,6 +715,10 @@ split. {
 }
 Qed.
 
+(* to be generalized with any "le", not only "rngl_le"
+   to be able to use the same theorem for upper bounds
+   and lower bounds *)
+(* there is a problem of decidability somewhere *)
 Theorem AnBn_exists_P :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
