@@ -759,25 +759,29 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 }
 Qed.
 
-(* to be completed
 Theorem in_AnBn :
-  ∀ le, (∀ a, le a a) → (∀ a b, ¬ le a b → le b a) →
   ∀ (P : _ → Prop) a b,
   P a
-  → (∀ x : T, P x → le x b)
+  → (∀ x, P x → (x < b)%L)
   → ∀ n an bn,
-  AnBn le P a b n = (an, bn)
-  → ∃ y : T, le an y ∧ le y bn ∧ P y.
+  AnBn P a b n = (an, bn)
+  → ∃ y : T, (an ≤ y ≤ bn)%L ∧ P y.
 Proof.
-intros * Hlr Hll * Ha Hs * Habn.
-specialize (AnBn_exists_P le Hll P) as H1.
-specialize (H1 a b a Hs).
-assert (H : le a a ∧ le a b). {
-  split; [ apply Hlr | now apply Hs ].
+intros * Ha Hs * Habn.
+specialize (AnBn_exists_P P) as H1.
+specialize (H1 a b a).
+assert (H : ∀ x : T, P x → (x ≤ b)%L). {
+  now intros; apply (rngl_lt_le_incl Hor), Hs.
+}
+specialize (H1 H); clear H.
+assert (H : (a ≤ a ≤ b)%L). {
+  split; [ apply (rngl_le_refl Hor) | ].
+  now apply (rngl_lt_le_incl Hor), Hs.
 }
 apply (H1 H Ha n an bn Habn).
 Qed.
 
+(* to be completed
 Theorem AnBn_not_P :
   ∀ le (P : _ → Prop) a b n an bn,
   (∀ x : T, P x → le x b)
