@@ -1028,17 +1028,15 @@ Theorem exists_supremum :
     is_limit_when_tending_to_inf rngl_distance
       (λ n, snd (AnBn rngl_le P a b n)) c.
 Proof.
-intros Hon Hiv Har Hco * Ha Hs.
+intros Hon Hiv Har Hco.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-move Hos before Har.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
-move Hiq before Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-move Hii before Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
+  intros * Ha Hs.
   exists 0%L.
   rewrite (H b).
   split. {
@@ -1068,6 +1066,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
 }
+intros * Ha Hs.
 (* Proof in
    https://en.wikipedia.org/wiki/Least-upper-bound_property#
      Proof_using_Cauchy_sequences *)
