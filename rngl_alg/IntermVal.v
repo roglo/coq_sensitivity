@@ -801,19 +801,20 @@ destruct (is_bound _) as [H1| H1]. {
 Qed.
 
 Theorem after_AnBn :
+  ∀ le, (∀ a b, le a b → le b a → a = b) →
   ∀ (P : _ → Prop) a b,
-  (∀ x : T, P x → (x ≤ b)%L)
+  (∀ x : T, P x → le x b)
   → ∀ n an bn,
-  AnBn rngl_le P a b n = (an, bn)
-  → ∀ y, (bn < y)%L
-  → ¬ P y.
+  AnBn le P a b n = (an, bn)
+  → ∀ y, le bn y → y ≠ bn → ¬ P y.
 Proof.
-intros * Hs * Habn * Hby.
-specialize (AnBn_not_P rngl_le P) as H1.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+intros * Has * Hs * Habn * Hby Hyb.
+specialize (AnBn_not_P le P) as H1.
 specialize (H1 a b n an bn Hs Habn).
 intros H2.
 specialize (H1 _ H2).
-now apply rngl_nle_gt in Hby.
+now specialize (Has _ _ H1 Hby).
 Qed.
 
 (* to be generalized with any "le", not only "rngl_le"
@@ -1020,7 +1021,7 @@ Theorem exists_supremum :
   is_complete T rngl_distance →
   ∀ (P : T → Prop) a b,
   P a
-  → (∀ x, P x → (x ≤ b)%L)
+  → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L ∧
     is_limit_when_tending_to_inf rngl_distance
       (λ n, fst (AnBn rngl_le P a b n)) c ∧
@@ -1074,7 +1075,7 @@ progress unfold is_supremum.
 set (u := λ n, fst (AnBn rngl_le P a b n)).
 set (v := λ n, snd (AnBn rngl_le P a b n)).
 specialize (An_Bn_are_Cauchy_sequences Hon Hiv Har rngl_le P) as H1.
-assert (Hab : (a ≤ b)%L) by now apply Hs.
+assert (Hab : (a ≤ b)%L) by now apply (rngl_lt_le_incl Hor), Hs.
 specialize (H1 a b Hab).
 progress fold u in H1.
 progress fold v in H1.
@@ -1134,6 +1135,11 @@ assert (Hlab : lima = limb). {
   apply H1.
   apply Hl.
 }
+assert (Hs' : ∀ x, P x → (x ≤ b)%L). {
+  intros * H.
+  now apply (rngl_lt_le_incl Hor), Hs.
+}
+move Hs' before Hs.
 subst limb; rename lima into lim.
 exists lim.
 move lim before b.
@@ -1147,10 +1153,10 @@ destruct (is_bound _ P lim) as [H1| H1]. {
     apply (rngl_nlt_ge_iff Hor).
     intros Hc.
     specialize (limit_between_An_and_Bn Hon Hiv a b lim rngl_le P) as Hl.
-    specialize (Hl Ha Hs Hal Hbl).
+    specialize (Hl Ha Hs' Hal Hbl).
     specialize (AnBn_interval Hon Hop Hiv Hor a b Hab rngl_le P) as Hi.
     specialize (in_AnBn rngl_le (rngl_le_refl Hor)) as Hin.
-    specialize (Hin rngl_not_le_le P a b Ha Hs).
+    specialize (Hin rngl_not_le_le P a b Ha Hs').
     (* if (b - a) / 2 ^ n < lim - c, then c < an < lim,
        we have a y between an and bn with P y, but
        therefore greater than c, what contredicts H2 *)
@@ -1205,7 +1211,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
     now apply rngl_nlt_ge in Hy.
   } {
     specialize (limit_between_An_and_Bn Hon Hiv a b lim rngl_le P) as Hl.
-    specialize (Hl Ha Hs Hal Hbl).
+    specialize (Hl Ha Hs' Hal Hbl).
     now specialize (Hl 0 _ _ (surjective_pairing _)).
   }
 } {
@@ -1216,11 +1222,12 @@ destruct (is_bound _ P lim) as [H1| H1]. {
   apply (rngl_nlt_ge_iff Hor).
   intros Hlc.
   specialize (limit_between_An_and_Bn Hon Hiv a b lim rngl_le P) as Hl.
-  specialize (Hl Ha Hs Hal Hbl).
+  specialize (Hl Ha Hs' Hal Hbl).
   specialize (AnBn_interval Hon Hop Hiv Hor a b Hab rngl_le P) as Hi.
   specialize (in_AnBn rngl_le (rngl_le_refl Hor) rngl_not_le_le) as Hin.
-  specialize (Hin P a b Ha Hs).
-  specialize (after_AnBn P a b Hs) as Han.
+  specialize (Hin P a b Ha Hs').
+  specialize (after_AnBn rngl_le (rngl_le_antisymm Hor)) as Han.
+  specialize (Han P a b Hs').
   (* faut que je trouve un n tel que bn < c,
      (qui contradira Hc avec Han),
      c'est-à-dire an + (b - a) / 2 ^ n < c
@@ -1233,7 +1240,12 @@ destruct (is_bound _ P lim) as [H1| H1]. {
   remember (AnBn rngl_le P a b n) as abn eqn:Habn; symmetry in Habn.
   destruct abn as (an, bn).
   specialize (Han n _ _ Habn c) as H1.
-  apply H1; [ clear H1 | apply Hc ].
+  enough (Hbc : (bn < c)%L). {
+    apply H1; [ | | apply Hc ].
+    now apply (rngl_lt_le_incl Hor).
+    now intros H; subst c; apply (rngl_lt_irrefl Hor) in Hbc.
+  }
+  clear H1.
   destruct (Hi n _ _ Habn) as (Haabb & Hbn).
   rewrite Hbn.
   apply (rngl_le_lt_trans Hor _ (lim + (b - a) / 2 ^ n)%L). {
@@ -1651,8 +1663,12 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
     supremum c = sup S exists" *)
 specialize (exists_supremum Hon Hiv Har Hco P) as H1.
 specialize (H1 a b Ha).
-assert (H : (∀ x, P x → (x ≤ b)%L)). {
-  now intros y ((Hay & Hyb) & Hy).
+assert (H : (∀ x, P x → (x < b)%L)). {
+  intros y ((Hay & Hyb) & Hy).
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  intros H; subst y.
+  now apply (rngl_lt_le_incl Hor), rngl_nlt_ge in Hy.
 }
 specialize (H1 H); clear H.
 destruct H1 as (c & Hc & H1 & Hlima & Hlimb).
@@ -1913,7 +1929,7 @@ Theorem upper_bound_property :
   is_complete T rngl_distance →
   ∀ (P : T → Prop) a b,
   P a
-  → (∀ x, P x → (x ≤ b)%L)
+  → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c.
 Proof.
 intros Hon Hiv Har Hco * Ha Hs.
