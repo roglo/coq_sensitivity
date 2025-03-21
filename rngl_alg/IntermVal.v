@@ -781,12 +781,11 @@ assert (H : (a ≤ a ≤ b)%L). {
 apply (H1 H Ha n an bn Habn).
 Qed.
 
-(* to be completed
 Theorem AnBn_not_P :
-  ∀ le (P : _ → Prop) a b n an bn,
-  (∀ x : T, P x → le x b)
-  → AnBn le P a b n = (an, bn)
-  → ∀ y, P y → le y bn.
+  ∀ (P : _ → Prop) a b n an bn,
+  (∀ x : T, P x → (x ≤ b)%L)
+  → AnBn P a b n = (an, bn)
+  → ∀ y, P y → (y ≤ bn)%L.
 Proof.
 intros * Hs Habn y Hby.
 revert a b Hs Habn.
@@ -794,13 +793,14 @@ induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
   now apply Hs.
 }
-destruct (is_bound _) as [H1| H1]. {
+destruct (is_upper_bound _ _) as [H1| H1]. {
   apply (IHn a ((a + b) / 2)%L H1 Habn).
 } {
   apply (IHn ((a + b) / 2)%L b Hs Habn).
 }
 Qed.
 
+(* to be completed
 Theorem after_AnBn :
   ∀ le, (∀ a b, le a b → le b a → a = b) →
   ∀ (P : _ → Prop) a b,
