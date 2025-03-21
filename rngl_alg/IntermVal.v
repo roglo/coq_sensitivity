@@ -713,8 +713,6 @@ split. {
 Qed.
 
 Theorem AnBn_exists_P :
-  rngl_has_1 T = true →
-  rngl_has_inv T = true →
   ∀ le, (∀ a b, ¬ le a b → le b a) →
   ∀ (P : _ → Prop) a b x,
   (∀ x : T, P x → le x b)
@@ -724,7 +722,7 @@ Theorem AnBn_exists_P :
   AnBn le P a b n = (an, bn)
   → ∃ y, le an y ∧ le y bn ∧ P y.
 Proof.
-intros Hon Hiv * Hll * Hs Hab Hx * Habn.
+intros * Hll * Hs Hab Hx * Habn.
 revert a b x Hs Hab Hx an bn Habn.
 induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
@@ -766,8 +764,6 @@ destruct (is_bound _ _ _) as [H1| H1]. {
 Qed.
 
 Theorem in_AnBn :
-  rngl_has_1 T = true →
-  rngl_has_inv T = true →
   ∀ le, (∀ a, le a a) → (∀ a b, ¬ le a b → le b a) →
   ∀ (P : _ → Prop) a b,
   P a
@@ -776,8 +772,8 @@ Theorem in_AnBn :
   AnBn le P a b n = (an, bn)
   → ∃ y : T, le an y ∧ le y bn ∧ P y.
 Proof.
-intros Hon Hiv * Hlr Hll * Ha Hs * Habn.
-specialize (AnBn_exists_P Hon Hiv le Hll P) as H1.
+intros * Hlr Hll * Ha Hs * Habn.
+specialize (AnBn_exists_P le Hll P) as H1.
 specialize (H1 a b a Hs).
 assert (H : le a a ∧ le a b). {
   split; [ apply Hlr | now apply Hs ].
@@ -785,24 +781,17 @@ assert (H : le a a ∧ le a b). {
 apply (H1 H Ha n an bn Habn).
 Qed.
 
-(* to be generalized with any "le", not only "rngl_le"
-   to be able to use the same theorem for upper bounds
-   and lower bounds *)
 Theorem AnBn_not_P :
-  rngl_has_1 T = true →
-  rngl_has_inv T = true →
-  ∀ (P : _ → Prop) a b n an bn,
-  (∀ x : T, P x → (x ≤ b)%L)
-  → AnBn rngl_le P a b n = (an, bn)
-  → ∀ y, (bn < y → ¬ P y)%L.
+  ∀ le (P : _ → Prop) a b n an bn,
+  (∀ x : T, P x → le x b)
+  → AnBn le P a b n = (an, bn)
+  → ∀ y, P y → le y bn.
 Proof.
-intros Hon Hiv * Hs Habn y Hby.
+intros * Hs Habn y Hby.
 revert a b Hs Habn.
 induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
-  intros H.
-  apply Hs in H.
-  now apply rngl_nlt_ge in H.
+  now apply Hs.
 }
 destruct (is_bound _) as [H1| H1]. {
   apply (IHn a ((a + b) / 2)%L H1 Habn).
@@ -812,21 +801,24 @@ destruct (is_bound _) as [H1| H1]. {
 Qed.
 
 Theorem after_AnBn :
-  rngl_has_1 T = true →
-  rngl_has_inv T = true →
   ∀ (P : _ → Prop) a b,
-  P a
-  → (∀ x : T, P x → (x ≤ b)%L)
+  (∀ x : T, P x → (x ≤ b)%L)
   → ∀ n an bn,
   AnBn rngl_le P a b n = (an, bn)
   → ∀ y, (bn < y)%L
   → ¬ P y.
 Proof.
-intros Hon Hiv * Ha Hs * Habn * Hby.
-specialize (AnBn_not_P Hon Hiv P) as H1.
-now apply (H1 a b n an bn Hs Habn).
+intros * Hs * Habn * Hby.
+specialize (AnBn_not_P rngl_le P) as H1.
+specialize (H1 a b n an bn Hs Habn).
+intros H2.
+specialize (H1 _ H2).
+now apply rngl_nle_gt in Hby.
 Qed.
 
+(* to be generalized with any "le", not only "rngl_le"
+   to be able to use the same theorem for upper bounds
+   and lower bounds *)
 Theorem intermediate_value_prop_1 :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -1157,7 +1149,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
     specialize (limit_between_An_and_Bn Hon Hiv a b lim rngl_le P) as Hl.
     specialize (Hl Ha Hs Hal Hbl).
     specialize (AnBn_interval Hon Hop Hiv Hor a b Hab rngl_le P) as Hi.
-    specialize (in_AnBn Hon Hiv rngl_le (rngl_le_refl Hor)) as Hin.
+    specialize (in_AnBn rngl_le (rngl_le_refl Hor)) as Hin.
     specialize (Hin rngl_not_le_le P a b Ha Hs).
     (* if (b - a) / 2 ^ n < lim - c, then c < an < lim,
        we have a y between an and bn with P y, but
@@ -1226,10 +1218,9 @@ destruct (is_bound _ P lim) as [H1| H1]. {
   specialize (limit_between_An_and_Bn Hon Hiv a b lim rngl_le P) as Hl.
   specialize (Hl Ha Hs Hal Hbl).
   specialize (AnBn_interval Hon Hop Hiv Hor a b Hab rngl_le P) as Hi.
-  specialize (in_AnBn Hon Hiv) as Hin.
-  specialize (Hin rngl_le (rngl_le_refl Hor) rngl_not_le_le).
+  specialize (in_AnBn rngl_le (rngl_le_refl Hor) rngl_not_le_le) as Hin.
   specialize (Hin P a b Ha Hs).
-  specialize (after_AnBn Hon Hiv P a b Ha Hs) as Han.
+  specialize (after_AnBn P a b Hs) as Han.
   (* faut que je trouve un n tel que bn < c,
      (qui contradira Hc avec Han),
      c'est-à-dire an + (b - a) / 2 ^ n < c
