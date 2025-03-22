@@ -1020,7 +1020,7 @@ Theorem exists_supremum :
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x < b)%L)
-  → ∃ c, is_extremum rngl_le P c ∧ (c ≤ b)%L ∧
+  → ∃ c, is_supremum P c ∧ (c ≤ b)%L ∧
     is_limit_when_tending_to_inf rngl_distance
       (λ n, fst (AnBn P a b n)) c ∧
     is_limit_when_tending_to_inf rngl_distance
@@ -1038,6 +1038,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   exists 0%L.
   rewrite (H b).
   split. {
+    progress unfold is_supremum.
     progress unfold is_extremum.
     destruct (is_bound _ P 0%L) as [H1| H1]. {
       intros.
@@ -1139,6 +1140,7 @@ subst limb; rename lima into lim.
 exists lim.
 move lim before b.
 clear Hl.
+progress unfold is_supremum.
 progress unfold is_extremum.
 destruct (is_bound _ P lim) as [H1| H1]. {
   split. {
@@ -1342,6 +1344,7 @@ assert (H : (∀ x, P x → (x < b)%L)). {
 }
 specialize (H1 H); clear H.
 destruct H1 as (c & Hc & H1 & Hlima & Hlimb).
+progress unfold is_supremum in Hc.
 progress unfold is_extremum in Hc.
 remember (is_bound _ _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
 destruct Hub1 as [Hub1| ]; [ | easy ].
@@ -1605,6 +1608,23 @@ intros Hon Hiv Har Hco * Ha Hs.
 destruct (exists_supremum Hon Hiv Har Hco P a b Ha Hs) as (c & Hc).
 now exists c.
 Qed.
+
+(* to be completed
+Theorem lower_bound_property :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_is_archimedean T = true →
+  is_complete T rngl_distance →
+  ∀ (P : T → Prop) a b,
+  P b
+  → (∀ x, P x → (a < x)%L)
+  → ∃ c, is_infimum P c.
+Proof.
+intros Hon Hiv Har Hco * Ha Hs.
+destruct (exists_infimum Hon Hiv Har Hco P a b Ha Hs) as (c & Hc).
+now exists c.
+Qed.
+*)
 
 Theorem intermediate_value :
   rngl_has_1 T = true →
