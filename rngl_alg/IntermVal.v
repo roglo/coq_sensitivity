@@ -785,13 +785,15 @@ Theorem AnBn_not_P :
   ∀ (P : _ → Prop) a b n an bn,
   (∀ x : T, P x → (x ≤ b)%L)
   → AnBn P a b n = (an, bn)
-  → ∀ y, P y → (y ≤ bn)%L.
+  → ∀ y, (bn < y → ¬ P y)%L.
 Proof.
 intros * Hs Habn y Hby.
 revert a b Hs Habn.
 induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
-  now apply Hs.
+  intros H.
+  apply Hs in H.
+  now apply rngl_nlt_ge in H.
 }
 destruct (is_upper_bound _ _) as [H1| H1]. {
   apply (IHn a ((a + b) / 2)%L H1 Habn).
@@ -800,27 +802,23 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 }
 Qed.
 
-(* to be completed
 Theorem after_AnBn :
-  ∀ le, (∀ a b, le a b → le b a → a = b) →
   ∀ (P : _ → Prop) a b,
-  (∀ x : T, P x → le x b)
+  P a
+  → (∀ x : T, P x → (x < b)%L)
   → ∀ n an bn,
-  AnBn le P a b n = (an, bn)
-  → ∀ y, le bn y → y ≠ bn → ¬ P y.
+  AnBn P a b n = (an, bn)
+  → ∀ y, (bn < y)%L
+  → ¬ P y.
 Proof.
-specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
-intros * Has * Hs * Habn * Hby Hyb.
-specialize (AnBn_not_P le P) as H1.
-specialize (H1 a b n an bn Hs Habn).
-intros H2.
-specialize (H1 _ H2).
-now specialize (Has _ _ H1 Hby).
+intros * Ha Hs * Habn * Hby.
+assert (H : ∀ x : T, P x → (x ≤ b)%L). {
+  now intros; apply (rngl_lt_le_incl Hor), Hs.
+}
+specialize (AnBn_not_P P) as H1.
+now apply (H1 a b n an bn H Habn).
 Qed.
 
-(* to be generalized with any "le", not only "rngl_le"
-   to be able to use the same theorem for upper bounds
-   and lower bounds *)
 Theorem intermediate_value_prop_1 :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -934,7 +932,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 a), (H1 b) in Hab.
   now apply (rngl_lt_irrefl Hor) in Hab.
 }
-(**)
 specialize (Hfc b).
 destruct Hfc as (Hfcl, Hfcr).
 specialize (Hfcl (f b - u)%L) as H2.
@@ -1015,6 +1012,7 @@ apply (rngl_nle_gt_iff Hor) in Hab.
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
+(* to be completed
 Theorem exists_supremum :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
