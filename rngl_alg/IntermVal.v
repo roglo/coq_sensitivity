@@ -1271,6 +1271,25 @@ destruct (is_bound _ P lim) as [H1| H1]. {
 }
 Qed.
 
+(* to be completed
+Theorem exists_infimum :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_is_archimedean T = true →
+  is_complete T rngl_distance →
+  ∀ (P : T → Prop) a b,
+  P b
+  → (∀ x, P x → (a < x)%L)
+  → ∃ c, is_infimum P c ∧ (a ≤ c)%L ∧
+    is_limit_when_tending_to_inf rngl_distance
+      (λ n, fst (AnBn P a b n)) c ∧
+    is_limit_when_tending_to_inf rngl_distance
+      (λ n, snd (AnBn P a b n)) c.
+Proof.
+intros Hon Hiv Har Hco.
+...
+*)
+
 (* https://en.wikipedia.org/wiki/Intermediate_value_theorem#Proof *)
 Theorem intermediate_value_le :
   rngl_has_1 T = true →
