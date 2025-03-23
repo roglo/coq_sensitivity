@@ -608,8 +608,7 @@ Theorem limit_between_An_and_Bn :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ a b lim P,
-  P a
-  → (∀ x : T, P x → (x ≤ b)%L)
+  (a ≤ b)%L
   → is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn P a b n)) lim
   → is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn P a b n)) lim
   → ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
@@ -618,12 +617,11 @@ intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Ha Hs Hal Hbl * Habn.
+  intros * Hab Hal Hbl * Habn.
   rewrite (H1 an), (H1 lim), (H1 bn).
   split; apply (rngl_le_refl Hor).
 }
-intros * Ha Hs Hal Hbl * Habn.
-assert (Hab : (a ≤ b)%L) by now apply Hs.
+intros * Hab Hal Hbl * Habn.
 split. {
   apply (rngl_nlt_ge_iff Hor).
   intros H5.
@@ -1131,11 +1129,6 @@ assert (Hlab : lima = limb). {
   apply H1.
   apply Hl.
 }
-assert (Hs' : ∀ x, P x → (x ≤ b)%L). {
-  intros * H.
-  now apply (rngl_lt_le_incl Hor), Hs.
-}
-move Hs' before Hs.
 subst limb; rename lima into lim.
 exists lim.
 move lim before b.
@@ -1150,7 +1143,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
     apply (rngl_nlt_ge_iff Hor).
     intros Hc.
     specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
-    specialize (Hl Ha Hs' Hal Hbl).
+    specialize (Hl Hab Hal Hbl).
     specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
     specialize (in_AnBn P a b Ha Hs) as Hin.
     (* if (b - a) / 2 ^ n < lim - c, then c < an < lim,
@@ -1207,7 +1200,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
     now apply rngl_nlt_ge in Hy.
   } {
     specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
-    specialize (Hl Ha Hs' Hal Hbl).
+    specialize (Hl Hab Hal Hbl).
     now specialize (Hl 0 _ _ (surjective_pairing _)).
   }
 } {
@@ -1218,7 +1211,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
   apply (rngl_nlt_ge_iff Hor).
   intros Hlc.
   specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
-  specialize (Hl Ha Hs' Hal Hbl).
+  specialize (Hl Hab Hal Hbl).
   specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
   specialize (in_AnBn P a b Ha Hs) as Hin.
   specialize (after_AnBn P a b Ha Hs) as Han.
@@ -1389,11 +1382,6 @@ assert (Hlab : lima = limb). {
   apply H1.
   apply Hl.
 }
-assert (Hs' : ∀ x, P x → (a ≤ x)%L). {
-  intros * H.
-  now apply (rngl_lt_le_incl Hor), Hs.
-}
-move Hs' before Hs.
 subst limb; rename lima into lim.
 exists lim.
 move lim before b.
@@ -1408,9 +1396,11 @@ destruct (is_bound _ P lim) as [H1| H1]. {
     apply (rngl_nlt_ge_iff Hor).
     intros Hc.
     specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
-...
-    specialize (Hl Hb Hs' Hal Hbl).
+    specialize (Hl Hab Hal Hbl).
     specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
+(**)
+    specialize (in_AnBn P a b) as Hin.
+...
     specialize (in_AnBn P a b Ha Hs) as Hin.
     (* if (b - a) / 2 ^ n < lim - c, then c < an < lim,
        we have a y between an and bn with P y, but
