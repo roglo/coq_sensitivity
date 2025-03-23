@@ -732,29 +732,38 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
   specialize (IHn a ((a + b) / 2)%L x H1) as H2.
   now specialize (H2 Hab Hx _ _ Habn).
 } {
-  specialize (IHn ((a + b) / 2)%L b) as H2.
   destruct (rngl_le_dec Hor ((a + b) / 2) x) as [Habx| Habx]. {
-    now specialize (H2 x Hs Habx Hx _ _ Habn).
+    now apply (IHn ((a + b) / 2)%L b x).
   }
   destruct H1 as (z & Hz).
-  specialize (H2 z Hs).
-  assert (Hpz : P z). {
+  apply (IHn ((a + b) / 2)%L b z); [ easy | | | easy ]. {
+    apply (rngl_nlt_ge_iff Hor).
+    intros H3.
+    apply Hz; clear Hz.
+    intros H4.
+    now apply (rngl_lt_le_incl Hor).
+  } {
     specialize (em_prop (P z)) as H3.
     destruct H3 as [H3| H3]; [ easy | ].
     exfalso.
     apply Hz.
     now intros H.
   }
-  assert (H : ((a + b) / 2 ≤ z)%L). {
-    apply (rngl_nlt_ge_iff Hor).
-    intros H3.
-    apply Hz; clear Hz.
-    intros H4.
-    now apply (rngl_lt_le_incl Hor).
-  }
-  now specialize (H2 H Hpz _ _ Habn); clear H.
 }
 Qed.
+
+(* to be completed
+Theorem AnBn_exists_P' :
+  ∀ (P : _ → Prop) a b x,
+  (∀ x : T, P x → (a ≤ x)%L)
+  → (x ≤ b)%L
+  → P x
+  → ∀ n an bn,
+  AnBn P a b n = (an, bn)
+  → ∃ y, (an ≤ y ≤ bn)%L ∧ P y.
+Proof.
+...
+*)
 
 Theorem in_AnBn :
   ∀ (P : _ → Prop) a b,
@@ -772,6 +781,26 @@ assert (H : ∀ x : T, P x → (x ≤ b)%L). {
 }
 now specialize (H1 H (rngl_le_refl Hor _) Ha _ _ _ Habn); clear H.
 Qed.
+
+(* to be completed
+Theorem in_AnBn' :
+  ∀ (P : _ → Prop) a b,
+  P b
+  → (∀ x, P x → (a < x)%L)
+  → ∀ n an bn,
+  AnBn P a b n = (an, bn)
+  → ∃ y : T, (an ≤ y ≤ bn)%L ∧ P y.
+Proof.
+intros * Ha Hs * Habn.
+specialize (AnBn_exists_P' P) as H1.
+...
+specialize (H1 a b a).
+assert (H : ∀ x : T, P x → (x ≤ b)%L). {
+  now intros; apply (rngl_lt_le_incl Hor), Hs.
+}
+now specialize (H1 H (rngl_le_refl Hor _) Ha _ _ _ Habn); clear H.
+Qed.
+*)
 
 Theorem AnBn_not_P :
   ∀ (P : _ → Prop) a b n an bn,
