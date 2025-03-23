@@ -614,14 +614,16 @@ Theorem limit_between_An_and_Bn :
   → is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn P a b n)) lim
   → ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
 Proof.
-intros Hon Hiv * Ha Hs Hal Hbl * Habn.
+intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hab : (a ≤ b)%L) by now apply Hs.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Ha Hs Hal Hbl * Habn.
   rewrite (H1 an), (H1 lim), (H1 bn).
   split; apply (rngl_le_refl Hor).
 }
+intros * Ha Hs Hal Hbl * Habn.
+assert (Hab : (a ≤ b)%L) by now apply Hs.
 split. {
   apply (rngl_nlt_ge_iff Hor).
   intros H5.
