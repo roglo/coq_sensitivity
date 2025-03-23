@@ -713,7 +713,7 @@ Qed.
 Theorem AnBn_exists_P :
   ∀ (P : _ → Prop) a b x,
   (∀ x : T, P x → (x ≤ b)%L)
-  → (a ≤ x ≤ b)%L
+  → (a ≤ x)%L
   → P x
   → ∀ n an bn,
   AnBn P a b n = (an, bn)
@@ -723,20 +723,18 @@ intros * Hs Hab Hx * Habn.
 revert a b x Hs Hab Hx an bn Habn.
 induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
-  now exists x.
+  exists x.
+  split; [ | easy ].
+  split; [ easy | ].
+  now apply Hs.
 }
 destruct (is_upper_bound _ _) as [H1| H1]. {
   specialize (IHn a ((a + b) / 2)%L x H1) as H2.
-  assert (H : (a ≤ x ≤ (a + b) / 2)%L). {
-    split; [ easy | now apply H1 ].
-  }
-  now specialize (H2 H Hx _ _ Habn).
+  now specialize (H2 Hab Hx _ _ Habn).
 } {
   specialize (IHn ((a + b) / 2)%L b) as H2.
   destruct (rngl_le_dec Hor ((a + b) / 2) x) as [Habx| Habx]. {
-    specialize (H2 x Hs).
-    assert (H : ((a + b) / 2 ≤ x ≤ b)%L) by easy.
-    now specialize (H2 H Hx _ _ Habn).
+    now specialize (H2 x Hs Habx Hx _ _ Habn).
   }
   destruct H1 as (z & Hz).
   specialize (H2 z Hs).
@@ -747,8 +745,7 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
     apply Hz.
     now intros H.
   }
-  assert (H : ((a + b) / 2 ≤ z ≤ b)%L). {
-    split; [ | now apply Hs ].
+  assert (H : ((a + b) / 2 ≤ z)%L). {
     apply (rngl_nlt_ge_iff Hor).
     intros H3.
     apply Hz; clear Hz.
@@ -773,12 +770,7 @@ specialize (H1 a b a).
 assert (H : ∀ x : T, P x → (x ≤ b)%L). {
   now intros; apply (rngl_lt_le_incl Hor), Hs.
 }
-specialize (H1 H); clear H.
-assert (H : (a ≤ a ≤ b)%L). {
-  split; [ apply (rngl_le_refl Hor) | ].
-  now apply (rngl_lt_le_incl Hor), Hs.
-}
-apply (H1 H Ha n an bn Habn).
+now specialize (H1 H (rngl_le_refl Hor _) Ha _ _ _ Habn); clear H.
 Qed.
 
 Theorem AnBn_not_P :
