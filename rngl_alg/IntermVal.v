@@ -445,6 +445,23 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 }
 Qed.
 
+(* to be completed
+Theorem rngl_abs_AnBn_sub_AnBn_le' :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤ b)%L →
+  ∀ P p q, p ≤ q →
+  ∀ ap bp aq bq,
+  AnBn' P a b p = (ap, bp)
+  → AnBn' P a b q = (aq, bq)
+  → (rngl_abs (ap - aq) ≤ (b - a) / 2 ^ p)%L ∧
+    (rngl_abs (bp - bq) ≤ (b - a) / 2 ^ p)%L.
+Proof.
+...
+*)
+
 Context {Hop : rngl_has_opp T = true}.
 Context {Hor : rngl_is_ordered T = true}.
 
@@ -684,8 +701,8 @@ split. {
     clear Hp Hq.
     progress unfold u.
     specialize (AnBn_interval' Hon Hop Hiv Hor) as Habi.
+    specialize (rngl_abs_AnBn_sub_AnBn_le' Hon Hop Hiv Hor) as H1.
 ...
-    specialize (rngl_abs_AnBn_sub_AnBn_le Hon Hop Hiv Hor) as H1.
     specialize (H1 a b Hab P).
     destruct (le_dec p q) as [Hpq| Hpq]. {
       rewrite Nat.min_l; [ | easy ].
