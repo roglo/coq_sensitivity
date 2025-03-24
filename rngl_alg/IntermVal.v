@@ -65,7 +65,10 @@ Fixpoint bisection (P : T → bool) lb ub n :=
       else bisection P lb x n'
   end.
 
-(* to be defined with "bisection", perhaps? *)
+(* AnBn to be defined with "bisection", perhaps? *)
+
+(* hypothesis: bn is an upper bound of P, an is not *)
+(* a1 ∈ P, but the following "an" may or may not ∈ P *)
 Fixpoint AnBn (P : T → Type) (an bn : T) n :=
   match n with
   | 0 => (an, bn)
@@ -75,13 +78,16 @@ Fixpoint AnBn (P : T → Type) (an bn : T) n :=
       else AnBn P a bn n'
   end.
 
+(* same for lower bound *)
+(* hypothesis: an is a lower bound of P, bn is not *)
+(* b1 ∈ P, but the following "bn" may or may not ∈ P *)
 Fixpoint AnBn' (P : T → Type) (an bn : T) n :=
   match n with
   | 0 => (an, bn)
   | S n' =>
-      let a := ((an + bn) / 2)%L in
-      if is_lower_bound P a then AnBn' P a bn n'
-      else AnBn' P an a n'
+      let b := ((an + bn) / 2)%L in
+      if is_lower_bound P b then AnBn' P b bn n'
+      else AnBn' P an b n'
   end.
 
 Theorem rngl_middle_in_middle :
