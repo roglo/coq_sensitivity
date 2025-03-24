@@ -822,16 +822,17 @@ Theorem in_AnBn' :
   P b
   → (∀ x, P x → (a < x)%L)
   → ∀ n an bn,
-  AnBn P a b n = (an, bn)
+  AnBn' P a b n = (an, bn)
   → ∃ y : T, (an ≤ y ≤ bn)%L ∧ P y.
 Proof.
 intros * Ha Hs * Habn.
 specialize (AnBn_exists_P' P) as H1.
-...
 specialize (H1 a b a).
-assert (H : ∀ x : T, P x → (x ≤ b)%L). {
+assert (H : ∀ x : T, P x → (a ≤ x)%L). {
   now intros; apply (rngl_lt_le_incl Hor), Hs.
 }
+specialize (H1 H) as HHH.
+... ça marche pas ...
 now specialize (H1 H (rngl_le_refl Hor _) Ha _ _ _ Habn); clear H.
 Qed.
 *)
