@@ -459,6 +459,79 @@ Theorem rngl_abs_AnBn_sub_AnBn_le' :
   → (rngl_abs (ap - aq) ≤ (b - a) / 2 ^ p)%L ∧
     (rngl_abs (bp - bq) ≤ (b - a) / 2 ^ p)%L.
 Proof.
+intros Hon Hop Hiv Hor * Hab * Hpq * Ha Hb.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
+  do 2 rewrite (H (rngl_abs _))%L.
+  rewrite (H ((b - a) / 2 ^ p)%L).
+  split; apply (rngl_le_refl Hor).
+}
+assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
+  intros.
+  apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+specialize (AnBn_interval Hon Hop Hiv Hor) as Habi.
+rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+  apply (rngl_le_sub_0 Hop Hor).
+  apply (AnBn_le' Hon Hop Hiv Hor a b Hab P p q ap bp aq bq Hpq Ha Hb).
+...
+}
+rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  apply (AnBn_le Hon Hop Hiv Hor a b Hab P p q ap bp aq bq Hpq Ha Hb).
+}
+rewrite (rngl_opp_sub_distr Hop).
+revert a b q Hab Hpq Ha Hb.
+induction p; intros. {
+  cbn.
+  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  cbn in Ha.
+  injection Ha; clear Ha; intros; subst ap bp.
+  split. {
+    apply (rngl_sub_le_mono_r Hop Hor).
+    specialize (Habi a b Hab P q aq bq Hb) as H1.
+    destruct H1 as ((H1 & H2 & H3), _).
+    now apply (rngl_le_trans Hor _ bq).
+  } {
+    apply (rngl_sub_le_mono_l Hop Hor).
+    specialize (Habi a b Hab P q aq bq Hb) as H1.
+    destruct H1 as ((H1 & H2 & H3), _).
+    now apply (rngl_le_trans Hor _ aq).
+  }
+}
+rewrite <- Nat.add_1_r.
+rewrite (rngl_pow_add_r Hon); cbn.
+destruct q; [ easy | cbn ].
+apply Nat.succ_le_mono in Hpq.
+cbn in Ha, Hb.
+destruct (is_upper_bound _ _) as [H1| H1]. {
+  specialize (IHp a ((a + b) / 2)%L q).
+  assert (H : (a ≤ (a + b) / 2)%L). {
+    now apply (rngl_middle_in_middle Hon Hop Hiv Hor).
+  }
+  specialize (IHp H Hpq Ha Hb); clear H.
+  rewrite (rngl_middle_sub_l Hon Hop Hiv Hor) in IHp.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite <- (rngl_div_div Hos Hon Hiv); [ easy | | apply H2i ].
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+} {
+  specialize (IHp ((a + b) / 2)%L b q).
+  assert (H : ((a + b) / 2 ≤ b)%L). {
+    now apply (rngl_middle_in_middle Hon Hop Hiv Hor).
+  }
+  specialize (IHp H Hpq Ha Hb); clear H.
+  rewrite (rngl_middle_sub_r Hon Hop Hiv Hor) in IHp.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite <- (rngl_div_div Hos Hon Hiv); [ easy | | apply H2i ].
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+}
+Qed.
 ...
 *)
 
