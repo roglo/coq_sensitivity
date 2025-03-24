@@ -558,6 +558,19 @@ split. {
 }
 Qed.
 
+(* to be completed
+Theorem An_Bn_are_Cauchy_sequences' :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_is_archimedean T = true →
+  ∀ P a b, (a ≤ b)%L →
+  is_Cauchy_sequence rngl_distance (λ n : nat, fst (AnBn' P a b n)) ∧
+  is_Cauchy_sequence rngl_distance (λ n : nat, snd (AnBn' P a b n)).
+Proof.
+intros Hon Hiv Har * Hab.
+...
+*)
+
 Theorem rngl_abs_An_Bn_le :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -1386,9 +1399,9 @@ intros * Hb Hs.
 (* Proof in
    https://en.wikipedia.org/wiki/Least-upper-bound_property#
      Proof_using_Cauchy_sequences *)
-set (u := λ n, fst (AnBn P a b n)).
-set (v := λ n, snd (AnBn P a b n)).
-specialize (An_Bn_are_Cauchy_sequences Hon Hiv Har P) as H1.
+set (u := λ n, fst (AnBn' P a b n)).
+set (v := λ n, snd (AnBn' P a b n)).
+specialize (An_Bn_are_Cauchy_sequences' Hon Hiv Har P) as H1.
 assert (Hab : (a ≤ b)%L) by now apply (rngl_lt_le_incl Hor), Hs.
 specialize (H1 a b Hab).
 progress fold u in H1.
@@ -1417,7 +1430,8 @@ assert
   progress unfold rngl_dist.
   rewrite (rngl_sub_0_r Hos).
   eapply (rngl_le_lt_trans Hor). {
-    apply (rngl_abs_An_Bn_le Hon Hiv _ _ Hab P n).
+    apply (rngl_abs_An_Bn_le' Hon Hiv _ _ Hab P n).
+...
     apply surjective_pairing.
   }
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
@@ -1462,8 +1476,19 @@ destruct (is_bound _ P lim) as [H1| H1]. {
     destruct (is_bound _ P c) as [H2| H2]; [ | easy ].
     apply (rngl_nlt_ge_iff Hor).
     intros Hc.
+Theorem limit_between_An_and_Bn' :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  ∀ a b lim P,
+  (a ≤ b)%L
+  → is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn' P a b n)) lim
+  → is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn' P a b n)) lim
+  → ∀ n an bn, AnBn' P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
+Proof.
+Admitted.
+    specialize (limit_between_An_and_Bn' Hon Hiv a b lim P) as Hl.
+    specialize (Hl Hab).
 ...
-    specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
     specialize (Hl Hab Hal Hbl).
     specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
 (**)
