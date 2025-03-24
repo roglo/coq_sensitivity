@@ -1341,8 +1341,8 @@ Theorem exists_infimum :
   P b
   → (∀ x, P x → (a < x)%L)
   → ∃ c, is_infimum P c ∧ (a ≤ c)%L ∧
-    is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn P a b n)) c ∧
-    is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn P a b n)) c.
+    is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn' P a b n)) c ∧
+    is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn' P a b n)) c.
 Proof.
 intros Hon Hiv Har Hco.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -1462,6 +1462,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
     destruct (is_bound _ P c) as [H2| H2]; [ | easy ].
     apply (rngl_nlt_ge_iff Hor).
     intros Hc.
+...
     specialize (limit_between_An_and_Bn Hon Hiv a b lim P) as Hl.
     specialize (Hl Hab Hal Hbl).
     specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
