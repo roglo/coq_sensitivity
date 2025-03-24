@@ -75,6 +75,15 @@ Fixpoint AnBn (P : T → Type) (an bn : T) n :=
       else AnBn P a bn n'
   end.
 
+Fixpoint AnBn' (P : T → Type) (an bn : T) n :=
+  match n with
+  | 0 => (an, bn)
+  | S n' =>
+      let a := ((an + bn) / 2)%L in
+      if is_lower_bound P a then AnBn' P a bn n'
+      else AnBn' P an a n'
+  end.
+
 Theorem rngl_middle_in_middle :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -729,41 +738,66 @@ induction n; intros; cbn in Habn. {
   now apply Hs.
 }
 destruct (is_upper_bound _ _) as [H1| H1]. {
-  specialize (IHn a ((a + b) / 2)%L x H1) as H2.
-  now specialize (H2 Hab Hx _ _ Habn).
+  apply (IHn a ((a + b) / 2)%L x H1 Hab Hx _ _ Habn).
+}
+destruct (rngl_le_dec Hor ((a + b) / 2) x) as [Habx| Habx]. {
+  apply (IHn ((a + b) / 2)%L b x Hs Habx Hx _ _ Habn).
+}
+destruct H1 as (z & Hz).
+apply (IHn ((a + b) / 2)%L b z); [ easy | | | easy ]. {
+  apply (rngl_nlt_ge_iff Hor).
+  intros H3.
+  apply Hz; clear Hz.
+  intros H4.
+  now apply (rngl_lt_le_incl Hor).
 } {
-  destruct (rngl_le_dec Hor ((a + b) / 2) x) as [Habx| Habx]. {
-    now apply (IHn ((a + b) / 2)%L b x).
-  }
-  destruct H1 as (z & Hz).
-  apply (IHn ((a + b) / 2)%L b z); [ easy | | | easy ]. {
-    apply (rngl_nlt_ge_iff Hor).
-    intros H3.
-    apply Hz; clear Hz.
-    intros H4.
-    now apply (rngl_lt_le_incl Hor).
-  } {
-    specialize (em_prop (P z)) as H3.
-    destruct H3 as [H3| H3]; [ easy | ].
-    exfalso.
-    apply Hz.
-    now intros H.
-  }
+  specialize (em_prop (P z)) as H3.
+  destruct H3 as [H3| H3]; [ easy | ].
+  exfalso.
+  apply Hz.
+  now intros H.
 }
 Qed.
 
-(* to be completed
 Theorem AnBn_exists_P' :
   ∀ (P : _ → Prop) a b x,
   (∀ x : T, P x → (a ≤ x)%L)
   → (x ≤ b)%L
   → P x
   → ∀ n an bn,
-  AnBn P a b n = (an, bn)
+  AnBn' P a b n = (an, bn)
   → ∃ y, (an ≤ y ≤ bn)%L ∧ P y.
 Proof.
-...
-*)
+intros * Hs Hab Hx * Habn.
+revert a b x Hs Hab Hx an bn Habn.
+induction n; intros; cbn in Habn. {
+  injection Habn; clear Habn; intros; subst an bn.
+  exists x.
+  split; [ | easy ].
+  split; [ | easy ].
+  now apply Hs.
+}
+destruct (is_lower_bound _ _) as [H1| H1]. {
+  apply (IHn ((a + b) / 2)%L b x H1 Hab Hx _ _ Habn).
+}
+destruct (rngl_le_dec Hor x ((a + b) / 2)) as [Habx| Habx]. {
+  apply (IHn a ((a + b) / 2)%L x Hs Habx Hx _ _ Habn).
+}
+destruct H1 as (z & Hz).
+apply (IHn a ((a + b) / 2)%L z); [ easy | | | easy ]. {
+  apply (rngl_nlt_ge_iff Hor).
+  intros H3.
+  apply Hz; clear Hz.
+  intros H4.
+  now apply (rngl_lt_le_incl Hor).
+} {
+  specialize (em_prop (P z)) as H3.
+  destruct H3 as [H3| H3]; [ easy | ].
+  exfalso.
+  apply Hz.
+  now intros H.
+}
+Qed.
 
 Theorem in_AnBn :
   ∀ (P : _ → Prop) a b,
