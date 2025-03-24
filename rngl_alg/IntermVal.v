@@ -229,7 +229,6 @@ destruct (is_upper_bound P _) as [H1| H1]. {
 }
 Qed.
 
-(* to be completed
 Theorem AnBn_interval' :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -302,16 +301,16 @@ destruct (is_lower_bound P _) as [H1| H1]. {
   rewrite (rngl_mul_1_r Hon).
   apply (rngl_middle_sub_r Hon Hop Hiv Hor).
 } {
-...
-  specialize (IHn ((a + b) / 2) b)%L.
-  assert (H : ((a + b) / 2 ≤ b)%L). {
+  specialize (IHn a ((a + b) / 2))%L.
+  assert (H : (a ≤ (a + b) / 2)%L). {
     now apply (rngl_middle_in_middle Hon Hop Hiv Hor).
   }
   specialize (IHn H Hanbn); clear H.
   destruct  IHn as (Haabb, Hbnan).
   split. {
-    split; [ | easy ].
-    eapply (rngl_le_trans Hor); [ | apply Haabb ].
+    split; [ easy | ].
+    split; [ easy | ].
+    eapply (rngl_le_trans Hor); [ apply Haabb | ].
     now apply (rngl_middle_in_middle Hon Hop Hiv Hor).
   }
   rewrite Hbnan at 1.
@@ -323,27 +322,10 @@ destruct (is_lower_bound P _) as [H1| H1]. {
     now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
   }
   f_equal.
-  progress unfold rngl_div.
-  rewrite Hiv.
-  rewrite rngl_mul_add_distr_r.
-  rewrite (rngl_mul_sub_distr_r Hop).
-  rewrite rngl_add_comm.
-  progress unfold rngl_sub.
-  rewrite Hop.
-  rewrite (rngl_opp_add_distr Hop).
-  progress unfold rngl_sub.
-  rewrite Hop.
-  rewrite (rngl_add_comm (- (a * _))%L).
   rewrite (rngl_mul_1_r Hon).
-  rewrite rngl_add_assoc; f_equal.
-  rewrite (rngl_add_opp_r Hop).
-  rewrite <- (rngl_mul_1_r Hon b) at 1.
-  rewrite <- (rngl_mul_sub_distr_l Hop).
-  f_equal.
-  apply (rngl_one_sub_half Hon Hop Hiv Hor).
+  apply (rngl_middle_sub_l Hon Hop Hiv Hor).
 }
 Qed.
-*)
 
 Theorem AnBn_le :
   rngl_has_1 T = true →
