@@ -41,8 +41,17 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {em : excl_midd}.
 
-Definition is_bound (le : T → T → Prop) (Q : T → Type) c :=
-  rl_forall_or_exist_not (λ x : T, Q x → le x c).
+(* is upper bound or lower bound.
+
+   E.g. for upper bound :
+
+     Given a set P (a predicate defining a subtype, i.e. a subset),
+     which is ordered, "c" is an upper bound if ∀ x ∈ P, x ≤ c.
+
+     An upper bound may or may not belong to P *)
+
+Definition is_bound (le : T → T → Prop) (P : T → Type) c :=
+  rl_forall_or_exist_not (λ x : T, P x → le x c).
 
 Definition is_upper_bound := is_bound (λ a b, (a ≤ b)%L).
 Definition is_lower_bound := is_bound (λ a b, (b ≤ a)%L).
@@ -822,7 +831,6 @@ assert (H : ∀ x : T, P x → (x ≤ b)%L). {
 now specialize (H1 H (rngl_le_refl Hor _) Ha _ _ _ Habn); clear H.
 Qed.
 
-(* to be completed
 Theorem in_AnBn' :
   ∀ (P : _ → Prop) a b,
   P b
@@ -833,15 +841,12 @@ Theorem in_AnBn' :
 Proof.
 intros * Ha Hs * Habn.
 specialize (AnBn_exists_P' P) as H1.
-specialize (H1 a b a).
+specialize (H1 a b b).
 assert (H : ∀ x : T, P x → (a ≤ x)%L). {
   now intros; apply (rngl_lt_le_incl Hor), Hs.
 }
-specialize (H1 H) as HHH.
-... ça marche pas ...
 now specialize (H1 H (rngl_le_refl Hor _) Ha _ _ _ Habn); clear H.
 Qed.
-*)
 
 Theorem AnBn_not_P :
   ∀ (P : _ → Prop) a b n an bn,
