@@ -70,6 +70,8 @@ Definition is_extremum le (Q : T → Type) c :=
 Definition is_supremum := is_extremum (λ a b, (a ≤ b)%L).
 Definition is_infimum := is_extremum (λ a b, (b ≤ a)%L).
 
+Arguments is_supremum Q c%_L.
+
 (* AnBn below to be defined with "bisection", perhaps? *)
 Fixpoint bisection (P : T → bool) lb ub n :=
   match n with
@@ -2417,6 +2419,45 @@ apply (rngl_le_antisymm Hor); apply (rngl_nlt_ge_iff Hor); intros Hu. {
 }
 Qed.
 
+Theorem extremum_compat :
+  ∀ le P Q c,
+  (∀ x, P x ↔ Q x)
+  → is_extremum le P c
+  → is_extremum le Q c.
+Proof.
+intros * Hpq Hp.
+progress unfold is_extremum in Hp.
+progress unfold is_extremum.
+destruct (is_bound le P c) as [Hpc| Hpc]; [ | easy ].
+destruct (is_bound le Q c) as [Hqc| Hqc]. {
+  intros c'.
+  destruct (is_bound le Q c') as [Hqc'| Hqc']; [ | easy ].
+  specialize (Hp c').
+  destruct (is_bound le P c') as [Hpc'| Hpc']; [ easy | ].
+  destruct Hpc' as (x, Hx).
+  exfalso.
+  apply Hx; clear Hx.
+  intros Hx.
+  now apply Hqc', Hpq.
+}
+destruct Hqc as (c', Hc').
+apply Hc'; clear Hc'.
+intros Hc'.
+now apply Hpc, Hpq.
+Qed.
+
+Theorem supremum_compat :
+  ∀ (P Q : _ → Prop) c,
+  (∀ x, P x ↔ Q x)
+  → is_supremum P c
+  → is_supremum Q c.
+Proof.
+intros * Hpq Hp.
+progress unfold is_supremum in Hp.
+progress unfold is_supremum.
+now eapply extremum_compat.
+Qed.
+
 (* *)
 
 Theorem upper_bound_property :
@@ -2478,10 +2519,39 @@ assert (H : ∀ x, P (- x)%L → (x < - a)%L).  {
 specialize (H1 H); clear H.
 destruct H1 as (c & Hc).
 exists (- c)%L.
+assert (Hpc : P (- c)%L). {
+(**)
+Theorem supremum_in :
+  ∀ P c, is_supremum P c → P c.
+Admitted.
+  apply supremum_in.
+About is_supremum.
+Theorem supremum_opp :
+  ∀ P c,
+  is_supremum P c → is_supremum (λ x, P (- x)%L) (- c).
+Admitted.
+  apply supremum_opp in Hc.
+  apply (supremum_compat _ P) in Hc; [ easy | ].
+  intros x.
+  now rewrite (rngl_opp_involutive Hop).
+}
+...
+Search is_supremum.
+progress unfold is_supremum in Hc.
+Search is_extremum.
+...
 progress unfold is_supremum in Hc.
 progress unfold is_infimum.
 progress unfold is_extremum in Hc.
 progress unfold is_extremum.
+destruct (is_bound _ _ (- c)) as [Hboc| Hboc]. {
+  intros c'.
+  destruct (is_bound _ _ c') as [Hbc'| Hbc']; [ | easy ].
+  destruct (is_bound _ _ c) as [Hbc| Hbc]. {
+    specialize (Hc c').
+    destruct (is_bound _ _ c') as [Hbc''| Hbc'']. {
+      apply Hbc'.
+...
 destruct (is_bound _ _ c) as [Hbc| Hbc]. {
   destruct (is_bound _ _ (- c)) as [Hboc| Hboc]. {
     intros c'.
