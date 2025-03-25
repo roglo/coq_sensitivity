@@ -359,6 +359,38 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 }
 Qed.
 
+Theorem AnBn_le' :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤ b)%L →
+  ∀ P p q ap bp aq bq,
+  p ≤ q
+  → AnBn' P a b p = (ap, bp)
+  → AnBn' P a b q = (aq, bq)
+  → (ap ≤ aq ∧ bq ≤ bp)%L.
+Proof.
+intros Hon Hop Hiv Hor * Hab * Hpq Hp Hq.
+revert a b q Hab Hpq Hp Hq.
+induction p; intros; cbn. {
+  cbn in Hp.
+  injection Hp; clear Hp; intros; subst ap bp.
+  specialize (AnBn_interval' Hon Hop Hiv Hor) as H1.
+  now specialize (H1 a b Hab P q aq bq Hq).
+}
+cbn in Hp.
+destruct q; [ easy | cbn in Hq ].
+apply Nat.succ_le_mono in Hpq.
+destruct (is_lower_bound _ _) as [H1| H1]. {
+  eapply IHp; [ | apply Hpq | apply Hp | apply Hq ].
+  now apply (rngl_middle_in_middle Hon Hop Hiv Hor).
+} {
+  eapply IHp; [ | apply Hpq | apply Hp | apply Hq ].
+  now apply (rngl_middle_in_middle Hon Hop Hiv Hor).
+}
+Qed.
+
 Theorem rngl_abs_AnBn_sub_AnBn_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -480,11 +512,10 @@ specialize (AnBn_interval Hon Hop Hiv Hor) as Habi.
 rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
   apply (AnBn_le' Hon Hop Hiv Hor a b Hab P p q ap bp aq bq Hpq Ha Hb).
-...
 }
 rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_le_0_sub Hop Hor).
-  apply (AnBn_le Hon Hop Hiv Hor a b Hab P p q ap bp aq bq Hpq Ha Hb).
+  apply (AnBn_le' Hon Hop Hiv Hor a b Hab P p q ap bp aq bq Hpq Ha Hb).
 }
 rewrite (rngl_opp_sub_distr Hop).
 revert a b q Hab Hpq Ha Hb.
@@ -495,6 +526,7 @@ induction p; intros. {
   injection Ha; clear Ha; intros; subst ap bp.
   split. {
     apply (rngl_sub_le_mono_r Hop Hor).
+...
     specialize (Habi a b Hab P q aq bq Hb) as H1.
     destruct H1 as ((H1 & H2 & H3), _).
     now apply (rngl_le_trans Hor _ bq).
