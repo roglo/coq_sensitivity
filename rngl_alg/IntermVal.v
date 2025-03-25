@@ -954,7 +954,6 @@ rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
 apply (rngl_le_refl Hor).
 Qed.
 
-(* to be completed
 Theorem rngl_abs_An_Bn_le' :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -964,8 +963,33 @@ Theorem rngl_abs_An_Bn_le' :
   → (rngl_abs (an - bn) ≤ (b - a) / 2 ^ n)%L.
 Proof.
 intros Hon Hiv * Hab * Habn.
-...
-*)
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
+  rewrite (H (rngl_abs _))%L.
+  rewrite H.
+  apply (rngl_le_refl Hor).
+}
+specialize (AnBn_interval' Hon Hop Hiv Hor) as H1.
+specialize (H1 a b Hab P n _ _ (surjective_pairing _)).
+rewrite Habn in H1; cbn in H1.
+destruct H1 as (H1, H2).
+rewrite H2.
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_diag Hos).
+rewrite <- (rngl_abs_opp Hop Hor).
+rewrite (rngl_opp_sub_distr Hop).
+rewrite (rngl_sub_0_r Hos).
+rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+    now apply (rngl_le_0_sub Hop Hor).
+  } {
+    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+}
+apply (rngl_le_refl Hor).
+Qed.
 
 Theorem limit_opp :
   ∀ u lim,
@@ -1105,6 +1129,19 @@ split. {
   now apply (rngl_lt_le_incl Hor).
 }
 Qed.
+
+(* to be completed
+Theorem limit_between_An_and_Bn' :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  ∀ a b lim P,
+  (a ≤ b)%L
+  → is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn' P a b n)) lim
+  → is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn' P a b n)) lim
+  → ∀ n an bn, AnBn' P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
+Proof.
+...
+*)
 
 Theorem AnBn_exists_P :
   ∀ (P : _ → Prop) a b x,
@@ -1790,7 +1827,6 @@ assert
   rewrite (rngl_sub_0_r Hos).
   eapply (rngl_le_lt_trans Hor). {
     apply (rngl_abs_An_Bn_le' Hon Hiv _ _ Hab P n).
-...
     apply surjective_pairing.
   }
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
@@ -1835,16 +1871,6 @@ destruct (is_bound _ P lim) as [H1| H1]. {
     destruct (is_bound _ P c) as [H2| H2]; [ | easy ].
     apply (rngl_nlt_ge_iff Hor).
     intros Hc.
-Theorem limit_between_An_and_Bn' :
-  rngl_has_1 T = true →
-  rngl_has_inv T = true →
-  ∀ a b lim P,
-  (a ≤ b)%L
-  → is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn' P a b n)) lim
-  → is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn' P a b n)) lim
-  → ∀ n an bn, AnBn' P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
-Proof.
-Admitted.
     specialize (limit_between_An_and_Bn' Hon Hiv a b lim P) as Hl.
     specialize (Hl Hab).
 ...
