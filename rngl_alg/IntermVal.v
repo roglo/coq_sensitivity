@@ -477,7 +477,6 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 }
 Qed.
 
-(* to be completed
 Theorem rngl_abs_AnBn_sub_AnBn_le' :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -508,7 +507,7 @@ assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
   apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
   apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 }
-specialize (AnBn_interval Hon Hop Hiv Hor) as Habi.
+specialize (AnBn_interval' Hon Hop Hiv Hor) as Habi.
 rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
   apply (AnBn_le' Hon Hop Hiv Hor a b Hab P p q ap bp aq bq Hpq Ha Hb).
@@ -526,7 +525,6 @@ induction p; intros. {
   injection Ha; clear Ha; intros; subst ap bp.
   split. {
     apply (rngl_sub_le_mono_r Hop Hor).
-...
     specialize (Habi a b Hab P q aq bq Hb) as H1.
     destruct H1 as ((H1 & H2 & H3), _).
     now apply (rngl_le_trans Hor _ bq).
@@ -542,17 +540,7 @@ rewrite (rngl_pow_add_r Hon); cbn.
 destruct q; [ easy | cbn ].
 apply Nat.succ_le_mono in Hpq.
 cbn in Ha, Hb.
-destruct (is_upper_bound _ _) as [H1| H1]. {
-  specialize (IHp a ((a + b) / 2)%L q).
-  assert (H : (a ≤ (a + b) / 2)%L). {
-    now apply (rngl_middle_in_middle Hon Hop Hiv Hor).
-  }
-  specialize (IHp H Hpq Ha Hb); clear H.
-  rewrite (rngl_middle_sub_l Hon Hop Hiv Hor) in IHp.
-  rewrite (rngl_mul_1_r Hon).
-  rewrite <- (rngl_div_div Hos Hon Hiv); [ easy | | apply H2i ].
-  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-} {
+destruct (is_lower_bound _ _) as [H1| H1]. {
   specialize (IHp ((a + b) / 2)%L b q).
   assert (H : ((a + b) / 2 ≤ b)%L). {
     now apply (rngl_middle_in_middle Hon Hop Hiv Hor).
@@ -562,10 +550,18 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
   rewrite (rngl_mul_1_r Hon).
   rewrite <- (rngl_div_div Hos Hon Hiv); [ easy | | apply H2i ].
   apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+} {
+  specialize (IHp a ((a + b) / 2)%L q).
+  assert (H : (a ≤ (a + b) / 2)%L). {
+    now apply (rngl_middle_in_middle Hon Hop Hiv Hor).
+  }
+  specialize (IHp H Hpq Ha Hb); clear H.
+  rewrite (rngl_middle_sub_l Hon Hop Hiv Hor) in IHp.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite <- (rngl_div_div Hos Hon Hiv); [ easy | | apply H2i ].
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 }
 Qed.
-...
-*)
 
 Context {Hop : rngl_has_opp T = true}.
 Context {Hor : rngl_is_ordered T = true}.
