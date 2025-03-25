@@ -9,8 +9,11 @@ Require Import RingLike.Misc.
 
 Class excl_midd := { em_prop : ∀ P, P + notT P }.
 
-Theorem rl_forall_or_exist_not {em : excl_midd} {T} :
-  ∀ (P : T → Prop), {∀ x, P x} + {∃ x, ¬ P x}.
+Definition forall_or_exists_not {T} (P : T → Prop) :=
+  {∀ x, P x} + {∃ x, ¬ P x}.
+
+Theorem rl_forall_or_exists_not {em : excl_midd} {T} :
+  ∀ (P : T → Prop), forall_or_exists_not P.
 Proof.
 intros.
 specialize (em_prop (∃ x, ¬ P x)) as H2.
@@ -22,7 +25,7 @@ exfalso; apply H2.
 now exists x.
 Qed.
 
-Theorem rl_not_forall_exist {em : excl_midd} {T} :
+Theorem rl_not_forall_exists {em : excl_midd} {T} :
   ∀ (P : T → Prop), ¬ (∀ x, ¬ P x) → ∃ x, P x.
 Proof.
 intros * Ha.
@@ -51,7 +54,7 @@ Context {em : excl_midd}.
      An upper bound may or may not belong to P *)
 
 Definition is_bound (le : T → T → Prop) (P : T → Type) c :=
-  rl_forall_or_exist_not (λ x : T, P x → le x c).
+  rl_forall_or_exists_not (λ x : T, P x → le x c).
 
 Definition is_upper_bound := is_bound (λ a b, (a ≤ b)%L).
 Definition is_lower_bound := is_bound (λ a b, (b ≤ a)%L).
@@ -65,6 +68,7 @@ Definition is_extremum le (Q : T → Type) c :=
 Definition is_supremum := is_extremum (λ a b, (a ≤ b)%L).
 Definition is_infimum := is_extremum (λ a b, (b ≤ a)%L).
 
+(* AnBn below to be defined with "bisection", perhaps? *)
 Fixpoint bisection (P : T → bool) lb ub n :=
   match n with
   | 0 => lb
@@ -74,7 +78,19 @@ Fixpoint bisection (P : T → bool) lb ub n :=
       else bisection P lb x n'
   end.
 
-(* AnBn to be defined with "bisection", perhaps? *)
+(* attempt to generalize AnBn and AnBn'
+   not so simple : the if then else is inverted
+   for AnBn' *)
+Fixpoint gen_AnBn le (P : T → Type) (an bn : T) n :=
+  match n with
+  | 0 => (an, bn)
+  | S n' =>
+      let a := ((an + bn) / 2)%L in
+      if rl_forall_or_exists_not (λ x, P x → le x a) then
+        gen_AnBn le P an a n'
+      else
+        gen_AnBn le P a bn n'
+  end.
 
 (* hypothesis: bn is an upper bound of P, an is not *)
 (* a1 ∈ P, but the following "an" may or may not ∈ P *)
@@ -2078,7 +2094,7 @@ progress unfold is_extremum in Hc.
 remember (is_bound _ _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
 destruct Hub1 as [Hub1| ]; [ | easy ].
 progress unfold is_bound in Hub2.
-destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
+destruct (rl_forall_or_exists_not _) as [Hub3| ]; [ | easy ].
 clear Hub2 Hub3.
 enough (H : ∃ d, _) by apply H.
 exists c.
@@ -2148,7 +2164,7 @@ assert
     }
   }
   split. {
-    apply rl_not_forall_exist.
+    apply rl_not_forall_exists.
     intros Hx.
     assert (Hx' : ∀ x, ((c - rngl_min3 η1 η2 η3 < x ≤ c)%L) → ¬ P x). {
       intros y Hy.
@@ -2187,7 +2203,7 @@ assert
     }
     now rewrite (rngl_mul_0_l Hos).
   } {
-    apply rl_not_forall_exist.
+    apply rl_not_forall_exists.
     intros Hx.
     assert (Hx' : ∀ x, (c ≤ x < c + rngl_min3 η1 η2 η3)%L → P x). {
       intros y Hy.
