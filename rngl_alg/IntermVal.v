@@ -2462,12 +2462,13 @@ Qed.
 
 (* another version: to be completed
 Theorem supremum_opp :
-  ∀ (P Q : _ → Prop) c,
-  (∀ x, P x ↔ Q (- x)%L)
+  ∀ (P Q : _ → Prop) c a,
+  P a
+  → (∀ x, P x ↔ Q (- x)%L)
   → is_supremum P c
   → is_infimum Q (- c).
 Proof.
-intros * Hpq Hp.
+intros * Ha Hpq Hp.
 progress unfold is_supremum in Hp.
 progress unfold is_infimum.
 (**)
@@ -2487,12 +2488,54 @@ destruct (is_bound _ P c) as [Hpc| Hpc]; [ | easy ].
 progress unfold is_extremum in Hp.
 progress unfold is_extremum.
 destruct (is_bound _ P c) as [Hpc| Hpc]; [ | easy ].
+specialize (Hpc a Ha) as Hac.
 destruct (is_bound _ _ (- c)) as [Hqc| Hqc]. {
   intros c'.
   destruct (is_bound _ _ c') as [Hqc'| Hqc']; [ | easy ].
-  specialize (Hp c').
+  specialize (Hp c') as H1.
 (**)
   destruct (is_bound _ P c') as [Hpc'| Hpc']. {
+    assert (Hac' : (a ≤ c')%L) by now apply (rngl_le_trans Hor _ c).
+    destruct (rngl_le_dec Hor c' 0) as [Hcz| Hcz]. {
+      apply (rngl_opp_le_compat Hop Hor).
+      rewrite (rngl_opp_involutive Hop).
+      apply (rngl_le_trans Hor _ c'); [ easy | ].
+      apply (rngl_le_trans Hor _ 0); [ easy | ].
+      now apply (rngl_opp_nonneg_nonpos Hop Hor).
+    }
+    apply (rngl_nle_gt_iff Hor) in Hcz.
+...
+apply (rngl_le_abs).
+...
+Search (_ ≤ - _)%L.
+      apply (rngl_le_opp_r Hop Hor).
+...
+      apply (rngl_le_trans Hor _ a). {
+        specialize (Hp a) as H2.
+        destruct (is_bound _ P a) as [Hpa| Hpa]. {
+
+...
+        apply (rngl_le_trans Hor _ (- a)).
+...
+      apply (rngl_le_trans Hor _ (- a)); [ now apply Hqc', Hpq | ].
+
+...
+      apply (rngl_le_trans Hor _ a). {
+        apply (rngl_le_trans Hor _ (- a)).
+
+      apply (rngl_le_trans Hor _ (- a)); [ now apply Hqc', Hpq | ].
+      apply -> (rngl_opp_le_compat Hop Hor).
+...
+...
+
+...
+      apply (rngl_le_trans Hor _ (- a)); [ now apply Hqc', Hpq | ].
+      apply -> (rngl_opp_le_compat Hop Hor).
+      apply (rngl_le_trans Hor _ (- a)).
+
+...
+    apply (rngl_le_trans Hor _ c'); [ easy | ].
+    apply Hqc'.
 ...
     apply Hqc'.
     apply Hpq.
