@@ -1146,7 +1146,6 @@ split. {
 }
 Qed.
 
-(* to be completed
 Theorem limit_between_An_and_Bn' :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -1156,8 +1155,102 @@ Theorem limit_between_An_and_Bn' :
   → is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn' P a b n)) lim
   → ∀ n an bn, AnBn' P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
 Proof.
-...
-*)
+intros Hon Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hab Hal Hbl * Habn.
+  rewrite (H1 an), (H1 lim), (H1 bn).
+  split; apply (rngl_le_refl Hor).
+}
+intros * Hab Hal Hbl * Habn.
+split. {
+  apply (rngl_nlt_ge_iff Hor).
+  intros H5.
+  specialize (Hal ((an - lim) / 2)%L) as H7.
+  assert (H : (0 < (an - lim) / 2)%L). {
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    now apply (rngl_lt_0_sub Hop Hor).
+  }
+  specialize (H7 H); clear H.
+  destruct H7 as (M, HM).
+  specialize (HM (max M n)).
+  assert (H : M ≤ max M n) by apply Nat.le_max_l.
+  specialize (HM H); clear H.
+  assert (H : n ≤ max M n) by apply Nat.le_max_r.
+  specialize (AnBn_le' Hon Hop Hiv Hor a b Hab P) as H6.
+  specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
+  destruct H6 as (H6, H7).
+  cbn in HM.
+  progress unfold rngl_dist in HM.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in HM. 2: {
+    apply (rngl_le_0_sub Hop Hor).
+    eapply (rngl_le_trans Hor); [ | apply H6 ].
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply rngl_nlt_ge in HM.
+  apply HM; clear HM.
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  rewrite rngl_mul_add_distr_l.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_add_sub_assoc Hop).
+  apply (rngl_sub_le_mono_r Hop Hor).
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  eapply (rngl_le_trans Hor); [ apply H6 | ].
+  apply (rngl_le_add_r Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  eapply (rngl_le_trans Hor); [ | apply H6 ].
+  now apply (rngl_lt_le_incl Hor).
+} {
+  apply (rngl_nlt_ge_iff Hor).
+  intros H5.
+  specialize (Hbl ((lim - bn) / 2)%L) as H7.
+  assert (H : (0 < (lim - bn) / 2)%L). {
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    now apply (rngl_lt_0_sub Hop Hor).
+  }
+  specialize (H7 H); clear H.
+  destruct H7 as (M, HM).
+  specialize (HM (max M n)).
+  assert (H : M ≤ max M n) by apply Nat.le_max_l.
+  specialize (HM H); clear H.
+  assert (H : n ≤ max M n) by apply Nat.le_max_r.
+  specialize (AnBn_le' Hon Hop Hiv Hor a b Hab P) as H6.
+  specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
+  destruct H6 as (H6, H7).
+  cbn in HM.
+  progress unfold rngl_dist in HM.
+  rewrite (rngl_abs_nonpos_eq Hop Hor) in HM. 2: {
+    apply (rngl_le_sub_0 Hop Hor).
+    eapply (rngl_le_trans Hor); [ apply H7 | ].
+    now apply (rngl_lt_le_incl Hor).
+  }
+  rewrite (rngl_opp_sub_distr Hop) in HM.
+  apply rngl_nlt_ge in HM.
+  apply HM; clear HM.
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  rewrite rngl_mul_add_distr_l.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite <- (rngl_sub_sub_distr Hop).
+  apply (rngl_sub_le_mono_l Hop Hor).
+  set (bm := snd (AnBn P a b (max M n))) in *.
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  apply (rngl_le_trans Hor _ bn); [ easy | ].
+  apply (rngl_le_add_l Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_trans Hor _ bn); [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
+}
+Qed.
 
 Theorem AnBn_exists_P :
   ∀ (P : _ → Prop) a b x,
@@ -1888,36 +1981,21 @@ destruct (is_bound _ P lim) as [H1| H1]. {
     apply (rngl_nlt_ge_iff Hor).
     intros Hc.
     specialize (limit_between_An_and_Bn' Hon Hiv a b lim P) as Hl.
-    specialize (Hl Hab).
-...
     specialize (Hl Hab Hal Hbl).
-    specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
-(**)
-    specialize (in_AnBn P a b) as Hin.
-...
-    specialize (in_AnBn P a b Ha Hs) as Hin.
-    (* if (b - a) / 2 ^ n < lim - c, then c < an < lim,
-       we have a y between an and bn with P y, but
-       therefore greater than c, what contredicts H2 *)
-    (* (b - a) / 2 ^ n < lim - c, if
-       (b - a) < (lim - c) * 2 ^ n, if
-       (b - a) / (lim - c) < 2 ^ n, if
-       (b - a) / (lim - c) < n *)
+    specialize (AnBn_interval' Hon Hop Hiv Hor a b Hab P) as Hi.
+    specialize (in_AnBn' P a b Hb Hs) as Hin.
     set (x := ((b - a) / (lim - c))%L).
     destruct (int_part Hon Hop Hc1 Hor Har x) as (n & Hnx & Hxn1).
     destruct (Hin n _ _ (surjective_pairing _)) as (y & Hny & Hy).
-    assert (Hcy : (c < y)%L). {
-      eapply (rngl_lt_le_trans Hor); [ | apply Hny ].
+    assert (Hcy : (y < c)%L). {
+      eapply (rngl_le_lt_trans Hor); [ apply Hny | ].
       specialize (Hl n _ _ (surjective_pairing _)) as H3.
       destruct (Hi n _ _ (surjective_pairing _)) as (Hanb, H4).
-      set (an := fst (AnBn P a b n)) in *.
-      set (bn := snd (AnBn P a b n)) in *.
-      symmetry in H4.
-      apply (rngl_add_sub_eq_r Hos) in H4.
-      rewrite <- H4.
-      apply (rngl_lt_add_lt_sub_l Hop Hor).
+      set (an := fst (AnBn' P a b n)) in *.
+      set (bn := snd (AnBn' P a b n)) in *.
+      rewrite H4.
       rewrite rngl_add_comm.
-      apply (rngl_lt_add_lt_sub_l Hop Hor).
+...
       apply (rngl_lt_le_trans Hor _ (lim - c)). 2: {
         now apply (rngl_sub_le_mono_r Hop Hor).
       }
