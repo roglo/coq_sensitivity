@@ -743,7 +743,6 @@ split. {
 }
 Qed.
 
-(* to be completed
 Theorem An_Bn_are_Cauchy_sequences' :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -803,7 +802,6 @@ split. {
     progress unfold u.
     specialize (AnBn_interval' Hon Hop Hiv Hor) as Habi.
     specialize (rngl_abs_AnBn_sub_AnBn_le' Hon Hop Hiv Hor) as H1.
-...
     specialize (H1 a b Hab P).
     destruct (le_dec p q) as [Hpq| Hpq]. {
       rewrite Nat.min_l; [ | easy ].
@@ -818,8 +816,6 @@ split. {
       apply (H1 _ _ _ _ (surjective_pairing _) (surjective_pairing _)).
     }
   }
-  eapply (rngl_le_lt_trans Hor). {
-...
   eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
     apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
@@ -876,8 +872,8 @@ split. {
   assert (H1 : (rngl_abs (v p - v q) ≤ (b - a) / 2 ^ min p q)%L). {
     clear Hp Hq.
     unfold v.
-    specialize (AnBn_interval Hon Hop Hiv Hor) as Habi.
-    specialize (rngl_abs_AnBn_sub_AnBn_le Hon Hop Hiv Hor) as H1.
+    specialize (AnBn_interval' Hon Hop Hiv Hor) as Habi.
+    specialize (rngl_abs_AnBn_sub_AnBn_le' Hon Hop Hiv Hor) as H1.
     specialize (H1 a b Hab P).
     destruct (le_dec p q) as [Hpq| Hpq]. {
       rewrite Nat.min_l; [ | easy ].
@@ -920,8 +916,6 @@ split. {
   }
 }
 Qed.
-...
-*)
 
 Theorem rngl_abs_An_Bn_le :
   rngl_has_1 T = true →
