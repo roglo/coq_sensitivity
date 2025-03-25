@@ -70,7 +70,9 @@ Definition is_extremum le (Q : T → Type) c :=
 Definition is_supremum := is_extremum (λ a b, (a ≤ b)%L).
 Definition is_infimum := is_extremum (λ a b, (b ≤ a)%L).
 
+Arguments is_extremum le Q c%_L.
 Arguments is_supremum Q c%_L.
+Arguments is_infimum Q c%_L.
 
 (* AnBn below to be defined with "bisection", perhaps? *)
 Fixpoint bisection (P : T → bool) lb ub n :=
@@ -2455,8 +2457,76 @@ Proof.
 intros * Hpq Hp.
 progress unfold is_supremum in Hp.
 progress unfold is_supremum.
-now eapply extremum_compat.
+now apply (extremum_compat _ P).
 Qed.
+
+(* another version: to be completed
+Theorem supremum_opp :
+  ∀ (P Q : _ → Prop) c,
+  (∀ x, P x ↔ Q (- x)%L)
+  → is_supremum P c
+  → is_infimum Q (- c).
+Proof.
+intros * Hpq Hp.
+progress unfold is_supremum in Hp.
+progress unfold is_infimum.
+(**)
+(*
+assert (Hc : P c). {
+Theorem extremum_in :
+  ∀ le P c,
+  is_extremum le P c
+  → P c.
+Proof.
+intros * Hlpc.
+progress unfold is_extremum in Hlpc.
+destruct (is_bound _ P c) as [Hpc| Hpc]; [ | easy ].
+(* non, on ne peut pas le prouver, parce que c'est FAUX *)
+...
+*)
+progress unfold is_extremum in Hp.
+progress unfold is_extremum.
+destruct (is_bound _ P c) as [Hpc| Hpc]; [ | easy ].
+destruct (is_bound _ _ (- c)) as [Hqc| Hqc]. {
+  intros c'.
+  destruct (is_bound _ _ c') as [Hqc'| Hqc']; [ | easy ].
+  specialize (Hp c').
+(**)
+  destruct (is_bound _ P c') as [Hpc'| Hpc']. {
+...
+    apply Hqc'.
+    apply Hpq.
+...
+...
+Theorem extremum_opp :
+  ∀ le (P : _ → Prop) c,
+  is_extremum le P c
+  → is_extremum (λ a b, le b a) (λ x, P (- x)%L) (- c).
+Proof.
+intros * Hp.
+progress unfold is_extremum in Hp.
+progress unfold is_extremum.
+destruct (is_bound le P c) as [Hpc| Hpc]; [ | easy ].
+destruct (is_bound _ _ (- c)) as [Hqc| Hqc]. {
+  intros c'.
+  destruct (is_bound _ _ c') as [Hqc'| Hqc']; [ | easy ].
+  specialize (Hp c').
+(**)
+  destruct (is_bound le P c') as [Hpc'| Hpc']. {
+...
+  destruct (is_bound le P c') as [Hpc'| Hpc']; [ easy | ].
+  destruct Hpc' as (x, Hx).
+  exfalso.
+  apply Hx; clear Hx.
+  intros Hx.
+  now apply Hqc', Hpq.
+}
+destruct Hqc as (c', Hc').
+apply Hc'; clear Hc'.
+intros Hc'.
+now apply Hpc, Hpq.
+...
+*)
 
 (* *)
 
@@ -2519,6 +2589,7 @@ assert (H : ∀ x, P (- x)%L → (x < - a)%L).  {
 specialize (H1 H); clear H.
 destruct H1 as (c & Hc).
 exists (- c)%L.
+...
 assert (Hpc : P (- c)%L). {
 (**)
 Theorem supremum_in :
@@ -2526,11 +2597,8 @@ Theorem supremum_in :
 Admitted.
   apply supremum_in.
 About is_supremum.
-Theorem supremum_opp :
-  ∀ P c,
-  is_supremum P c → is_supremum (λ x, P (- x)%L) (- c).
-Admitted.
   apply supremum_opp in Hc.
+...
   apply (supremum_compat _ P) in Hc; [ easy | ].
   intros x.
   now rewrite (rngl_opp_involutive Hop).
