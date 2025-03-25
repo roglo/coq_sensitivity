@@ -954,6 +954,19 @@ rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
 apply (rngl_le_refl Hor).
 Qed.
 
+(* to be completed
+Theorem rngl_abs_An_Bn_le' :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  ∀ a b, (a ≤ b)%L →
+  ∀ P n an bn,
+  AnBn' P a b n = (an, bn)
+  → (rngl_abs (an - bn) ≤ (b - a) / 2 ^ n)%L.
+Proof.
+intros Hon Hiv * Hab * Habn.
+...
+*)
+
 Theorem limit_opp :
   ∀ u lim,
   is_limit_when_tending_to_inf rngl_distance u lim
