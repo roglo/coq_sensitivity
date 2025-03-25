@@ -56,6 +56,8 @@ Context {em : excl_midd}.
 Definition is_bound (le : T → T → Prop) (P : T → Type) c :=
   rl_forall_or_exists_not (λ x : T, P x → le x c).
 
+Arguments is_bound le P c%_L.
+
 Definition is_upper_bound := is_bound (λ a b, (a ≤ b)%L).
 Definition is_lower_bound := is_bound (λ a b, (b ≤ a)%L).
 
@@ -2447,6 +2449,46 @@ intros Hon Hiv Har Hco * Ha Hs.
 destruct (exists_infimum Hon Hiv Har Hco P a b Ha Hs) as (c & Hc).
 now exists c.
 Qed.
+*)
+
+(* another version: to be completed
+Theorem lower_bound_property :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_is_archimedean T = true →
+  is_complete T rngl_distance →
+  ∀ (P : T → Prop) a b,
+  P b
+  → (∀ x, P x → (a < x)%L)
+  → ∃ c, is_infimum P c.
+Proof.
+intros Hon Hiv Har Hco * Ha Hs.
+specialize (upper_bound_property Hon Hiv Har Hco (λ x, P (- x)%L)) as H1.
+specialize (H1 (- b) (- a))%L.
+cbn in H1.
+rewrite (rngl_opp_involutive Hop) in H1.
+specialize (H1 Ha).
+assert (H : ∀ x, P (- x)%L → (x < - a)%L).  {
+  intros x Hx.
+  apply (rngl_lt_opp_r Hop Hor).
+  rewrite rngl_add_comm.
+  apply (rngl_lt_opp_r Hop Hor).
+  now apply Hs.
+}
+specialize (H1 H); clear H.
+destruct H1 as (c & Hc).
+exists (- c)%L.
+progress unfold is_supremum in Hc.
+progress unfold is_infimum.
+progress unfold is_extremum in Hc.
+progress unfold is_extremum.
+destruct (is_bound _ _ c) as [Hbc| Hbc]. {
+  destruct (is_bound _ _ (- c)) as [Hboc| Hboc]. {
+    intros c'.
+    destruct (is_bound _ _ c') as [Hbc'| Hbc']; [ | easy ].
+...
+Qed.
+...
 *)
 
 Theorem intermediate_value :
