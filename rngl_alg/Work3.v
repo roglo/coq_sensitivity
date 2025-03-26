@@ -965,6 +965,20 @@ destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
+(* conseil de Mistral AI *)
+Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
+  ∀ (P : list (GComplex T)),
+  1 < length P
+  → let deg := length P - 1 in
+  List.nth deg P 0%L ≠ 0%C
+  → ∀ ε, (0 < ε)%L
+  → ∃ R, (0 < R)%L ∧
+    ∀ z,
+    (R < ‖z‖)%L
+    → (‖rngl_eval_polyn P z / (P.[deg] * z ^ deg) - 1‖ < ε)%L.
+Proof.
+intros * H1len * Hz * Hε.
+...
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →
