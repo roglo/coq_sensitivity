@@ -22,6 +22,7 @@ Require Import Misc.
 Require Import Complex.
 Require Import Work.
 Require Import Work2.
+Require Import IntermVal.
 
 Section a.
 
@@ -966,8 +967,11 @@ remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
 (* conseil de Mistral AI *)
+Check @rngl_distance.
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
-  ∀ (P : list (GComplex T)),
+  rngl_is_archimedean T = true →
+  @is_complete T ro T (@rngl_distance T ro rp ac_op ac_or) →
+  ∀ (em : excl_midd) (P : list (GComplex T)),
   1 < length P
   → let deg := length P - 1 in
   List.nth deg P 0%L ≠ 0%C
@@ -977,7 +981,11 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
     (R < ‖z‖)%L
     → (‖rngl_eval_polyn P z / (P.[deg] * z ^ deg) - 1‖ < ε)%L.
 Proof.
-intros * H1len * Hz * Hε.
+destruct_ac.
+intros Har Hco.
+intros em * H1len * Hz * Hε.
+specialize @lower_bound_property as H1.
+specialize (H1 _ _ _ em Hop Hor Hon Hiv Har Hco).
 ...
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →
