@@ -993,27 +993,15 @@ specialize (H1 Q 0%L).
 specialize (H1 (f 0%L)).
 assert (H : Q (f 0%L)) by now exists 0%L.
 specialize (H1 H); clear H.
-assert (H : ∀ x, Q x → (0 < x)%L). {
+assert (H : ∀ x, Q x → (0 ≤ x)%L). {
   intros x Hx.
   progress unfold Q in Hx.
   destruct Hx as (z, Hxz).
   subst x.
   progress unfold f.
-  apply (rngl_lt_iff Hor).
-  split; [ apply (gc_modl_nonneg Hos Hor) | ].
-  intros H; symmetry in H.
-Check @lower_bound_property.
-...
-set (f := List.map gc_modl P).
-set (Q := λ z, (rngl_eval_polyn f z / (f.[deg] * z ^ deg) - 1)%L).
-...
-...
-progress unfold Q in H1.
-cbn in H1.
-cbn in H1.
-set (f := List.map gc_modl P).
-set (Q := λ z, (rngl_eval_polyn f z / (f.[deg] * z ^ deg) - 1)%L).
-specialize (H1 Q).
+  apply (gc_modl_nonneg Hos Hor).
+}
+specialize (H1 H); clear H.
 ...
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →

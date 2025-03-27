@@ -742,7 +742,7 @@ Qed.
 Theorem in_AnBn :
   ∀ (P : _ → Prop) a b,
   P a
-  → (∀ x, P x → (x < b)%L)
+  → (∀ x, P x → (x ≤ b)%L)
   → ∀ n an bn,
   AnBn P a b n = (an, bn)
   → ∃ y : T, (an ≤ y ≤ bn)%L ∧ P y.
@@ -750,10 +750,7 @@ Proof.
 intros * Ha Hs * Habn.
 specialize (AnBn_exists_P P) as H1.
 specialize (H1 a b a).
-assert (H : ∀ x : T, P x → (x ≤ b)%L). {
-  now intros; apply (rngl_lt_le_incl Hor), Hs.
-}
-now specialize (H1 H (rngl_le_refl Hor _) Ha _ _ _ Habn); clear H.
+now specialize (H1 Hs (rngl_le_refl Hor _) Ha _ _ _ Habn).
 Qed.
 
 Theorem AnBn_not_P :
@@ -780,18 +777,15 @@ Qed.
 Theorem after_AnBn :
   ∀ (P : _ → Prop) a b,
   P a
-  → (∀ x : T, P x → (x < b)%L)
+  → (∀ x : T, P x → (x ≤ b)%L)
   → ∀ n an bn,
   AnBn P a b n = (an, bn)
   → ∀ y, (bn < y)%L
   → ¬ P y.
 Proof.
 intros * Ha Hs * Habn * Hby.
-assert (H : ∀ x : T, P x → (x ≤ b)%L). {
-  now intros; apply (rngl_lt_le_incl Hor), Hs.
-}
 specialize (AnBn_not_P P) as H1.
-now apply (H1 a b n an bn H Habn).
+now apply (H1 a b n an bn Hs Habn).
 Qed.
 
 Theorem intermediate_value_prop_1 :
@@ -994,7 +988,7 @@ Theorem exists_supremum :
   is_complete T rngl_distance →
   ∀ (P : T → Prop) a b,
   P a
-  → (∀ x, P x → (x < b)%L)
+  → (∀ x, P x → (x ≤ b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L ∧
     is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn P a b n)) c ∧
     is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn P a b n)) c.
@@ -1044,7 +1038,7 @@ intros * Ha Hs.
 set (u := λ n, fst (AnBn P a b n)).
 set (v := λ n, snd (AnBn P a b n)).
 specialize (An_Bn_are_Cauchy_sequences Hon Hiv Har P) as H1.
-assert (Hab : (a ≤ b)%L) by now apply (rngl_lt_le_incl Hor), Hs.
+assert (Hab : (a ≤ b)%L) by now apply Hs.
 specialize (H1 a b Hab).
 progress fold u in H1.
 progress fold v in H1.
@@ -1303,13 +1297,7 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
     supremum c = sup S exists" *)
 specialize (exists_supremum Hon Hiv Har Hco P) as H1.
 specialize (H1 a b Ha).
-assert (H : (∀ x, P x → (x < b)%L)). {
-  intros y ((Hay & Hyb) & Hy).
-  apply (rngl_lt_iff Hor).
-  split; [ easy | ].
-  intros H; subst y.
-  now apply (rngl_lt_le_incl Hor), rngl_nlt_ge in Hy.
-}
+assert (H : (∀ x, P x → (x ≤ b)%L)) by now intros y ((Hay & Hyb) & Hy).
 specialize (H1 H); clear H.
 destruct H1 as (c & Hc & H1 & Hlima & Hlimb).
 progress unfold is_supremum in Hc.
@@ -1606,7 +1594,7 @@ Theorem upper_bound_property :
   is_complete T rngl_distance →
   ∀ (P : T → Prop) a b,
   P a
-  → (∀ x, P x → (x < b)%L)
+  → (∀ x, P x → (x ≤ b)%L)
   → ∃ c, is_supremum P c.
 Proof.
 intros Hon Hiv Har Hco * Ha Hs.
@@ -1621,7 +1609,7 @@ Theorem lower_bound_property :
   is_complete T rngl_distance →
   ∀ (P : T → Prop) a b,
   P b
-  → (∀ x, P x → (a < x)%L)
+  → (∀ x, P x → (a ≤ x)%L)
   → ∃ c, is_infimum P c.
 Proof.
 intros Hon Hiv Har Hco * Ha Hs.
@@ -1630,11 +1618,11 @@ specialize (H1 (- b) (- a))%L.
 cbn in H1.
 rewrite (rngl_opp_involutive Hop) in H1.
 specialize (H1 Ha).
-assert (H : ∀ x, P (- x)%L → (x < - a)%L).  {
+assert (H : ∀ x, P (- x)%L → (x ≤ - a)%L).  {
   intros x Hx.
-  apply (rngl_lt_opp_r Hop Hor).
+  apply (rngl_le_opp_r Hop Hor).
   rewrite rngl_add_comm.
-  apply (rngl_lt_opp_r Hop Hor).
+  apply (rngl_le_opp_r Hop Hor).
   now apply Hs.
 }
 specialize (H1 H); clear H.
