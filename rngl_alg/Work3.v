@@ -986,6 +986,13 @@ intros Har Hco.
 intros em * H1len * Hz * Hε.
 specialize @lower_bound_property as H1.
 specialize (H1 _ _ _ em Hop Hor Hon Hiv Har Hco).
+(* a=0, but what is P? *)
+...
+specialize (H1 (λ _, True) 0%L).
+cbn in H1.
+set (f := List.map gc_modl P).
+set (Q := λ z, (rngl_eval_polyn f z / (f.[deg] * z ^ deg) - 1)%L).
+specialize (H1 Q).
 ...
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →
