@@ -1006,13 +1006,9 @@ destruct H1 as (c, Hc).
 progress unfold is_infimum in Hc.
 progress unfold is_extremum in Hc.
 destruct (is_bound _ _ _) as [Hqc| Hqc]; [ | easy ].
+change (∃ R : T, (0 < R)%L ∧ ∀ z : GComplex T, (R < ‖ z ‖)%L → (f z < ε)%L).
+progress unfold Q in Hqc.
 exists c.
-specialize (Hc 0%L) as H1.
-destruct (is_bound _ _ _) as [Hqz| Hqz]. {
-  split. {
-    apply (rngl_lt_iff Hor).
-    split; [ easy | ].
-    intros H; subst c; clear H1.
 ...
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →
