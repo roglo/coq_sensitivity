@@ -1595,7 +1595,7 @@ Theorem upper_bound_property :
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x ≤ b)%L)
-  → ∃ c, is_supremum P c.
+  → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
 intros Hon Hiv Har Hco * Ha Hs.
 destruct (exists_supremum Hon Hiv Har Hco P a b Ha Hs) as (c & Hc).
@@ -1610,7 +1610,7 @@ Theorem lower_bound_property :
   ∀ (P : T → Prop) a b,
   P b
   → (∀ x, P x → (a ≤ x)%L)
-  → ∃ c, is_infimum P c.
+  → ∃ c, is_infimum P c ∧ (a ≤ c)%L.
 Proof.
 intros Hon Hiv Har Hco * Ha Hs.
 specialize (upper_bound_property Hon Hiv Har Hco (λ x, P (- x)%L)) as H1.
@@ -1626,9 +1626,12 @@ assert (H : ∀ x, P (- x)%L → (x ≤ - a)%L).  {
   now apply Hs.
 }
 specialize (H1 H); clear H.
-destruct H1 as (c & Hc).
+destruct H1 as (c & Hc & Hca).
 exists (- c)%L.
-now apply (supremum_opp _ P) in Hc.
+apply (supremum_opp _ P) in Hc; [ | easy ].
+split; [ easy | ].
+apply (rngl_opp_le_compat Hop Hor).
+now rewrite (rngl_opp_involutive Hop).
 Qed.
 
 Theorem intermediate_value :
