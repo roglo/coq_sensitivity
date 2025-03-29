@@ -1001,12 +1001,12 @@ assert (H : ∀ x, Im x → (0 ≤ x)%L). {
   apply (gc_modl_nonneg Hos Hor).
 }
 specialize (H1 H); clear H.
-destruct H1 as (c & Hc & Hzc).
-progress unfold is_infimum in Hc.
-progress unfold is_extremum in Hc.
+destruct H1 as (m & Hm & Hzm).
+progress unfold is_infimum in Hm.
+progress unfold is_extremum in Hm.
 destruct (is_bound _ _ _) as [Hqc| Hqc]; [ | easy ].
 change (∃ R : T, (0 < R)%L ∧ ∀ z : GComplex T, (R < ‖ z ‖)%L → (f z < ε)%L).
-exists c.
+exists m.
 split. {
   apply (rngl_lt_iff Hor).
   split; [ easy | ].
