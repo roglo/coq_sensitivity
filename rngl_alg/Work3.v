@@ -1045,6 +1045,15 @@ destruct (rngl_eq_dec Heo m 0) as [Hmz| Hmz]; [ now subst m | ].
 assert (H : (0 < m)%L) by now apply (rngl_lt_iff Hor).
 move H before Hzm; clear Hzm Hmz; rename H into Hzm.
 exfalso.
+progress unfold is_infimum in Hm.
+progress unfold is_extremum in Hm.
+destruct (is_bound _ _) as [Him| Him]; [ | easy ].
+assert (H : Im (m / 2)%L). {
+  progress unfold Im.
+  progress unfold f.
+...
+specialize (Him _ Hqz) as H1.
+progress unfold f in H1.
 ...
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →
