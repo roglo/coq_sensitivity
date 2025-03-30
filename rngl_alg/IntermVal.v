@@ -1722,3 +1722,5 @@ now apply (rngl_opp_inj Hop) in Hc.
 Qed.
 
 End a.
+
+Arguments is_infimum {T ro em} Q c%_L.

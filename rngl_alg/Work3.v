@@ -1002,6 +1002,17 @@ assert (H : ∀ x, Im x → (0 ≤ x)%L). {
 }
 specialize (H1 H); clear H.
 destruct H1 as (m & Hm & Hzm).
+Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
+  rngl_is_archimedean T = true →
+  @is_complete T ro T (@rngl_distance T ro rp ac_op ac_or) →
+  ∀ (em : excl_midd) (P : list (GComplex T)),
+  1 < length P
+  → let deg := length P - 1 in
+  List.nth deg P 0%L ≠ 0%C
+  → let f := λ z, ‖ (rngl_eval_polyn P z / (P.[deg] * z ^ deg) - 1) ‖ in
+    let Im := λ v, ∃ z : GComplex T, v = f z in
+    is_infimum Im 0.
+...
 progress unfold is_infimum in Hm.
 progress unfold is_extremum in Hm.
 destruct (is_bound _ _ _) as [Hqc| Hqc]; [ | easy ].
