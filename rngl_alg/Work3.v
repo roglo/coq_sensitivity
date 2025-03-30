@@ -1002,6 +1002,14 @@ assert (H : ∀ x, Im x → (0 ≤ x)%L). {
 }
 specialize (H1 H); clear H.
 destruct H1 as (m & Hm & Hzm).
+progress unfold is_infimum in Hm.
+progress unfold is_extremum in Hm.
+destruct (is_bound _ _ _) as [Hqc| Hqc]; [ | easy ].
+change (∃ R : T, (0 < R)%L ∧ ∀ z : GComplex T, (R < ‖ z ‖)%L → (f z < ε)%L).
+exists m.
+split. {
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_is_archimedean T = true →
   @is_complete T ro T (@rngl_distance T ro rp ac_op ac_or) →
@@ -1012,15 +1020,31 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   → let f := λ z, ‖ (rngl_eval_polyn P z / (P.[deg] * z ^ deg) - 1) ‖ in
     let Im := λ v, ∃ z : GComplex T, v = f z in
     is_infimum Im 0.
-...
-progress unfold is_infimum in Hm.
-progress unfold is_extremum in Hm.
-destruct (is_bound _ _ _) as [Hqc| Hqc]; [ | easy ].
-change (∃ R : T, (0 < R)%L ∧ ∀ z : GComplex T, (R < ‖ z ‖)%L → (f z < ε)%L).
-exists m.
-split. {
-  apply (rngl_lt_iff Hor).
-  split; [ easy | ].
+Proof.
+destruct_ac.
+intros Har Hco.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+intros em * H1len * Hz *.
+specialize @lower_bound_property as H1.
+specialize (H1 _ _ _ em Hop Hor Hon Hiv Har Hco).
+specialize (H1 Im 0%L).
+specialize (H1 (f 0%L)).
+assert (Hqz : Im (f 0%L)) by now exists 0%L.
+specialize (H1 Hqz).
+assert (H : ∀ x, Im x → (0 ≤ x)%L). {
+  intros x Hx.
+  progress unfold Im in Hx.
+  destruct Hx as (z, Hxz).
+  subst x.
+  progress unfold f.
+  apply (gc_modl_nonneg Hos Hor).
+}
+specialize (H1 H); clear H.
+destruct H1 as (m & Hm & Hzm).
+destruct (rngl_eq_dec Heo m 0) as [Hmz| Hmz]; [ now subst m | ].
+assert (H : (0 < m)%L) by now apply (rngl_lt_iff Hor).
+move H before Hzm; clear Hzm Hmz; rename H into Hzm.
+exfalso.
 ...
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →
