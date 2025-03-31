@@ -1015,9 +1015,9 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   @is_complete T ro T (@rngl_distance T ro rp ac_op ac_or) →
   ∀ (em : excl_midd) (P : list (GComplex T)),
   1 < length P
-  → let deg := length P - 1 in
-  List.nth deg P 0%L ≠ 0%C
-  → let f := λ z, ‖ (rngl_eval_polyn P z / (P.[deg] * z ^ deg) - 1) ‖ in
+  → let n := length P - 1 in
+  List.nth n P 0%L ≠ 0%C
+  → let f := λ z, ‖ (rngl_eval_polyn P z / (P.[n] * z ^ n) - 1) ‖ in
     let Im := λ v, ∃ z : GComplex T, v = f z in
     is_infimum Im 0.
 Proof.
