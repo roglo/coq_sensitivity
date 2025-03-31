@@ -1724,3 +1724,4 @@ Qed.
 End a.
 
 Arguments is_infimum {T ro em} Q c%_L.
+Arguments is_lower_bound {T ro em} P c%_L.

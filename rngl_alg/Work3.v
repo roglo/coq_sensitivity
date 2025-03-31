@@ -1048,6 +1048,23 @@ exfalso.
 progress unfold is_infimum in Hm.
 progress unfold is_extremum in Hm.
 destruct (is_bound _ _) as [Him| Him]; [ | easy ].
+(* pour voir... *)
+assert
+  (Hnlbe :
+     ∀ ε, (0 < ε)%L → bool_of_sumbool (is_lower_bound Im (m + ε)) = false). {
+  intros ε Hε.
+  progress unfold bool_of_sumbool.
+  destruct (is_lower_bound Im (m + ε)) as [Hme| Hme]; [ exfalso | easy ].
+  specialize (Hm (m + ε)%L) as H1.
+  destruct (is_bound _ _) as [Hbme| Hbme]. {
+    apply rngl_nlt_ge in H1.
+    now apply H1, (rngl_lt_add_r Hos Hor).
+  }
+  clear H1.
+  destruct Hbme as (x, Hx).
+  apply Hx, Hme.
+}
+...
 assert (H : Im (m / 2)%L). {
   progress unfold Im.
   progress unfold f.
