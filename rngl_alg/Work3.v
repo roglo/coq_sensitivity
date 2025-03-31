@@ -1024,6 +1024,7 @@ Proof.
 destruct_ac.
 intros Har Hco.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 intros em * H1len * Hz *.
 specialize @lower_bound_property as H1.
 specialize (H1 _ _ _ em Hop Hor Hon Hiv Har Hco).
@@ -1064,6 +1065,30 @@ assert
   destruct Hbme as (x, Hx).
   apply Hx, Hme.
 }
+assert (H : ∀ c', if is_lower_bound Im c' then (c' ≤ m)%L else True). {
+  easy.
+}
+move H before Hm; clear Hm; rename H into Hm.
+(* pour voir *)
+assert (H : ∀ m, (0 < m)%L → ∃ z, z ≠ 0%C ∧ ‖ z ‖ = m). {
+  intros a Ha.
+  exists (mk_gc a 0).
+  split. {
+    intros H.
+    injection H; clear H; intros H.
+    now subst a; apply (rngl_lt_irrefl Hor) in Ha.
+  }
+  progress unfold gc_modl.
+  cbn.
+  progress unfold rl_modl.
+  rewrite (rngl_squ_0 Hos).
+  rewrite rngl_add_0_r.
+  rewrite (rl_sqrt_squ Hon Hop Hor).
+  apply (rngl_abs_nonneg_eq Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
+specialize (H m Hzm).
+destruct H as (z & Hmzz & Hmz).
 ...
 assert (H : Im (m / 2)%L). {
   progress unfold Im.
