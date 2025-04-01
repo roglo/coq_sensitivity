@@ -1025,6 +1025,14 @@ intros Har Hco.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros em * H1len * Hz *.
+  apply (neq_neq_GComplex Hed) in Hz.
+  cbn - [ rngl_zero ] in Hz.
+  rewrite (H1 (gre _)), (H1 (gim _)) in Hz.
+  now destruct Hz.
+}
 intros em * H1len * Hz *.
 specialize @lower_bound_property as H1.
 specialize (H1 _ _ _ em Hop Hor Hon Hiv Har Hco).
@@ -1102,6 +1110,22 @@ assert (H :
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     apply (rngl_summation_nonneg Hor).
     intros i Hi.
+    apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+      apply (gc_modl_nonneg Hos Hor).
+    }
+    apply (rngl_mul_pos_pos Hos Hor Hii). {
+      apply (rngl_lt_iff Hor).
+      split; [ apply (gc_modl_nonneg Hos Hor) | ].
+      intros H; symmetry in H.
+      now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
+    }
+    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply (gc_modl_nonneg Hos Hor) | ].
+    intros H; rewrite <- H in Hrz.
+    apply (rngl_lt_le_incl Hor) in Hrz.
+    now apply rngl_nlt_ge in Hrz.
+  }
 ...
 (* pour voir *)
 assert (H : ∀ m, (0 < m)%L → ∃ z, z ≠ 0%C ∧ ‖ z ‖ = m). {
