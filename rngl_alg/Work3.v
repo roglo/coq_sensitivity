@@ -1080,9 +1080,8 @@ assert (H :
   is_limit_when_tending_to_inf rngl_distance'
     (λ x, ∑ (k = 0, n - 1), ‖ P.[k] ‖ / (‖ P.[n] ‖ * x ^ (n - k))) 0%L). {
   intros ε Hε.
-...
+  admit.
 }
-... ...
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (R & Hr & Hrx).
@@ -1099,7 +1098,10 @@ assert (H :
   cbn - [ rngl_add rngl_zero ] in Hrx.
   progress unfold rngl_dist in Hrx.
   rewrite (rngl_sub_0_r Hos) in Hrx.
-  (* mouais, bon, j'espère que ça va marcher... *)
+  eapply (rngl_le_lt_trans Hor); [ | apply Hrx ].
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    apply (rngl_summation_nonneg Hor).
+    intros i Hi.
 ...
 (* pour voir *)
 assert (H : ∀ m, (0 < m)%L → ∃ z, z ≠ 0%C ∧ ‖ z ‖ = m). {

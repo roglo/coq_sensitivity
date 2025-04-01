@@ -750,6 +750,22 @@ split; [ easy | ].
 flia Hbi Hib.
 Qed.
 
+Theorem rngl_summation_nonneg :
+  rngl_is_ordered T = true →
+  ∀ b e f,
+  (∀ i, b ≤ i ≤ e → (0 ≤ f i)%L)
+  → (0 ≤ ∑ (i = b, e), f i)%L.
+Proof.
+intros Hor.
+intros * Hz.
+eapply (rngl_le_trans Hor). 2: {
+  apply (rngl_summation_le_compat Hor).
+  apply Hz.
+}
+rewrite all_0_rngl_summation_0; [ | easy ].
+apply (rngl_le_refl Hor).
+Qed.
+
 Theorem rngl_summation_filter : ∀ A l f (g : A → T),
   ∑ (a ∈ List.filter f l), g a = ∑ (a ∈ l), if f a then g a else 0%L.
 Proof.
