@@ -967,10 +967,9 @@ remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
 (* conseil de Mistral AI *)
-Check @rngl_distance.
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_is_archimedean T = true →
-  @is_complete T ro T (@rngl_distance T ro rp ac_op ac_or) →
+  @is_complete T ro T rngl_distance' →
   ∀ (em : excl_midd) (P : list (GComplex T)),
   1 < length P
   → let deg := length P - 1 in
@@ -1023,6 +1022,7 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
 Proof.
 destruct_ac.
 intros Har Hco.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 intros em * H1len * Hz *.
@@ -1077,9 +1077,29 @@ Definition is_limit_when_tending_to_inf {A} (dist : distance A) f L :=
   ∀ ε, (0 < ε)%L → ∃ R, (0 < R)%L ∧
   ∀ x, (R < x)%L → (d_dist (f x) L < ε)%L.
 assert (H :
-  is_limit_when_tending_to_inf ...
-  ∀ ε, (0 < ε)%L → ∃ R₀, (0 < R₀)%L ∧
-  ∀ z, (R₀ < ‖z‖)%L → (‖ U z ‖ < ε)%L). {
+  is_limit_when_tending_to_inf rngl_distance'
+    (λ x, ∑ (k = 0, n - 1), ‖ P.[k] ‖ / (‖ P.[n] ‖ * x ^ (n - k))) 0%L). {
+  intros ε Hε.
+...
+}
+... ...
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (R & Hr & Hrx).
+  exists R.
+  split; [ easy | ].
+  intros z Hrz.
+  progress unfold U.
+  eapply (rngl_le_lt_trans Hor). {
+    apply (gc_summation_triangular Hic Hon Hop Hiv Hor Hii).
+  }
+  cbn - [ rngl_add rngl_zero ].
+  specialize (Hrx (‖ z ‖)%L Hrz).
+  progress unfold d_dist in Hrx.
+  cbn - [ rngl_add rngl_zero ] in Hrx.
+  progress unfold rngl_dist in Hrx.
+  rewrite (rngl_sub_0_r Hos) in Hrx.
+  (* mouais, bon, j'espère que ça va marcher... *)
 ...
 (* pour voir *)
 assert (H : ∀ m, (0 < m)%L → ∃ z, z ≠ 0%C ∧ ‖ z ‖ = m). {
