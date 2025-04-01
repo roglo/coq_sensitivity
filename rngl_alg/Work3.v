@@ -1126,6 +1126,55 @@ assert (H :
     apply (rngl_lt_le_incl Hor) in Hrz.
     now apply rngl_nlt_ge in Hrz.
   }
+  apply (rngl_summation_le_compat Hor).
+  intros i Hi.
+  rewrite (rngl_div_gc_div Hic Hiv).
+  rewrite (gc_modl_div Hic Hon Hop Hiv Hor).
+  rewrite (gc_modl_mul Hic Hon Hop Hor).
+  rewrite rngl_pow_gc_pow. 2: {
+    rewrite <- rngl_mul_gc_mul.
+...
+Search (_ * _ = 0)%C.
+replace 0%C with 0%L.
+    intros H.
+    injection H; clear H; intros H1 H2.
+Search gc_zero.
+    progress unfold gc_zero.
+Set Printing All.
+Search (0%C).
+    intros H.
+Search (_ * _ = 0)%L.
+apply (rngl_
+    apply (rngl_integral) in H.
+    apply (rngl_pow_nonzero).
+Search (_ ^ _ = 0)%L.
+...
+  rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
+Search (‖ _ * _ ‖)%L.
+Search (_ / _ ≤ _ / _)%L.
+Check rngl_div_le_mono_pos_l.
+2: {
+progress unfold gc_ring_like_op.
+cbn.
+...
+progress unfold gc_div.
+Check gc_modl_div.
+...
+progress unfold gc_ring_like_op.
+cbn.
+Set Printing All.
+progress unfold gc_div.
+
+  cbn - [ rngl_add rngl_zero ].
+Set Printing All.
+progress unfold gc_opt_inv_or_quot.
+...
+specialize (gc_modl_div Hic Hon Hop Hiv Hor) as H1.
+specialize (H1 a b).
+Set Printing All.
+....
+Search (‖ _ / _ ‖).
+  rewrite rngl_div_modl.
 ...
 (* pour voir *)
 assert (H : ∀ m, (0 < m)%L → ∃ z, z ≠ 0%C ∧ ‖ z ‖ = m). {
