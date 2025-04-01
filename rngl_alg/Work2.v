@@ -1268,8 +1268,8 @@ Theorem rngl_limit_sub_l_limit :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a u l,
-  is_limit_when_tending_to_inf rngl_distance (λ i, (a - u i)%L) (a - l)%L
-  → is_limit_when_tending_to_inf rngl_distance u l.
+  is_limit_when_seq_tends_to_inf rngl_distance (λ i, (a - u i)%L) (a - l)%L
+  → is_limit_when_seq_tends_to_inf rngl_distance u l.
 Proof.
 intros Hop Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.

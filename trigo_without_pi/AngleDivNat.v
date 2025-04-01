@@ -30,7 +30,7 @@ Theorem angle_lim_eq_compat :
   → angle_lim g θ.
 Proof.
 intros * Hfg Hf.
-eapply is_limit_when_tending_to_inf_eq_compat; [ apply Hfg | easy ].
+eapply is_limit_when_seq_tends_to_inf_eq_compat; [ apply Hfg | easy ].
 Qed.
 
 Theorem angle_lim_opp :

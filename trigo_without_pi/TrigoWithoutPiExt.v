@@ -1711,7 +1711,7 @@ Definition angle_eucl_distance :=
 Definition angle_taxi_distance :=
   {| d_dist := angle_taxi_dist; d_prop := angle_taxi_dist_is_dist |}.
 
-Definition angle_lim := is_limit_when_tending_to_inf angle_eucl_distance.
+Definition angle_lim := is_limit_when_seq_tends_to_inf angle_eucl_distance.
 
 Theorem angle_eucl_dist_opp_opp :
   ∀ θ1 θ2, angle_eucl_dist (- θ1) (- θ2) = angle_eucl_dist θ1 θ2.
@@ -1919,7 +1919,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * H1.
 progress unfold angle_lim in H1.
-progress unfold is_limit_when_tending_to_inf in H1.
+progress unfold is_limit_when_seq_tends_to_inf in H1.
 apply angle_eucl_dist_separation.
 rewrite angle_eucl_dist_symmetry.
 specialize (angle_eucl_dist_nonneg θ1 θ2) as Hzx.

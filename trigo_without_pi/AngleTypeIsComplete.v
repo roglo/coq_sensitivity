@@ -150,7 +150,7 @@ Theorem rngl_dist_to_limit_bounded :
   rngl_is_ordered T = true →
   rngl_characteristic T ≠ 1 →
   ∀ u l,
-  is_limit_when_tending_to_inf rngl_distance' u l
+  is_limit_when_seq_tends_to_inf rngl_distance' u l
   → ∃ N, ∀ n, N ≤ n → (rngl_dist (u n) l < 1)%L.
 Proof.
 intros Hon Hop Hor Hc1.
@@ -167,7 +167,7 @@ Theorem rngl_converging_seq_bounded :
   rngl_is_ordered T = true →
   rngl_characteristic T ≠ 1 →
   ∀ u l,
-  is_limit_when_tending_to_inf rngl_distance' u l
+  is_limit_when_seq_tends_to_inf rngl_distance' u l
   → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n) < rngl_abs l + 1)%L.
 Proof.
 intros Hon Hop Hor Hc1.
@@ -192,7 +192,7 @@ Theorem rngl_converging_seq_add_limit_bounded :
   rngl_is_ordered T = true →
   rngl_characteristic T ≠ 1 →
   ∀ u k,
-  is_limit_when_tending_to_inf rngl_distance' u k
+  is_limit_when_seq_tends_to_inf rngl_distance' u k
   → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n + k) < 2 * rngl_abs k + 1)%L.
 Proof.
 intros Hon Hop Hor Hc1.
@@ -218,8 +218,8 @@ Theorem rngl_limit_limit_squ :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ u l,
-  is_limit_when_tending_to_inf rngl_distance' u l
-  → is_limit_when_tending_to_inf rngl_distance' (λ i, (u i)²)%L l²%L.
+  is_limit_when_seq_tends_to_inf rngl_distance' u l
+  → is_limit_when_seq_tends_to_inf rngl_distance' (λ i, (u i)²)%L l²%L.
 Proof.
 intros Hon Hop Hic Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -291,11 +291,11 @@ rewrite (rngl_mul_comm Hic).
 now apply (rngl_mul_lt_mono_pos_l Hop Hor Hii).
 Qed.
 
-Theorem is_limit_when_tending_to_inf_eq_compat :
+Theorem is_limit_when_seq_tends_to_inf_eq_compat :
   ∀ A (dist : distance A) a b f g z,
   (∀ i, f (i + a) = g (i + b))
-  → is_limit_when_tending_to_inf dist f z
-  → is_limit_when_tending_to_inf dist g z.
+  → is_limit_when_seq_tends_to_inf dist f z
+  → is_limit_when_seq_tends_to_inf dist g z.
 Proof.
 intros * Hfg Hf.
 intros ε Hε.
@@ -312,11 +312,11 @@ Qed.
 
 Theorem limit_cos_cos_sin_sin :
   ∀ u θ,
-  is_limit_when_tending_to_inf rngl_distance'
+  is_limit_when_seq_tends_to_inf rngl_distance'
     (λ i, rngl_cos (u i)) (rngl_cos θ)
-  → is_limit_when_tending_to_inf rngl_distance'
+  → is_limit_when_seq_tends_to_inf rngl_distance'
       (λ i, rngl_sin (u i)) (rngl_sin θ)
-  → is_limit_when_tending_to_inf angle_eucl_distance u θ.
+  → is_limit_when_seq_tends_to_inf angle_eucl_distance u θ.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -397,7 +397,7 @@ Theorem limit_const :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ c lim,
-  is_limit_when_tending_to_inf rngl_distance' (λ _, c) lim
+  is_limit_when_seq_tends_to_inf rngl_distance' (λ _, c) lim
   → lim = c.
 Proof.
 intros Hop Hor * Hlim.
@@ -488,7 +488,7 @@ assert (Hcs1 : (c² + s² = 1)%L). {
   specialize (H (rngl_dist_add_add_le Hop Hor)).
   specialize (H _ _ _ _ H1 H2).
   cbn in H.
-  eapply (is_limit_when_tending_to_inf_eq_compat _ _ 0 0) in H. 2: {
+  eapply (is_limit_when_seq_tends_to_inf_eq_compat _ _ 0 0) in H. 2: {
     intros i.
     rewrite Nat.add_0_r.
     now rewrite cos2_sin2_1.

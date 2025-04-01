@@ -1069,6 +1069,18 @@ assert (H : ∀ c', if is_lower_bound Im c' then (c' ≤ m)%L else True). {
   easy.
 }
 move H before Hm; clear Hm; rename H into Hm.
+set (U := λ z, ∑ (k = 0, n - 1), P.[k] / (P.[n] * z ^ (n - k))).
+assert (H :
+  ∀ ε, (0 < ε)%L → ∃ R₀, (0 < R₀)%L ∧
+  ∀ z, (R₀ < ‖z‖)%L → (‖ U z ‖ < ε)%L). {
+Definition is_limit_when_tending_to_inf {A} (dist : distance A) f L :=
+  ∀ ε, (0 < ε)%L → ∃ R, (0 < R)%L ∧
+  ∀ x, (R < x)%L → (d_dist (f x) L < ε)%L.
+assert (H :
+  is_limit_when_tending_to_inf ...
+  ∀ ε, (0 < ε)%L → ∃ R₀, (0 < R₀)%L ∧
+  ∀ z, (R₀ < ‖z‖)%L → (‖ U z ‖ < ε)%L). {
+...
 (* pour voir *)
 assert (H : ∀ m, (0 < m)%L → ∃ z, z ≠ 0%C ∧ ‖ z ‖ = m). {
   intros a Ha.

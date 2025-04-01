@@ -65,7 +65,7 @@ Definition rngl_distance Hop Hor :=
 
 (* limits *)
 
-Definition is_limit_when_tending_to_inf {A} (dist : distance A) u L :=
+Definition is_limit_when_seq_tends_to_inf {A} (dist : distance A) u L :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (d_dist (u n) L < ε)%L.
 
 Definition is_limit_when_tending_to_neighbourhood (is_left : bool) {A B}
@@ -85,7 +85,7 @@ Definition is_Cauchy_sequence {A} (dist : distance A) (u : nat → A) :=
 
 Definition is_complete A (dist : distance A) :=
   ∀ u, is_Cauchy_sequence dist u
-  → ∃ c, is_limit_when_tending_to_inf dist u c.
+  → ∃ c, is_limit_when_seq_tends_to_inf dist u c.
 
 (* continuity *)
 
@@ -175,12 +175,12 @@ Theorem rngl_limit_interv :
   → (∀ x y z, (x ≤ y ≤ z → d_dist y z ≤ d_dist x z)%L)
   → ∀ u a b c,
   (∀ i, (a ≤ u i ≤ b)%L)
-  → is_limit_when_tending_to_inf dist u c
+  → is_limit_when_seq_tends_to_inf dist u c
   → (a ≤ c ≤ b)%L.
 Proof.
 intros Hon Hop Hiv Hor.
 intros * mono_1 mono_2 * Hi Hlim.
-progress unfold is_limit_when_tending_to_inf in Hlim.
+progress unfold is_limit_when_seq_tends_to_inf in Hlim.
 split. {
   apply (rngl_nlt_ge_iff Hor).
   intros Hca.
@@ -233,8 +233,8 @@ Theorem limit_unique :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ A (dist : distance A) u lim1 lim2,
-  is_limit_when_tending_to_inf dist u lim1
-  → is_limit_when_tending_to_inf dist u lim2
+  is_limit_when_seq_tends_to_inf dist u lim1
+  → is_limit_when_seq_tends_to_inf dist u lim2
   → lim1 = lim2.
 Proof.
 intros Hon Hop Hiv Hor * Hu1 Hu2.
@@ -248,7 +248,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H.
 }
 specialize (dist_nonneg Hon Hop Hiv Hor dist) as Hdpos.
-assert (Hu : is_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
+assert (Hu : is_limit_when_seq_tends_to_inf dist (λ _, lim1) lim2). {
   intros ε Hε.
   assert (Hε2 : (0 < ε / 2)%L). {
     apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := 2%L). {
@@ -314,9 +314,9 @@ Theorem limit_add :
   ∀ dist,
   (∀ a b c d, (d_dist (a + b) (c + d) ≤ d_dist a c + d_dist b d)%L)
   → ∀ u v limu limv,
-  is_limit_when_tending_to_inf dist u limu
-  → is_limit_when_tending_to_inf dist v limv
-  → is_limit_when_tending_to_inf dist (λ n, (u n + v n))%L (limu + limv)%L.
+  is_limit_when_seq_tends_to_inf dist u limu
+  → is_limit_when_seq_tends_to_inf dist v limv
+  → is_limit_when_seq_tends_to_inf dist (λ n, (u n + v n))%L (limu + limv)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hd * Hu Hv ε Hε.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.

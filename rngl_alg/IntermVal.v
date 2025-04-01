@@ -562,8 +562,8 @@ Qed.
 
 Theorem limit_opp :
   ∀ u lim,
-  is_limit_when_tending_to_inf rngl_distance u lim
-  → is_limit_when_tending_to_inf rngl_distance (λ n, (- u n)%L) (- lim)%L.
+  is_limit_when_seq_tends_to_inf rngl_distance u lim
+  → is_limit_when_seq_tends_to_inf rngl_distance (λ n, (- u n)%L) (- lim)%L.
 Proof.
 intros * Hu.
 intros ε Hε.
@@ -582,8 +582,8 @@ Qed.
 Theorem gen_limit_ext_in :
   ∀ {A} (dist : distance A) u v lim,
   (∀ n, u n = v n)
-  → is_limit_when_tending_to_inf dist u lim
-  → is_limit_when_tending_to_inf dist v lim.
+  → is_limit_when_seq_tends_to_inf dist u lim
+  → is_limit_when_seq_tends_to_inf dist v lim.
 Proof.
 intros * Huv Hu ε Hε.
 destruct (Hu ε Hε) as (N, HN).
@@ -598,8 +598,8 @@ Theorem limit_between_An_and_Bn :
   rngl_has_inv T = true →
   ∀ a b lim P,
   (a ≤ b)%L
-  → is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn P a b n)) lim
-  → is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn P a b n)) lim
+  → is_limit_when_seq_tends_to_inf rngl_distance (λ n, fst (AnBn P a b n)) lim
+  → is_limit_when_seq_tends_to_inf rngl_distance (λ n, snd (AnBn P a b n)) lim
   → ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
 Proof.
 intros Hon Hiv.
@@ -990,8 +990,8 @@ Theorem exists_supremum :
   P a
   → (∀ x, P x → (x ≤ b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L ∧
-    is_limit_when_tending_to_inf rngl_distance (λ n, fst (AnBn P a b n)) c ∧
-    is_limit_when_tending_to_inf rngl_distance (λ n, snd (AnBn P a b n)) c.
+    is_limit_when_seq_tends_to_inf rngl_distance (λ n, fst (AnBn P a b n)) c ∧
+    is_limit_when_seq_tends_to_inf rngl_distance (λ n, snd (AnBn P a b n)) c.
 Proof.
 intros Hon Hiv Har Hco.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -1049,7 +1049,7 @@ destruct Hac as (lima, Hal).
 destruct Hbc as (limb, Hbl).
 move limb before lima.
 assert
-  (Hl : (is_limit_when_tending_to_inf rngl_distance (λ n, (u n - v n)) 0)%L). {
+  (Hl : (is_limit_when_seq_tends_to_inf rngl_distance (λ n, (u n - v n)) 0)%L). {
   intros ε Hε.
   progress unfold u.
   progress unfold v.
