@@ -949,6 +949,11 @@ now apply (gc_mul_div Hic Hon Hop Hiv Hor).
 Qed.
 *)
 
+(*
+Print rngl_opt_integral.
+Check is_charac_0_field.
+*)
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
