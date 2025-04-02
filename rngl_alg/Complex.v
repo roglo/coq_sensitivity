@@ -198,11 +198,7 @@ Instance gc_ring_like_op T
      rngl_opt_one := gc_opt_one;
      rngl_opt_opp_or_subt := gc_opt_opp_or_subt T;
      rngl_opt_inv_or_quot := gc_opt_inv_or_quot T;
-(* to be completed *)
-     rngl_opt_is_zero_divisor := Some (λ _, True); (* to be improved *)
-(*
      rngl_opt_is_zero_divisor := gc_opt_is_zero_divisor;
-*)
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 
@@ -644,83 +640,94 @@ remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 now destruct ic.
 Qed.
 
-(* to be completed *)
 Theorem gc_integral :
-(*
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
-  rngl_has_eq_dec_or_order T = true →
   (rngl_is_integral_domain T ||
      rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec_or_order T)%bool =
      true →
-*)
   ∀ a b : GComplex T,
   (a * b)%L = 0%L
   → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
-(*
-intros Hop Heo Hio.
+intros Hic Hop Hio.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-*)
 intros * Hab.
-(*
-injection Hab; clear Hab; intros H1 H2.
-destruct (rngl_eq_dec Heo (gre a) 0) as [Hra| Hra]. {
-  destruct (rngl_eq_dec Heo (gim a) 0) as [Hia| Hia]. {
-    left.
-    destruct a; cbn in Hra, Hia |-*.
-    now rewrite Hra, Hia.
-  }
-  right.
-  rewrite Hra in H1, H2.
-  rewrite (rngl_mul_0_l Hos) in H1, H2.
-  rewrite rngl_add_0_r in H1.
-  rewrite (rngl_sub_0_l Hop) in H2.
-  apply (f_equal rngl_opp) in H2.
-  rewrite (rngl_opp_involutive Hop) in H2.
-  rewrite (rngl_opp_0 Hop) in H2.
-  destruct (rngl_eq_dec Heo (gre b) 0) as [Hrb| Hrb]. {
-    destruct (rngl_eq_dec Heo (gim b) 0) as [Hib| Hib]. {
-      left.
-      destruct b; cbn in Hrb, Hib |-*.
-      now rewrite Hrb, Hib.
-    }
-    right.
-    apply (rngl_integral Hos Hio) in H2.
-    now destruct H2.
-  }
-  right.
-  apply (rngl_integral Hos Hio) in H1.
-  now destruct H1.
-}
-right.
-destruct (rngl_eq_dec Heo (gre b) 0) as [Hrb| Hrb]. {
-  destruct (rngl_eq_dec Heo (gim b) 0) as [Hib| Hib]. {
-    left.
-    destruct b; cbn in Hrb, Hib |-*.
-    now rewrite Hrb, Hib.
-  }
-  right.
-  rewrite Hrb in H1, H2.
-  rewrite (rngl_mul_0_r Hos) in H1, H2.
-  rewrite rngl_add_0_l in H1.
-  rewrite (rngl_sub_0_l Hop) in H2.
-  apply (f_equal rngl_opp) in H2.
-  rewrite (rngl_opp_involutive Hop) in H2.
-  rewrite (rngl_opp_0 Hop) in H2.
-  apply (rngl_integral Hos Hio) in H1.
-  now destruct H1.
-}
-right.
+right; right.
 progress unfold rngl_is_zero_divisor.
 cbn.
-progress unfold gc_opt_is_zero_divisor.
-remember (rngl_opt_is_zero_divisor T) as zd eqn:Hzd.
-symmetry in Hzd.
-destruct zd as [zd| ]. {
-(* non, marche pas *)
-...
-*)
+injection Hab; intros H1 H2.
+apply (f_equal (rngl_mul (gim a))) in H1.
+apply (f_equal (rngl_mul (gre a))) in H2.
+rewrite rngl_mul_add_distr_l in H1.
+rewrite (rngl_mul_sub_distr_l Hop) in H2.
+do 2 rewrite rngl_mul_assoc in H1, H2.
+rewrite (rngl_mul_comm Hic (gim a) (gre a)) in H1.
+rewrite (rngl_mul_0_r Hos) in H1, H2.
+rewrite fold_rngl_squ in H1, H2.
+eapply (f_equal (rngl_add 0)) in H1.
+rewrite <- H2 in H1 at 1.
+rewrite rngl_add_assoc in H1.
+rewrite <- (rngl_add_sub_swap Hop) in H1.
+rewrite (rngl_sub_add Hop) in H1.
+rewrite <- rngl_mul_add_distr_r in H1.
+rewrite rngl_add_0_l in H1.
+apply (rngl_integral Hos Hio) in H1.
+destruct H1 as [H1| H1]; [ now left | ].
+rewrite H1 in H2 |-*.
+rewrite (rngl_mul_0_r Hos) in H2.
+rewrite (rngl_sub_0_l Hop) in H2.
+apply (f_equal rngl_opp) in H2.
+rewrite (rngl_opp_involutive Hop) in H2.
+rewrite (rngl_opp_0 Hop) in H2.
+rewrite (rngl_squ_0 Hos).
+rewrite rngl_add_0_l.
+apply (rngl_integral Hos Hio) in H2.
+destruct H2 as [H2| H2]. 2: {
+  rewrite H2, (rngl_squ_0 Hos).
+  now right.
+}
+apply (rngl_integral Hos Hio) in H2.
+destruct H2 as [H2| H2]. {
+  rewrite H2, (rngl_squ_0 Hos).
+  rewrite rngl_add_0_l.
+  injection Hab; intros H3 H4.
+  rewrite H2 in H4.
+  rewrite (rngl_mul_0_l Hos) in H4.
+  rewrite (rngl_sub_0_l Hop) in H4.
+  apply (f_equal rngl_opp) in H4.
+  rewrite (rngl_opp_involutive Hop) in H4.
+  rewrite (rngl_opp_0 Hop) in H4.
+  apply (rngl_integral Hos Hio) in H4.
+  destruct H4 as [H4| H4]. {
+    rewrite H4, (rngl_squ_0 Hos).
+    now left.
+  } {
+    rewrite H4, (rngl_squ_0 Hos).
+    now right.
+  }
+} {
+  rewrite H2, (rngl_squ_0 Hos).
+  rewrite rngl_add_0_r.
+  injection Hab; intros H3 H4.
+  rewrite H2 in H3.
+  rewrite (rngl_mul_0_l Hos) in H3.
+  rewrite rngl_add_0_l in H3.
+  apply (rngl_integral Hos Hio) in H3.
+  destruct H3 as [H3| H3]. {
+    rewrite H3, (rngl_squ_0 Hos).
+    now left.
+  } {
+    rewrite H3, (rngl_squ_0 Hos).
+    now right.
+  }
+}
+(*
+intros Hic Hop Heo Hio.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hab.
 now right; right; left.
+*)
 Qed.
 
 Theorem gc_characteristic_prop :
@@ -806,6 +813,7 @@ Context {Hor : rngl_is_ordered T = true}.
 Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
   let Hos := rngl_has_opp_has_opp_or_subt Hop in
   let Hsu := rngl_has_opp_has_no_subt Hop in
+  let Hio := rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
@@ -827,7 +835,7 @@ Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
      rngl_opt_mul_inv_diag_r := gc_opt_mul_inv_diag_r;
      rngl_opt_mul_div := gc_opt_mul_div;
      rngl_opt_mul_quot_r := gc_opt_mul_quot_r;
-     rngl_opt_integral := gc_integral;
+     rngl_opt_integral := gc_integral Hic Hop Hio;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := gc_characteristic_prop;
      rngl_opt_ord := NA;
