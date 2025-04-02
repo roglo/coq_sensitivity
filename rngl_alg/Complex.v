@@ -175,7 +175,12 @@ Qed.
 
 Definition gc_opt_is_zero_divisor : option (GComplex T → Prop) :=
   match rngl_opt_is_zero_divisor T with
-  | Some zd => Some (λ z, zd (gre z) ∨ zd (gim z))
+  | Some zd =>
+      Some
+        (λ z,
+           zd (gre z) ∨ zd (gim z) ∨
+           ¬ rngl_is_zero_divisor (gre z) ∨
+           ¬ rngl_is_zero_divisor (gim z))
   | None => None
   end.
 
@@ -201,8 +206,9 @@ Instance gc_ring_like_op T
      rngl_opt_one := gc_opt_one;
      rngl_opt_opp_or_subt := gc_opt_opp_or_subt T;
      rngl_opt_inv_or_quot := gc_opt_inv_or_quot T;
+(* to be completed *)
      rngl_opt_is_zero_divisor := Some (λ _, True); (* to be improved *)
-(* to be completed
+(*
      rngl_opt_is_zero_divisor := gc_opt_is_zero_divisor;
 *)
      rngl_opt_eq_dec := gc_opt_eq_dec;
@@ -713,6 +719,13 @@ destruct (rngl_eq_dec Heo (gre b) 0) as [Hrb| Hrb]. {
   now destruct H1.
 }
 right.
+progress unfold rngl_is_zero_divisor.
+cbn.
+progress unfold gc_opt_is_zero_divisor.
+remember (rngl_opt_is_zero_divisor T) as zd eqn:Hzd.
+symmetry in Hzd.
+destruct zd as [zd| ]. {
+(* non, marche pas *)
 ...
 *)
 now right; right; left.
