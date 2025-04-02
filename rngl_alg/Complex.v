@@ -175,13 +175,10 @@ Qed.
 
 Definition gc_opt_is_zero_divisor : option (GComplex T → Prop) :=
   match rngl_opt_is_zero_divisor T with
-  | Some zd =>
-      Some
-        (λ z,
-           zd (gre z) ∨ zd (gim z) ∨
-           ¬ rngl_is_zero_divisor (gre z) ∨
-           ¬ rngl_is_zero_divisor (gim z))
-  | None => None
+  | Some _ =>
+      Some (λ z, rngl_is_zero_divisor (gre z) ∧ rngl_is_zero_divisor (gim z))
+  | None =>
+      None
   end.
 
 Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
