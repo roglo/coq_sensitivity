@@ -174,12 +174,7 @@ destruct H1 as [H1| H1]. {
 Qed.
 
 Definition gc_opt_is_zero_divisor : option (GComplex T → Prop) :=
-  match rngl_opt_is_zero_divisor T with
-  | Some _ =>
-      Some (λ z, rngl_is_zero_divisor (gre z) ∧ rngl_is_zero_divisor (gim z))
-  | None =>
-      None
-  end.
+  Some (λ z, ((gre z)² + (gim z)² = 0)%L).
 
 Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
   match Bool.bool_dec (rngl_has_eq_dec T) true with
