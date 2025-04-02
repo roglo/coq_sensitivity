@@ -710,16 +710,17 @@ progress unfold gc_opt_one.
 now destruct (rngl_opt_one T).
 Qed.
 
-(*
 Theorem gc_eq_mul_0_l :
   rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b, (a * b = 0 → b ≠ 0 → a = 0)%C.
 Proof.
-intros Hic Hop Hor Hii.
+intros Hic Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 intros * Hab Hbz.
 apply eq_gc_eq in Hab.
@@ -747,7 +748,7 @@ assert (Hra : gre a = 0%L). {
   do 2 rewrite fold_rngl_squ in Habr.
   apply (rngl_eq_mul_0_l Hos Hii) in Habr; [ easy | ].
   intros H; apply Hbz.
-  apply (rl_integral_modulus_prop Hop Hor Hii) in H.
+  apply (rl_integral_modulus_prop Hos Hor Hii) in H.
   now apply eq_gc_eq.
 }
 rewrite Hra in Habr, Habi.
@@ -767,11 +768,11 @@ Theorem gc_pow_nonzero :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a n, a ≠ 0%C → (a ^ n)%C ≠ 0%C.
 Proof.
-intros Hic Hon Hop Hor Hii.
+intros Hic Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -793,10 +794,9 @@ induction n. {
 cbn in Hanz.
 destruct (gc_eq_dec Heo a 0) as [Haz| Haz]; [ easy | exfalso ].
 rewrite (gc_mul_comm Hic) in Hanz.
-apply (gc_eq_mul_0_l Hic Hop Hor Hii) in Hanz; [ | easy ].
+apply (gc_eq_mul_0_l Hic Hon Hop Hiv Hor) in Hanz; [ | easy ].
 now apply Haz, IHn.
 Qed.
-*)
 
 Theorem rngl_pow_gc_pow : ∀ z n, (z ^ n)%L = (z ^ n)%C.
 Proof. easy. Qed.
@@ -1133,8 +1133,28 @@ assert (H :
   rewrite (gc_modl_mul Hic Hon Hop Hor).
   rewrite rngl_pow_gc_pow. 2: {
     rewrite <- rngl_mul_gc_mul.
+    intros H.
+    apply gc_integral in H.
+    destruct H as [H| H]; [ easy | ].
+    destruct H as [H| H]. {
+      apply (gc_pow_nonzero Hic Hon Hop Hiv Hor) in H; [ easy | ].
+      intros H'; rewrite H' in Hrz.
+      rewrite (gc_modl_0 Hon Hop Hor Hii) in Hrz.
+      apply (rngl_lt_le_incl Hor) in Hrz.
+      now apply rngl_nlt_ge in Hrz.
+    }
+Print rngl_is_zero_divisor.
+Print rngl_opt_is_zero_divisor.
+Set Printing All.
 ...
-Search (_ * _ = 0)%C.
+    clear H.
+...
+      cbn in H.
+Search ((_ ^ _)%L = 0%C).
+Set Printing All.
+cbn in H.
+      apply rngl_pow_nonzero in H.
+...
 replace 0%C with 0%L.
     intros H.
     injection H; clear H; intros H1 H2.

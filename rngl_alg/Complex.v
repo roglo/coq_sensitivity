@@ -173,6 +173,12 @@ destruct H1 as [H1| H1]. {
 }
 Qed.
 
+Definition gc_opt_is_zero_divisor : option (GComplex T → Prop) :=
+  match rngl_opt_is_zero_divisor T with
+  | Some zd => Some (λ z, zd (gre z) ∨ zd (gim z))
+  | None => None
+  end.
+
 Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
   match Bool.bool_dec (rngl_has_eq_dec T) true with
   | left Hed =>
@@ -196,6 +202,9 @@ Instance gc_ring_like_op T
      rngl_opt_opp_or_subt := gc_opt_opp_or_subt T;
      rngl_opt_inv_or_quot := gc_opt_inv_or_quot T;
      rngl_opt_is_zero_divisor := Some (λ _, True); (* to be improved *)
+(* to be completed
+     rngl_opt_is_zero_divisor := gc_opt_is_zero_divisor;
+*)
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 
@@ -637,12 +646,75 @@ remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 now destruct ic.
 Qed.
 
+(* to be completed *)
 Theorem gc_integral :
+(*
+  rngl_has_opp T = true →
+  rngl_has_eq_dec_or_order T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec_or_order T)%bool =
+     true →
+*)
   ∀ a b : GComplex T,
   (a * b)%L = 0%L
   → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
+(*
+intros Hop Heo Hio.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+*)
 intros * Hab.
+(*
+injection Hab; clear Hab; intros H1 H2.
+destruct (rngl_eq_dec Heo (gre a) 0) as [Hra| Hra]. {
+  destruct (rngl_eq_dec Heo (gim a) 0) as [Hia| Hia]. {
+    left.
+    destruct a; cbn in Hra, Hia |-*.
+    now rewrite Hra, Hia.
+  }
+  right.
+  rewrite Hra in H1, H2.
+  rewrite (rngl_mul_0_l Hos) in H1, H2.
+  rewrite rngl_add_0_r in H1.
+  rewrite (rngl_sub_0_l Hop) in H2.
+  apply (f_equal rngl_opp) in H2.
+  rewrite (rngl_opp_involutive Hop) in H2.
+  rewrite (rngl_opp_0 Hop) in H2.
+  destruct (rngl_eq_dec Heo (gre b) 0) as [Hrb| Hrb]. {
+    destruct (rngl_eq_dec Heo (gim b) 0) as [Hib| Hib]. {
+      left.
+      destruct b; cbn in Hrb, Hib |-*.
+      now rewrite Hrb, Hib.
+    }
+    right.
+    apply (rngl_integral Hos Hio) in H2.
+    now destruct H2.
+  }
+  right.
+  apply (rngl_integral Hos Hio) in H1.
+  now destruct H1.
+}
+right.
+destruct (rngl_eq_dec Heo (gre b) 0) as [Hrb| Hrb]. {
+  destruct (rngl_eq_dec Heo (gim b) 0) as [Hib| Hib]. {
+    left.
+    destruct b; cbn in Hrb, Hib |-*.
+    now rewrite Hrb, Hib.
+  }
+  right.
+  rewrite Hrb in H1, H2.
+  rewrite (rngl_mul_0_r Hos) in H1, H2.
+  rewrite rngl_add_0_l in H1.
+  rewrite (rngl_sub_0_l Hop) in H2.
+  apply (f_equal rngl_opp) in H2.
+  rewrite (rngl_opp_involutive Hop) in H2.
+  rewrite (rngl_opp_0 Hop) in H2.
+  apply (rngl_integral Hos Hio) in H1.
+  now destruct H1.
+}
+right.
+...
+*)
 now right; right; left.
 Qed.
 
