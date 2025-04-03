@@ -1176,7 +1176,15 @@ assert (H :
       now apply (rngl_lt_trans Hor _ R).
     }
     rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-    rewrite (rngl_abs_nonneg_eq Hop Hor (∑ (_ = _, _), _)).
+    rewrite (rngl_abs_nonneg_eq Hop Hor (∑ (i = _, _), _)). 2: {
+      apply (rngl_summation_nonneg Hor).
+      intros i Hi.
+      apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
+      apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+      now apply (rngl_lt_trans Hor _ R).
+    }
+    apply (rngl_summation_le_compat Hor).
+    intros i Hi.
 ...
 }
 ... ...
