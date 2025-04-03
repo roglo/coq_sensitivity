@@ -1116,6 +1116,20 @@ assert (H :
   is_limit_when_tending_to_inf rngl_distance'
     (λ x, ∑ (k = 0, n - 1), ‖ P.[k] ‖ / (‖ P.[n] ‖ * x ^ (n - k))) 0%L). {
   intros ε Hε.
+  cbn - [ rngl_zero ].
+  progress unfold rngl_dist.
+  enough (H :
+    ∃ R,
+    (0 < R)%L
+    ∧ ∀ x, (R < x)%L →
+       (∣ (∑ (k = 0, n - 1), ‖ P.[k] ‖ / (‖ P.[n] ‖ * x ^ (n - k))) ∣ < ε)%L). {
+    destruct H as (R, H).
+    exists R.
+    split; [ easy | ].
+    intros x Hrx.
+    rewrite (rngl_sub_0_r Hos).
+    now apply H.
+  }
 ...
 }
 ... ...
