@@ -1052,6 +1052,7 @@ destruct_ac.
 intros Har Hco.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1130,6 +1131,58 @@ assert (H :
     rewrite (rngl_sub_0_r Hos).
     now apply H.
   }
+  enough (H :
+    ∃ R,
+    (0 < R)%L
+    ∧ ∀ x, (R < x)%L →
+       (∣ (∑ (k = 0, n - 1), ‖ P.[k] ‖ / x ^ (n - k)) ∣ < ε * ‖ P.[n] ‖)%L). {
+    destruct H as (R, H).
+    exists R.
+    split; [ easy | ].
+    intros x Hrx.
+    destruct H as (Hzr, H).
+    specialize (H x Hrx).
+    apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (‖ P.[n] ‖)%L). {
+      apply (rngl_lt_iff Hor).
+      split; [ apply (gc_modl_nonneg Hos Hor) | ].
+      intros H'; symmetry in H'.
+      now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+    }
+    eapply (rngl_le_lt_trans Hor); [ | apply H ].
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor (‖ P.[n] ‖)).
+    rewrite <- (rngl_abs_mul Hop Hi1 Hor). 2: {
+      apply (gc_modl_nonneg Hos Hor).
+    }
+    rewrite (rngl_mul_summation_distr_r Hos).
+    rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+      apply (rngl_summation_nonneg Hor).
+      intros i Hi.
+      rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+        apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+        intros H'; rewrite H' in Hrx.
+        apply (rngl_lt_le_incl Hor) in Hrx.
+        now apply rngl_nlt_ge in Hrx.
+      } {
+        intros H'.
+        apply (eq_rngl_abs_0 Hop) in H'.
+        now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+      }
+      rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+        apply (gc_modl_nonneg Hos Hor).
+      }
+      rewrite (rngl_div_mul Hon Hiv). 2: {
+        intros H'.
+        now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+      }
+      apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+        apply (gc_modl_nonneg Hos Hor).
+      }
+      apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+      now apply (rngl_lt_trans Hor _ R).
+    }
+    rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+...
+    rewrite (rngl_abs_nonneg_eq Hop Hor (∑ (_ = _, _), _)).
 ...
 }
 ... ...
