@@ -1063,6 +1063,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now destruct Hz.
 }
 intros em * H1len * Hz *.
+assert (Hzmx : ∀ x, (0 ≤ ‖ x ‖)%L) by apply (gc_modl_nonneg Hos Hor).
 specialize @lower_bound_property as H1.
 specialize (H1 _ _ _ em Hop Hor Hon Hiv Har Hco).
 specialize (H1 Im 0%L).
@@ -1144,15 +1145,13 @@ assert (H :
     specialize (H x Hrx).
     apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (‖ P.[n] ‖)%L). {
       apply (rngl_lt_iff Hor).
-      split; [ apply (gc_modl_nonneg Hos Hor) | ].
+      split; [ easy | ].
       intros H'; symmetry in H'.
       now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
     }
     eapply (rngl_le_lt_trans Hor); [ | apply H ].
-    rewrite <- (rngl_abs_nonneg_eq Hop Hor (‖ P.[n] ‖)).
-    rewrite <- (rngl_abs_mul Hop Hi1 Hor). 2: {
-      apply (gc_modl_nonneg Hos Hor).
-    }
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor (‖ P.[n] ‖)); [ | easy ].
+    rewrite <- (rngl_abs_mul Hop Hi1 Hor).
     rewrite (rngl_mul_summation_distr_r Hos).
     rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
       apply (rngl_summation_nonneg Hor).
@@ -1167,21 +1166,16 @@ assert (H :
         apply (eq_rngl_abs_0 Hop) in H'.
         now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
       }
-      rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-        apply (gc_modl_nonneg Hos Hor).
-      }
+      rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
       rewrite (rngl_div_mul Hon Hiv). 2: {
         intros H'.
         now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
       }
-      apply (rngl_div_nonneg Hon Hop Hiv Hor). {
-        apply (gc_modl_nonneg Hos Hor).
-      }
+      apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
       apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
       now apply (rngl_lt_trans Hor _ R).
     }
-    rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-...
+    rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
     rewrite (rngl_abs_nonneg_eq Hop Hor (∑ (_ = _, _), _)).
 ...
 }
