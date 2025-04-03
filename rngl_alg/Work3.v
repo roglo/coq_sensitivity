@@ -954,6 +954,29 @@ Print rngl_opt_integral.
 Check is_charac_0_field.
 *)
 
+Theorem rngl_has_1_gc_has_1 :
+  rngl_has_1 T = true → rngl_has_1 (GComplex T) = true.
+Proof.
+intros Hon.
+progress unfold rngl_has_1.
+cbn.
+progress unfold rngl_has_1 in Hon.
+progress unfold gc_opt_one.
+now destruct (rngl_opt_one T).
+Qed.
+
+Theorem rngl_has_opp_or_subt_gc_has_opp_or_subt :
+  rngl_has_opp_or_subt T = true → rngl_has_opp_or_subt (GComplex T) = true.
+Proof.
+intros Hos.
+progress unfold rngl_has_opp_or_subt.
+cbn.
+progress unfold rngl_has_opp_or_subt in Hos.
+progress unfold gc_opt_opp_or_subt.
+destruct (rngl_opt_opp_or_subt T) as [s| ]; [ | easy ].
+now destruct s.
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
@@ -1093,8 +1116,9 @@ assert (H :
   is_limit_when_tending_to_inf rngl_distance'
     (λ x, ∑ (k = 0, n - 1), ‖ P.[k] ‖ / (‖ P.[n] ‖ * x ^ (n - k))) 0%L). {
   intros ε Hε.
-  admit.
+...
 }
+... ...
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (R & Hr & Hrx).
@@ -1139,7 +1163,7 @@ assert (H :
   rewrite rngl_pow_gc_pow. 2: {
     rewrite <- rngl_mul_gc_mul.
     intros H.
-    apply gc_integral in H.
+    apply (gc_integral Hic Hop Hio) in H.
     destruct H as [H| H]; [ easy | ].
     destruct H as [H| H]. {
       apply (gc_pow_nonzero Hic Hon Hop Hiv Hor) in H; [ easy | ].
@@ -1148,58 +1172,49 @@ assert (H :
       apply (rngl_lt_le_incl Hor) in Hrz.
       now apply rngl_nlt_ge in Hrz.
     }
-Print rngl_is_zero_divisor.
-Print rngl_opt_is_zero_divisor.
-Set Printing All.
-...
-    clear H.
-...
-      cbn in H.
-Search ((_ ^ _)%L = 0%C).
-Set Printing All.
-cbn in H.
-      apply rngl_pow_nonzero in H.
-...
-replace 0%C with 0%L.
-    intros H.
-    injection H; clear H; intros H1 H2.
-Search gc_zero.
-    progress unfold gc_zero.
-Set Printing All.
-Search (0%C).
-    intros H.
-Search (_ * _ = 0)%L.
-apply (rngl_
-    apply (rngl_integral) in H.
-    apply (rngl_pow_nonzero).
-Search (_ ^ _ = 0)%L.
-...
+    cbn - [ rngl_zero ] in H.
+    destruct H as [H| H]. {
+      move Hz at bottom.
+      apply (rngl_eq_add_0 Hor) in H; cycle 1. {
+        apply (rngl_squ_nonneg Hos Hor).
+      } {
+        apply (rngl_squ_nonneg Hos Hor).
+      }
+      destruct H as (H1, H2).
+      apply (eq_rngl_squ_0 Hos Hio) in H1, H2.
+      apply (neq_neq_GComplex Hed) in Hz.
+      now destruct Hz.
+    }
+    apply (rngl_eq_add_0 Hor) in H; cycle 1. {
+      apply (rngl_squ_nonneg Hos Hor).
+    } {
+      apply (rngl_squ_nonneg Hos Hor).
+    }
+    destruct H as (H1, H2).
+    apply (eq_rngl_squ_0 Hos Hio) in H1, H2.
+    assert (H3 : (z ^ (n - i) = 0)%L) by now apply eq_gc_eq.
+    set (grp := gc_ring_like_prop_not_alg_closed Hon Hic Hop Hiv Hor).
+    apply rngl_pow_nonzero in H3; [ easy | | easy | | | ]. {
+      now apply rngl_has_1_gc_has_1.
+    } {
+      now apply rngl_has_opp_or_subt_gc_has_opp_or_subt.
+    } {
+      apply Bool.orb_true_iff; right.
+      clear - Hic Hon Hiv.
+      apply rngl_has_inv_and_1_has_inv_and_1_or_quot.
+      now apply rngl_has_1_gc_has_1.
+      now rewrite rngl_has_inv_gc_has_inv.
+    } {
+      intros H; rewrite H in Hrz.
+      cbn in Hrz.
+      rewrite (gc_modl_0 Hon Hop Hor Hii) in Hrz.
+      apply (rngl_lt_le_incl Hor) in Hrz.
+      now apply rngl_nlt_ge in Hrz.
+    }
+  }
   rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
-Search (‖ _ * _ ‖)%L.
-Search (_ / _ ≤ _ / _)%L.
-Check rngl_div_le_mono_pos_l.
-2: {
-progress unfold gc_ring_like_op.
-cbn.
-...
-progress unfold gc_div.
-Check gc_modl_div.
-...
-progress unfold gc_ring_like_op.
-cbn.
-Set Printing All.
-progress unfold gc_div.
-
-  cbn - [ rngl_add rngl_zero ].
-Set Printing All.
-progress unfold gc_opt_inv_or_quot.
-...
-specialize (gc_modl_div Hic Hon Hop Hiv Hor) as H1.
-specialize (H1 a b).
-Set Printing All.
-....
-Search (‖ _ / _ ‖).
-  rewrite rngl_div_modl.
+  apply (rngl_le_refl Hor).
+}
 ...
 (* pour voir *)
 assert (H : ∀ m, (0 < m)%L → ∃ z, z ≠ 0%C ∧ ‖ z ‖ = m). {
