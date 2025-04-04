@@ -1272,6 +1272,28 @@ assert (H :
     rewrite (rngl_mul_inv_r Hiv).
     apply (rngl_le_refl Hor).
   }
+  enough (H :
+    ∃ R,
+    (0 < R)%L
+    ∧ ∀ x, (R < x)%L →
+      (1 / (x - 1) * (1 - 1 / x ^ n) < ε * ‖ P.[n] ‖ / M)%L). {
+    destruct H as (R, H).
+    exists (rngl_max 1 R).
+    split; [ now apply (rngl_max_lt_iff Hor); right | ].
+    intros x Hrx.
+    destruct H as (Hzr, H).
+    specialize (H (x + 1)%L).
+    assert (H' : (R < x + 1)%L). {
+      apply (rngl_le_lt_trans Hor _ (R + 1)). {
+        apply (rngl_le_add_r Hor).
+        apply (rngl_0_le_1 Hon Hos Hor).
+      }
+      apply (rngl_add_lt_mono_r Hop Hor).
+      eapply (rngl_le_lt_trans Hor); [ | apply Hrx ].
+      apply (rngl_le_max_r Hor).
+    }
+    specialize (H H'); clear H'.
+    rewrite (rngl_add_sub Hos) in H.
 ... ...
   intros ε Hε.
   specialize (H ε Hε).
