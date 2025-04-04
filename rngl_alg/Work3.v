@@ -1244,6 +1244,34 @@ assert (H :
     intros H; symmetry in H.
     now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
   }
+  assert (HzM : (0 < M)%L). {
+    apply (rngl_lt_iff Hor).
+    split; [ | easy ].
+    progress unfold M.
+Search (_ < Max (_ = _, _), _)%L.
+Search (_ ≤ Max (_ = _, _), _)%L.
+Search (_ ≤ Max (_ ∈ _), _)%L.
+Search (_ ≤ ∑ (_ = _, _), _)%L.
+...
+  enough (H :
+    ∃ R,
+    (0 < R)%L
+    ∧ ∀ x, (R < x)%L →
+       (∑ (k = 0, n - 1), x ^ (n - k) < ε * ‖ P.[n] ‖ / M)%L). {
+    destruct H as (R, H).
+    exists R.
+    split; [ easy | ].
+    intros x Hrx.
+    destruct H as (Hzr, H).
+    specialize (H x Hrx).
+    apply (rngl_mul_lt_mono_pos_r Hop Hor Hii M) in H.
+2: {
+...
+    eapply (rngl_le_lt_trans Hor); [ | apply H ].
+    apply (rngl_summation_le_compat Hor).
+    intros i Hi.
+    apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
+      apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
 ... ...
   intros ε Hε.
   specialize (H ε Hε).

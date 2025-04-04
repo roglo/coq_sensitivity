@@ -1,6 +1,6 @@
 (* maximum of a list or of a sequence *)
 
-Require Import Utf8.
+Require Import Utf8 Arith.
 Require Import RingLike.
 Require Import Misc.
 Import List.ListNotations.
@@ -171,6 +171,31 @@ rewrite (rngl_max_iter_list_cons Hor). {
 intros b Hi.
 apply (rngl_max_r_iff Hor).
 now apply Hf.
+Qed.
+
+Theorem rngl_iter_seq_max_nonneg :
+  rngl_is_ordered T = true →
+  ∀ b e f,
+  (∀ i, b ≤ i ≤ e → (0 ≤ f i)%L)
+  → (0 ≤ Max (i = b, e), f i)%L.
+Proof.
+intros Hor * Hf.
+destruct (lt_dec e b) as [Heb| Heb]. {
+  progress unfold iter_seq.
+  rewrite rngl_max_list_empty; [ apply (rngl_le_refl Hor) | ].
+  now rewrite (proj2 (Nat.sub_0_le _ _)).
+}
+apply Nat.nlt_ge in Heb.
+apply (rngl_iter_max_list_nonneg Hor).
+intros i Hi.
+apply Hf.
+apply List.in_seq in Hi.
+split; [ easy | ].
+destruct Hi as (Hbi, Hib).
+rewrite Nat.add_comm in Hib.
+rewrite Nat.sub_add in Hib.
+now apply -> Nat.lt_succ_r in Hib.
+now apply Nat.le_le_succ_r.
 Qed.
 
 Theorem eq_rngl_max_list_0 :
