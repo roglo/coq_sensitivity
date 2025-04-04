@@ -1294,6 +1294,38 @@ assert (H :
     }
     specialize (H H'); clear H'.
     rewrite (rngl_add_sub Hos) in H.
+    rewrite rngl_summation_rtl.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros i Hi.
+      rewrite Nat.add_0_r.
+      rewrite Nat.sub_sub_distr; [ | easy | flia Hi ].
+      rewrite Nat.sub_sub_distr; [ | flia H1len | easy ].
+      rewrite Nat.sub_diag.
+      rewrite Nat.add_0_l, Nat.add_comm.
+      rewrite (rngl_pow_add_r Hon).
+      rewrite (rngl_pow_1_r Hon).
+      rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+        intros H'; subst x.
+        apply rngl_nle_gt in Hrx.
+        apply Hrx.
+        apply (rngl_le_trans Hor _ R).
+        now apply (rngl_lt_le_incl Hor).
+        apply (rngl_le_max_r Hor).
+      } {
+        apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+        intros H'; subst x.
+        apply rngl_nle_gt in Hrx.
+        apply Hrx.
+        apply (rngl_le_trans Hor _ R).
+        now apply (rngl_lt_le_incl Hor).
+        apply (rngl_le_max_r Hor).
+      }
+      rewrite <- (rngl_mul_inv_r Hiv).
+      rewrite <- (rngl_div_1_l Hon Hiv).
+      easy.
+    }
+    cbn - [ rngl_zero ].
+    rewrite <- (rngl_mul_summation_distr_l Hos).
 ... ...
   intros ε Hε.
   specialize (H ε Hε).
