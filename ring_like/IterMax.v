@@ -173,7 +173,7 @@ apply (rngl_max_r_iff Hor).
 now apply Hf.
 Qed.
 
-Theorem rngl_iter_seq_max_nonneg :
+Theorem rngl_iter_max_seq_nonneg :
   rngl_is_ordered T = true →
   ∀ b e f,
   (∀ i, b ≤ i ≤ e → (0 ≤ f i)%L)
