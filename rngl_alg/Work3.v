@@ -1185,6 +1185,33 @@ assert (H :
     }
     apply (rngl_summation_le_compat Hor).
     intros i Hi.
+    rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+      apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+      intros H'; rewrite H' in Hrx.
+      apply (rngl_lt_le_incl Hor) in Hrx.
+      now apply rngl_nlt_ge in Hrx.
+    } {
+      intros H'.
+      now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+    }
+    rewrite (rngl_div_mul Hon Hiv). 2: {
+      intros H'.
+      now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+    }
+    apply (rngl_le_refl Hor).
+  }
+...
+  enough (H :
+    ∃ R,
+    (0 < R)%L
+    ∧ ∀ x, (R < x)%L →
+       ((∑ (k = 0, n - 1), ‖ P.[k] ‖ / x ^ (n - k)) < ε * ‖ P.[n] ‖)%L). {
+    destruct H as (R, H).
+    exists R.
+    split; [ easy | ].
+    intros x Hrx.
+    destruct H as (Hzr, H).
+    specialize (H x Hrx).
 ...
 }
 ... ...
