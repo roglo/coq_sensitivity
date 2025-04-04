@@ -1224,8 +1224,26 @@ assert (H :
     apply (Nat.le_lt_trans _ (n - 1)); [ easy | ].
     flia H1len.
   }
-...
-}
+  destruct (rngl_eq_dec Heo M 0) as [Hmz| Hmz]. {
+    subst M; rewrite Hmz.
+    exists 1%L.
+    split; [ apply (rngl_0_lt_1 Hon Hos Hc1 Hor) | ].
+    intros x Hx.
+    rewrite all_0_rngl_summation_0. 2: {
+      intros i Hi.
+      apply (rngl_div_0_l Hos Hi1).
+      apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+      intros H; subst x.
+      apply rngl_nle_gt in Hx.
+      apply Hx.
+      apply (rngl_0_le_1 Hon Hos Hor).
+    }
+    apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
+    apply (rngl_lt_iff Hor).
+    split ; [ easy | ].
+    intros H; symmetry in H.
+    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
+  }
 ... ...
   intros ε Hε.
   specialize (H ε Hε).
