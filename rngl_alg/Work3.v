@@ -1192,6 +1192,38 @@ assert (H :
     }
     apply (rngl_le_refl Hor).
   }
+  set (M := Max (k = 0, n - 1), ‖ P.[k] ‖).
+  enough (H :
+    ∃ R,
+    (0 < R)%L
+    ∧ ∀ x, (R < x)%L →
+       (∑ (k = 0, n - 1), M / x ^ (n - k) < ε * ‖ P.[n] ‖)%L). {
+    destruct H as (R, H).
+    exists R.
+    split; [ easy | ].
+    intros x Hrx.
+    destruct H as (Hzr, H).
+    specialize (H x Hrx).
+    eapply (rngl_le_lt_trans Hor); [ | apply H ].
+    apply (rngl_summation_le_compat Hor).
+    intros i Hi.
+    apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
+      apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+      now apply (rngl_lt_trans Hor _ R).
+    }
+    progress unfold M.
+    apply (rngl_le_max_seq_r Hor) with (f := λ k, ‖ P.[k] ‖). {
+      intros k Hk.
+      now apply (rngl_max_r_iff Hor).
+    }
+    rewrite <- Nat_succ_sub_succ_r; [ | flia H1len ].
+    do 2 rewrite Nat.sub_0_r.
+    apply List.in_seq.
+    split; [ easy | ].
+    rewrite Nat.add_0_l.
+    apply (Nat.le_lt_trans _ (n - 1)); [ easy | ].
+    flia H1len.
+  }
 ...
 }
 ... ...
