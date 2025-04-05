@@ -383,7 +383,7 @@ transitivity (1 * 1⁻¹)%L. {
   apply (rngl_mul_1_l Hon).
 }
 apply H; [ easy | ].
-now apply rngl_1_neq_0_iff.
+now apply (rngl_1_neq_0_iff Hon).
 Qed.
 
 Theorem rngl_div_1_l :

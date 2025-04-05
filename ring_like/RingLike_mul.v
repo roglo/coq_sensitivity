@@ -350,11 +350,8 @@ specialize (rngl_opt_characteristic_prop) as H1.
 rewrite Hon, Hch in H1; cbn in H1.
 destruct H1 as (_, H1).
 rewrite rngl_add_0_r in H1.
-assert (H : (x * 0)%L = x). {
-  rewrite <- H1.
-  apply (rngl_mul_1_r Hon).
-}
-rewrite <- H.
+rewrite <- (rngl_mul_1_r Hon x).
+rewrite H1.
 apply (rngl_mul_0_r Hos).
 Qed.
 

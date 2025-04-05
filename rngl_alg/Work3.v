@@ -977,6 +977,30 @@ destruct (rngl_opt_opp_or_subt T) as [s| ]; [ | easy ].
 now destruct s.
 Qed.
 
+Theorem rngl_inv_pow :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ x n, x ≠ 0%L → ((x ^ n)⁻¹ = x⁻¹ ^ n)%L.
+Proof.
+intros Hic Hon Hiv Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite H1; apply H1.
+}
+intros * Hxz.
+induction n; [ apply (rngl_inv_1 Hon Hiv Hc1) | ].
+cbn.
+rewrite (rngl_inv_mul_distr Hon Hos Hiv); [ | easy | ]. 2: {
+  now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+}
+rewrite IHn.
+apply (rngl_mul_comm Hic).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
@@ -1281,6 +1305,14 @@ assert (H :
     exists (rngl_max 1 R).
     split; [ now apply (rngl_max_lt_iff Hor); right | ].
     intros x Hrx.
+    assert (Hzx : x ≠ 0%L). {
+      intros H'; subst x.
+      apply rngl_nle_gt in Hrx.
+      apply Hrx.
+      apply (rngl_le_trans Hor _ R).
+      now apply (rngl_lt_le_incl Hor).
+      apply (rngl_le_max_r Hor).
+    }
     destruct H as (Hzr, H).
     specialize (H (x + 1)%L).
     assert (H' : (R < x + 1)%L). {
@@ -1304,28 +1336,36 @@ assert (H :
       rewrite Nat.add_0_l, Nat.add_comm.
       rewrite (rngl_pow_add_r Hon).
       rewrite (rngl_pow_1_r Hon).
-      rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
-        intros H'; subst x.
-        apply rngl_nle_gt in Hrx.
-        apply Hrx.
-        apply (rngl_le_trans Hor _ R).
-        now apply (rngl_lt_le_incl Hor).
-        apply (rngl_le_max_r Hor).
-      } {
-        apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-        intros H'; subst x.
-        apply rngl_nle_gt in Hrx.
-        apply Hrx.
-        apply (rngl_le_trans Hor _ R).
-        now apply (rngl_lt_le_incl Hor).
-        apply (rngl_le_max_r Hor).
+      rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
+        now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
       }
       rewrite <- (rngl_mul_inv_r Hiv).
+      rewrite (rngl_inv_pow Hic Hon Hiv Hos); [ | easy ].
       rewrite <- (rngl_div_1_l Hon Hiv).
       easy.
     }
     cbn - [ rngl_zero ].
     rewrite <- (rngl_mul_summation_distr_l Hos).
+Theorem rngl_summation_power :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
+  ∀ n x, x ≠ 1%L → ∑ (i = 0, n), x ^ i = ((x ^ S n - 1) / (x - 1))%L.
+Proof.
+intros Hon Hop Hiv * Hx1.
+induction n. {
+  rewrite rngl_summation_only_one.
+  rewrite rngl_pow_0_r.
+  rewrite (rngl_pow_1_r Hon).
+  symmetry.
+  apply (rngl_div_diag Hon Hiv).
+  intros H; apply Hx1; clear Hx1.
+  apply (f_equal (rngl_add 1%L)) in H.
+  rewrite rngl_add_comm, rngl_add_0_r in H.
+  now rewrite (rngl_sub_add Hop) in H.
+}
+... ...
+rewrite rngl_summation_power.
 ... ...
   intros ε Hε.
   specialize (H ε Hε).
