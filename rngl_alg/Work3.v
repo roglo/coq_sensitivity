@@ -1001,6 +1001,53 @@ rewrite IHn.
 apply (rngl_mul_comm Hic).
 Qed.
 
+Theorem rngl_summation_power :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ n x, x ≠ 1%L → ∑ (i = 0, n), x ^ i = ((x ^ S n - 1) / (x - 1))%L.
+Proof.
+intros Hic Hon Hop Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+intros * Hx1.
+assert (Hx1z : (x - 1)%L ≠ 0%L). {
+  intros H; apply Hx1; clear Hx1.
+  apply (f_equal (rngl_add 1%L)) in H.
+  rewrite rngl_add_comm, rngl_add_0_r in H.
+  now rewrite (rngl_sub_add Hop) in H.
+}
+induction n. {
+  rewrite rngl_summation_only_one.
+  rewrite rngl_pow_0_r.
+  rewrite (rngl_pow_1_r Hon).
+  symmetry.
+  now apply (rngl_div_diag Hon Hiq).
+}
+rewrite rngl_summation_split_last; [ | easy ].
+rewrite rngl_summation_succ_succ.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat_sub_succ_1.
+}
+rewrite IHn.
+apply (rngl_mul_cancel_r Hi1 _ _ (x - 1)); [ easy | ].
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+rewrite (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite (rngl_sub_diag Hos).
+rewrite (rngl_sub_0_l Hop).
+rewrite (rngl_mul_comm Hic).
+apply (rngl_add_opp_l Hop).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
@@ -1074,6 +1121,7 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
 Proof.
 destruct_ac.
 intros Har Hco.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -1346,26 +1394,20 @@ assert (H :
     }
     cbn - [ rngl_zero ].
     rewrite <- (rngl_mul_summation_distr_l Hos).
-Theorem rngl_summation_power :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
-  ∀ n x, x ≠ 1%L → ∑ (i = 0, n), x ^ i = ((x ^ S n - 1) / (x - 1))%L.
-Proof.
-intros Hon Hop Hiv * Hx1.
-induction n. {
-  rewrite rngl_summation_only_one.
-  rewrite rngl_pow_0_r.
-  rewrite (rngl_pow_1_r Hon).
-  symmetry.
-  apply (rngl_div_diag Hon Hiv).
-  intros H; apply Hx1; clear Hx1.
-  apply (f_equal (rngl_add 1%L)) in H.
-  rewrite rngl_add_comm, rngl_add_0_r in H.
-  now rewrite (rngl_sub_add Hop) in H.
-}
-... ...
-rewrite rngl_summation_power.
+    rewrite (rngl_summation_power Hic Hon Hop Hiv). 2: {
+      intros H'.
+      rewrite <- (rngl_div_1_r Hon Hiq Hc1) in H'.
+      apply (rngl_div_div_mul_mul Hon Hic Hiv) in H'; [ | easy | ]. 2: {
+        now apply (rngl_1_neq_0_iff Hon).
+      }
+      do 2 rewrite (rngl_mul_1_r Hon) in H'.
+      rewrite <- H' in Hrx.
+      apply rngl_nle_gt in Hrx.
+      apply Hrx; clear Hrx.
+      apply (rngl_le_max_l Hor).
+    }
+    rewrite <- Nat_succ_sub_succ_r; [ | flia H1len ].
+    rewrite Nat.sub_0_r.
 ... ...
   intros ε Hε.
   specialize (H ε Hε).
