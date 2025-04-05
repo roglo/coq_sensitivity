@@ -1048,6 +1048,24 @@ rewrite (rngl_mul_comm Hic).
 apply (rngl_add_opp_l Hop).
 Qed.
 
+Theorem rngl_div_opp_opp :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ a b, (b ≠ 0 → - a / - b = a / b)%L.
+Proof.
+intros Hon Hop Hiv.
+intros * Hbz.
+rewrite <- (rngl_mul_inv_r Hiv).
+rewrite <- (rngl_opp_inv Hon Hop Hiv); [ | easy ].
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_inv_r Hiv).
+apply (rngl_opp_involutive Hop).
+Qed.
+
+Arguments rngl_div_opp_opp Hon Hop Hiv (a b)%_L.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
@@ -1408,6 +1426,31 @@ assert (H :
     }
     rewrite <- Nat_succ_sub_succ_r; [ | flia H1len ].
     rewrite Nat.sub_0_r.
+    rewrite <- (rngl_div_opp_opp Hon Hop Hiv _ (1 / x - 1)). 2: {
+      intros H'.
+      apply -> (rngl_sub_move_0_r Hop) in H'.
+Search (_ / _ = _)%L.
+...
+    rewrite (rngl_opp_sub_distr Hop).
+2: {
+...
+Theorem rngl_div_sub :
+  ∀ a b c, ((a - b * c) / c = a / b - c)%L.
+Proof.
+...
+rewrite <- rngl_div_sub.
+Search ((_ - _ * _) / _)%L.
+rngl_div_sub_distr_r:
+  ∀ {T : Type} {ro : ring_like_op T},
+    ring_like_prop T
+    → rngl_has_opp T = true
+      → rngl_has_inv T = true → ∀ a b c : T, ((a - b) / c)%L = (a / c - b / c)%L
+Search (_ / _ - _)%L.
+Search (_ / (_ / _))%L.
+    rewrite (rngl_div_div_r Hon Hos Hiv).
+...
+    rewrite (rngl_div_1_l Hon Hiv).
+    rewrite <- (rngl_inv_pow Hic Hon Hiv Hos).
 ... ...
   intros ε Hε.
   specialize (H ε Hε).
