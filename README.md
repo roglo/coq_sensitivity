@@ -7,8 +7,8 @@ Work in progress... (13th Dec 2021)
 # DIRECTORIES
 
 sensibility: files for the proof<br/>
-ring_like: library for manipulating rings and fields
-rngl_alg: examples of algebras of the theory RingLike
+ring_like: library for manipulating rings and fields<br/>
+rngl_alg: examples of algebras of the theory RingLike<br/>
 trigo_without_pi: an approach of trigonometry
 
 # AUTHOR
