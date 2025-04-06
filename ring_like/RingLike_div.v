@@ -765,6 +765,22 @@ rewrite Hiv.
 apply (rngl_mul_opp_l Hop).
 Qed.
 
+Theorem rngl_div_opp_opp :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ a b, (b ≠ 0 → - a / - b = a / b)%L.
+Proof.
+intros Hon Hop Hiv.
+intros * Hbz.
+rewrite <- (rngl_mul_inv_r Hiv).
+rewrite <- (rngl_opp_inv Hon Hop Hiv); [ | easy ].
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_inv_r Hiv).
+apply (rngl_opp_involutive Hop).
+Qed.
+
 Theorem rngl_inv_pow :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -794,6 +810,7 @@ End a.
 Arguments rngl_div_add_distr_r {T ro rp} Hiv (a b c)%_L.
 Arguments rngl_div_diag {T ro rp} Hon Hiq a%_L.
 Arguments rngl_div_mul {T ro rp} Hon Hiv (a b)%_L.
+Arguments rngl_div_opp_opp {T ro rp} Hon Hop Hiv (a b)%_L.
 Arguments rngl_div_1_l {T ro rp} Hon Hiv a%_L.
 Arguments rngl_mul_cancel_r {T ro rp} Hi1 (a b c)%_L.
 Arguments rngl_mul_div {T ro rp} Hiv (a b)%_L.

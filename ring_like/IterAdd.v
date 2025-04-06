@@ -844,4 +844,52 @@ rewrite (rngl_pow_add_r Hon).
 now rewrite (rngl_pow_1_r Hon).
 Qed.
 
+Theorem rngl_summation_power :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ n x, x ≠ 1%L → ∑ (i = 0, n), x ^ i = ((x ^ S n - 1) / (x - 1))%L.
+Proof.
+clear Hos.
+intros Hic Hon Hop Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+intros * Hx1.
+assert (Hx1z : (x - 1)%L ≠ 0%L). {
+  intros H; apply Hx1; clear Hx1.
+  apply (f_equal (rngl_add 1%L)) in H.
+  rewrite rngl_add_comm, rngl_add_0_r in H.
+  now rewrite (rngl_sub_add Hop) in H.
+}
+induction n. {
+  rewrite rngl_summation_only_one.
+  rewrite rngl_pow_0_r.
+  rewrite (rngl_pow_1_r Hon).
+  symmetry.
+  now apply (rngl_div_diag Hon Hiq).
+}
+rewrite rngl_summation_split_last; [ | easy ].
+rewrite rngl_summation_succ_succ.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat_sub_succ_1.
+}
+rewrite IHn.
+apply (rngl_mul_cancel_r Hi1 _ _ (x - 1)); [ easy | ].
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+rewrite (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite (rngl_sub_diag Hos).
+rewrite (rngl_sub_0_l Hop).
+rewrite (rngl_mul_comm Hic).
+apply (rngl_add_opp_l Hop).
+Qed.
+
 End a.
