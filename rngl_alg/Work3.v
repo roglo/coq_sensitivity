@@ -977,29 +977,7 @@ destruct (rngl_opt_opp_or_subt T) as [s| ]; [ | easy ].
 now destruct s.
 Qed.
 
-Theorem rngl_inv_pow :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_inv T = true →
-  rngl_has_opp_or_subt T = true →
-  ∀ x n, x ≠ 0%L → ((x ^ n)⁻¹ = x⁻¹ ^ n)%L.
-Proof.
-intros Hic Hon Hiv Hos.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  rewrite H1; apply H1.
-}
-intros * Hxz.
-induction n; [ apply (rngl_inv_1 Hon Hiv Hc1) | ].
-cbn.
-rewrite (rngl_inv_mul_distr Hon Hos Hiv); [ | easy | ]. 2: {
-  now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-}
-rewrite IHn.
-apply (rngl_mul_comm Hic).
-Qed.
+(**)
 
 Theorem rngl_summation_power :
   rngl_mul_is_comm T = true →
