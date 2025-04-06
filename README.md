@@ -6,8 +6,10 @@ Work in progress... (13th Dec 2021)
 
 # DIRECTORIES
 
-main: files for the proof<br/>
+sensibility: files for the proof<br/>
+ring_like: library for manipulating rings and fields
 rngl_alg: examples of algebras of the theory RingLike
+trigo_without_pi: an approach of trigonometry
 
 # AUTHOR
 Daniel de Rauglaudre
