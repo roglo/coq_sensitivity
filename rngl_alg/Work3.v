@@ -1340,16 +1340,22 @@ assert (H :
     rewrite <- (rngl_div_opp_opp Hon Hop Hiv _ (1 / x - 1)). 2: {
       intros H'.
       apply -> (rngl_sub_move_0_r Hop) in H'.
-Search (_ / _ = _)%L.
-...
-    rewrite (rngl_opp_sub_distr Hop).
-2: {
-...
-Theorem rngl_div_sub :
-  ∀ a b c, ((a - b * c) / c = a / b - c)%L.
+      rewrite (rngl_div_1_l Hon Hiv) in H'.
+      rewrite <- (rngl_inv_1 Hon Hiv Hc1) in H'.
+      apply (rngl_inv_inj Hon Hos Hiv) in H'; [ | easy | ]. 2: {
+        now apply (rngl_1_neq_0_iff Hon).
+      }
+      rewrite H' in Hrx.
+      apply rngl_nle_gt in Hrx.
+      apply Hrx; clear Hrx.
+      apply (rngl_le_max_l Hor).
+    }
+    do 2 rewrite (rngl_opp_sub_distr Hop).
+Theorem rngl_div_sub_r :
+  ∀ a b c, ((a * b - c) / b = a - c / b)%L.
 Proof.
-...
-rewrite <- rngl_div_sub.
+... ...
+rewrite <- rngl_div_sub_r.
 Search ((_ - _ * _) / _)%L.
 rngl_div_sub_distr_r:
   ∀ {T : Type} {ro : ring_like_op T},
