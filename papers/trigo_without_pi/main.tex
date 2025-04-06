@@ -9,8 +9,12 @@
 \geometry{margin=2.5cm}
 \usepackage{tikz}
 \usepackage{pgfmath}
+\usepackage{mathtools}
 
 \newtheorem{theorem}{Theorem}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
 
 \title{Trigonometry without $\pi$: a constructive approach}
 \author{Daniel de Rauglaudre (alias roglo)}
@@ -131,6 +135,76 @@ is zero. In that context, sine and cosine are functions in the
 mathematical sense, not in the computational one.
 
 \
+
+\subsubsection*{Drawback}
+
+The difficulty arises from the arithmetic of angles. In classical
+trigonometry, this issue does not appear, since angles are treated as
+real numbers. Any operation that is defined on the reals—addition,
+subtraction, multiplication, inversion, and so on—is directly
+applicable to angles.
+
+However, when we think of angles as points on the unit circle, we can
+no longer rely on the standard algebraic operations. These points, in
+themselves, do not carry any inherent arithmetic structure. In order
+to define such operations, we must construct them from scratch. We
+begin with addition.
+
+\section{Addition of angles}
+
+If we have two angles $(x, y)$ and $(x', y')$, we want to define an
+addition, giving a third angle $(x'', y'')$ (such that
+$x''^2+y''^2=1$)
+
+\[
+(x, y) + (x', y') ::= (x'', y'')
+\]
+
+\
+
+\noindent The solution comes from normal trigonometry. If we have two
+angles $a$ and $b$, we now that
+
+\[
+cos(a+b) = cos\;a\;.\;cos\;b - sin\;a\;.\;sin\;b
+\]
+
+\[
+sin(a+b) = sin\;a\;.\;cos\;b + cos\;a\;.\;sin\;b
+\]
+
+\
+
+\noindent In our trigonometry, if we consider that the angle $(x, y)$
+is named $a$, and the angle $(x', y')$ as $b$, we have
+
+\[
+(x, y) = (cos\;a, sin\;a)
+\]
+
+\[
+(x, y) = (cos\;a, sin\;a)
+\]
+
+\noindent In that case, $(x'', y'')$ is $a + b$.  Applying the
+classical formulas above, we can define the addition of angles as
+
+\begin{definition}[Addition of angles]
+
+Let $(x, y)$ and $(x', y')$ be two angles. We define a new binary
+operation $\boldsymbol{+}$ by:
+
+\[
+(x, y) \boldsymbol{+} (x', y') \coloneqq (x x' - y y', x y' + y x').
+\]
+
+\end{definition}
+
+\noindent We can also consider the points $(x, y)$ and $(x', y')$ as
+the complex numbers $x+iy$ and $x'+iy'$ and define addition as the
+product of these complex numbers, giving the same result, since it is
+well known that multiplication of complex numbers is addition or their
+angles.
 
 ...
 
