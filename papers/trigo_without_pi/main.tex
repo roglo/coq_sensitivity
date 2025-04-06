@@ -10,6 +10,8 @@
 \usepackage{tikz}
 \usepackage{pgfmath}
 
+\newtheorem{theorem}{Theorem}
+
 \title{Trigonometry without $\pi$: a constructive approach}
 \author{Daniel de Rauglaudre (alias roglo)}
 \date{\today}
@@ -35,7 +37,7 @@ formally proven using the Coq proof assistant.
 \section{Basic Construction}
 
 In classical trigonometry, angles are real numbers. The set \( A \) of
-angles is defined by
+angles is therefore defined by
 
 \[
 A ::= \mathbb{R}
@@ -83,6 +85,59 @@ and the line segment joining the origin \( O \) and the given point.
     \node at (-0.2, \py*2) {$y$};
 
 \end{tikzpicture}
+
+\
+
+\
+
+\noindent An angle $\theta$ is therefore not a real, but a triplet
+
+$\theta = (x, y, x^2\!+\!y^2\!=\!1)$
+
+\
+
+\noindent In that case, we define
+
+$cos(\theta) = x$
+
+$sin(\theta) = y$
+
+\
+
+\noindent These are our {\em definitions} of cos and sin. The third
+component of $\theta$ is a proof that $x^2+y^2=1$. Note that, in
+traditional mathematics, proofs are not mathematical objects. Here, we
+work in Type Theory where proofs are themselves mathematical
+objects. And now, a first theorem
+
+\begin{theorem}
+$\cos^2(\theta) + \sin^2(\theta) = 1$.
+\end{theorem}
+
+\begin{proof}
+By definition of angles, this is this third component.
+\end{proof}
+
+\
+
+\noindent Note that in classical trigonometry, this theorem must be
+proven using the definitions of $cos$ and $sin$, which are
+series. Here, we don't need that, the result is straightforward.
+
+\
+
+\noindent The same way, here, $cos$ and $sin$ are directly accessed
+from the angle. In classical trigonometry, being series, they even
+cannot be computed: they are just limits of the series seen as
+sequences. For example, there is no algorithm computing $sin(0)$: they
+can just can claim that the $sin$ of $0$ is indeed $0$, i.e. the limit
+of the series $sin$ in $0$ is indeed $0$. In classical trigonometry,
+$sin$ and $cos$ are functions in mathematical sense, not in
+programming sense.
+
+\
+
+...
 
 \section{Conclusion}
 
