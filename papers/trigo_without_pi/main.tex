@@ -43,97 +43,92 @@ angles is therefore defined by
 A ::= \mathbb{R}
 \]
 
-\noindent Here, we will forget this definition and instead define
+\noindent Here, we set aside this definition and instead define:
 
 \[
 A ::= \{ \; (x, y) \; | \; x^2 + y^2 = 1 \; \}
 \]
 
 \noindent In other words, an angle is defined by a point on the unit
-circle. This represents the angle between the positive \( x \)-axis
-and the line segment joining the origin \( O \) and the given point.
+circle. This point represents the angle between the positive \( x
+\)-axis and the line segment from the origin \( O \) to the point.
 
 \
 
-\noindent Here, the angle $(x, y)$
+\noindent The angle \( (x, y) \) is illustrated below:
 
 \
 
 \begin{tikzpicture}
     \draw[thick] (0,0) circle(2);
-
     \draw[->, thick] (-2.5, 0) -- (2.5, 0);
     \draw[->, thick] (0, -2.5) -- (0, 2.5);
-
     \node at (-0.2,-0.2) {$O$};
 
     \pgfmathsetmacro{\px}{cos(30)}
     \pgfmathsetmacro{\py}{sin(30)}
     \coordinate (P) at (\px*2, \py*2);
     \draw[fill] (P) circle (2pt);
-
     \draw[thick] (0,0) -- (P);
-
     \draw[thick] (0.6,0) arc[start angle=0, end angle=30, radius=0.6];
 
     \draw[dotted] (P) -- (\px*2, 0);
     \draw[fill] (\px*2, 0) circle (1pt);
-    \node at (\px*2, -0.2) {$x$};
+    \node at ({\px*2 - 0.1}, -0.3) {$x$};
 
     \draw[dotted] (P) -- (0, \py*2);
     \draw[fill] (0, \py*2) circle (1pt);
-    \node at (-0.2, \py*2) {$y$};
-
+    \node at (-0.3, {\py*2 - 0.05}) {$y$};
 \end{tikzpicture}
 
 \
 
 \
 
-\noindent An angle $\theta$ is therefore not a real, but a triplet
+\noindent An angle \( \theta \) is therefore not a real number, but a triplet:
 
-$\theta = (x, y, x^2\!+\!y^2\!=\!1)$
+\[
+\theta = (x, y, x^2 + y^2 = 1)
+\]
 
-\
+\noindent In this setting, we define:
 
-\noindent In that case, we define
+\[
+\cos(\theta) = x \qquad \sin(\theta) = y
+\]
 
-$cos(\theta) = x$
-
-$sin(\theta) = y$
-
-\
-
-\noindent These are our {\em definitions} of cos and sin. The third
-component of $\theta$ is a proof that $x^2+y^2=1$. Note that, in
-traditional mathematics, proofs are not mathematical objects. Here, we
-work in Type Theory where proofs are themselves mathematical
-objects. And now, a first theorem
+\noindent These are our \emph{definitions} of cosine and sine. The
+third component of \( \theta \) is a proof that \( x^2 + y^2 = 1
+\). Note that, in traditional mathematics, proofs are not mathematical
+objects. Here, we work in type theory, where proofs are themselves
+objects.
 
 \begin{theorem}
-$\cos^2(\theta) + \sin^2(\theta) = 1$.
+\[
+\cos^2(\theta) + \sin^2(\theta) = 1
+\]
 \end{theorem}
 
 \begin{proof}
-By definition of angles, this is this third component.
+By the definition of angles, this equality corresponds to the third
+component of the triplet.
 \end{proof}
 
 \
 
-\noindent Note that in classical trigonometry, this theorem must be
-proven using the definitions of $cos$ and $sin$, which are
-series. Here, we don't need that, the result is straightforward.
+\noindent In classical trigonometry, this identity requires a proof
+based on the definitions of \( \cos \) and \( \sin \) as power
+series. Here, no such proof is needed: the result is immediate.
 
 \
 
-\noindent The same way, here, $cos$ and $sin$ are directly accessed
-from the angle. In classical trigonometry, being series, they even
-cannot be computed: they are just limits of the series seen as
-sequences. For example, there is no algorithm computing $sin(0)$: they
-can just can claim that the $sin$ of $0$ is indeed $0$, i.e. the limit
-of the series $sin$ in $0$ is indeed $0$. In classical trigonometry,
-$sin$ and $cos$ are functions in mathematical sense, not in
-programming sense.
+\noindent In our approach, \( \cos \) and \( \sin \) are directly
+accessed from the angle's coordinates. In classical analysis, being
+defined as infinite series, they are not computable in a strict sense:
+they are limits of sequences. For example, there is no algorithm that
+computes \( \sin(0) \); we simply assert that the limit of the series
+is zero. In that context, sine and cosine are functions in the
+mathematical sense, not in the computational one.
 
 \
 
