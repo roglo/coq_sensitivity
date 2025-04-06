@@ -7,6 +7,8 @@
 \usepackage{graphicx}
 \usepackage{geometry}
 \geometry{margin=2.5cm}
+\usepackage{tikz}
+\usepackage{pgfmath}
 
 \title{Trigonometry without $\pi$: a constructive approach}
 \author{Daniel de Rauglaudre (alias roglo)}
@@ -28,11 +30,63 @@ formally proven using the Coq proof assistant.
 
 \section{Introduction}
 
-Pouet.
+... to be done ...
+
+\section{Basic Construction}
+
+In classical trigonometry, angles are real numbers. The set \( A \) of
+angles is defined by
+
+\[
+A ::= \mathbb{R}
+\]
+
+\noindent Here, we will forget this definition and instead define
+
+\[
+A ::= \{ \; (x, y) \; | \; x^2 + y^2 = 1 \; \}
+\]
+
+\noindent In other words, an angle is defined by a point on the unit
+circle. This represents the angle between the positive \( x \)-axis
+and the line segment joining the origin \( O \) and the given point.
+
+\
+
+\noindent Here, the angle $(x, y)$
+
+\
+
+\begin{tikzpicture}
+    \draw[thick] (0,0) circle(2);
+
+    \draw[->, thick] (-2.5, 0) -- (2.5, 0);
+    \draw[->, thick] (0, -2.5) -- (0, 2.5);
+
+    \node at (-0.2,-0.2) {$O$};
+
+    \pgfmathsetmacro{\px}{cos(30)}
+    \pgfmathsetmacro{\py}{sin(30)}
+    \coordinate (P) at (\px*2, \py*2);
+    \draw[fill] (P) circle (2pt);
+
+    \draw[thick] (0,0) -- (P);
+
+    \draw[thick] (0.6,0) arc[start angle=0, end angle=30, radius=0.6];
+
+    \draw[dotted] (P) -- (\px*2, 0);
+    \draw[fill] (\px*2, 0) circle (1pt);
+    \node at (\px*2, -0.2) {$x$};
+
+    \draw[dotted] (P) -- (0, \py*2);
+    \draw[fill] (0, \py*2) circle (1pt);
+    \node at (-0.2, \py*2) {$y$};
+
+\end{tikzpicture}
 
 \section{Conclusion}
 
-Glop.
+... to be done ...
 
 \paragraph{Code source :}
 \url{https://github.com/roglo/coq_sensitivity/tree/master/trigo_without_pi}
