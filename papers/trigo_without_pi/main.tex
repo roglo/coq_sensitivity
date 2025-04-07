@@ -89,54 +89,25 @@ circle. This point represents the angle between the positive \( x
 
 \
 
-\noindent In our setting, an angle \( \theta \) is not simply a real
-number, but a triple of the form
+\noindent In our setting, an angle \( \theta \) is not a real number,
+but a triple of the form
 \[
 \theta = (x, y, p),
 \]
 where \( (x, y) \in \mathbb{R}^2 \), and \( p \) is a proof (or
-witness) that \( x^2 + y^2 = 1 \).
-
-\begin{definition}[Cosine and sine]
-Given an angle \( \theta = (x, y, p) \), we define:
+witness) that \( x^2 + y^2 = 1 \); we define:
 \[
 \cos(\theta) \coloneqq x, \qquad \sin(\theta) \coloneqq y.
 \]
-\end{definition}
 
-\noindent That is, cosine and sine extract the components of the point
-on the unit circle associated with the angle. The third component \( p
-\) ensures that this point lies on the circle. While in classical
-mathematics such an identity is treated informally, we work here in
-type theory, where proofs are explicit mathematical objects.
-
-\begin{theorem}
+\noindent While in classical mathematics, cosine and sine are defined
+by power series, here they are just the first two components of the
+triplet. The theorem:
 \[
-\cos^2(\theta) + \sin^2(\theta) = 1.
+\cos^2(\theta) + \sin^2(\theta) = 1
 \]
-\end{theorem}
-
-\begin{proof}
-By definition, we have \( \cos(\theta) = x \) and \( \sin(\theta) = y
-\), and the third component of \( \theta \) is a proof that \( x^2 +
-y^2 = 1 \).
-\end{proof}
-
-\
-
-\noindent In classical trigonometry, this identity requires a proof
-based on the definitions of \( \cos \) and \( \sin \) as power
-series. Here, no such proof is needed: the result is immediate.
-
-\
-
-\noindent In our approach, \( \cos \) and \( \sin \) are directly
-accessed from the angle's coordinates. In classical analysis, being
-defined as infinite series, they are not computable in a strict sense:
-they are limits of sequences. For example, there is no algorithm that
-computes \( \sin(0) \); we simply assert that the limit of the series
-is zero. In that context, sine and cosine are functions in the
-mathematical sense, not in the computational one.
+is true by definition: its proof is $p$, the third component of the
+triplet.
 
 \
 
@@ -152,15 +123,15 @@ However, when we think of angles as points on the unit circle, we can
 no longer rely on the standard algebraic operations. These points, in
 themselves, do not carry any inherent arithmetic structure. In order
 to define such operations, we must construct them from scratch. We
-begin with addition.
+begin with addition in the next section.
 
 \section{Addition of angles}
 
-If we have two angles $(x, y)$ and $(x', y')$, we want to define an
-addition, giving a third angle $(x'', y'')$ (such that
-$x''^2+y''^2=1$)
+If we have two angles $(x, y, p)$ and $(x', y', p')$, we want to
+define an addition, giving a third angle $(x'', y'', p'')$, such that
+$x''^2+y''^2=1$.
 \[
-(x, y) + (x', y') ::= (x'', y'')
+(x, y, p) + (x', y', p') ::= (x'', y'', p'')
 \]
 
 \
@@ -176,33 +147,16 @@ sin(a+b) = sin\;a\;.\;cos\;b + cos\;a\;.\;sin\;b
 
 \
 
-\noindent In our trigonometry, if we consider that the angle $(x, y)$
-is named $a$, and the angle $(x', y')$ as $b$, we have
+\noindent In our trigonometry, if we consider that the angle $(x, y,
+p)$ is ``$a$'', and the angle $(x', y', p')$ is ``$b$'', the angle
+$(x'', y'', p'')$ is ``$a + b$''. Applying the classical formulas
+above, we can define the addition of angles as
 \[
-(x, y) = (cos\;a, sin\;a)
+(x, y, p) \boldsymbol{+} (x', y', p') \coloneqq (x x' - y y', x y' + y
+x', p'').
 \]
-\[
-(x, y) = (cos\;a, sin\;a)
-\]
-
-\noindent In that case, $(x'', y'')$ is $a + b$.  Applying the
-classical formulas above, we can define the addition of angles as
-
-\begin{definition}[Addition of angles]
-
-Let $(x, y)$ and $(x', y')$ be two angles. We define a new binary
-operation $\boldsymbol{+}$ by:
-\[
-(x, y) \boldsymbol{+} (x', y') \coloneqq (x x' - y y', x y' + y x').
-\]
-
-\end{definition}
-
-\noindent We can also consider the points $(x, y)$ and $(x', y')$ as
-the complex numbers $x+iy$ and $x'+iy'$ and define addition as the
-product of these complex numbers, giving the same result, since it is
-well known that multiplication of complex numbers is addition or their
-angles.
+where $p''$ is the proof that that the sum of the squares of first two
+commponents is 1. This is a consequence of $p$ and $p'$.
 
 ...
 
