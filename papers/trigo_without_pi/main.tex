@@ -89,27 +89,31 @@ circle. This point represents the angle between the positive \( x
 
 \
 
-\noindent An angle \( \theta \) is therefore not a real number, but a triplet:
-
+\noindent An angle \( \theta \) is not merely a real number, but a
+structured object—a triplet:
 \[
-\theta = (x, y, x^2 + y^2 = 1)
+\theta = (x, y, p)
+\]
+where \( x, y \in \mathbb{R} \), and \( p \) is a proof object
+witnessing the fact that \( x^2 + y^2 = 1 \), i.e.,
+\[
+p : x^2 + y^2 = 1.
 \]
 
-\noindent In this setting, we define:
-
+\begin{definition}[Cosine and sine]
+Let \( \theta = (x, y, p) \) be an angle. We define:
 \[
-\cos(\theta) = x \qquad \sin(\theta) = y
+\cos(\theta) \coloneqq x \qquad \text{and} \qquad \sin(\theta) \coloneqq y.
 \]
+\end{definition}
 
-\noindent These are our \emph{definitions} of cosine and sine. The
-third component of \( \theta \) is a proof that \( x^2 + y^2 = 1
-\). Note that, in traditional mathematics, proofs are not mathematical
-objects. Here, we work in type theory, where proofs are themselves
-objects.
+\noindent These are our fundamental definitions of the cosine and sine
+functions. The third component of the triplet serves as a certificate
+that these two values lie on the unit circle.
 
 \begin{theorem}
 \[
-\cos^2(\theta) + \sin^2(\theta) = 1
+\cos^2(\theta) + \sin^2(\theta) = 1.
 \]
 \end{theorem}
 
@@ -168,7 +172,6 @@ angles $a$ and $b$, we now that
 \[
 cos(a+b) = cos\;a\;.\;cos\;b - sin\;a\;.\;sin\;b
 \]
-
 \[
 sin(a+b) = sin\;a\;.\;cos\;b + cos\;a\;.\;sin\;b
 \]
@@ -177,11 +180,9 @@ sin(a+b) = sin\;a\;.\;cos\;b + cos\;a\;.\;sin\;b
 
 \noindent In our trigonometry, if we consider that the angle $(x, y)$
 is named $a$, and the angle $(x', y')$ as $b$, we have
-
 \[
 (x, y) = (cos\;a, sin\;a)
 \]
-
 \[
 (x, y) = (cos\;a, sin\;a)
 \]
@@ -193,7 +194,6 @@ classical formulas above, we can define the addition of angles as
 
 Let $(x, y)$ and $(x', y')$ be two angles. We define a new binary
 operation $\boldsymbol{+}$ by:
-
 \[
 (x, y) \boldsymbol{+} (x', y') \coloneqq (x x' - y y', x y' + y x').
 \]
