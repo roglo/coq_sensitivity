@@ -977,6 +977,10 @@ destruct (rngl_opt_opp_or_subt T) as [s| ]; [ | easy ].
 now destruct s.
 Qed.
 
+Definition is_limit_when_tending_to_inf {A} (dist : distance A) f L :=
+  ∀ ε, (0 < ε)%L → ∃ R, (0 < R)%L ∧
+  ∀ x, (R < x)%L → (d_dist (f x) L < ε)%L.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
@@ -1114,9 +1118,6 @@ assert (H :
   ∀ ε, (0 < ε)%L → ∃ R₀, (0 < R₀)%L ∧
   ∀ z, (R₀ < ‖z‖)%L → (‖ U z ‖ < ε)%L). {
 *)
-Definition is_limit_when_tending_to_inf {A} (dist : distance A) f L :=
-  ∀ ε, (0 < ε)%L → ∃ R, (0 < R)%L ∧
-  ∀ x, (R < x)%L → (d_dist (f x) L < ε)%L.
 assert (H :
   is_limit_when_tending_to_inf rngl_distance'
     (λ x, ∑ (k = 0, n - 1), ‖ P.[k] ‖ / (‖ P.[n] ‖ * x ^ (n - k))) 0%L). {
