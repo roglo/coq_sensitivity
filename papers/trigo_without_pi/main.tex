@@ -176,7 +176,8 @@ $sin\;(- \theta) = - sin\;\theta$.
 \
 
 \noindent Like for all additive groups, it is possible to define
-multiplication by a natural $n$, by adding the element $n$ times.
+external multiplication by a natural $n$, by adding the element $n$
+times:
 \[
   n \; \theta ::=
   \underbrace{\theta + \theta + ... + \theta}_{n \; times}
@@ -184,7 +185,7 @@ multiplication by a natural $n$, by adding the element $n$ times.
 
 \
 
-What about multiplication of two angles? It seems not
+What about {\em multiplication} of two angles? It seems not
 possible. Because {\em addition} of angles is actually {\em
   multiplication} of complex numbers, when we consider angle $(x,y)$
 as the complex number $x+iy$: indeed if we apply rules of
@@ -193,28 +194,34 @@ for additions of angles. Therefore, perhaps, multiplication of angles
 could be something that {\em exponentiation} of complex numbers? But
 this intuition seems not to work.
 
-Moreover, multiplication of angles has no meaning, as far as geometry
-is concerned. In this work, we did not define multiplication of
-angles.
+Moreover, as far as geometry is concerned, multiplication of angles
+seems to have no meaning. In this work, we did not define
+multiplication of angles.
 
 This has a consequence: it is not possible to define exponentiation of
-imaginary angles, like in the famous expression $e^{i\theta}$ of
-classical trigonometry, supposed to be equal to
+imaginary angles either, like in the famous expression $e^{i\theta}$
+of classical trigonometry, supposed to be equal to
 $cos\;\theta+i\;sin\;\theta$ (Euler's formula), because exponentiation
 is defined by a power series holding powers of its parameter:
 \[
 e^x = \sum_{n=0}^\infty{\; \frac{x^n}{n!}}
 \]
 
-i.e. its parameter $x$ {\em multiplied} several times by
-itself. Euler's formula therefore doesn't work, but we see further,
-that Moivre's formula works in our trigonometry.
+i.e. its parameter $x$ {\em multiplied} several times by itself. Since
+multiplication of angles doesn't exist, Euler's formula doesn't work,
+but we see further, that de Moivre's formula works in our trigonometry
+and we use it. Remainder: de Moivre's formula is:
+\[
+(cos \; \theta + i \; sin \; \theta)^n = cos (n \theta) + i \; sin (n
+\theta)
+\]
 
 \
 
-\noindent But what we need is division by a natural. We defined above
-multiplication by a natural. Division is more complicated but we see
-in next sections that it is possible to define it.
+\noindent But what we need, for the moment, is division by a
+natural. We defined above multiplication by a natural. Division is
+more complicated but we see in next sections that it is possible to
+define it.
 
 \section{Trying to define the division of an angle by a natural}
 
