@@ -38,6 +38,34 @@ formally proven using the Coq proof assistant.
 
 ... to be done ...
 
+\section{Why trigonometry?}
+
+Our initial problem was not about constructing trigonometry, but to
+prove that any complex number $x+iy$ as an nth-root, for any non null
+natural number $n$. We usually prove that by first writing it in polar
+form:
+\[
+x + i y = \rho \; e^{i \theta}
+\]
+
+\noindent With this form, the nth-root is obvious:
+\[
+\sqrt[n]{x + i y} = \sqrt[n]\rho \; e^{\frac{i\theta}{n}}
+\]
+
+\noindent By $\sqrt[n]\rho$, we are speaking of nth-root of a
+non-negative real number. In our context (that we don't explain,
+here), we consider that it exists.
+
+\
+
+\noindent The right hand part is $e^{i\theta/n}$ and it is the moment
+when trigonometry appears, $\theta$ being an angle.
+
+\
+
+...
+
 \section{Basic Construction}
 
 In classical trigonometry, angles are real numbers. The set \( A \) of
@@ -239,6 +267,8 @@ to resolve:
 \[
 (x + i \; y)^n = u + i \; v
 \]
+
+\
 
 ...
 
