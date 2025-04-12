@@ -1,6 +1,6 @@
 Set Nested Proofs Allowed.
 
-Require Import Utf8 ZArith.
+From Stdlib Require Import Utf8 ZArith.
 Require Import Init.Nat.
 Import List.ListNotations.
 

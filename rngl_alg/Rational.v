@@ -1,7 +1,7 @@
 (* Rationals based on nat and where num and den are always common primes *)
 (* allowing us to use Leibnitz' equality. *)
 
-Require Import Utf8 Arith Psatz Init.Nat.
+From Stdlib Require Import Utf8 Arith Psatz Init.Nat.
 Require Import RingLike.Misc Misc GQ.
 Import GQ_Notations.
 

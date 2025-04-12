@@ -1,7 +1,7 @@
 (* Positive rationals where num and den are always common primes *)
 (* allowing us to use Leibnitz' equality. *)
 
-Require Import Utf8 Arith Morphisms Init.Nat.
+From Stdlib Require Import Utf8 Arith Morphisms Init.Nat.
 Require Import RingLike.Misc PQ Nat_ggcd.
 Import PQ_Notations.
 
