@@ -2,7 +2,7 @@
 Sensitivity Conjecture in Coq<br/>
 Proved by Hao Huang
 
-Work in progress... (13th Dec 2021)
+Work in progress... (12 Apr 2025)
 
 # DIRECTORIES
 
