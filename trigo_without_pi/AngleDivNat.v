@@ -1,8 +1,10 @@
 Set Nested Proofs Allowed.
-Require Import Utf8 Arith.
+From Stdlib Require Import Utf8 Arith.
+
 Require Import RingLike.RingLike.
 Require Import RingLike.RealLike.
 Require Import RingLike.Misc.
+
 Require Import Angle TrigoWithoutPiExt.
 Require Import Angle_order.
 Require Import AngleDiv2.

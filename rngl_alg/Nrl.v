@@ -4,7 +4,7 @@
      if n is not prime, it has neither inverse nor division, it is a ring *)
 
 Set Nested Proofs Allowed.
-Require Import Utf8 Arith.
+From Stdlib Require Import Utf8 Arith.
 Require Import RingLike.Misc Misc FermatLittle.
 
 (*

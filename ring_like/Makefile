@@ -1,5 +1,7 @@
 TARGET=RingLike.vo RealLike.vo IterMul.vo IterAnd.vo IterMax.vo DerivMul.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
+ROCQ=rocq compile
+ROCQ_OPT=
 
 all: $(TARGET)
 
@@ -15,8 +17,8 @@ depend:
 
 .SUFFIXES: .v .vo
 
-.v.vo:
-	coqc -R . RingLike $<
+%.vo: %.v
+	$(ROCQ) $(ROCQ_OPT) -R . RingLike $<
 
 .PHONY: all clean depend
 

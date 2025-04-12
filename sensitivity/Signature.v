@@ -2,12 +2,13 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 Arith Init.Nat.
+From Stdlib Require Import Utf8 Arith Init.Nat.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.
 Require Import RingLike.PermutationFun.
 Require Import RingLike.IterMul.
+
 Require Import Misc.
 Require Import SortingFun SortRank.
 Require Import PermutSeq.

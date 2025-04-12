@@ -1,8 +1,8 @@
 (* ℤ is a ring-like, i.e. a ring *)
 
 Set Nested Proofs Allowed.
-Require Import Utf8.
-Require Import ZArith.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import ZArith.
 
 Require Import RingLike.RingLike.
 

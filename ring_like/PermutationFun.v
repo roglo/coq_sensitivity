@@ -2,8 +2,9 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 Arith.
-Require FinFun.
+From Stdlib Require Import Utf8 Arith.
+From Stdlib Require FinFun.
+
 Import Init.Nat.
 Import List.ListNotations.
 

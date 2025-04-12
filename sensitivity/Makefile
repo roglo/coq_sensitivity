@@ -1,6 +1,8 @@
 TARGET=Polynomial.vo CauchyBinet.vo Lemma_2_2.vo Lemma_2_1.vo Sensitivity.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 TEST_DIR=test `basename "$<"` = "$<" || { echo "File \"$<\" needs to be recompiled."; echo "Please run 'make' in directory '$$(dirname "$<")' first."; exit 1; }
+ROCQ=rocq compile
+ROCQ_OPT=
 
 all: $(TARGET)
 
@@ -19,9 +21,9 @@ depend:
 
 .SUFFIXES: .v .vo
 
-.v.vo:
+%.vo: %.v
 	@$(TEST_DIR)
-	coqc -R . Sensitivity -Q ../ring_like RingLike -Q ../rngl_alg RnglAlg $<
+	$(ROCQ) $(ROCQ_OPTS) -R . Sensitivity -Q ../ring_like RingLike -Q ../rngl_alg RnglAlg $<
 
 .PHONY: all clean depend
 

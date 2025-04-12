@@ -4,8 +4,8 @@
 (* borrowed 2021-01-17 from my development "coq_euler_prod_form" *)
 
 Set Nested Proofs Allowed.
-Require Import Utf8 Arith.
-Require FinFun.
+From Stdlib Require Import Utf8 Arith.
+From Stdlib Require FinFun.
 Import List.ListNotations.
 
 Require Import Misc.

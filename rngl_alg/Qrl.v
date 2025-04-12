@@ -2,7 +2,7 @@
 (* i.e. it is a field *)
 
 Set Implicit Arguments.
-Require Import Utf8.
+From Stdlib Require Import Utf8.
 
 Require Import RingLike.RingLike.
 Require Import Rational.

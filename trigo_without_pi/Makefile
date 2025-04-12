@@ -2,6 +2,8 @@ TARGET=AngleDivNat.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 QDIRS=-Q ../ring_like RingLike
 TEST_DIR=test `basename "$<"` = "$<" || { echo "File \"$<\" needs to be recompiled."; echo "Please run 'make' in directory '$$(dirname "$<")' first."; exit 1; }
+ROCQ=rocq compile
+ROCQ_OPT=
 
 all: $(TARGET)
 
@@ -19,9 +21,11 @@ depend:
 
 .SUFFIXES: .v .vo
 
-.v.vo:
+%.vo: %.v
 	@$(TEST_DIR)
-	coqc -R . Trigo $(QDIRS) $<
+	$(ROCQ) $(ROCQ_OPTS) -R . Trigo $(QDIRS) $<
+
+.v.vo:
 
 .PHONY: all clean depend
 

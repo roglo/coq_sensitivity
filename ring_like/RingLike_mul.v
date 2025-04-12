@@ -3,7 +3,7 @@
    It defines theorems that do not require an order relation. *)
 
 Set Nested Proofs Allowed.
-Require Import Utf8 Arith.
+From Stdlib Require Import Utf8 Arith.
 Require Import RingLike_structures.
 Require Import RingLike_add.
 
@@ -784,7 +784,7 @@ End a.
 
 (* to be able to use tactic "ring" *)
 
-Require Import Ring_theory.
+From Stdlib Require Import Ring_theory.
 
 Section a.
 

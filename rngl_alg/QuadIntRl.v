@@ -14,7 +14,7 @@
 
 Set Implicit Arguments.
 
-Require Import Utf8 ZArith.
+From Stdlib Require Import Utf8 ZArith.
 Import List.ListNotations.
 
 Require Import RingLike.RingLike.

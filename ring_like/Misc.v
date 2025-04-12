@@ -1,7 +1,7 @@
 (* Misc.v *)
 (* Theorems of general usage, which could be (or not) in Coq library *)
 
-Require Import Utf8 Arith Psatz.
+From Stdlib Require Import Utf8 Arith Psatz.
 Import List.ListNotations.
 Open Scope list.
 

@@ -2,6 +2,8 @@ TARGET=IntermVal.vo Qrl.vo Zrl.vo Nrl.vo MatRl.vo QuadIntRl.vo GaussIntRl.vo New
 FILESFORDEP=`LC_ALL=C ls *.v`
 QDIRS=-Q ../ring_like RingLike -Q ../trigo_without_pi Trigo -Q ../sensitivity Sensitivity
 TEST_DIR=test `basename "$<"` = "$<" || { echo "File \"$<\" needs to be recompiled."; echo "Please run 'make' in directory '$$(dirname "$<")' first."; exit 1; }
+ROCQ=rocq compile
+ROCQ_OPT=
 
 all: $(TARGET)
 
@@ -19,9 +21,9 @@ depend:
 
 .SUFFIXES: .v .vo
 
-.v.vo:
+%.vo: %.v
 	@$(TEST_DIR)
-	coqc -R . RnglAlg $(QDIRS) $<
+	$(ROCQ) $(ROCQ_OPT) -R . RnglAlg $(QDIRS) $<
 
 .PHONY: all clean depend
 

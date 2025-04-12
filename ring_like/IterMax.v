@@ -1,6 +1,7 @@
 (* maximum of a list or of a sequence *)
 
-Require Import Utf8 Arith.
+From Stdlib Require Import Utf8 Arith.
+
 Require Import RingLike.
 Require Import Misc.
 Import List.ListNotations.

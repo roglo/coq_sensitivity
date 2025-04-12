@@ -2,14 +2,14 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 Arith.
+From Stdlib Require Import Utf8 Arith.
 Import List.ListNotations.
 Import Init.Nat.
-
 Require Import RingLike.RingLike.
 Require Import RingLike.PermutationFun.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterMul.
+
 Require Import Misc.
 Require Import SortingFun SortRank.
 Require Import MyVector Matrix PermutSeq Signature.
