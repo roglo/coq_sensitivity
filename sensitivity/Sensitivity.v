@@ -5,11 +5,11 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 Arith.
+From Stdlib Require Import Utf8 Arith.
 Import List.ListNotations.
 Require Import Init.Nat.
-
 Require Import RingLike.IterAdd.
+
 Require Import Misc SortingFun.
 Require Import NatRingLike.
 
@@ -292,7 +292,7 @@ Definition block_sensitivity n f :=
 
 (* Proving Theorem: bs(f) ≥ s(f) *)
 
-Require Import Sorting.
+From Stdlib Require Import Sorting.
 
 (* property of partitions of {0,1,..,n-1} returned by pre_partitions *)
 
