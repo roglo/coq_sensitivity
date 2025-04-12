@@ -1,0 +1,62 @@
+============================================================
+ Git Workflow – (with Coq/Rocq)
+============================================================
+
+📌 Objective:
+Maintain a clean repository with multiple versions of Coq/Rocq,
+while working on the current version without breaking others.
+
+------------------------------------------------------------
+1. Create a branch for a Coq/Rocq version
+------------------------------------------------------------
+
+# From master (or another stable branch)
+git checkout -b rocq-9.0
+
+# Work on this branch until it compiles
+# Commit and push as needed
+
+------------------------------------------------------------
+2. Merge into master when ready
+------------------------------------------------------------
+
+# Option 1: merge
+git checkout master
+git merge rocq-9.0
+
+# Option 2: replace master files with rocq-9.0 files
+# then commit
+
+------------------------------------------------------------
+3. Don’t touch "frozen" branches
+------------------------------------------------------------
+
+# Example: coq-8.15.0, coq-8.20.0, rocq-9.0
+# These serve as references, not experimental branches
+
+------------------------------------------------------------
+4. Useful Commands
+------------------------------------------------------------
+
+# See differences between two branches
+git diff master..rocq-9.0
+
+# See commits from rocq-9.0 not present in master
+git log master..rocq-9.0 --oneline
+
+# Delete a local branch
+git branch -d old-branch
+
+# Delete a remote branch
+git push origin --delete old-branch
+
+------------------------------------------------------------
+5. Tips
+------------------------------------------------------------
+
+- Use "git worktree" to work on multiple branches at the same time:
+  git worktree add ../trigo-rocq-9.0 rocq-9.0
+
+- If you work on multiple machines, remember to regularly use "git pull" and "git push"
+
+============================================================
