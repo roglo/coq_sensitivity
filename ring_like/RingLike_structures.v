@@ -1,4 +1,4 @@
-Require Import Utf8 Arith.
+From Stdlib Require Import Utf8 Arith.
 
 Class ring_like_op T :=
   { rngl_zero : T;

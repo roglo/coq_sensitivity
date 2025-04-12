@@ -1,4 +1,4 @@
-Require Import Utf8 Arith.
+From Stdlib Require Import Utf8 Arith.
 Require Import RingLike_structures.
 
 Section a.
