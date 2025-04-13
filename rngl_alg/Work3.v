@@ -981,6 +981,21 @@ Definition is_limit_when_tending_to_inf {A} (dist : distance A) f L :=
   ∀ ε, (0 < ε)%L → ∃ R, (0 < R)%L ∧
   ∀ x, (R < x)%L → (d_dist (f x) L < ε)%L.
 
+Theorem rngl_div_sub_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ a b c, (b ≠ 0 → (a * b - c) / b = a - c / b)%L.
+Proof.
+intros Hon Hop Hiv.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+intros * Hbz.
+apply (rngl_mul_cancel_r Hi1 _ _ b Hbz).
+rewrite (rngl_div_mul Hon Hiv _ _ Hbz).
+rewrite (rngl_mul_sub_distr_r Hop).
+now rewrite (rngl_div_mul Hon Hiv _ _ Hbz).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
@@ -1352,11 +1367,22 @@ assert (H :
       apply (rngl_le_max_l Hor).
     }
     do 2 rewrite (rngl_opp_sub_distr Hop).
-Theorem rngl_div_sub_r :
-  ∀ a b c, ((a * b - c) / b = a - c / b)%L.
-Proof.
-... ...
-rewrite <- rngl_div_sub_r.
+    rewrite <- (rngl_div_sub_r Hon Hop Hiv _ _ _ Hzx).
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_div_div_r Hon Hos Hiv); [ | | easy ]. 2: {
+      intros H'; apply -> (rngl_sub_move_0_r Hop) in H'.
+      subst x.
+      apply rngl_nle_gt in Hrx.
+      apply Hrx; clear Hrx.
+      apply (rngl_le_max_l Hor).
+    }
+    rewrite (rngl_mul_comm Hic _ x).
+    rewrite (rngl_mul_div_assoc Hiv).
+    rewrite rngl_mul_assoc.
+    rewrite (rngl_div_1_l Hon Hiv) at 1.
+    rewrite (rngl_mul_inv_diag_l Hon Hiv _ Hzx).
+    rewrite (rngl_mul_1_l Hon).
+...
 Search ((_ - _ * _) / _)%L.
 rngl_div_sub_distr_r:
   ∀ {T : Type} {ro : ring_like_op T},
