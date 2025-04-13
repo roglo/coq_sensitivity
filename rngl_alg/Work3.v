@@ -996,6 +996,22 @@ rewrite (rngl_mul_sub_distr_r Hop).
 now rewrite (rngl_div_mul Hon Hiv _ _ Hbz).
 Qed.
 
+Theorem rngl_pow_div_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_has_inv T = true →
+  ∀ a b n,
+  b ≠ 0%L
+  → ((a / b) ^ n = a ^ n / b ^ n)%L.
+Proof.
+intros Hic Hon Hos Hiv * Hbz.
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite (rngl_pow_mul_l Hic Hon).
+now rewrite (rngl_inv_pow Hic Hon Hiv Hos _ _ Hbz).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
@@ -1376,6 +1392,11 @@ assert (H :
       apply Hrx; clear Hrx.
       apply (rngl_le_max_l Hor).
     }
+    rewrite (rngl_pow_div_l Hic Hon Hos Hiv _ _ _ Hzx).
+    rewrite (rngl_pow_1_l Hon).
+    rewrite <- rngl_div_sub_r.
+    rewrite (rngl_mul_1_l Hon).
+...
     rewrite (rngl_mul_comm Hic _ x).
     rewrite (rngl_mul_div_assoc Hiv).
     rewrite rngl_mul_assoc.
