@@ -1309,6 +1309,34 @@ assert (H :
     ∃ R,
     (0 < R)%L
     ∧ ∀ x, (R < x)%L →
+       (∑ (k = 1, n), 1 / x ^ k < ε * ‖ P.[n] ‖ / M)%L). {
+    destruct H as (R, H).
+    exists R.
+    split; [ easy | ].
+    intros x Hrx.
+    destruct H as (Hzr, H).
+    specialize (H x Hrx).
+    rewrite rngl_summation_rtl.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros i Hi.
+      rewrite Nat.add_0_r.
+      rewrite Nat.sub_sub_distr; [ | easy | flia Hi ].
+      rewrite Nat.sub_sub_distr; [ | flia H1len | easy ].
+      rewrite Nat.sub_diag.
+      now rewrite Nat.add_0_l.
+    }
+    cbn - [ rngl_zero Nat.add ].
+    rewrite (rngl_summation_shift 1) in H. 2: {
+      split; [ easy | flia H1len ].
+    }
+    now rewrite Nat.sub_diag in H.
+  }
+Search (∑ (_ = _, _), (_ ^ _))%L.
+...
+  enough (H :
+    ∃ R,
+    (0 < R)%L
+    ∧ ∀ x, (R < x)%L →
       (1 / (x - 1) * (1 - 1 / x ^ n) < ε * ‖ P.[n] ‖ / M)%L). {
     destruct H as (R, H).
     exists (rngl_max 1 R).
