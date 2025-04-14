@@ -1331,7 +1331,31 @@ assert (H :
     }
     now rewrite Nat.sub_diag in H.
   }
-Search (∑ (_ = _, _), (_ ^ _))%L.
+  exists (rngl_max 1 (rngl_of_nat n / (ε * ‖ P.[n] ‖ / M))).
+  split. {
+    apply (rngl_max_lt_iff Hor); left.
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  }
+  intros x Hx.
+  apply (rngl_le_lt_trans Hor _ (∑ (k = 1, n), 1 / x)). {
+    apply (rngl_summation_le_compat Hor).
+    intros i Hi.
+    apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    }
+Search (_⁻¹ ≤ _⁻¹)%L.
+Search (_⁻¹ < _⁻¹)%L.
+Search (_⁻¹ = _⁻¹)%L.
+Theorem rngl_le_inv_inv :
+  ∀ a b : T, a ≠ 0%L → b ≠ 0%L → (a⁻¹ ≤ b⁻¹)%L ↔ (b ≤ a)%L.
+Proof.
+... ...
+    apply rngl_le_inv_inv.
+...
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii 1). {
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    }
 ...
   enough (H :
     ∃ R,
