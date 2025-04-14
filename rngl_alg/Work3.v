@@ -1412,6 +1412,8 @@ assert (H :
     now apply (rngl_le_max_l Hor).
   }
   rewrite (rngl_summation_const Hos Hon).
+  rewrite Nat_sub_succ_1.
+(* ça va le faire, grave, je le sens bien *)
 ...
   enough (H :
     ∃ R,
