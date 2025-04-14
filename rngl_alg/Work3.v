@@ -1012,6 +1012,59 @@ rewrite (rngl_pow_mul_l Hic Hon).
 now rewrite (rngl_inv_pow Hic Hon Hiv Hos _ _ Hbz).
 Qed.
 
+Theorem rngl_lt_neq :
+  rngl_is_ordered T = true →
+  ∀ a b, (a < b)%L → a ≠ b.
+Proof.
+intros Hor.
+intros * Hab.
+intros H; subst b.
+now apply (rngl_lt_irrefl Hor) in Hab.
+Qed.
+
+Theorem rngl_le_inv_inv :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b : T, (0 < a)%L → (0 < b)%L → (a⁻¹ ≤ b⁻¹)%L ↔ (b ≤ a)%L.
+Proof.
+intros Hon Hop Hiv Hor.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Haz Hbz.
+split; intros Hab. {
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor a) in Hab. 2: {
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ b) in Hab. 2: {
+    now apply (rngl_lt_le_incl Hor).
+  }
+  rewrite (rngl_mul_inv_diag_r Hon Hiv) in Hab. 2: {
+    now apply (rngl_lt_neq Hor) in Haz.
+  }
+  rewrite <- rngl_mul_assoc in Hab.
+  rewrite (rngl_mul_inv_diag_l Hon Hiv) in Hab. 2: {
+    now apply (rngl_lt_neq Hor) in Hbz.
+  }
+  rewrite (rngl_mul_1_l Hon) in Hab.
+  rewrite (rngl_mul_1_r Hon) in Hab.
+  easy.
+} {
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ a); [ easy | ].
+  apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ b); [ easy | ].
+  rewrite (rngl_mul_inv_diag_r Hon Hiv). 2: {
+    now apply (rngl_lt_neq Hor) in Haz.
+  }
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_mul_inv_diag_l Hon Hiv). 2: {
+    now apply (rngl_lt_neq Hor) in Hbz.
+  }
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_1_r Hon).
+  easy.
+}
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
@@ -1337,25 +1390,27 @@ assert (H :
     apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
   }
   intros x Hx.
+  assert (Hzx : (0 < x)%L). {
+    eapply (rngl_lt_trans Hor); [ | apply Hx ].
+    apply (rngl_max_lt_iff Hor); left.
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  }
   apply (rngl_le_lt_trans Hor _ (∑ (k = 1, n), 1 / x)). {
     apply (rngl_summation_le_compat Hor).
     intros i Hi.
     apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
       apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
     }
-Search (_⁻¹ ≤ _⁻¹)%L.
-Search (_⁻¹ < _⁻¹)%L.
-Search (_⁻¹ = _⁻¹)%L.
-Theorem rngl_le_inv_inv :
-  ∀ a b : T, a ≠ 0%L → b ≠ 0%L → (a⁻¹ ≤ b⁻¹)%L ↔ (b ≤ a)%L.
-Proof.
-... ...
-    apply rngl_le_inv_inv.
-...
-      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
-    apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii 1). {
-      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    apply (rngl_le_inv_inv Hon Hop Hiv Hor); [ | easy | ]. {
+      now apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
     }
+    rewrite <- (rngl_pow_1_r Hon x) at 1.
+    apply (rngl_pow_le_mono_r Hop Hon Hor); [ | easy ].
+    eapply (rngl_le_trans Hor). 2: {
+      apply (rngl_lt_le_incl Hor), Hx.
+    }
+    now apply (rngl_le_max_l Hor).
+  }
 ...
   enough (H :
     ∃ R,
