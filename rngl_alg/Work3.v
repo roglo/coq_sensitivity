@@ -1411,6 +1411,7 @@ assert (H :
     }
     now apply (rngl_le_max_l Hor).
   }
+  rewrite (rngl_summation_const Hos Hon).
 ...
   enough (H :
     ∃ R,
