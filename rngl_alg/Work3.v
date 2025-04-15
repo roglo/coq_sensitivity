@@ -981,6 +981,24 @@ Definition is_limit_when_tending_to_inf {A} (dist : distance A) f L :=
   ∀ ε, (0 < ε)%L → ∃ R, (0 < R)%L ∧
   ∀ x, (R < x)%L → (d_dist (f x) L < ε)%L.
 
+Definition is_limit_when_module_tending_to_inf {A} (dist : distance A) f L :=
+  ∀ ε, (0 < ε)%L → ∃ R, (0 < R)%L ∧
+  ∀ z, (R < ‖ z ‖)%L → (d_dist (f (‖ z ‖)) L < ε)%L.
+
+Theorem is_limit_is_limit_module {A} :
+  ∀ (dist : distance A) f L,
+  is_limit_when_tending_to_inf dist f L
+  → is_limit_when_module_tending_to_inf dist f L.
+Proof.
+intros * Hlim.
+intros ε Hε.
+destruct (Hlim ε Hε) as (R & HR & Hd).
+exists R.
+split; [ easy | ].
+intros z Hz.
+now apply Hd.
+Qed.
+
 Theorem rngl_div_sub_r :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1430,6 +1448,7 @@ assert (H :
   eapply (rngl_le_lt_trans Hor); [ | apply Hx ].
   apply (rngl_le_max_r Hor).
 }
+apply is_limit_is_limit_module in H.
 ...
   enough (H :
     ∃ R,
