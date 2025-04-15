@@ -1172,7 +1172,9 @@ destruct H1 as (m & Hm & Hzm).
 destruct (rngl_eq_dec Heo m 0) as [Hmz| Hmz]; [ now subst m | ].
 assert (H : (0 < m)%L) by now apply (rngl_lt_iff Hor).
 move H before Hzm; clear Hzm Hmz; rename H into Hzm.
+(*
 exfalso.
+*)
 progress unfold is_infimum in Hm.
 progress unfold is_extremum in Hm.
 destruct (is_bound _ _) as [Him| Him]; [ | easy ].
@@ -1413,7 +1415,25 @@ assert (H :
   }
   rewrite (rngl_summation_const Hos Hon).
   rewrite Nat_sub_succ_1.
-(* ça va le faire, grave, je le sens bien *)
+  rewrite (rngl_mul_div_assoc Hiv).
+  rewrite (rngl_mul_1_r Hon).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor _ _ x Hzx).
+  rewrite <- (rngl_mul_div_assoc Hiv).
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
+    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+    apply (rngl_lt_iff Hor).
+    split; [ apply (gc_modl_nonneg Hos Hor) | ].
+    intros H; symmetry in H.
+    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
+  }
+  rewrite (rngl_mul_div_assoc Hiv).
+  eapply (rngl_le_lt_trans Hor); [ | apply Hx ].
+  apply (rngl_le_max_r Hor).
+}
+progress unfold is_infimum.
+progress unfold is_extremum.
 ...
   enough (H :
     ∃ R,
