@@ -1172,9 +1172,7 @@ destruct H1 as (m & Hm & Hzm).
 destruct (rngl_eq_dec Heo m 0) as [Hmz| Hmz]; [ now subst m | ].
 assert (H : (0 < m)%L) by now apply (rngl_lt_iff Hor).
 move H before Hzm; clear Hzm Hmz; rename H into Hzm.
-(*
 exfalso.
-*)
 progress unfold is_infimum in Hm.
 progress unfold is_extremum in Hm.
 destruct (is_bound _ _) as [Him| Him]; [ | easy ].
@@ -1432,8 +1430,6 @@ assert (H :
   eapply (rngl_le_lt_trans Hor); [ | apply Hx ].
   apply (rngl_le_max_r Hor).
 }
-progress unfold is_infimum.
-progress unfold is_extremum.
 ...
   enough (H :
     ∃ R,
