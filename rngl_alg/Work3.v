@@ -983,12 +983,12 @@ Definition is_limit_when_tending_to_inf {A} (dist : distance A) f L :=
 
 Definition is_limit_when_module_tending_to_inf {A} (dist : distance A) f L :=
   ∀ ε, (0 < ε)%L → ∃ R, (0 < R)%L ∧
-  ∀ z, (R < ‖ z ‖)%L → (d_dist (f (‖ z ‖)) L < ε)%L.
+  ∀ z, (R < ‖ z ‖)%L → (d_dist (f (z)) L < ε)%L.
 
 Theorem is_limit_is_limit_module {A} :
   ∀ (dist : distance A) f L,
   is_limit_when_tending_to_inf dist f L
-  → is_limit_when_module_tending_to_inf dist f L.
+  → is_limit_when_module_tending_to_inf dist (λ z, f (‖ z ‖)%L) L.
 Proof.
 intros * Hlim.
 intros ε Hε.
@@ -1093,7 +1093,7 @@ Theorem dominant_term_of_polynomial :
   1 < length a
   → a.[n] ≠ 0%C
   → is_limit_when_module_tending_to_inf rngl_distance'
-      (λ x, ∑ (k = 0, n - 1), ‖ a.[k] ‖ / (‖ a.[n] ‖ * x ^ (n - k))) 0%L.
+      (λ z, ∑ (k = 0, n - 1), ‖ a.[k] ‖ / (‖ a.[n] * z ^ (n - k) ‖)) 0%L.
 Proof.
 intros Hic Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -1113,27 +1113,30 @@ progress unfold rngl_dist.
 enough (H :
   ∃ R,
   (0 < R)%L
-  ∧ ∀ x, (R < x)%L →
-     (∑ (k = 0, n - 1), ‖ a.[k] ‖ / (‖ a.[n] ‖ * x ^ (n - k)) < ε)%L). {
+  ∧ ∀ z, (R < ‖ z ‖)%L →
+     (∑ (k = 0, n - 1), ‖ a.[k] ‖ / (‖ a.[n] * z ^ (n - k) ‖) < ε)%L). {
   destruct H as (R, H).
   exists R.
   split; [ easy | ].
-  intros x Hrx.
+  intros z Hrz.
   rewrite (rngl_sub_0_r Hos).
   rewrite (rngl_abs_nonneg_eq Hop Hor); [ now apply H | ].
   apply (rngl_summation_nonneg Hor).
   intros i Hi.
+  rewrite (gc_modl_mul Hic Hon Hop Hor).
   rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
     apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-    intros H'; rewrite H' in Hrx.
-    apply (rngl_lt_le_incl Hor) in Hrx.
-    now apply rngl_nlt_ge in Hrx.
+    intros H'; rewrite H' in Hrz.
+    apply (rngl_lt_le_incl Hor) in Hrz.
+    now apply rngl_nlt_ge in Hrz.
   } {
     intros H'.
     now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
   }
   apply (rngl_div_nonneg Hon Hop Hiv Hor). {
     apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
+    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
     apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
     now apply (rngl_lt_trans Hor _ R).
   }
@@ -1145,14 +1148,14 @@ enough (H :
 enough (H :
   ∃ R,
   (0 < R)%L
-  ∧ ∀ x, (R < x)%L →
-     (∑ (k = 0, n - 1), ‖ a.[k] ‖ / x ^ (n - k) < ε * ‖ a.[n] ‖)%L). {
+  ∧ ∀ z, (R < ‖ z ‖)%L →
+     (∑ (k = 0, n - 1), ‖ a.[k] ‖ / ‖ z ^ (n - k) ‖ < ε * ‖ a.[n] ‖)%L). {
   destruct H as (R, H).
   exists R.
   split; [ easy | ].
-  intros x Hrx.
+  intros z Hrz.
   destruct H as (Hzr, H).
-  specialize (H x Hrx).
+  specialize (H z Hrz).
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (‖ a.[n] ‖)%L). {
     apply (rngl_lt_iff Hor).
     split; [ easy | ].
@@ -1165,11 +1168,13 @@ enough (H :
   rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
   apply (rngl_summation_le_compat Hor).
   intros i Hi.
+  rewrite (gc_modl_mul Hic Hon Hop Hor).
   rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
     apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-    intros H'; rewrite H' in Hrx.
-    apply (rngl_lt_le_incl Hor) in Hrx.
-    now apply rngl_nlt_ge in Hrx.
+    intros H'; rewrite H' in Hrz.
+    apply (rngl_lt_le_incl Hor) in Hrz.
+    now apply rngl_nlt_ge in Hrz.
   } {
     intros H'.
     now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
@@ -1184,18 +1189,19 @@ set (M := Max (k = 0, n - 1), ‖ a.[k] ‖).
 enough (H :
   ∃ R,
   (0 < R)%L
-  ∧ ∀ x, (R < x)%L →
-     (∑ (k = 0, n - 1), M / x ^ (n - k) < ε * ‖ a.[n] ‖)%L). {
+  ∧ ∀ z, (R < ‖ z ‖)%L →
+     (∑ (k = 0, n - 1), M / ‖ z ^ (n - k) ‖ < ε * ‖ a.[n] ‖)%L). {
   destruct H as (R, H).
   exists R.
   split; [ easy | ].
-  intros x Hrx.
+  intros z Hrz.
   destruct H as (Hzr, H).
-  specialize (H x Hrx).
+  specialize (H z Hrz).
   eapply (rngl_le_lt_trans Hor); [ | apply H ].
   apply (rngl_summation_le_compat Hor).
   intros i Hi.
   apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
+    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
     apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
     now apply (rngl_lt_trans Hor _ R).
   }
@@ -1220,8 +1226,9 @@ destruct (rngl_eq_dec Heo M 0) as [Hmz| Hmz]. {
   rewrite all_0_rngl_summation_0. 2: {
     intros i Hi.
     apply (rngl_div_0_l Hos Hi1).
+    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
     apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-    intros H; subst x.
+    intros H; rewrite H in Hx.
     apply rngl_nle_gt in Hx.
     apply Hx.
     apply (rngl_0_le_1 Hon Hos Hor).
@@ -1241,14 +1248,14 @@ assert (HzM : (0 < M)%L). {
 enough (H :
   ∃ R,
   (0 < R)%L
-  ∧ ∀ x, (R < x)%L →
-     (∑ (k = 0, n - 1), 1 / x ^ (n - k) < ε * ‖ a.[n] ‖ / M)%L). {
+  ∧ ∀ z, (R < ‖ z ‖)%L →
+     (∑ (k = 0, n - 1), 1 / ‖ z ^ (n - k) ‖ < ε * ‖ a.[n] ‖ / M)%L). {
   destruct H as (R, H).
   exists R.
   split; [ easy | ].
-  intros x Hrx.
+  intros z Hrz.
   destruct H as (Hzr, H).
-  specialize (H x Hrx).
+  specialize (H z Hrz).
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii M) in H; [ | easy ].
   rewrite (rngl_div_mul Hon Hiv) in H; [ | easy ].
   eapply (rngl_le_lt_trans Hor); [ | apply H ].
@@ -1263,14 +1270,14 @@ enough (H :
 enough (H :
   ∃ R,
   (0 < R)%L
-  ∧ ∀ x, (R < x)%L →
-     (∑ (k = 1, n), 1 / x ^ k < ε * ‖ a.[n] ‖ / M)%L). {
+  ∧ ∀ z, (R < ‖ z ‖)%L →
+     (∑ (k = 1, n), 1 / ‖ z ^ k ‖ < ε * ‖ a.[n] ‖ / M)%L). {
   destruct H as (R, H).
   exists R.
   split; [ easy | ].
-  intros x Hrx.
+  intros z Hrz.
   destruct H as (Hzr, H).
-  specialize (H x Hrx).
+  specialize (H z Hrz).
   rewrite rngl_summation_rtl.
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
@@ -1291,25 +1298,27 @@ split. {
   apply (rngl_max_lt_iff Hor); left.
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
-intros x Hx.
-assert (Hzx : (0 < x)%L). {
-  eapply (rngl_lt_trans Hor); [ | apply Hx ].
+intros z Hrz.
+assert (Hzx : (0 < ‖ z ‖)%L). {
+  eapply (rngl_lt_trans Hor); [ | apply Hrz ].
   apply (rngl_max_lt_iff Hor); left.
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
-apply (rngl_le_lt_trans Hor _ (∑ (k = 1, n), 1 / x)). {
+apply (rngl_le_lt_trans Hor _ (∑ (k = 1, n), 1 / ‖ z ‖)). {
   apply (rngl_summation_le_compat Hor).
   intros i Hi.
   apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
     apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
   }
   apply (rngl_le_inv_inv Hon Hop Hiv Hor); [ | easy | ]. {
+    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
     now apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
   }
-  rewrite <- (rngl_pow_1_r Hon x) at 1.
+  rewrite <- (rngl_pow_1_r Hon (‖ z ‖)) at 1.
+  rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
   apply (rngl_pow_le_mono_r Hop Hon Hor); [ | easy ].
   eapply (rngl_le_trans Hor). 2: {
-    apply (rngl_lt_le_incl Hor), Hx.
+    apply (rngl_lt_le_incl Hor), Hrz.
   }
   now apply (rngl_le_max_l Hor).
 }
@@ -1317,7 +1326,7 @@ rewrite (rngl_summation_const Hos Hon).
 rewrite Nat_sub_succ_1.
 rewrite (rngl_mul_div_assoc Hiv).
 rewrite (rngl_mul_1_r Hon).
-apply (rngl_lt_div_l Hon Hop Hiv Hor _ _ x Hzx).
+apply (rngl_lt_div_l Hon Hop Hiv Hor _ _ _ Hzx).
 rewrite <- (rngl_mul_div_assoc Hiv).
 rewrite (rngl_mul_comm Hic).
 apply (rngl_lt_div_l Hon Hop Hiv Hor). {
@@ -1329,7 +1338,7 @@ apply (rngl_lt_div_l Hon Hop Hiv Hor). {
   now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
 }
 rewrite (rngl_mul_div_assoc Hiv).
-eapply (rngl_le_lt_trans Hor); [ | apply Hx ].
+eapply (rngl_le_lt_trans Hor); [ | apply Hrz ].
 apply (rngl_le_max_r Hor).
 Qed.
 
@@ -1476,7 +1485,7 @@ assert (H :
   specialize (dominant_term_of_polynomial Hic Hon Hop Hiv Hor) as H.
   specialize (H P H1len Hz).
   progress fold n in H.
-... (* il faut que je fasse un is_limit_module_is_limit *)
+... (* il faut que je fasse un is_limit_module_is_limit, ou pas *)
   apply is_limit_is_limit_module.
 ...
 }
