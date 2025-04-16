@@ -1083,6 +1083,256 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem dominant_term_of_polynomial :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a (n := length a - 1),
+  1 < length a
+  → a.[n] ≠ 0%C
+  → is_limit_when_module_tending_to_inf rngl_distance'
+      (λ x, ∑ (k = 0, n - 1), ‖ a.[k] ‖ / (‖ a.[n] ‖ * x ^ (n - k))) 0%L.
+Proof.
+intros Hic Hon Hop Hiv Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * H1len Hz ε Hε.
+  rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+assert (Hzmx : ∀ x, (0 ≤ ‖ x ‖)%L) by apply (gc_modl_nonneg Hos Hor).
+intros * H1len Hz ε Hε.
+cbn - [ rngl_zero ].
+progress unfold rngl_dist.
+enough (H :
+  ∃ R,
+  (0 < R)%L
+  ∧ ∀ x, (R < x)%L →
+     (∑ (k = 0, n - 1), ‖ a.[k] ‖ / (‖ a.[n] ‖ * x ^ (n - k)) < ε)%L). {
+  destruct H as (R, H).
+  exists R.
+  split; [ easy | ].
+  intros x Hrx.
+  rewrite (rngl_sub_0_r Hos).
+  rewrite (rngl_abs_nonneg_eq Hop Hor); [ now apply H | ].
+  apply (rngl_summation_nonneg Hor).
+  intros i Hi.
+  rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+    intros H'; rewrite H' in Hrx.
+    apply (rngl_lt_le_incl Hor) in Hrx.
+    now apply rngl_nlt_ge in Hrx.
+  } {
+    intros H'.
+    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+  }
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
+    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    now apply (rngl_lt_trans Hor _ R).
+  }
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  intros H'; symmetry in H'.
+  now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+}
+enough (H :
+  ∃ R,
+  (0 < R)%L
+  ∧ ∀ x, (R < x)%L →
+     (∑ (k = 0, n - 1), ‖ a.[k] ‖ / x ^ (n - k) < ε * ‖ a.[n] ‖)%L). {
+  destruct H as (R, H).
+  exists R.
+  split; [ easy | ].
+  intros x Hrx.
+  destruct H as (Hzr, H).
+  specialize (H x Hrx).
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (‖ a.[n] ‖)%L). {
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H'; symmetry in H'.
+    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+  }
+  eapply (rngl_le_lt_trans Hor); [ | apply H ].
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor (‖ a.[n] ‖)); [ | easy ].
+  rewrite (rngl_mul_summation_distr_r Hos).
+  rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+  apply (rngl_summation_le_compat Hor).
+  intros i Hi.
+  rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+    intros H'; rewrite H' in Hrx.
+    apply (rngl_lt_le_incl Hor) in Hrx.
+    now apply rngl_nlt_ge in Hrx.
+  } {
+    intros H'.
+    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+  }
+  rewrite (rngl_div_mul Hon Hiv). 2: {
+    intros H'.
+    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+  }
+  apply (rngl_le_refl Hor).
+}
+set (M := Max (k = 0, n - 1), ‖ a.[k] ‖).
+enough (H :
+  ∃ R,
+  (0 < R)%L
+  ∧ ∀ x, (R < x)%L →
+     (∑ (k = 0, n - 1), M / x ^ (n - k) < ε * ‖ a.[n] ‖)%L). {
+  destruct H as (R, H).
+  exists R.
+  split; [ easy | ].
+  intros x Hrx.
+  destruct H as (Hzr, H).
+  specialize (H x Hrx).
+  eapply (rngl_le_lt_trans Hor); [ | apply H ].
+  apply (rngl_summation_le_compat Hor).
+  intros i Hi.
+  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
+    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    now apply (rngl_lt_trans Hor _ R).
+  }
+  progress unfold M.
+  apply (rngl_le_max_seq_r Hor) with (f := λ k, ‖ a.[k] ‖). {
+    intros k Hk.
+    now apply (rngl_max_r_iff Hor).
+  }
+  rewrite <- Nat_succ_sub_succ_r; [ | flia H1len ].
+  do 2 rewrite Nat.sub_0_r.
+  apply List.in_seq.
+  split; [ easy | ].
+  rewrite Nat.add_0_l.
+  apply (Nat.le_lt_trans _ (n - 1)); [ easy | ].
+  flia H1len.
+}
+destruct (rngl_eq_dec Heo M 0) as [Hmz| Hmz]. {
+  subst M; rewrite Hmz.
+  exists 1%L.
+  split; [ apply (rngl_0_lt_1 Hon Hos Hc1 Hor) | ].
+  intros x Hx.
+  rewrite all_0_rngl_summation_0. 2: {
+    intros i Hi.
+    apply (rngl_div_0_l Hos Hi1).
+    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+    intros H; subst x.
+    apply rngl_nle_gt in Hx.
+    apply Hx.
+    apply (rngl_0_le_1 Hon Hos Hor).
+  }
+  apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
+  apply (rngl_lt_iff Hor).
+  split ; [ easy | ].
+  intros H; symmetry in H.
+  now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
+}
+assert (HzM : (0 < M)%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ | easy ].
+  progress unfold M.
+  now apply (rngl_iter_max_seq_nonneg Hor).
+}
+enough (H :
+  ∃ R,
+  (0 < R)%L
+  ∧ ∀ x, (R < x)%L →
+     (∑ (k = 0, n - 1), 1 / x ^ (n - k) < ε * ‖ a.[n] ‖ / M)%L). {
+  destruct H as (R, H).
+  exists R.
+  split; [ easy | ].
+  intros x Hrx.
+  destruct H as (Hzr, H).
+  specialize (H x Hrx).
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii M) in H; [ | easy ].
+  rewrite (rngl_div_mul Hon Hiv) in H; [ | easy ].
+  eapply (rngl_le_lt_trans Hor); [ | apply H ].
+  rewrite (rngl_mul_summation_distr_r Hos).
+  apply (rngl_summation_le_compat Hor).
+  intros i Hi.
+  rewrite (rngl_div_1_l Hon Hiv).
+  rewrite (rngl_mul_comm Hic).
+  rewrite (rngl_mul_inv_r Hiv).
+  apply (rngl_le_refl Hor).
+}
+enough (H :
+  ∃ R,
+  (0 < R)%L
+  ∧ ∀ x, (R < x)%L →
+     (∑ (k = 1, n), 1 / x ^ k < ε * ‖ a.[n] ‖ / M)%L). {
+  destruct H as (R, H).
+  exists R.
+  split; [ easy | ].
+  intros x Hrx.
+  destruct H as (Hzr, H).
+  specialize (H x Hrx).
+  rewrite rngl_summation_rtl.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    rewrite Nat.add_0_r.
+    rewrite Nat.sub_sub_distr; [ | easy | flia Hi ].
+    rewrite Nat.sub_sub_distr; [ | flia H1len | easy ].
+    rewrite Nat.sub_diag.
+    now rewrite Nat.add_0_l.
+  }
+  cbn - [ rngl_zero Nat.add ].
+  rewrite (rngl_summation_shift 1) in H. 2: {
+    split; [ easy | flia H1len ].
+  }
+  now rewrite Nat.sub_diag in H.
+}
+exists (rngl_max 1 (rngl_of_nat n / (ε * ‖ a.[n] ‖ / M))).
+split. {
+  apply (rngl_max_lt_iff Hor); left.
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+}
+intros x Hx.
+assert (Hzx : (0 < x)%L). {
+  eapply (rngl_lt_trans Hor); [ | apply Hx ].
+  apply (rngl_max_lt_iff Hor); left.
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+}
+apply (rngl_le_lt_trans Hor _ (∑ (k = 1, n), 1 / x)). {
+  apply (rngl_summation_le_compat Hor).
+  intros i Hi.
+  apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_le_inv_inv Hon Hop Hiv Hor); [ | easy | ]. {
+    now apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+  }
+  rewrite <- (rngl_pow_1_r Hon x) at 1.
+  apply (rngl_pow_le_mono_r Hop Hon Hor); [ | easy ].
+  eapply (rngl_le_trans Hor). 2: {
+    apply (rngl_lt_le_incl Hor), Hx.
+  }
+  now apply (rngl_le_max_l Hor).
+}
+rewrite (rngl_summation_const Hos Hon).
+rewrite Nat_sub_succ_1.
+rewrite (rngl_mul_div_assoc Hiv).
+rewrite (rngl_mul_1_r Hon).
+apply (rngl_lt_div_l Hon Hop Hiv Hor _ _ x Hzx).
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite (rngl_mul_comm Hic).
+apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+  apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
+  apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+  apply (rngl_lt_iff Hor).
+  split; [ apply (gc_modl_nonneg Hos Hor) | ].
+  intros H; symmetry in H.
+  now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
+}
+rewrite (rngl_mul_div_assoc Hiv).
+eapply (rngl_le_lt_trans Hor); [ | apply Hx ].
+apply (rngl_le_max_r Hor).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
@@ -1221,234 +1471,17 @@ assert (H :
   ∀ z, (R₀ < ‖z‖)%L → (‖ U z ‖ < ε)%L). {
 *)
 assert (H :
-  is_limit_when_tending_to_inf rngl_distance'
+  is_limit_when_tending_to_inf (@rngl_distance T ro rp Hop Hor)
     (λ x, ∑ (k = 0, n - 1), ‖ P.[k] ‖ / (‖ P.[n] ‖ * x ^ (n - k))) 0%L). {
-  intros ε Hε.
-  cbn - [ rngl_zero ].
-  progress unfold rngl_dist.
-  enough (H :
-    ∃ R,
-    (0 < R)%L
-    ∧ ∀ x, (R < x)%L →
-       (∑ (k = 0, n - 1), ‖ P.[k] ‖ / (‖ P.[n] ‖ * x ^ (n - k)) < ε)%L). {
-    destruct H as (R, H).
-    exists R.
-    split; [ easy | ].
-    intros x Hrx.
-    rewrite (rngl_sub_0_r Hos).
-    rewrite (rngl_abs_nonneg_eq Hop Hor); [ now apply H | ].
-    apply (rngl_summation_nonneg Hor).
-    intros i Hi.
-    rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
-      apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-      intros H'; rewrite H' in Hrx.
-      apply (rngl_lt_le_incl Hor) in Hrx.
-      now apply rngl_nlt_ge in Hrx.
-    } {
-      intros H'.
-      now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
-    }
-    apply (rngl_div_nonneg Hon Hop Hiv Hor). {
-      apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
-      apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
-      now apply (rngl_lt_trans Hor _ R).
-    }
-    apply (rngl_lt_iff Hor).
-    split; [ easy | ].
-    intros H'; symmetry in H'.
-    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
-  }
-  enough (H :
-    ∃ R,
-    (0 < R)%L
-    ∧ ∀ x, (R < x)%L →
-       (∑ (k = 0, n - 1), ‖ P.[k] ‖ / x ^ (n - k) < ε * ‖ P.[n] ‖)%L). {
-    destruct H as (R, H).
-    exists R.
-    split; [ easy | ].
-    intros x Hrx.
-    destruct H as (Hzr, H).
-    specialize (H x Hrx).
-    apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (‖ P.[n] ‖)%L). {
-      apply (rngl_lt_iff Hor).
-      split; [ easy | ].
-      intros H'; symmetry in H'.
-      now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
-    }
-    eapply (rngl_le_lt_trans Hor); [ | apply H ].
-    rewrite <- (rngl_abs_nonneg_eq Hop Hor (‖ P.[n] ‖)); [ | easy ].
-    rewrite (rngl_mul_summation_distr_r Hos).
-    rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-    apply (rngl_summation_le_compat Hor).
-    intros i Hi.
-    rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
-      apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-      intros H'; rewrite H' in Hrx.
-      apply (rngl_lt_le_incl Hor) in Hrx.
-      now apply rngl_nlt_ge in Hrx.
-    } {
-      intros H'.
-      now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
-    }
-    rewrite (rngl_div_mul Hon Hiv). 2: {
-      intros H'.
-      now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
-    }
-    apply (rngl_le_refl Hor).
-  }
-  set (M := Max (k = 0, n - 1), ‖ P.[k] ‖).
-  enough (H :
-    ∃ R,
-    (0 < R)%L
-    ∧ ∀ x, (R < x)%L →
-       (∑ (k = 0, n - 1), M / x ^ (n - k) < ε * ‖ P.[n] ‖)%L). {
-    destruct H as (R, H).
-    exists R.
-    split; [ easy | ].
-    intros x Hrx.
-    destruct H as (Hzr, H).
-    specialize (H x Hrx).
-    eapply (rngl_le_lt_trans Hor); [ | apply H ].
-    apply (rngl_summation_le_compat Hor).
-    intros i Hi.
-    apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
-      apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
-      now apply (rngl_lt_trans Hor _ R).
-    }
-    progress unfold M.
-    apply (rngl_le_max_seq_r Hor) with (f := λ k, ‖ P.[k] ‖). {
-      intros k Hk.
-      now apply (rngl_max_r_iff Hor).
-    }
-    rewrite <- Nat_succ_sub_succ_r; [ | flia H1len ].
-    do 2 rewrite Nat.sub_0_r.
-    apply List.in_seq.
-    split; [ easy | ].
-    rewrite Nat.add_0_l.
-    apply (Nat.le_lt_trans _ (n - 1)); [ easy | ].
-    flia H1len.
-  }
-  destruct (rngl_eq_dec Heo M 0) as [Hmz| Hmz]. {
-    subst M; rewrite Hmz.
-    exists 1%L.
-    split; [ apply (rngl_0_lt_1 Hon Hos Hc1 Hor) | ].
-    intros x Hx.
-    rewrite all_0_rngl_summation_0. 2: {
-      intros i Hi.
-      apply (rngl_div_0_l Hos Hi1).
-      apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-      intros H; subst x.
-      apply rngl_nle_gt in Hx.
-      apply Hx.
-      apply (rngl_0_le_1 Hon Hos Hor).
-    }
-    apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
-    apply (rngl_lt_iff Hor).
-    split ; [ easy | ].
-    intros H; symmetry in H.
-    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
-  }
-  assert (HzM : (0 < M)%L). {
-    apply (rngl_lt_iff Hor).
-    split; [ | easy ].
-    progress unfold M.
-    now apply (rngl_iter_max_seq_nonneg Hor).
-  }
-  enough (H :
-    ∃ R,
-    (0 < R)%L
-    ∧ ∀ x, (R < x)%L →
-       (∑ (k = 0, n - 1), 1 / x ^ (n - k) < ε * ‖ P.[n] ‖ / M)%L). {
-    destruct H as (R, H).
-    exists R.
-    split; [ easy | ].
-    intros x Hrx.
-    destruct H as (Hzr, H).
-    specialize (H x Hrx).
-    apply (rngl_mul_lt_mono_pos_r Hop Hor Hii M) in H; [ | easy ].
-    rewrite (rngl_div_mul Hon Hiv) in H; [ | easy ].
-    eapply (rngl_le_lt_trans Hor); [ | apply H ].
-    rewrite (rngl_mul_summation_distr_r Hos).
-    apply (rngl_summation_le_compat Hor).
-    intros i Hi.
-    rewrite (rngl_div_1_l Hon Hiv).
-    rewrite (rngl_mul_comm Hic).
-    rewrite (rngl_mul_inv_r Hiv).
-    apply (rngl_le_refl Hor).
-  }
-  enough (H :
-    ∃ R,
-    (0 < R)%L
-    ∧ ∀ x, (R < x)%L →
-       (∑ (k = 1, n), 1 / x ^ k < ε * ‖ P.[n] ‖ / M)%L). {
-    destruct H as (R, H).
-    exists R.
-    split; [ easy | ].
-    intros x Hrx.
-    destruct H as (Hzr, H).
-    specialize (H x Hrx).
-    rewrite rngl_summation_rtl.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros i Hi.
-      rewrite Nat.add_0_r.
-      rewrite Nat.sub_sub_distr; [ | easy | flia Hi ].
-      rewrite Nat.sub_sub_distr; [ | flia H1len | easy ].
-      rewrite Nat.sub_diag.
-      now rewrite Nat.add_0_l.
-    }
-    cbn - [ rngl_zero Nat.add ].
-    rewrite (rngl_summation_shift 1) in H. 2: {
-      split; [ easy | flia H1len ].
-    }
-    now rewrite Nat.sub_diag in H.
-  }
-  exists (rngl_max 1 (rngl_of_nat n / (ε * ‖ P.[n] ‖ / M))).
-  split. {
-    apply (rngl_max_lt_iff Hor); left.
-    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
-  }
-  intros x Hx.
-  assert (Hzx : (0 < x)%L). {
-    eapply (rngl_lt_trans Hor); [ | apply Hx ].
-    apply (rngl_max_lt_iff Hor); left.
-    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
-  }
-  apply (rngl_le_lt_trans Hor _ (∑ (k = 1, n), 1 / x)). {
-    apply (rngl_summation_le_compat Hor).
-    intros i Hi.
-    apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
-      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
-    }
-    apply (rngl_le_inv_inv Hon Hop Hiv Hor); [ | easy | ]. {
-      now apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
-    }
-    rewrite <- (rngl_pow_1_r Hon x) at 1.
-    apply (rngl_pow_le_mono_r Hop Hon Hor); [ | easy ].
-    eapply (rngl_le_trans Hor). 2: {
-      apply (rngl_lt_le_incl Hor), Hx.
-    }
-    now apply (rngl_le_max_l Hor).
-  }
-  rewrite (rngl_summation_const Hos Hon).
-  rewrite Nat_sub_succ_1.
-  rewrite (rngl_mul_div_assoc Hiv).
-  rewrite (rngl_mul_1_r Hon).
-  apply (rngl_lt_div_l Hon Hop Hiv Hor _ _ x Hzx).
-  rewrite <- (rngl_mul_div_assoc Hiv).
-  rewrite (rngl_mul_comm Hic).
-  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
-    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
-    apply (rngl_lt_iff Hor).
-    split; [ apply (gc_modl_nonneg Hos Hor) | ].
-    intros H; symmetry in H.
-    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
-  }
-  rewrite (rngl_mul_div_assoc Hiv).
-  eapply (rngl_le_lt_trans Hor); [ | apply Hx ].
-  apply (rngl_le_max_r Hor).
+  specialize (dominant_term_of_polynomial Hic Hon Hop Hiv Hor) as H.
+  specialize (H P H1len Hz).
+  progress fold n in H.
+... (* il faut que je fasse un is_limit_module_is_limit *)
+  apply is_limit_is_limit_module.
+...
 }
 apply is_limit_is_limit_module in H.
+rename P into a.
 ...
 (* pour voir *)
 assert (H : ∀ m, (0 < m)%L → ∃ z, z ≠ 0%C ∧ ‖ z ‖ = m). {
