@@ -1166,6 +1166,16 @@ rewrite <- List.seq_shift.
 now rewrite List.map_map.
 Qed.
 
+Theorem List_last_nth : ∀ A (la : list A) d,
+  List.last la d = List.nth (length la - 1) la d.
+Proof.
+intros.
+destruct la as [| a] using List.rev_ind; [ easy | cbn ].
+rewrite List.last_last, List.length_app, Nat.add_sub.
+rewrite List.app_nth2; [ | now progress unfold ge ].
+now rewrite Nat.sub_diag.
+Qed.
+
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
   | left _ _ => true

@@ -1359,6 +1359,30 @@ destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
+enough (Hic : rngl_mul_is_comm T = true).
+enough (Hon : rngl_has_1 T = true).
+enough (Hiv : rngl_has_inv T = true).
+enough (Hor : rngl_is_ordered T = true).
+specialize (dominant_term_of_polynomial Hic Hon Hop Hiv Hor) as H.
+specialize (H la Hla).
+Search (_.[length _ - 1])%L.
+Search (List.nth (length _ - 1)).
+Check List.nth.
+Check List.last_last.
+Check List_last_nth.
+...
+Search (List.last _ _).
+specialize (H la H1len Hz).
+  progress fold n in H.
+...
+intros; cbn.
+remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
+destruct op; [ | easy ].
+remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc; symmetry in Hivc.
+destruct ivc; [ | easy ].
+remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
+destruct onc; [ cbn | easy ].
+intros la Hla Hl1.
 (* conseil de Mistral AI *)
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_is_archimedean T = true →
