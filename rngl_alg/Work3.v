@@ -1342,18 +1342,62 @@ eapply (rngl_le_lt_trans Hor); [ | apply Hrz ].
 apply (rngl_le_max_r Hor).
 Qed.
 
-(*
+(* to be completed
 Theorem polynomial_norm_tends_to_inf :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
   ∀ a,
   let n := length a - 1 in
   1 < length a
   → a.[n] ≠ 0%C
-  → ∀ ε, (0 < ε)%L → ∃ R, ∀ z, (R ≤ ‖ z ‖)%L
+  → ∀ ε, (0 < ε)%L → ∃ R, ∀ z, (R < ‖ z ‖)%L
   → ((1 - ε) * ‖ a.[n] * z ^n ‖ ≤ ‖ rngl_eval_polyn a z ‖)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+set (roc := gc_ring_like_op T).
+set (rpc := gc_ring_like_prop_not_alg_closed Hon Hic Hop Hiv Hor).
+assert (Hosc : rngl_has_opp_or_subt (GComplex T) = true). {
+  progress unfold rngl_has_opp_or_subt.
+  cbn.
+  progress unfold gc_opt_opp_or_subt.
+  generalize Hop; intros H.
+  progress unfold rngl_has_opp in H.
+  destruct (rngl_opt_opp_or_subt T) as [opp| ]; [ | easy ].
+  now destruct opp.
+}
+assert (Honc : rngl_has_1 (GComplex T) = true). {
+  progress unfold rngl_has_1.
+  cbn.
+  progress unfold gc_opt_one.
+  generalize Hon; intros H.
+  progress unfold rngl_has_1 in H.
+  now destruct (rngl_opt_one T).
+}
+intros * H1a Hnz.
+specialize (dominant_term_of_polynomial Hic Hon Hop Hiv Hor) as H1.
+specialize (H1 a H1a Hnz).
+progress unfold is_limit_when_module_tending_to_inf in H1.
+progress fold n in H1.
+cbn - [ rngl_zero ] in H1.
+progress unfold rngl_dist in H1.
+intros ε Hε.
+specialize (H1 ε Hε).
+destruct H1 as (R & Hzr & Hr).
+exists R.
+intros z Hrz.
+specialize (Hr z Hrz).
+rewrite (rngl_sub_0_r Hos) in Hr.
+rewrite (@rngl_eval_polyn_is_summation _ roc rpc Hosc Honc). 2: {
+  rewrite rngl_add_0_l.
+  apply (rngl_mul_0_l Hosc).
+}
+progress fold n.
 ...
-*)
 
-(* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
       rngl_has_1 (GComplex T))%bool
