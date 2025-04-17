@@ -1342,6 +1342,17 @@ eapply (rngl_le_lt_trans Hor); [ | apply Hrz ].
 apply (rngl_le_max_r Hor).
 Qed.
 
+(*
+Theorem polynomial_norm_tends_to_inf :
+  ∀ a,
+  let n := length a - 1 in
+  1 < length a
+  → a.[n] ≠ 0%C
+  → ∀ ε, (0 < ε)%L → ∃ R, ∀ z, (R ≤ ‖ z ‖)%L
+  → ((1 - ε) * ‖ a.[n] * z ^n ‖ ≤ ‖ rngl_eval_polyn a z ‖)%L.
+...
+*)
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
