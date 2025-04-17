@@ -1358,8 +1358,16 @@ Theorem polynomial_norm_tends_to_inf :
 Proof.
 intros Hic Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * H1a Hnz ε Hε.
+  rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 set (roc := gc_ring_like_op T).
 set (rpc := gc_ring_like_prop_not_alg_closed Hon Hic Hop Hiv Hor).
+assert (Hc1c : rngl_characteristic (GComplex T) ≠ 1) by easy.
 assert (Hosc : rngl_has_opp_or_subt (GComplex T) = true). {
   progress unfold rngl_has_opp_or_subt.
   cbn.
@@ -1376,6 +1384,21 @@ assert (Honc : rngl_has_1 (GComplex T) = true). {
   generalize Hon; intros H.
   progress unfold rngl_has_1 in H.
   now destruct (rngl_opt_one T).
+}
+assert (Hicc : rngl_mul_is_comm (GComplex T) = true) by easy.
+assert (Hi1c : rngl_has_inv_and_1_or_quot (GComplex T) = true). {
+  specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+  generalize Hi1; intros Hi1'.
+  generalize Hiv; intros Hiv'.
+  progress unfold rngl_has_inv_and_1_or_quot in Hi1'.
+  progress unfold rngl_has_inv in Hiv'.
+  progress unfold rngl_has_inv_and_1_or_quot.
+  cbn.
+  progress unfold gc_opt_inv_or_quot.
+  rewrite Hon in Hi1'.
+  rewrite Honc, Hic.
+  destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+  now destruct iq.
 }
 intros * H1a Hnz.
 specialize (dominant_term_of_polynomial Hic Hon Hop Hiv Hor) as H1.
@@ -1396,6 +1419,36 @@ rewrite (@rngl_eval_polyn_is_summation _ roc rpc Hosc Honc). 2: {
   apply (rngl_mul_0_l Hosc).
 }
 progress fold n.
+(* refaire dominant_term_of_polynomial pour mettre en facteur 1/a.[n] *)
+...
+rewrite (rngl_abs_nonneg_eq Hop Hor) in Hr. 2: {
+  apply (rngl_summation_nonneg Hor).
+  intros i Hi.
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+    apply (gc_modl_nonneg Hos Hor).
+  }
+  apply (rngl_lt_iff Hor).
+  split; [ apply (gc_modl_nonneg Hos Hor) | ].
+  intros H; symmetry in H.
+  apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
+  apply (rngl_eq_mul_0_r Hosc Hi1c) in H; [ | easy ].
+  apply (rngl_pow_nonzero Honc Hc1c Hosc Hi1c) in H; [ easy | ].
+  intros H'; rewrite H' in Hrz; cbn in Hrz.
+  rewrite (gc_modl_0 Hon Hop Hor Hii) in Hrz.
+  apply (rngl_lt_le_incl Hor) in Hrz.
+  now apply rngl_nlt_ge in Hrz.
+}
+...
+  apply (rngl_pow_nonzero Hon Hc1 Hos) in H.
+...
+rewrite rngl_summation_split_last; [ | easy ].
+rewrite rngl_summation_rgl
+rewrite (rngl_summation_shift 1); [ | flia H1a ].
+rewrite Nat.sub_diag.
+rewrite (rngl_summation_eq_compat _ (λ i, (a.[i] * z ^ i)%L)). 2: {
+  intros i Hi.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
 ...
 
 Theorem gc_opt_alg_closed :
