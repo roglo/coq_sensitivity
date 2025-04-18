@@ -1083,6 +1083,7 @@ split; intros Hab. {
 }
 Qed.
 
+(* to be completed
 Theorem dominant_term_of_polynomial :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1092,8 +1093,12 @@ Theorem dominant_term_of_polynomial :
   ∀ a (n := length a - 1),
   1 < length a
   → a.[n] ≠ 0%C
+(*
   → is_limit_when_module_tending_to_inf rngl_distance'
       (λ z, ∑ (k = 0, n - 1), ‖ a.[k] ‖ / (‖ a.[n] * z ^ (n - k) ‖)) 0%L.
+*)
+  → is_limit_when_module_tending_to_inf rngl_distance'
+      (λ z, (∑ (k = 0, n - 1), ‖ a.[k] * z ^ k ‖) / ‖ a.[n] * z ^ n ‖)%L 0%L.
 Proof.
 intros Hic Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -1114,78 +1119,54 @@ enough (H :
   ∃ R,
   (0 < R)%L
   ∧ ∀ z, (R < ‖ z ‖)%L →
-     (∑ (k = 0, n - 1), ‖ a.[k] ‖ / (‖ a.[n] * z ^ (n - k) ‖) < ε)%L). {
+     ((∑ (k = 0, n - 1), ‖ a.[k] * z ^ k ‖) / ‖ a.[n] * z ^ n ‖ < ε)%L). {
   destruct H as (R, H).
   exists R.
   split; [ easy | ].
   intros z Hrz.
   rewrite (rngl_sub_0_r Hos).
   rewrite (rngl_abs_nonneg_eq Hop Hor); [ now apply H | ].
+  apply (rngl_div_nonneg Hon Hop Hiv Hor).
   apply (rngl_summation_nonneg Hor).
   intros i Hi.
-  rewrite (gc_modl_mul Hic Hon Hop Hor).
-  rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
-    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
-    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-    intros H'; rewrite H' in Hrz.
-    apply (rngl_lt_le_incl Hor) in Hrz.
-    now apply rngl_nlt_ge in Hrz.
-  } {
-    intros H'.
-    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
-  }
-  apply (rngl_div_nonneg Hon Hop Hiv Hor). {
-    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
-    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
-    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
-    now apply (rngl_lt_trans Hor _ R).
-  }
+  apply (gc_modl_nonneg Hos Hor).
   apply (rngl_lt_iff Hor).
   split; [ easy | ].
   intros H'; symmetry in H'.
-  now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+  apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+  rewrite (gc_mul_comm Hic) in H'.
+  apply (gc_eq_mul_0_l Hic Hon Hop Hiv Hor) in H'; [ | easy ].
+  apply (gc_pow_nonzero Hic Hon Hop Hiv Hor) in H'; [ easy | ].
+  intros H''; rewrite H'' in Hrz.
+  rewrite (gc_modl_0 Hon Hop Hor Hii) in Hrz.
+  apply (rngl_lt_le_incl Hor) in Hrz.
+  now apply rngl_nlt_ge in Hrz.
 }
 enough (H :
   ∃ R,
   (0 < R)%L
   ∧ ∀ z, (R < ‖ z ‖)%L →
-     (∑ (k = 0, n - 1), ‖ a.[k] ‖ / ‖ z ^ (n - k) ‖ < ε * ‖ a.[n] ‖)%L). {
+     (∑ (k = 0, n - 1), ‖ a.[k] * z ^ k ‖ < ε * ‖ a.[n] * z ^ n ‖)%L). {
   destruct H as (R, H).
   exists R.
   split; [ easy | ].
   intros z Hrz.
   destruct H as (Hzr, H).
   specialize (H z Hrz).
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (‖ a.[n] ‖)%L). {
-    apply (rngl_lt_iff Hor).
-    split; [ easy | ].
-    intros H'; symmetry in H'.
-    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
-  }
-  eapply (rngl_le_lt_trans Hor); [ | apply H ].
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor (‖ a.[n] ‖)); [ | easy ].
-  rewrite (rngl_mul_summation_distr_r Hos).
-  rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-  apply (rngl_summation_le_compat Hor).
-  intros i Hi.
-  rewrite (gc_modl_mul Hic Hon Hop Hor).
-  rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
-    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
-    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-    intros H'; rewrite H' in Hrz.
-    apply (rngl_lt_le_incl Hor) in Hrz.
-    now apply rngl_nlt_ge in Hrz.
-  } {
-    intros H'.
-    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
-  }
-  rewrite (rngl_div_mul Hon Hiv). 2: {
-    intros H'.
-    now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
-  }
-  apply (rngl_le_refl Hor).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor); [ | easy ].
+  apply (rngl_lt_iff Hor).
+  split; [ apply (gc_modl_nonneg Hos Hor) | ].
+  intros H'; symmetry in H'.
+  apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H'.
+  apply (gc_eq_mul_0_l Hic Hon Hop Hiv Hor) in H'; [ easy | ].
+  apply (gc_pow_nonzero Hic Hon Hop Hiv Hor).
+  intros H''; rewrite H'' in Hrz.
+  rewrite (gc_modl_0 Hon Hop Hor Hii) in Hrz.
+  apply (rngl_lt_le_incl Hor) in Hrz.
+  now apply rngl_nlt_ge in Hrz.
 }
 set (M := Max (k = 0, n - 1), ‖ a.[k] ‖).
+...
 enough (H :
   ∃ R,
   (0 < R)%L
@@ -1342,7 +1323,6 @@ eapply (rngl_le_lt_trans Hor); [ | apply Hrz ].
 apply (rngl_le_max_r Hor).
 Qed.
 
-(* to be completed
 Theorem polynomial_norm_tends_to_inf :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
