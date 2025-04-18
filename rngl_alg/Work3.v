@@ -1166,12 +1166,11 @@ enough (H :
   now apply rngl_nlt_ge in Hrz.
 }
 set (M := Max (k = 0, n - 1), ‖ a.[k] ‖).
-...
 enough (H :
   ∃ R,
   (0 < R)%L
   ∧ ∀ z, (R < ‖ z ‖)%L →
-     (∑ (k = 0, n - 1), M / ‖ z ^ (n - k) ‖ < ε * ‖ a.[n] ‖)%L). {
+     (∑ (k = 0, n - 1), (M * ‖ z ^ k ‖) < ε * ‖ a.[n] * z ^ n ‖)%L). {
   destruct H as (R, H).
   exists R.
   split; [ easy | ].
@@ -1181,10 +1180,9 @@ enough (H :
   eapply (rngl_le_lt_trans Hor); [ | apply H ].
   apply (rngl_summation_le_compat Hor).
   intros i Hi.
-  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
-    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
-    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
-    now apply (rngl_lt_trans Hor _ R).
+  rewrite (gc_modl_mul Hic Hon Hop Hor).
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor). {
+    apply (gc_modl_nonneg Hos Hor).
   }
   progress unfold M.
   apply (rngl_le_max_seq_r Hor) with (f := λ k, ‖ a.[k] ‖). {
@@ -1206,19 +1204,20 @@ destruct (rngl_eq_dec Heo M 0) as [Hmz| Hmz]. {
   intros x Hx.
   rewrite all_0_rngl_summation_0. 2: {
     intros i Hi.
-    apply (rngl_div_0_l Hos Hi1).
-    rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
-    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-    intros H; rewrite H in Hx.
-    apply rngl_nle_gt in Hx.
-    apply Hx.
-    apply (rngl_0_le_1 Hon Hos Hor).
+    apply (rngl_mul_0_l Hos).
   }
   apply (rngl_mul_pos_pos Hos Hor Hii); [ easy | ].
   apply (rngl_lt_iff Hor).
   split ; [ easy | ].
   intros H; symmetry in H.
-  now apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
+  apply (eq_gc_modl_0 Hon Hos Hiv Hor) in H.
+  apply (gc_eq_mul_0_l Hic Hon Hop Hiv Hor) in H; [ easy | ].
+  apply (gc_pow_nonzero Hic Hon Hop Hiv Hor).
+  intros H''; rewrite H'' in Hx.
+  rewrite (gc_modl_0 Hon Hop Hor Hii) in Hx.
+  apply rngl_nle_gt in Hx.
+  apply Hx; clear Hx.
+  apply (rngl_0_le_1 Hon Hos Hor).
 }
 assert (HzM : (0 < M)%L). {
   apply (rngl_lt_iff Hor).
@@ -1226,6 +1225,7 @@ assert (HzM : (0 < M)%L). {
   progress unfold M.
   now apply (rngl_iter_max_seq_nonneg Hor).
 }
+...
 enough (H :
   ∃ R,
   (0 < R)%L
