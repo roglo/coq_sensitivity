@@ -13,13 +13,14 @@ Fixpoint QG_of_nat n :=
   end.
 
 Definition QG_2 := (QG_1 + QG_1)%QG.
+Notation "2" := QG_2 : QG_scope.
 
 Section a.
 
 Instance roq : ring_like_op QG := QG_ring_like_op.
 
 Theorem harmonic_sum_log2_bound :
-  ∀ n, (∑ (k = 1, n), 1 / QG_of_nat k ≤ QG_2 * QG_of_nat (Nat.log2 n))%L.
+  ∀ n, (∑ (k = 1, n), 1 / QG_of_nat k ≤ 2 * QG_of_nat (Nat.log2 n))%L.
 Proof.
 ...
 
