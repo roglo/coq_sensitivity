@@ -1242,6 +1242,7 @@ enough (H :
   now rewrite (rngl_mul_comm Hic).
 }
 ...
+(* faut que je dise que c'est inférieur à n * z ^ n *)
 enough (H :
   ∃ R,
   (0 < R)%L
