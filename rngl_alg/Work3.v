@@ -1225,12 +1225,11 @@ assert (HzM : (0 < M)%L). {
   progress unfold M.
   now apply (rngl_iter_max_seq_nonneg Hor).
 }
-...
 enough (H :
   ∃ R,
   (0 < R)%L
   ∧ ∀ z, (R < ‖ z ‖)%L →
-     (∑ (k = 0, n - 1), 1 / ‖ z ^ (n - k) ‖ < ε * ‖ a.[n] ‖ / M)%L). {
+     (∑ (k = 0, n - 1), ‖ z ^ k ‖ < ε * ‖ a.[n] * z ^ n ‖ / M)%L). {
   destruct H as (R, H).
   exists R.
   split; [ easy | ].
@@ -1239,15 +1238,10 @@ enough (H :
   specialize (H z Hrz).
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii M) in H; [ | easy ].
   rewrite (rngl_div_mul Hon Hiv) in H; [ | easy ].
-  eapply (rngl_le_lt_trans Hor); [ | apply H ].
-  rewrite (rngl_mul_summation_distr_r Hos).
-  apply (rngl_summation_le_compat Hor).
-  intros i Hi.
-  rewrite (rngl_div_1_l Hon Hiv).
-  rewrite (rngl_mul_comm Hic).
-  rewrite (rngl_mul_inv_r Hiv).
-  apply (rngl_le_refl Hor).
+  rewrite <- (rngl_mul_summation_distr_l Hos).
+  now rewrite (rngl_mul_comm Hic).
 }
+...
 enough (H :
   ∃ R,
   (0 < R)%L
