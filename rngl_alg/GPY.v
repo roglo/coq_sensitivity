@@ -15,8 +15,6 @@ Instance roc : ring_like_prop QG := QG_ring_like_prop.
 
 Definition QG_of_nat n : QG := rngl_of_nat n.
 
-Notation "2" := (QG_of_nat 2) : QG_scope.
-
 Theorem QG_of_nat_succ : ∀ n, QG_of_nat (S n) = (1 + QG_of_nat n)%QG.
 Proof. easy. Qed.
 
@@ -46,7 +44,7 @@ erewrite rngl_summation_eq_compat. 2: {
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 cbn - [ rngl_zero rngl_add Nat.log2 rngl_le rngl_div rngl_of_nat ].
-replace ((1%QG + 1%QG)%L) with 2%QG by easy.
+replace ((1%QG + 1%QG)%L) with 2%L by easy.
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
 destruct (Nat.log2_succ_or n) as [Hn| Hn]. {
   eapply (rngl_le_trans Hor). {
