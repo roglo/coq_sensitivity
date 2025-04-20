@@ -34,6 +34,33 @@ assert (Hc1 : rngl_characteristic QG ≠ 1) by easy.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * H1n.
 progress unfold QG_of_nat.
+specialize (Nat.log2_spec_alt n) as H1.
+assert (H : 0 < n) by flia H1n.
+specialize (H1 H); clear H.
+destruct H1 as (p & Hp & _ & Hpn).
+remember (Nat.log2 n) as m eqn:Hm.
+subst n.
+clear Hm.
+rename m into n.
+revert p H1n Hpn.
+induction n; intros. {
+  cbn in H1n.
+  apply Nat.lt_1_r in Hpn; subst p.
+  flia H1n.
+}
+...
+
+Theorem harmonic_sum_log2_bound :
+  ∀ n, 2 ≤ n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 2 * QG_of_nat (Nat.log2 n))%L.
+Proof.
+assert (Hon : rngl_has_1 QG = true) by easy.
+assert (Hop : rngl_has_opp QG = true) by easy.
+assert (Hiv : rngl_has_inv QG = true) by easy.
+assert (Hor : rngl_is_ordered QG = true) by easy.
+assert (Hc1 : rngl_characteristic QG ≠ 1) by easy.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * H1n.
+progress unfold QG_of_nat.
 induction n; [ now rewrite rngl_summation_empty | ].
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ flia Hnz H1n | ].
 rewrite rngl_summation_split_last; [ | flia ].
