@@ -20,6 +20,11 @@ Notation "2" := (QG_of_nat 2) : QG_scope.
 Theorem QG_of_nat_succ : ∀ n, QG_of_nat (S n) = (1 + QG_of_nat n)%QG.
 Proof. easy. Qed.
 
+(* 1 + 1/2 + 1/3 = (6 + 3 + 2) / 6 = 11/6 *)
+(* 2 * log2 3 = 2 ok *)
+(* 1 + 1/2 + 1/3 + 1/4 = 11/6 + 1/4 = 22/12 + 3/12 = 25/12 *)
+(* 2 * log2 4 = 4 ok *)
+
 Theorem harmonic_sum_log2_bound :
   ∀ n, 1 < n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 2 * QG_of_nat (Nat.log2 n))%L.
 Proof.
