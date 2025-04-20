@@ -48,6 +48,13 @@ induction n; intros. {
   apply Nat.lt_1_r in Hpn; subst p.
   flia H1n.
 }
+cbn - [ rngl_zero rngl_add Nat.log2 rngl_le rngl_div rngl_of_nat ].
+rewrite Nat.add_0_r.
+rewrite <- Nat.add_assoc.
+(* fait chier, marche pas *)
+...
+eapply (rngl_le_trans Hor). {
+  apply IHn.
 ...
 
 Theorem harmonic_sum_log2_bound :
