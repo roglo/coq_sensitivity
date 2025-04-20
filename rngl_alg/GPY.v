@@ -24,7 +24,69 @@ Proof. easy. Qed.
 (* 2 * log2 4 = 4 ok *)
 
 Theorem harmonic_sum_log2_bound :
-  ∀ n, 1 < n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 2 * QG_of_nat (Nat.log2 n))%L.
+  ∀ n,
+  2 ≤ n
+  → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 2 * QG_of_nat (S (Nat.log2 n)))%L.
+Proof.
+assert (Hon : rngl_has_1 QG = true) by easy.
+assert (Hop : rngl_has_opp QG = true) by easy.
+assert (Hiv : rngl_has_inv QG = true) by easy.
+assert (Hor : rngl_is_ordered QG = true) by easy.
+assert (Hc1 : rngl_characteristic QG ≠ 1) by easy.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * H1n.
+progress unfold QG_of_nat.
+rewrite (rngl_of_nat_succ (Nat.log2 n)).
+induction n; [ now rewrite rngl_summation_empty | ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ flia Hnz H1n | ].
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
+rewrite rngl_summation_split_last; [ | flia ].
+rewrite (rngl_summation_shift 1); [ | flia Hnz ].
+do 2 rewrite Nat_sub_succ_1.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+cbn - [ rngl_zero rngl_add Nat.log2 rngl_le rngl_div rngl_of_nat ].
+replace ((1%QG + 1%QG)%L) with 2%L by easy.
+...
+destruct (Nat.log2_succ_or n) as [Hn| Hn]. {
+  eapply (rngl_le_trans Hor). {
+    apply (rngl_add_le_mono_r Hop Hor).
+    apply IHn.
+    flia Hnz Hn1.
+  }
+  rewrite Hn.
+  rewrite (rngl_of_nat_succ (Nat.log2 n)).
+  do 3 rewrite QG_mul_add_distr_l.
+  do 2 rewrite QG_mul_1_r.
+  rewrite (QG_add_comm _ (_ + _)).
+  apply (QG_add_le_mono_l).
+  change (1 / rngl_of_nat (S n) ≤ 2)%L.
+  rewrite rngl_of_nat_succ.
+  Time apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    apply (rngl_lt_le_trans Hor _ 1). {
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_le_add_r Hor).
+    apply (rngl_of_nat_nonneg Hon Hos Hor).
+  }
+  rewrite rngl_mul_add_distr_l.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite <- rngl_add_assoc.
+  apply (rngl_le_add_r Hor).
+  apply (rngl_add_nonneg_nonneg Hor). {
+    apply (rngl_0_le_1 Hon Hos Hor).
+  }
+  apply (rngl_mul_nonneg_nonneg Hos Hor). {
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
+}
+...
+
+Theorem harmonic_sum_log2_bound :
+  ∀ n, 1 < n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 3 * QG_of_nat (Nat.log2 n))%L.
 Proof.
 assert (Hon : rngl_has_1 QG = true) by easy.
 assert (Hop : rngl_has_opp QG = true) by easy.
@@ -58,7 +120,7 @@ destruct (Nat.log2_succ_or n) as [Hn| Hn]. {
   rewrite QG_mul_1_r.
   rewrite rngl_add_comm.
   apply (QG_add_le_mono_r).
-  change (((1 / (1 + rngl_of_nat n))%L ≤ 2)%L).
+  change (((1 / (1 + rngl_of_nat n))%L ≤ 1 + 2)%L).
   Time apply (rngl_le_div_l Hon Hop Hiv Hor). {
     apply (rngl_add_pos_nonneg Hor).
     apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
@@ -70,6 +132,11 @@ destruct (Nat.log2_succ_or n) as [Hn| Hn]. {
   apply (rngl_le_add_r Hor).
   apply (rngl_add_nonneg_nonneg Hor). {
     apply (rngl_0_le_1 Hon Hos Hor).
+  }
+  rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_add_nonneg_nonneg Hor). {
+    apply (rngl_of_nat_nonneg Hon Hos Hor).
   }
   rewrite rngl_mul_add_distr_r.
   rewrite (rngl_mul_1_l Hon).
