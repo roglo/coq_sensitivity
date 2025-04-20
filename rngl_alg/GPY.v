@@ -24,7 +24,7 @@ Proof. easy. Qed.
 (* 2 * log2 4 = 4 ok *)
 
 Theorem harmonic_sum_log2_bound :
-  ∀ n, 1 < n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 2 * QG_of_nat (Nat.log2 n))%L.
+  ∀ n, 2 ≤ n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 2 * QG_of_nat (Nat.log2 n))%L.
 Proof.
 assert (Hon : rngl_has_1 QG = true) by easy.
 assert (Hop : rngl_has_opp QG = true) by easy.
