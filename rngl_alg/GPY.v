@@ -61,6 +61,60 @@ apply (rngl_le_add_r Hor).
 apply (rngl_of_nat_nonneg Hon Hos Hor).
 Qed.
 
+Theorem harmonic_sum_after_2_pow_bound :
+  ∀ n k, n ≤ k → (∑ (i = 1, n), 1 / rngl_of_nat (k + i) ≤ 1)%L.
+Proof.
+assert (Hon : rngl_has_1 QG = true) by easy.
+assert (Hop : rngl_has_opp QG = true) by easy.
+assert (Hiv : rngl_has_inv QG = true) by easy.
+assert (Hc1 : rngl_characteristic QG ≠ 1) by easy.
+assert (Hor : rngl_is_ordered QG = true) by easy.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hnk.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply (rngl_le_trans Hor _ (∑ (i = 1, n), 1 / rngl_of_nat k)). {
+  apply (rngl_summation_le_compat Hor).
+  intros i Hi.
+  Time apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_le_inv_inv Hon Hop Hiv Hor). {
+    apply (rngl_lt_iff Hor).
+    split; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
+    intros H; symmetry in H.
+    apply (eq_rngl_of_nat_0 Hon) in H; [ | easy ].
+    flia Hi H.
+  } {
+    apply (rngl_lt_iff Hor).
+    split; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
+    intros H; symmetry in H.
+    apply (eq_rngl_of_nat_0 Hon) in H; [ | easy ].
+    subst k.
+    apply Nat.nlt_ge in Hnk.
+    apply Hnk; clear Hnk.
+    flia Hi.
+  } {
+    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+    apply Nat.le_add_r.
+  }
+}
+rewrite (rngl_summation_const Hos Hon).
+rewrite Nat_sub_succ_1.
+rewrite (rngl_mul_div_assoc Hiv).
+rewrite (rngl_mul_1_r Hon).
+apply (rngl_div_le_1 Hon Hop Hiv Hor). {
+  intros H.
+  apply (eq_rngl_of_nat_0 Hon) in H; [ | easy ].
+  subst k.
+  apply Nat.nlt_ge in Hnk.
+  apply Hnk; clear Hnk.
+  now apply Nat.neq_0_lt_0.
+}
+split; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
+now apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+Qed.
+
 (* 1 + 1/2 + 1/3 = (6 + 3 + 2) / 6 = 11/6 *)
 (* 2 * log2 3 = 2 ok *)
 (* 1 + 1/2 + 1/3 + 1/4 = 11/6 + 1/4 = 22/12 + 3/12 = 25/12 *)
@@ -136,61 +190,7 @@ rewrite (rngl_summation_shift (2 ^ n)). 2: {
 }
 rewrite Nat.add_comm, Nat.add_sub.
 rewrite Nat.add_sub.
-Theorem harmonic_sum_after_2_pow_bound :
-  ∀ n k, 2 ^ n ≤ k → (∑ (i = 1, 2 ^ n), 1 / rngl_of_nat (k + i) ≤ 1)%L.
-Proof.
-assert (Hon : rngl_has_1 QG = true) by easy.
-assert (Hop : rngl_has_opp QG = true) by easy.
-assert (Hiv : rngl_has_inv QG = true) by easy.
-assert (Hc1 : rngl_characteristic QG ≠ 1) by easy.
-assert (Hor : rngl_is_ordered QG = true) by easy.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Hnk.
-apply (rngl_le_trans Hor _ (∑ (i = 1, 2 ^ n), 1 / rngl_of_nat k)). {
-  apply (rngl_summation_le_compat Hor).
-  intros i Hi.
-  Time apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
-    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
-  }
-  apply (rngl_le_inv_inv Hon Hop Hiv Hor). {
-    apply (rngl_lt_iff Hor).
-    split; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
-    intros H; symmetry in H.
-    apply (eq_rngl_of_nat_0 Hon) in H; [ | easy ].
-    flia Hi H.
-  } {
-    apply (rngl_lt_iff Hor).
-    split; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
-    intros H; symmetry in H.
-    apply (eq_rngl_of_nat_0 Hon) in H; [ | easy ].
-    subst k.
-    apply Nat.nlt_ge in Hnk.
-    apply Hnk; clear Hnk.
-    apply Nat.neq_0_lt_0.
-    now apply Nat.pow_nonzero.
-  } {
-    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-    apply Nat.le_add_r.
-  }
-}
-rewrite (rngl_summation_const Hos Hon).
-rewrite Nat_sub_succ_1.
-rewrite (rngl_mul_div_assoc Hiv).
-rewrite (rngl_mul_1_r Hon).
-apply (rngl_div_le_1 Hon Hop Hiv Hor). {
-  intros H.
-  apply (eq_rngl_of_nat_0 Hon) in H; [ | easy ].
-  subst k.
-  apply Nat.nlt_ge in Hnk.
-  apply Hnk; clear Hnk.
-  apply Nat.neq_0_lt_0.
-  now apply Nat.pow_nonzero.
-}
-split; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
-now apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-Qed.
-...
+... ...
 Check harmonic_sum_after_2_pow_bound.
 ...
 Search (0 < rngl_of_nat _)%L.
