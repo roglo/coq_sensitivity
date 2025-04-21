@@ -23,6 +23,7 @@ Proof. easy. Qed.
 (* 1 + 1/2 + 1/3 + 1/4 = 11/6 + 1/4 = 22/12 + 3/12 = 25/12 *)
 (* 2 * log2 4 = 4 ok *)
 
+(*
 Theorem harmonic_sum_log2_bound :
   ∀ n, 2 ≤ n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 2 * QG_of_nat (Nat.log2 n))%L.
 Proof.
@@ -56,6 +57,7 @@ rewrite <- Nat.add_assoc.
 eapply (rngl_le_trans Hor). {
   apply IHn.
 ...
+*)
 
 Theorem harmonic_sum_log2_bound :
   ∀ n, 2 ≤ n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 2 * QG_of_nat (Nat.log2 n))%L.
