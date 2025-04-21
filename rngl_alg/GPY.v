@@ -147,8 +147,15 @@ assert (Hor : rngl_is_ordered QG = true) by easy.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hnk.
-Check rngl_summation_shift.
+(**)
 rewrite (rngl_summation_rshift k).
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite Nat.add_comm.
+  rewrite Nat.sub_add; [ | flia Hi ].
+  easy.
+}
+cbn - [ rngl_zero rngl_add rngl_div rngl_le rngl_one ].
 ...
 revert k Hnk.
 induction n; intros. {
