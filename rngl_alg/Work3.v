@@ -1030,59 +1030,6 @@ rewrite (rngl_pow_mul_l Hic Hon).
 now rewrite (rngl_inv_pow Hic Hon Hiv Hos _ _ Hbz).
 Qed.
 
-Theorem rngl_lt_neq :
-  rngl_is_ordered T = true →
-  ∀ a b, (a < b)%L → a ≠ b.
-Proof.
-intros Hor.
-intros * Hab.
-intros H; subst b.
-now apply (rngl_lt_irrefl Hor) in Hab.
-Qed.
-
-Theorem rngl_le_inv_inv :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ a b : T, (0 < a)%L → (0 < b)%L → (a⁻¹ ≤ b⁻¹)%L ↔ (b ≤ a)%L.
-Proof.
-intros Hon Hop Hiv Hor.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Haz Hbz.
-split; intros Hab. {
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor a) in Hab. 2: {
-    now apply (rngl_lt_le_incl Hor).
-  }
-  apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ b) in Hab. 2: {
-    now apply (rngl_lt_le_incl Hor).
-  }
-  rewrite (rngl_mul_inv_diag_r Hon Hiv) in Hab. 2: {
-    now apply (rngl_lt_neq Hor) in Haz.
-  }
-  rewrite <- rngl_mul_assoc in Hab.
-  rewrite (rngl_mul_inv_diag_l Hon Hiv) in Hab. 2: {
-    now apply (rngl_lt_neq Hor) in Hbz.
-  }
-  rewrite (rngl_mul_1_l Hon) in Hab.
-  rewrite (rngl_mul_1_r Hon) in Hab.
-  easy.
-} {
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ a); [ easy | ].
-  apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ b); [ easy | ].
-  rewrite (rngl_mul_inv_diag_r Hon Hiv). 2: {
-    now apply (rngl_lt_neq Hor) in Haz.
-  }
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_inv_diag_l Hon Hiv). 2: {
-    now apply (rngl_lt_neq Hor) in Hbz.
-  }
-  rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_mul_1_r Hon).
-  easy.
-}
-Qed.
-
 (* to be completed
 Theorem dominant_term_of_polynomial :
   rngl_mul_is_comm T = true →
@@ -1283,6 +1230,7 @@ assert (Hzx : (0 < ‖ z ‖)%L). {
 apply (rngl_le_lt_trans Hor _ (∑ (k = 1, n), 1 / ‖ z ‖)). {
   apply (rngl_summation_le_compat Hor).
   intros i Hi.
+...
   apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
     apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
   }
