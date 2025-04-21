@@ -512,6 +512,27 @@ rewrite IHlen; [ | easy ].
 now replace (s + (b - s + len)) with (b + len) by flia Hsb.
 Qed.
 
+Theorem iter_rshift : ∀ {T} s b k f (d : T),
+  iter_seq b k f d =
+  iter_seq (s + b) (s + k) (λ c i, f c (i - s)) d.
+Proof.
+intros.
+progress unfold iter_seq, iter_list.
+replace (S (s + k) - (s + b)) with (S k - b) by flia.
+remember (S k - b)%nat as len; clear Heqlen.
+clear k.
+revert b d.
+induction len; intros; [ easy | ].
+rewrite List.seq_S; symmetry.
+rewrite List.seq_S; symmetry.
+do 2 rewrite List.fold_left_app; cbn.
+rewrite IHlen.
+rewrite Nat.add_comm.
+rewrite Nat.add_shuffle0.
+rewrite Nat.add_sub.
+easy.
+Qed.
+
 Theorem iter_seq_inv : ∀ T d op inv b e f
   (inv_op_distr : ∀ a b, inv (op a b) = op (inv a) (inv b)),
   inv (iter_seq b e (λ (c : T) (i : nat), op c (f i)) d) =

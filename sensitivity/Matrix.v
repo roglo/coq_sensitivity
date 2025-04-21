@@ -1934,7 +1934,7 @@ rewrite rngl_summation_seq_summation. 2: {
   now rewrite H in Hi.
 }
 apply List.in_seq in Hi.
-rewrite rngl_summation_rshift.
+rewrite (rngl_summation_rshift 1).
 rewrite <- Nat.sub_succ_l. 2: {
   destruct (mat_ncols A); [ | flia ].
   now rewrite Harc in Hi.
@@ -1942,7 +1942,7 @@ rewrite <- Nat.sub_succ_l. 2: {
 rewrite Nat_sub_succ_1.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  rewrite rngl_summation_rshift.
+  rewrite (rngl_summation_rshift 1).
   rewrite <- Nat.sub_succ_l; [ | easy ].
   rewrite Nat_sub_succ_1.
   rewrite <- Hcbv.

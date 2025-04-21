@@ -147,6 +147,8 @@ assert (Hor : rngl_is_ordered QG = true) by easy.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hnk.
+Check rngl_summation_shift.
+rewrite (rngl_summation_rshift k).
 ...
 revert k Hnk.
 induction n; intros. {

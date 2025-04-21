@@ -920,7 +920,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       now rewrite Nat.add_assoc, Nat.add_sub.
     }
     cbn - [ "^" ].
-    rewrite rngl_summation_rshift.
+    rewrite (rngl_summation_rshift 1).
     rewrite <- Nat.sub_succ_l. 2: {
       apply Nat.neq_0_lt_0.
       now apply Nat.pow_nonzero.

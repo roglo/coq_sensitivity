@@ -257,14 +257,11 @@ intros s b g k Hbk.
 now apply (iter_shift s).
 Qed.
 
-Theorem rngl_summation_rshift : ∀ b e f,
-  ∑ (i = b, e), f i = ∑ (i = S b, S e), f (i - 1)%nat.
+Theorem rngl_summation_rshift : ∀ s b e f,
+  ∑ (i = b, e), f i = ∑ (i = s + b, s + e), f (i - s)%nat.
 Proof.
 intros.
-rewrite rngl_summation_succ_succ.
-apply rngl_summation_eq_compat.
-intros i Hi.
-now rewrite Nat_sub_succ_1.
+apply (iter_rshift s).
 Qed.
 
 Theorem rngl_opp_summation :

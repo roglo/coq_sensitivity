@@ -87,7 +87,7 @@ remember (∑ (i = _, _), _) as x; subst x.
 rewrite rngl_summation_add_distr.
 f_equal.
 symmetry.
-rewrite rngl_summation_rshift.
+rewrite (rngl_summation_rshift 1).
 erewrite rngl_summation_eq_compat. 2: {
   intros * Hin.
   rewrite <- Nat.sub_succ_l; [ | easy ].

@@ -1879,7 +1879,7 @@ rewrite rngl_summation_seq_summation. 2: {
   rewrite <- (squ_mat_ncols _ Hsm); flia Hk.
 }
 symmetry.
-rewrite rngl_summation_rshift.
+rewrite (rngl_summation_rshift 1).
 rewrite Nat.add_0_l.
 rewrite <- Nat_succ_sub_succ_r. 2: {
   rewrite <- (squ_mat_ncols _ Hsm); flia Hk.
