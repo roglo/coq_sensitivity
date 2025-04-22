@@ -157,7 +157,12 @@ eapply (rngl_le_trans Hor). {
 *)
 
 Theorem harmonic_sum_log2_bound_up_to_2_pow :
-  ∀ n, 2 ≤ n → (∑ (k = 1, 2^ n), 1 / QG_of_nat k ≤ 2 * QG_of_nat n)%L.
+  ∀ n,
+  2 ≤ n
+(*
+  → (∑ (k = 1, 2^ n), 1 / QG_of_nat k ≤ 2 * QG_of_nat n)%L.
+*)
+  → (∑ (i = 1, 2 ^ n + 1), 1 / QG_of_nat i ≤ 2 * QG_of_nat n)%L.
 Proof.
 assert (Hon : rngl_has_1 QG = true) by easy.
 assert (Hop : rngl_has_opp QG = true) by easy.
@@ -172,7 +177,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ flia Hnz H1n | clear H1n ].
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
 rewrite Nat.pow_succ_r'.
 rewrite Nat_mul_2_l.
-rewrite (rngl_summation_split (2 ^ n)); [ | flia ].
+rewrite (rngl_summation_split (2 ^ n + 1)); [ | flia ].
 eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_r Hop Hor).
   apply IHn.
@@ -183,15 +188,18 @@ rewrite rngl_mul_add_distr_l.
 rewrite (rngl_mul_1_r Hon).
 rewrite rngl_add_comm.
 apply (rngl_add_le_mono_r Hop Hor).
-rewrite (rngl_summation_shift (2 ^ n)). 2: {
+rewrite (rngl_summation_shift (2 ^ n + 1)). 2: {
   split; [ flia | ].
+  apply Nat.add_le_mono_r.
   apply Nat.add_le_mono_l.
   now apply Nat.pow_lower_bound.
 }
 rewrite Nat.add_comm, Nat.add_sub.
+rewrite <- Nat.add_assoc.
 rewrite Nat.add_sub.
 apply (rngl_le_trans Hor _ 1); [ | apply (rngl_1_le_2 Hon Hos Hor) ].
-now apply harmonic_sum_after_2_pow_bound.
+apply harmonic_sum_after_2_pow_bound.
+apply Nat.le_add_r.
 Qed.
 
 Theorem harmonic_sum_log2_bound :
@@ -216,6 +224,7 @@ clear Hnz.
 remember (Nat.log2 n) as m; clear Heqm.
 subst n; rename m into n.
 remember (∑ (i = _, _), _)%L as x; subst x.
+(*
 destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
   subst r.
   rewrite Nat.add_0_r.
@@ -234,6 +243,12 @@ destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
 }
 destruct (Nat.eq_dec r 1) as [Hr1| Hr1]. {
   subst r.
+  eapply (rngl_le_trans Hor). {
+    apply harmonic_sum_log2_bound_up_to_2_pow.
+    destruct n; [ cbn in Hr; flia Hr | ].
+    destruct n; [ | flia ].
+    cbn in Hr, Hn1.
+...
   clear Hrz.
 Theorem glop :
   ∀ n,
@@ -241,6 +256,7 @@ Theorem glop :
   → (∑ (i = 1, 2 ^ n + 1), 1 / rngl_of_nat i ≤ 2 * rngl_of_nat n)%L.
 Proof.
 intros * Hnz.
+Inspect 2.
 ...
   rewrite (rngl_summation_shift 1); [ | flia ].
   rewrite Nat.sub_diag, Nat.add_sub.
@@ -254,12 +270,14 @@ Compute (
 ...
 }
 ... ...
+*)
 rewrite (rngl_summation_split (2 ^ n)); [ | flia ].
 rewrite QG_mul_add_distr_r.
 rewrite QG_mul_1_l.
 rewrite rngl_add_comm.
 eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_l Hop Hor).
+...
   apply harmonic_sum_log2_bound_up_to_2_pow.
   destruct n. {
     cbn in Hn1, Hr.
