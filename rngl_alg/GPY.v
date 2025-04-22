@@ -212,13 +212,13 @@ specialize (Nat.log2_spec_alt n) as H1.
 assert (H : 0 < n) by flia Hnz.
 specialize (H1 H); clear H.
 destruct H1 as (r & Hnr & _ & Hr).
+clear Hnz.
 remember (Nat.log2 n) as m; clear Heqm.
 subst n; rename m into n.
 remember (∑ (i = _, _), _)%L as x; subst x.
 destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
   subst r.
   rewrite Nat.add_0_r.
-  clear Hnz.
   rewrite Nat.add_0_r in Hn1.
   destruct (Nat.eq_dec n 1) as [Hne1| Hne1]; [ now subst n | ].
   eapply (rngl_le_trans Hor). {
@@ -234,7 +234,10 @@ destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
 }
 destruct (Nat.eq_dec r 1) as [Hr1| Hr1]. {
   subst r.
+  clear Hrz.
 ...
+}
+... ...
 rewrite (rngl_summation_split (2 ^ n)); [ | flia ].
 rewrite QG_mul_add_distr_r.
 rewrite QG_mul_1_l.
@@ -243,29 +246,26 @@ eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_l Hop Hor).
   apply harmonic_sum_log2_bound_up_to_2_pow.
   destruct n. {
-    cbn in Hn1, Hnz, Hr.
+    cbn in Hn1, Hr.
     now apply Nat.lt_1_r in Hr; subst r.
   }
   destruct n; [ | flia ].
   cbn in Hr.
   destruct r; [ easy | ].
-  destruct r; [ | flia Hr ].
-  cbn in Hn1, Hnz.
-...
-    cbn in Hn1, Hnz.
-  apply Nat.lt_2_r in Hr.
-Inspect 2.
-...
-rewrite (rngl_summation_shift (2 ^ n)). 2: {
-  split; [ flia | ].
-  apply Nat.add_le_mono_l.
-  destruct r; [ | flia ].
-...
-eapply (rngl_le_trans Hor). {
-  apply (rngl_add_le_mono_r Hop Hor).
-Inspect 2.
-...
-Inspect 1.
+  destruct r; [ easy | flia Hr ].
+}
+rewrite rngl_add_comm.
+apply QG_add_le_compat; [ apply QG_le_refl | ].
+erewrite (rngl_summation_shift (2 ^ n)); [ | flia Hrz Hr1 ].
+do 2 rewrite Nat.add_comm, Nat.add_sub.
+apply (rngl_le_trans Hor _ 1). 2: {
+  rewrite <- rngl_of_nat_1.
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  destruct n; [ | flia ].
+  now apply Nat.lt_1_r in Hr; subst r.
+}
+apply harmonic_sum_after_2_pow_bound.
+now apply Nat.lt_le_incl.
 ...
 
 Theorem harmonic_sum_log2_bound :
