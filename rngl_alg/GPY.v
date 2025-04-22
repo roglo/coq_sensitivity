@@ -235,6 +235,22 @@ destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
 destruct (Nat.eq_dec r 1) as [Hr1| Hr1]. {
   subst r.
   clear Hrz.
+Theorem glop :
+  ∀ n,
+  n ≠ 0
+  → (∑ (i = 1, 2 ^ n + 1), 1 / rngl_of_nat i ≤ 2 * rngl_of_nat n)%L.
+Proof.
+intros * Hnz.
+...
+  rewrite (rngl_summation_shift 1); [ | flia ].
+  rewrite Nat.sub_diag, Nat.add_sub.
+Inspect 2.
+...
+From Stdlib Require Import QArith.
+Compute (
+  let n := 1%nat in
+  (∑ (i = 1, 2 ^ n + 1), 1 / rngl_of_nat i ≤ 2 * rngl_of_nat n)%L
+).
 ...
 }
 ... ...
