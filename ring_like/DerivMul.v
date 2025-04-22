@@ -676,14 +676,12 @@ specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 assert (Hz3 : (0 < 3)%L). {
   apply (rngl_lt_le_trans Hor _ 2); [ easy | ].
   apply (rngl_add_le_mono_r Hop Hor).
-  apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_1_le_2 Hon Hos Hor).
 }
 assert (Hz3' : (0 ≤ 3)%L). {
   apply (rngl_le_trans Hor _ 2); [ easy | ].
   apply (rngl_add_le_mono_r Hop Hor).
-  apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_1_le_2 Hon Hos Hor).
 }
 intros * Hlti * Hf Hg *.
 destruct is_left. {

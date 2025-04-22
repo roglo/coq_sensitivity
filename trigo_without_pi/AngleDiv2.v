@@ -603,8 +603,7 @@ rewrite (rngl_squ_1 Hon).
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_trans Hor _ 2); [ apply (rngl_0_le_2 Hon Hos Hor) | ].
   apply (rngl_add_le_mono_r Hop Hor).
-  apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_1_le_2 Hon Hos Hor).
 }
 rewrite <- (rngl_div_add_distr_r Hiv).
 replace (3 + 1)%L with 2²%L. 2: {
@@ -649,8 +648,7 @@ rewrite (rngl_squ_1 Hon).
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_trans Hor _ 2); [ apply (rngl_0_le_2 Hon Hos Hor) | ].
   apply (rngl_add_le_mono_r Hop Hor).
-  apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_1_le_2 Hon Hos Hor).
 }
 replace (3 - 1)%L with 2%L. 2: {
   symmetry.
@@ -814,8 +812,7 @@ apply (rngl_lt_le_trans Hor _ 2). {
   apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 apply (rngl_add_le_mono_r Hop Hor).
-apply (rngl_le_add_l Hor).
-apply (rngl_0_le_1 Hon Hos Hor).
+apply (rngl_1_le_2 Hon Hos Hor).
 Qed.
 
 Theorem angle_straight_le_4_angle_straight_div_3 :

@@ -211,10 +211,7 @@ rewrite rngl_add_0_l.
 do 3 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
 apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
-  apply (rngl_le_trans Hor _ 1)%L.
-  apply (rngl_0_le_1 Hon Hos Hor).
-  apply (rngl_le_add_r Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
 }
 eapply (rngl_le_trans Hor); [ apply (rngl_le_abs_diag Hop Hor) | ].
 rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {

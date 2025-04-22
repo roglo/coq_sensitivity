@@ -190,8 +190,11 @@ rewrite (rngl_summation_shift (2 ^ n)). 2: {
 }
 rewrite Nat.add_comm, Nat.add_sub.
 rewrite Nat.add_sub.
-... ...
-Check harmonic_sum_after_2_pow_bound.
+apply (rngl_le_trans Hor _ 1); [ | apply (rngl_1_le_2 Hon Hos Hor) ].
+now apply harmonic_sum_after_2_pow_bound.
+Qed.
+Inspect 1.
+(* voir si on peut pas descendre ce 2 * en 1 * *)
 ...
 Search (0 < rngl_of_nat _)%L.
 Search (_⁻¹ ≤ _⁻¹)%L.

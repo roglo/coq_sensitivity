@@ -987,8 +987,7 @@ apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
 eapply (rngl_lt_le_trans Hor _ ε); [ easy | ].
 rewrite <- (rngl_mul_1_r Hon ε) at 1.
 apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-apply (rngl_le_add_l Hor).
-apply (rngl_0_le_1 Hon Hos Hor).
+apply (rngl_1_le_2 Hon Hos Hor).
 Qed.
 
 Theorem rngl_cos_left_or_right_derivative_at_straight :
@@ -1040,8 +1039,7 @@ destruct is_left. {
   eapply (rngl_lt_le_trans Hor _ ε); [ easy | ].
   rewrite <- (rngl_mul_1_r Hon ε) at 1.
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-  apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_1_le_2 Hon Hos Hor).
 } {
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
@@ -1067,8 +1065,7 @@ destruct is_left. {
   eapply (rngl_lt_le_trans Hor _ ε); [ easy | ].
   rewrite <- (rngl_mul_1_r Hon ε) at 1.
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-  apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_1_le_2 Hon Hos Hor).
 }
 Qed.
 

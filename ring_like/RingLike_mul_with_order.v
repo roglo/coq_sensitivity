@@ -161,6 +161,17 @@ apply rngl_leb_le.
 apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
 
+Theorem rngl_1_le_2 :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_is_ordered T = true →
+  (1 ≤ 2)%L.
+Proof.
+intros Hon Hos Hor.
+apply (rngl_le_add_l Hor).
+apply (rngl_0_le_1 Hon Hos Hor).
+Qed.
+
 Theorem rngl_mul_diag_nonneg :
   rngl_has_opp_or_subt T = true →
   rngl_is_ordered T = true →
@@ -244,8 +255,7 @@ intros Hon Hos Hor.
 apply (rngl_le_trans Hor _ 1)%L. {
   apply (rngl_0_le_1 Hon Hos Hor).
 }
-apply (rngl_le_add_r Hor).
-apply (rngl_0_le_1 Hon Hos Hor).
+apply (rngl_1_le_2 Hon Hos Hor).
 Qed.
 
 Theorem rngl_2_neq_0 :
@@ -642,10 +652,7 @@ destruct (rngl_eq_dec Heo (rngl_abs a) 1) as [Ha1| Ha1]. {
   rewrite rngl_add_0_r.
   split; [ apply (rngl_le_refl Hor) | ].
   apply (rngl_lt_iff Hor).
-  split. {
-    apply (rngl_le_add_r Hor).
-    apply (rngl_0_le_1 Hon Hos Hor).
-  }
+  split; [ apply (rngl_1_le_2 Hon Hos Hor) | ].
   intros H12.
   apply (f_equal (λ b, rngl_sub b 1))%L in H12.
   rewrite (rngl_sub_diag Hos) in H12.
