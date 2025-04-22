@@ -193,105 +193,9 @@ rewrite Nat.add_sub.
 apply (rngl_le_trans Hor _ 1); [ | apply (rngl_1_le_2 Hon Hos Hor) ].
 now apply harmonic_sum_after_2_pow_bound.
 Qed.
-Inspect 1.
-(* voir si on peut pas descendre ce 2 * en 1 * *)
-...
-Search (0 < rngl_of_nat _)%L.
-Search (_⁻¹ ≤ _⁻¹)%L.
-...
-  apply -> (rngl_le_div_l Hon Hop Hiv Hor).
-...
-eapply (rngl_le_trans Hor). {
-  apply (rngl_summation_le_compat Hor).
-  intros i Hi.
-Search (_ / _ ≤ _)%L.
-  apply -> (rngl_le_div_l Hon Hop Hiv Hor).
-...
-rewrite (rngl_summation_rshift k).
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite Nat.add_comm.
-  rewrite Nat.sub_add; [ | flia Hi ].
-  easy.
-}
-cbn - [ rngl_zero rngl_add rngl_div rngl_le rngl_one ].
-...
-revert k Hnk.
-induction n; intros. {
-  cbn - [ rngl_le rngl_div ].
-  progress unfold iter_seq.
-  progress unfold iter_list.
-  cbn - [ rngl_le ].
-  rewrite QG_add_0_l, QG_mul_1_l.
-  rewrite <- (rngl_div_1_l Hon Hiv).
-  Time apply (rngl_le_div_l Hon Hop Hiv Hor). {
-    apply (rngl_lt_iff Hor).
-    split; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
-    intros H; symmetry in H.
-    apply (eq_rngl_of_nat_0 Hon) in H; [ | easy ].
-    now rewrite Nat.add_comm in H.
-  }
-  rewrite QG_mul_1_l.
-  replace 1%QG with 1%L by easy.
-  replace (rngl_of_nat _)⁻¹%QG with (rngl_of_nat (k + 1))⁻¹%L by easy.
-  rewrite Nat.add_comm.
-  rewrite rngl_of_nat_succ.
-  apply (rngl_le_add_r Hor).
-  apply (rngl_of_nat_nonneg Hon Hos Hor).
-}
-rewrite Nat.pow_succ_r'.
-rewrite Nat_mul_2_l.
-rewrite (rngl_summation_split (2 ^ n)); [ | flia ].
-eapply (rngl_le_trans Hor). {
-  apply (rngl_add_le_mono_r Hop Hor).
-  apply IHn.
-  apply (Nat.le_trans _ (2 ^ S n)); [ | easy ].
-  apply Nat.pow_le_mono_r; [ easy | ].
-  apply Nat.le_succ_diag_r.
-}
-(* ah oui mais non, ça marche pas du tout, ça *)
-... ...
-apply (rngl_le_trans Hor _ 1).
-apply harmonic_sum_after_2_pow_bound.
-...
-Require Import QArith.
-Compute (
-  let n := 5%nat in
-  (∑ (i = 1, 2 ^ n), 1 / rngl_of_nat (2 ^ n + i) ≤ 1)%L
-).
-...
-...
-  rewrite Hn.
-  rewrite QG_mul_add_distr_l.
-  rewrite QG_mul_1_r.
-  rewrite rngl_add_comm.
-  apply (QG_add_le_mono_r).
-  change (((1 / (1 + rngl_of_nat n))%L ≤ 2)%L).
-  Time apply (rngl_le_div_l Hon Hop Hiv Hor). {
-    apply (rngl_add_pos_nonneg Hor).
-    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
-    apply (rngl_of_nat_nonneg Hon Hos Hor).
-  }
-  rewrite rngl_mul_add_distr_l.
-  rewrite (rngl_mul_1_r Hon).
-  rewrite <- rngl_add_assoc.
-  apply (rngl_le_add_r Hor).
-  apply (rngl_add_nonneg_nonneg Hor). {
-    apply (rngl_0_le_1 Hon Hos Hor).
-  }
-  rewrite rngl_mul_add_distr_r.
-  rewrite (rngl_mul_1_l Hon).
-  apply (rngl_add_nonneg_nonneg Hor); apply (rngl_of_nat_nonneg Hon Hos Hor).
-}
-rewrite Hn.
-specialize (Nat.log2_spec_alt n) as H1.
-assert (H : 0 < n) by flia Hnz.
-specialize (H1 H); clear H.
-destruct H1 as (r & Hnr & _ & Hr).
-...
 
 Theorem harmonic_sum_log2_bound :
-  ∀ n, 2 ≤ n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 2 * QG_of_nat (Nat.log2 n))%L.
+  ∀ n, 2 ≤ n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ 3 * QG_of_nat (Nat.log2 n))%L.
 Proof.
 assert (Hon : rngl_has_1 QG = true) by easy.
 assert (Hop : rngl_has_opp QG = true) by easy.
@@ -310,7 +214,58 @@ specialize (H1 H); clear H.
 destruct H1 as (r & Hnr & _ & Hr).
 remember (Nat.log2 n) as m; clear Heqm.
 subst n; rename m into n.
+remember (∑ (i = _, _), _)%L as x; subst x.
+destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
+  subst r.
+  rewrite Nat.add_0_r.
+  clear Hnz.
+  rewrite Nat.add_0_r in Hn1.
+  destruct (Nat.eq_dec n 1) as [Hne1| Hne1]; [ now subst n | ].
+  eapply (rngl_le_trans Hor). {
+    apply harmonic_sum_log2_bound_up_to_2_pow.
+    destruct n; cbn in Hn1; [ easy | ].
+    flia Hne1.
+  }
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor).
+  apply (rngl_of_nat_nonneg Hon Hor Hor). (* what? work with twice Hor *)
+  apply (rngl_le_add_r Hor).
+  apply (rngl_0_le_1 Hon Hor Hos). (* n'importe quoi, ça marche *)
+  (* bug probable dans Rocq *)
+}
+destruct (Nat.eq_dec r 1) as [Hr1| Hr1]. {
+  subst r.
+...
 rewrite (rngl_summation_split (2 ^ n)); [ | flia ].
+rewrite QG_mul_add_distr_r.
+rewrite QG_mul_1_l.
+rewrite rngl_add_comm.
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply harmonic_sum_log2_bound_up_to_2_pow.
+  destruct n. {
+    cbn in Hn1, Hnz, Hr.
+    now apply Nat.lt_1_r in Hr; subst r.
+  }
+  destruct n; [ | flia ].
+  cbn in Hr.
+  destruct r; [ easy | ].
+  destruct r; [ | flia Hr ].
+  cbn in Hn1, Hnz.
+...
+    cbn in Hn1, Hnz.
+  apply Nat.lt_2_r in Hr.
+Inspect 2.
+...
+rewrite (rngl_summation_shift (2 ^ n)). 2: {
+  split; [ flia | ].
+  apply Nat.add_le_mono_l.
+  destruct r; [ | flia ].
+...
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_r Hop Hor).
+Inspect 2.
+...
+Inspect 1.
 ...
 
 Theorem harmonic_sum_log2_bound :
