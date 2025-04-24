@@ -18,49 +18,6 @@ Definition QG_of_nat n : QG := rngl_of_nat n.
 Theorem QG_of_nat_succ : ∀ n, QG_of_nat (S n) = (1 + QG_of_nat n)%QG.
 Proof. easy. Qed.
 
-Theorem harmonic_sum_bound :
-  ∀ n, 2 ≤ n → (∑ (k = 1, n), 1 / QG_of_nat k ≤ QG_of_nat n)%L.
-Proof.
-assert (Hon : rngl_has_1 QG = true) by easy.
-assert (Hop : rngl_has_opp QG = true) by easy.
-assert (Hiv : rngl_has_inv QG = true) by easy.
-assert (Hor : rngl_is_ordered QG = true) by easy.
-assert (Hc1 : rngl_characteristic QG ≠ 1) by easy.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * H1n.
-progress unfold QG_of_nat.
-induction n; [ now rewrite rngl_summation_empty | ].
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ flia Hnz H1n | ].
-rewrite rngl_summation_split_last; [ | flia ].
-rewrite (rngl_summation_shift 1); [ | flia Hnz ].
-do 2 rewrite Nat_sub_succ_1.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  now rewrite Nat.add_comm, Nat.add_sub.
-}
-cbn - [ rngl_zero rngl_add Nat.log2 rngl_le rngl_div rngl_of_nat ].
-replace ((1%QG + 1%QG)%L) with 2%L by easy.
-destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
-eapply (rngl_le_trans Hor). {
-  apply (rngl_add_le_mono_r Hop Hor).
-  apply IHn.
-  flia Hnz Hn1.
-}
-rewrite rngl_of_nat_succ.
-rewrite rngl_add_comm.
-apply (rngl_add_le_mono_r Hop Hor).
-replace 1%QG with 1%L by easy.
-Time apply (rngl_le_div_l Hon Hop Hiv Hor). {
-  apply (rngl_add_pos_nonneg Hor).
-  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
-  apply (rngl_of_nat_nonneg Hon Hos Hor).
-}
-rewrite rngl_mul_add_distr_l.
-do 2 rewrite (rngl_mul_1_l Hon).
-apply (rngl_le_add_r Hor).
-apply (rngl_of_nat_nonneg Hon Hos Hor).
-Qed.
-
 Theorem harmonic_sum_after_2_pow_bound :
   ∀ n k, n ≤ k → (∑ (i = 1, n), 1 / rngl_of_nat (k + i) ≤ 1)%L.
 Proof.
