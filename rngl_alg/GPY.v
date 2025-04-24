@@ -207,4 +207,37 @@ apply harmonic_sum_after_2_pow_bound.
 now apply Nat.lt_le_incl.
 Qed.
 
+(* borrowed from FermatLittle.v *)
+(* to prevent importing it for the moment *)
+
+Fixpoint prime_test cnt n d :=
+  match cnt with
+  | 0 => true
+  | S c =>
+      match n mod d with
+      | 0 => n <=? d
+      | S _ => prime_test c n (d + 1)
+      end
+  end.
+
+Definition is_prime n :=
+  match n with
+  | 0 | 1 => false
+  | S (S c) => prime_test c n 2
+  end.
+
+(* *)
+
+Definition prime_indicator n :=
+  if is_prime n then 1 else 0.
+
+Theorem prime_indicator_sum_lower_bound :
+  ∀ H, ∃ N₀, ∀ N,
+  N₀ ≤ N
+  → (QG_of_nat N / QG_of_nat (Nat.log2 N) ≤
+     ∑ (n = 1, N),
+       ∑ (h = 0, H), QG_of_nat (prime_indicator (n + h)))%QG.
+Proof.
+...
+
 End a.
