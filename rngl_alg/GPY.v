@@ -238,6 +238,26 @@ Theorem prime_indicator_sum_lower_bound :
      ∑ (n = 1, N),
        ∑ (h = 0, H), QG_of_nat (prime_indicator (n + h)))%QG.
 Proof.
+intros.
+From Stdlib Require Import QArith.
+Open Scope nat_scope.
+Import List.ListNotations.
+Compute (
+  let H := 100 in
+  List.map (λ n, (n,
+     ∑ (h = 0, H), QG_of_nat (prime_indicator (n + h)))%QG
+  ) (List.seq 30 40)
+).
+...
+Compute (
+  let H := 0%nat in
+  List.map (λ N,
+  (QG_of_nat N / QG_of_nat (Nat.log2 N) ≤
+   ∑ (n = 1, N),
+     ∑ (h = 0, H), QG_of_nat (prime_indicator (n + h)))%QG
+  ) (List.seq 200 10)
+).
+
 ...
 
 End a.
