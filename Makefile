@@ -6,6 +6,12 @@ all1:
 	cd sensitivity; $(MAKE) $(MFLAGS)
 	cd rngl_alg; $(MAKE) $(MFLAGS)
 
+depend:
+	cd ring_like; $(MAKE) depend
+	cd trigo_without_pi; $(MAKE) depend
+	cd sensitivity; $(MAKE) depend
+	cd rngl_alg; $(MAKE) depend
+
 clean:
 	cd ring_like; $(MAKE) clean
 	cd trigo_without_pi; $(MAKE) clean
