@@ -15,7 +15,7 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	coqdep -Q ../ring_like RingLike $(FILESFORDEP) | LC_ALL=C sort | \
+	rocq dep -Q ../ring_like RingLike $(FILESFORDEP) | LC_ALL=C sort | \
 	sed -e 's/  *$$//' > .depend
 
 

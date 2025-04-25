@@ -11,7 +11,7 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	coqdep $(FILESFORDEP) | LC_ALL=C sort > .depend | \
+	rocq dep $(FILESFORDEP) | LC_ALL=C sort > .depend | \
 	sed -e 's/  *$$//' > .depend
 
 
