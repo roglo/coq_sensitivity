@@ -16,7 +16,7 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	rocq dep $(QDIRS) $(FILESFORDEP) | sed -e "s/$(HOME)[^ *] //" \
+	rocq dep $(QDIRS) $(FILESFORDEP) | sed -e " s|$$HOME[^ ]*||" | \
 	LC_ALL=C sort |	sed -e 's/  *$$//' > .depend
 
 .SUFFIXES: .v .vo
