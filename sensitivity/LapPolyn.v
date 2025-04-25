@@ -998,7 +998,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-rewrite rngl_summation_summation_exch.
+rewrite rngl_summation_depend_summation_exch.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_summation_eq_compat. 2: {

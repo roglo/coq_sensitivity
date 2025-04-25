@@ -2,6 +2,7 @@
 
 Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith.
+Import ListDef.
 
 Require Import RingLike.Misc.
 Require Import RingLike.RingLike.
@@ -239,10 +240,21 @@ Theorem prime_indicator_sum_lower_bound :
        ∑ (h = 0, H), QG_of_nat (prime_indicator (n + h)))%QG.
 Proof.
 intros.
+enough (H1 :
+  ∃ N₀, ∀ N,
+  N₀ ≤ N
+  → (QG_of_nat N / QG_of_nat (Nat.log2 N) ≤
+     ∑ (n = 1, N),
+       ∑ (h = 0, H), QG_of_nat (prime_indicator (n + h)))%QG). {
+  destruct H1 as (N₀ & H1).
+  exists N₀.
+  intros * HNN.
+  rewrite rngl_summation_summation_exch.
+...
+(*
 From Stdlib Require Import QArith.
 Open Scope nat_scope.
 Import List.ListNotations.
-(*
 Compute (
   let H := 100 in
   List.map (λ n, (n,
@@ -250,7 +262,6 @@ Compute (
   ) (List.seq 30 40)
 ).
 ...
-*)
 Compute (
   let H := 1%nat in
   List.map (λ N,
@@ -259,7 +270,7 @@ Compute (
      ∑ (h = 0, H), QG_of_nat (prime_indicator (n + h)))%QG
   ) (List.seq 0 100)
 ).
-
+*)
 ...
 
 End a.

@@ -3,6 +3,7 @@
 Set Nested Proofs Allowed.
 
 From Stdlib Require Import Utf8 Arith.
+Import ListDef.
 
 Require Import RingLike.
 Require Import Misc.
@@ -469,7 +470,41 @@ rewrite rngl_summation_list_add_distr.
 now f_equal.
 Qed.
 
-Theorem rngl_summation_summation_exch : ∀ g k,
+Theorem rngl_summation_summation_list_exch {A B} : ∀ l1 l2 (g : A → B → _),
+  (∑ (j ∈ l2), (∑ (i ∈ l1), g i j) =
+   ∑ (i ∈ l1), ∑ (j ∈ l2), g i j)%L.
+Proof.
+intros.
+revert l1.
+induction l2 as [| a]; intros. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  symmetry.
+  apply all_0_rngl_summation_list_0.
+  intros i Hi.
+  now apply rngl_summation_list_empty.
+}
+rewrite rngl_summation_list_cons.
+symmetry.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_summation_list_cons.
+  easy.
+}
+cbn.
+rewrite rngl_summation_list_add_distr.
+f_equal; symmetry.
+apply IHl2.
+Qed.
+
+Theorem rngl_summation_summation_exch : ∀ a b m n g,
+  (∑ (j = a, m), (∑ (i = b, n), g i j) =
+   ∑ (i = b, n), ∑ (j = a, m), g i j)%L.
+Proof.
+intros.
+apply rngl_summation_summation_list_exch.
+Qed.
+
+Theorem rngl_summation_depend_summation_exch : ∀ g k,
   (∑ (j = 0, k), (∑ (i = 0, j), g i j) =
    ∑ (i = 0, k), ∑ (j = i, k), g i j)%L.
 Proof.

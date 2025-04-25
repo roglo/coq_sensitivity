@@ -1,4 +1,6 @@
-all:
+all: ring_like trigo_without_pi sensitivity rngl_alg
+
+all1:
 	cd ring_like; $(MAKE) $(MFLAGS)
 	cd trigo_without_pi; $(MAKE) $(MFLAGS)
 	cd sensitivity; $(MAKE) $(MFLAGS)
@@ -9,8 +11,6 @@ clean:
 	cd trigo_without_pi; $(MAKE) clean
 	cd sensitivity; $(MAKE) clean
 	cd rngl_alg; $(MAKE) clean
-
-all1: ring_like trigo_without_pi sensitivity rngl_alg
 
 ring_like:
 	cd ring_like; $(MAKE) $(MFLAGS)
