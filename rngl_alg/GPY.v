@@ -244,12 +244,13 @@ enough (H1 :
   ∃ N₀, ∀ N,
   N₀ ≤ N
   → (QG_of_nat N / QG_of_nat (Nat.log2 N) ≤
-     ∑ (n = 1, N),
-       ∑ (h = 0, H), QG_of_nat (prime_indicator (n + h)))%QG). {
+     ∑ (h = 0, H), ∑ (n = 1, N), QG_of_nat (prime_indicator (n + h)))%QG). {
   destruct H1 as (N₀ & H1).
   exists N₀.
   intros * HNN.
   rewrite rngl_summation_summation_exch.
+  now apply H1.
+}
 ...
 (*
 From Stdlib Require Import QArith.
