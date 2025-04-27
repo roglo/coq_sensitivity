@@ -252,7 +252,7 @@ enough (H1 :
   rewrite rngl_summation_summation_exch.
   now apply H1.
 }
-Theorem weak_prime_number :
+Theorem weak_prime_number_theorem :
   ∀ N, (QG_of_nat_pair (2 * N) (Nat.log2 N) ≤ QG_of_nat (π N))%QG.
 ...
 (*
