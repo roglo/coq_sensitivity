@@ -253,8 +253,25 @@ enough (H1 :
   now apply H1.
 }
 Theorem weak_prime_number_theorem :
-  ∀ N, (QG_of_nat_pair (2 * N) (Nat.log2 N) ≤ QG_of_nat (π N))%QG.
+  ∀ n, 2 ≤ n → (QG_of_nat_pair n (2 * Nat.log2 n) ≤ QG_of_nat (π n))%QG.
+Proof.
+intros * H2n.
 ...
+(*
+From Stdlib Require Import QArith.
+Open Scope nat_scope.
+Import List.ListNotations.
+Compute (
+  map (λ N,
+    (N, π N)
+  ) (seq 2 20)
+).
+Compute (
+  map (λ N,
+    (N, QG_of_nat_pair N (2 * Nat.log2 N) ≤ QG_of_nat (π N))%QG
+  ) (seq 2 20)
+).
+*)
 (*
 From Stdlib Require Import QArith.
 Open Scope nat_scope.
