@@ -231,7 +231,7 @@ Definition is_prime n :=
 (* *)
 
 Definition prime_indicator n := if is_prime n then 1 else 0.
-Definition π n := ∑ (i = 1, n), prime_indicator i.
+Definition pi n := ∑ (i = 1, n), prime_indicator i.
 
 Theorem prime_indicator_sum_lower_bound :
   ∀ H, ∃ N₀, ∀ N,
@@ -253,7 +253,7 @@ enough (H1 :
   now apply H1.
 }
 Theorem weak_prime_number_theorem :
-  ∀ n, 4 ≤ n → (QG_of_nat_pair n (Nat.log2 n) ≤ QG_of_nat (π n))%QG.
+  ∀ n, 4 ≤ n → (QG_of_nat_pair n (Nat.log2 n) ≤ QG_of_nat (pi n))%QG.
 Proof.
 intros * H4n.
 ...
@@ -273,7 +273,7 @@ Compute (
 ).
 *)
 Theorem weak_prime_number_theorem' :
-  ∀ n, 2 ≤ n → (QG_of_nat_pair n (2 * Nat.log2 n) ≤ QG_of_nat (π n))%QG.
+  ∀ n, 2 ≤ n → (QG_of_nat_pair n (2 * Nat.log2 n) ≤ QG_of_nat (pi n))%QG.
 Proof.
 intros * H2n.
 ...
