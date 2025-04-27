@@ -252,26 +252,50 @@ enough (H1 :
   rewrite rngl_summation_summation_exch.
   now apply H1.
 }
+(* https://www.cs.umd.edu/~gasarch/TOPICS/mathnotes/weakpnt.pdf *)
+(* https://en.wikipedia.org/wiki/Prime_number_theorem#Non-asymptotic_bounds_on_the_prime-counting_function *)
 Theorem weak_prime_number_theorem :
-  ∀ n, 4 ≤ n → (QG_of_nat_pair n (Nat.log2 n) ≤ QG_of_nat (pi n))%QG.
-Proof.
-intros * H4n.
+  ∀ ε, (0 < ε)%QG → ∃ n₀, ∀ n, n₀ ≤ n →
+  let xlnx := (QG_of_nat n / QG_of_nat (Nat.log2 n))%QG in
+  ((1 - ε) * xlnx < QG_of_nat (pi n) < (QG_of_nat 2 + ε) * xlnx)%QG.
 ...
 (*
 From Stdlib Require Import QArith.
 Open Scope nat_scope.
 Import List.ListNotations.
 Compute (
-  map (λ N,
-    (N, π N)
-  ) (seq 2 20)
+  let ε := (1/ QG_of_nat 170)%QG in
+  map (λ n,
+  let xlnx := (QG_of_nat n / QG_of_nat (Nat.log2 n))%QG in
+  (n, (((1 - ε) * xlnx)%QG, (QG_of_nat (pi n))%QG)%QG)
+  ) (seq 4 60)
 ).
 Compute (
-  map (λ N,
-    (N, QG_of_nat_pair N (Nat.log2 N) ≤ QG_of_nat (π N))%QG
-  ) (seq 4 20)
+  let ε := (1/ QG_of_nat 170)%QG in
+  map (λ n,
+  let xlnx := (QG_of_nat n / QG_of_nat (Nat.log2 n))%QG in
+  (n,
+  (((1 - ε) * xlnx)%QG, QG_of_nat (pi n))%QG,
+  (QG_of_nat (pi n), (QG_of_nat 2 + ε) * xlnx)%QG
+  )
+  ) (seq 4 60)
 ).
 *)
+...
+Theorem weak_prime_number_theorem_1 :
+  ∀ n, (QG_of_nat (Nat.log2 n) / QG_of_nat 3 ≤ QG_of_nat (pi n))%QG.
+Proof.
+...
+Theorem weak_prime_number_theorem :
+  ∀ n, (QG_of_nat_pair n (Nat.log2 n) / QG_of_nat 3 ≤ QG_of_nat (pi n))%QG.
+Proof.
+(**)
+...
+Theorem weak_prime_number_theorem :
+  ∀ n, 4 ≤ n → (QG_of_nat_pair n (Nat.log2 n) ≤ QG_of_nat (pi n))%QG.
+Proof.
+intros * H4n.
+...
 Theorem weak_prime_number_theorem' :
   ∀ n, 2 ≤ n → (QG_of_nat_pair n (2 * Nat.log2 n) ≤ QG_of_nat (pi n))%QG.
 Proof.
