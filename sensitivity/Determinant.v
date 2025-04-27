@@ -9,11 +9,11 @@ Require Import RingLike.RingLike.
 Require Import RingLike.PermutationFun.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterMul.
+Require Import RingLike.NatRingLike.
 
 Require Import Misc.
 Require Import SortingFun SortRank.
 Require Import MyVector Matrix PermutSeq Signature.
-Require Import NatRingLike.
 Import matrix_Notations.
 
 Definition set_minus {A} (eqb : A → _) E F :=

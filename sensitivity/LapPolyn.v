@@ -2661,7 +2661,7 @@ Proof.
 intros Hsu *.
 ...
 End a.
-Require Import NatRingLike.
+Require Import RingLike.NatRingLike.
 Check lap_subt.
 Compute (
   let ro := nat_ring_like_op in

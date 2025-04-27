@@ -7,6 +7,7 @@ Import ListDef.
 Require Import RingLike.Misc.
 Require Import RingLike.RingLike.
 Require Import RingLike.IterAdd.
+Require Import RingLike.NatRingLike.
 Require Import QG.
 
 Section a.
@@ -229,8 +230,8 @@ Definition is_prime n :=
 
 (* *)
 
-Definition prime_indicator n :=
-  if is_prime n then 1 else 0.
+Definition prime_indicator n := if is_prime n then 1 else 0.
+Definition π n := ∑ (i = 1, n), prime_indicator i.
 
 Theorem prime_indicator_sum_lower_bound :
   ∀ H, ∃ N₀, ∀ N,
@@ -251,6 +252,8 @@ enough (H1 :
   rewrite rngl_summation_summation_exch.
   now apply H1.
 }
+Theorem weak_prime_number :
+  ∀ N, (QG_of_nat_pair (2 * N) (Nat.log2 N) ≤ QG_of_nat (π N))%QG.
 ...
 (*
 From Stdlib Require Import QArith.

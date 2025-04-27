@@ -2497,7 +2497,7 @@ Arguments polyn_of_norm_lap {T ro} la%_lap.
 (* polynomials of nat *)
 
 (* commented because locally don't want to depend here on NatRingLike
-Require Import NatRingLike.
+Require Import RingLike.NatRingLike.
 
 Definition nat_polyn_ring_like_op : ring_like_op (polyn nat) :=
   @polyn_ring_like_op _ nat_ring_like_op nat_ring_like_prop

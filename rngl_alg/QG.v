@@ -172,6 +172,8 @@ Definition QG_of_Q (q : Q) :=
 
 Definition QG_of_Z a := QG_of_Q (a # 1).
 Definition Z_of_QG a := (Qnum (qg_q a) / QDen (qg_q a))%Z.
+Definition QG_of_Z_pair n d := QG_of_Q (n # d).
+Definition QG_of_nat_pair n d := QG_of_Q (Z.of_nat n # Pos.of_nat d).
 
 Definition QG_0 := QG_of_Q 0.
 Definition QG_1 := QG_of_Q 1.

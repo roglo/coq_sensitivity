@@ -1,18 +1,17 @@
 Algebraic.vo Algebraic.glob Algebraic.v.beautified Algebraic.required_vo: Algebraic.v ../ring_like/IterAdd.vo ../ring_like/IterAnd.vo ../ring_like/IterMul.vo ../ring_like/RingLike.vo Comatrix.vo Determinant.vo LapPolyn.vo Matrix.vo Misc.vo MyVector.vo PermutSeq.vo Polynomial.vo Signature.vo
 CauchyBinet.vo CauchyBinet.glob CauchyBinet.v.beautified CauchyBinet.required_vo: CauchyBinet.v ../ring_like/IterAdd.vo ../ring_like/IterMul.vo ../ring_like/PermutationFun.vo ../ring_like/RingLike.vo Determinant.vo Matrix.vo Misc.vo PermutSeq.vo Signature.vo SortRank.vo SortingFun.vo
 Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v ../ring_like/IterAdd.vo ../ring_like/IterMul.vo ../ring_like/PermutationFun.vo ../ring_like/RingLike.vo Determinant.vo Matrix.vo Misc.vo MyVector.vo PermutSeq.vo Pigeonhole.vo Signature.vo SortRank.vo SortingFun.vo
-Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v ../ring_like/IterAdd.vo ../ring_like/IterMul.vo ../ring_like/PermutationFun.vo ../ring_like/RingLike.vo Matrix.vo Misc.vo MyVector.vo NatRingLike.vo PermutSeq.vo Signature.vo SortRank.vo SortingFun.vo
+Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v ../ring_like/IterAdd.vo ../ring_like/IterMul.vo ../ring_like/NatRingLike.vo ../ring_like/PermutationFun.vo ../ring_like/RingLike.vo Matrix.vo Misc.vo MyVector.vo PermutSeq.vo Signature.vo SortRank.vo SortingFun.vo
 LapPolyn.vo LapPolyn.glob LapPolyn.v.beautified LapPolyn.required_vo: LapPolyn.v ../ring_like/IterAdd.vo ../ring_like/RingLike.vo Misc.vo
 Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v ../ring_like/IterAdd.vo ../ring_like/IterMul.vo ../ring_like/RingLike.vo CauchyBinet.vo Comatrix.vo Determinant.vo Matrix.vo Misc.vo MyVector.vo Signature.vo
 Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v ../ring_like/IterAdd.vo ../ring_like/RingLike.vo Matrix.vo Misc.vo MyVector.vo
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v ../ring_like/IterAdd.vo ../ring_like/IterAnd.vo ../ring_like/IterMul.vo ../ring_like/RingLike.vo Misc.vo MyVector.vo Signature.vo
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v ../ring_like/Misc.vo
 MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v ../ring_like/IterAdd.vo ../ring_like/RingLike.vo Misc.vo
-NatRingLike.vo NatRingLike.glob NatRingLike.v.beautified NatRingLike.required_vo: NatRingLike.v ../ring_like/RingLike.vo Misc.vo
 PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v ../ring_like/IterAnd.vo ../ring_like/PermutationFun.vo Misc.vo Pigeonhole.vo SortRank.vo SortingFun.vo
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
 Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v ../ring_like/IterAdd.vo ../ring_like/IterAnd.vo ../ring_like/PermutationFun.vo ../ring_like/RingLike.vo LapPolyn.vo Misc.vo SortingFun.vo
-Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v ../ring_like/IterAdd.vo Misc.vo NatRingLike.vo SortingFun.vo
+Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v ../ring_like/IterAdd.vo ../ring_like/NatRingLike.vo Misc.vo SortingFun.vo
 Signature.vo Signature.glob Signature.v.beautified Signature.required_vo: Signature.v ../ring_like/IterMul.vo ../ring_like/PermutationFun.vo ../ring_like/RingLike.vo Misc.vo PermutSeq.vo SortRank.vo SortingFun.vo
 SortRank.vo SortRank.glob SortRank.v.beautified SortRank.required_vo: SortRank.v Misc.vo SortingFun.vo
 SortingFun.vo SortingFun.glob SortingFun.v.beautified SortingFun.required_vo: SortingFun.v SortingFun_bsort.vo SortingFun_common.vo SortingFun_isort.vo SortingFun_misc.vo SortingFun_msort.vo SortingFun_ssort.vo

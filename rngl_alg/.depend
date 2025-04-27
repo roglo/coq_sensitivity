@@ -5,7 +5,7 @@ AngleRl.vo AngleRl.glob AngleRl.v.beautified AngleRl.required_vo: AngleRl.v ../r
 AngleTan.vo AngleTan.glob AngleTan.v.beautified AngleTan.required_vo: AngleTan.v ../ring_like/DerivMul.vo ../ring_like/RealLike.vo ../ring_like/RingLike.vo ../trigo_without_pi/Angle.vo ../trigo_without_pi/AngleDiv2.vo ../trigo_without_pi/Angle_order.vo ../trigo_without_pi/TrigoWithoutPiExt.vo AngleDeriv.vo
 Complex.vo Complex.glob Complex.v.beautified Complex.required_vo: Complex.v ../ring_like/IterAdd.vo ../ring_like/Misc.vo ../ring_like/RealLike.vo ../ring_like/RingLike.vo ../trigo_without_pi/Angle.vo ../trigo_without_pi/AngleAddLeMonoL.vo ../trigo_without_pi/AngleAddOverflowLe.vo ../trigo_without_pi/AngleDiv2.vo ../trigo_without_pi/AngleDiv2Add.vo ../trigo_without_pi/Angle_order.vo ../trigo_without_pi/TacChangeAngle.vo ../trigo_without_pi/TrigoWithoutPiExt.vo Misc.vo
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v ../ring_like/Misc.vo ../ring_like/PermutationFun.vo Misc.vo
-GPY.vo GPY.glob GPY.v.beautified GPY.required_vo: GPY.v ../ring_like/IterAdd.vo ../ring_like/Misc.vo ../ring_like/RingLike.vo QG.vo
+GPY.vo GPY.glob GPY.v.beautified GPY.required_vo: GPY.v ../ring_like/IterAdd.vo ../ring_like/Misc.vo ../ring_like/NatRingLike.vo ../ring_like/RingLike.vo QG.vo
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v ../ring_like/Misc.vo Nat_ggcd.vo PQ.vo
 GaussIntRl.vo GaussIntRl.glob GaussIntRl.v.beautified GaussIntRl.required_vo: GaussIntRl.v ../ring_like/RingLike.vo
 HyperbolicTrigo.vo HyperbolicTrigo.glob HyperbolicTrigo.v.beautified HyperbolicTrigo.required_vo: HyperbolicTrigo.v ../ring_like/Misc.vo ../ring_like/RealLike.vo ../ring_like/RingLike.vo ../trigo_without_pi/Angle.vo ../trigo_without_pi/AngleDiv2.vo

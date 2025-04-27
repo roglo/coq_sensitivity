@@ -1,13 +1,9 @@
 (* ℕ is a ring-like without opposite, i.e. a semiring *)
-(* ℤ/nℤ is a ring-like,
-     if n is prime, has inverse, i.e. it is a field
-     if n is not prime, it has neither inverse nor division, it is a ring *)
 
 Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith.
 
-Require Import RingLike.RingLike.
-Require Import Misc.
+Require Import RingLike.
 
 Instance nat_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 0;
