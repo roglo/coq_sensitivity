@@ -23,7 +23,7 @@ depend:
 
 %.vo: %.v
 	@$(TEST_DIR)
-	$(ROCQ) $(ROCQ_OPTS) -R . Sensitivity -Q ../ring_like RingLike -Q ../rngl_alg RnglAlg $<
+	$(ROCQ) $(ROCQ_OPTS) -R . Sensitivity $(QDIRS) $<
 
 .PHONY: all clean depend
 
