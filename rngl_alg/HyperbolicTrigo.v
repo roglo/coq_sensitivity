@@ -1664,8 +1664,8 @@ Qed.
 
 End a.
 
-Require Import Trigo.Angle.
-Require Import Trigo.AngleDiv2.
+Require Import TrigoWithoutPi.Angle.
+Require Import TrigoWithoutPi.AngleDiv2.
 
 Section a.
 

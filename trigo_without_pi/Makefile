@@ -23,7 +23,7 @@ depend:
 
 %.vo: %.v
 	@$(TEST_DIR)
-	$(ROCQ) $(ROCQ_OPTS) -R . Trigo $(QDIRS) $<
+	$(ROCQ) $(ROCQ_OPTS) -R . TrigoWithoutPi $(QDIRS) $<
 
 .v.vo:
 

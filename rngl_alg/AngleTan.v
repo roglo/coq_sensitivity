@@ -8,10 +8,10 @@ Require Import RingLike.RingLike.
 Require Import RingLike.RealLike.
 Require Import RingLike.DerivMul.
 
-Require Import Trigo.Angle.
-Require Import Trigo.AngleDiv2.
-Require Import Trigo.Angle_order.
-Require Import Trigo.TrigoWithoutPiExt.
+Require Import TrigoWithoutPi.Angle.
+Require Import TrigoWithoutPi.AngleDiv2.
+Require Import TrigoWithoutPi.Angle_order.
+Require Import TrigoWithoutPi.TrigoWithoutPiExt.
 
 Require Import AngleDeriv.
 
