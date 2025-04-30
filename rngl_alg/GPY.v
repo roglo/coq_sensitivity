@@ -254,10 +254,30 @@ enough (H1 :
 }
 (* https://www.cs.umd.edu/~gasarch/TOPICS/mathnotes/weakpnt.pdf *)
 (* https://en.wikipedia.org/wiki/Prime_number_theorem#Non-asymptotic_bounds_on_the_prime-counting_function *)
+Theorem weak_prime_number_theorem_1 :
+  ∀ n, (QG_of_nat_pair 1 3 * QG_of_nat (Nat.log2_up n) ≤ QG_of_nat (pi n))%QG.
+Proof.
+intros.
+...
+From Stdlib Require Import QArith.
+Open Scope nat_scope.
+Import List.ListNotations.
+Compute (
+  map (λ n,
+    (n, QG_of_nat_pair 1 3 * QG_of_nat (Nat.log2 n), QG_of_nat (pi n))%QG
+  ) (seq 0 40)
+).
+Compute (
+  map (λ n,
+    (n, QG_of_nat_pair 1 3 * QG_of_nat (Nat.log2 n) = QG_of_nat (pi n))%QG
+  ) (seq 0 40)
+).
+Check eq_QG_eq.
+...
 Theorem weak_prime_number_theorem :
   ∀ ε, (0 < ε)%QG → ∃ n₀, ∀ n, n₀ ≤ n →
   let xlnx := (QG_of_nat n / QG_of_nat (Nat.log2 n))%QG in
-  ((1 - ε) * xlnx < QG_of_nat (pi n) < (QG_of_nat 2 + ε) * xlnx)%QG.
+  ((1 - ε) * xlnx < QG_of_nat (pi n) < (QG_of_nat 1 + ε) * xlnx)%QG.
 Proof.
 intros * Hε.
 ...
