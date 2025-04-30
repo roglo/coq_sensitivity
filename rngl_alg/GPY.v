@@ -259,6 +259,42 @@ Theorem weak_prime_number_theorem_1 :
 Proof.
 intros.
 ...
+(*
+Proof:
+Let COMP be the composite numbers that are ≤ n.
+
+a) Let x ∈ COMP and x ≤ n. We factor x so that x = p₁^a1 ... p_{a_π(n)}^an.
+Write each ai = 2bi + ci where ci ∈ {0, 1}. Hence
+  x =
+    p₁^2b₁ p₂^2b₂ p₃^2b₃ ... p_{π(n)}^2b_{π(n)}
+    p₁^c₁ p₂^c₂ ... p_{pi(n)}^c_{pi(n)}.
+Note that this can be written as
+    m² p₁^c₁ p₂^c₂ ... p_{pi(n)}^c_{pi(n)}.
+How many numbers are of this form?
+
+There are at most √n numbers of the form m² where m² ≤ n. There are at
+most 2^π(n) numbers of the form p₁^c₁ p₂^c₂ ... p_{pi(n)}^c_{pi(n)}.
+where each ci ∈ {0, 1}. Hence there
+    #COMP ≤ √n2^π(n)
+    n − π(n) ≤ √n2^π(n)
+    n ≤ √n2^π(n) + π(n)
+
+if π(n) ≤ 1/3 log2 n then
+  n ≤ √n2^π(n) + π(n) ≤ √n n^(1/3) + 1/3 log2 n ≤ n^(5/6) + 1/3 log2 n
+
+which is a contradiction.
+*)
+...
+(*
+From Stdlib Require Import QArith.
+Open Scope nat_scope.
+Import List.ListNotations.
+Compute (
+  map (λ n,
+    (n, QG_of_nat_pair 1 3 * QG_of_nat (Nat.log2_up n) ≤ QG_of_nat (pi n))%QG
+  ) (seq 0 40)
+).
+*)
 From Stdlib Require Import QArith.
 Open Scope nat_scope.
 Import List.ListNotations.
