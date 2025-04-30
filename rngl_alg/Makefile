@@ -1,6 +1,6 @@
 TARGET=IntermVal.vo Qrl.vo Zrl.vo Nrl.vo MatRl.vo QuadIntRl.vo GaussIntRl.vo NewtonBinomial.vo AngleRl.vo Work3.vo AngleEuclDistLtAngleLtLt.vo Rrl.vo Ideal.vo QG.vo HyperbolicTrigo.vo AngleDeriv.vo AngleTan.vo Rational.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
-QDIRS=-Q ../ring_like RingLike -Q ../trigo_without_pi TrigoWithoutPi -Q ../sensitivity Sensitivity
+QDIRS=-Q ../sensitivity Sensitivity
 TEST_DIR=test `basename "$<"` = "$<" || { echo "File \"$<\" needs to be recompiled."; echo "Please run 'make' in directory '$$(dirname "$<")' first."; exit 1; }
 ROCQ=rocq compile
 ROCQ_OPT=

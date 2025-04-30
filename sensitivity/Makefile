@@ -1,6 +1,6 @@
 TARGET=Polynomial.vo CauchyBinet.vo Lemma_2_2.vo Lemma_2_1.vo Sensitivity.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
-QDIRS=-Q ../ring_like RingLike
+QDIRS=
 TEST_DIR=test `basename "$<"` = "$<" || { echo "File \"$<\" needs to be recompiled."; echo "Please run 'make' in directory '$$(dirname "$<")' first."; exit 1; }
 ROCQ=rocq compile
 ROCQ_OPT=

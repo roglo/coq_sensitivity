@@ -1,1 +1,1 @@
--R . RnglAlg -Q ../ring_like RingLike -Q ../trigo_without_pi TrigoWithoutPi -Q ../sensitivity Sensitivity
+-R . RnglAlg -Q ../sensitivity Sensitivity
