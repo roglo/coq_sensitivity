@@ -258,6 +258,8 @@ Theorem weak_prime_number_theorem :
   ∀ ε, (0 < ε)%QG → ∃ n₀, ∀ n, n₀ ≤ n →
   let xlnx := (QG_of_nat n / QG_of_nat (Nat.log2 n))%QG in
   ((1 - ε) * xlnx < QG_of_nat (pi n) < (QG_of_nat 2 + ε) * xlnx)%QG.
+Proof.
+intros * Hε.
 ...
 (*
 From Stdlib Require Import QArith.
