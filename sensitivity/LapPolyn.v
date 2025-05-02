@@ -472,17 +472,11 @@ Qed.
 
 (* lap opposite or subtraction *)
 
+(* cannot define opposite or subtraction because [1]-[1]=[0],
+   but should be [] *)
 Definition lap_opt_opp_or_subt :
   option ((list T → list T) + (list T → list T → list T)) :=
-(**)
   None.
-(*
-  match rngl_opt_opp_or_subt with
-  | Some (inl _) => Some (inl lap_opp)
-  | Some (inr _) => None
-  | None => None
-  end.
-*)
 
 (* lap quotient *)
 
