@@ -3,10 +3,12 @@
 Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith.
 Import ListDef.
+Import List.ListNotations.
 
 Require Import RingLike.Misc.
 Require Import RingLike.RingLike.
 Require Import RingLike.IterAdd.
+Require Import RingLike.IterMul.
 Require Import RingLike.NatRingLike.
 Require Import QG.
 
@@ -258,6 +260,25 @@ Theorem weak_prime_number_theorem_1 :
   ∀ n, (QG_of_nat_pair 1 3 * QG_of_nat (Nat.log2_up n) ≤ QG_of_nat (pi n))%QG.
 Proof.
 intros.
+Fixpoint rev_primes_le n :=
+  match n with
+  | 0 => []
+  | S n' => if is_prime n then n :: rev_primes_le n' else rev_primes_le n'
+  end.
+
+Definition primes_le n := List.rev (rev_primes_le n).
+
+Definition nth_prime n i := (primes_le n).[i].
+
+Theorem composite_special_decompose :
+  ∀ n x, x ≤ n → is_prime x = false →
+  ∃ p a b c,
+  (∀ i, p.[i] = nth_prime n i)
+  → (∀ i, a.[i] = 2 * b.[i] + c.[i])
+  → (∀ i, c.[i] ∈ [0; 1])
+  → x = ∏ (i = 1, pi n), p.[i-1] ^ a.[i-1].
+Proof.
+intros * Hxn Hpx.
 ...
 (*
 Proof:
@@ -288,7 +309,6 @@ which is a contradiction.
 (*
 From Stdlib Require Import QArith.
 Open Scope nat_scope.
-Import List.ListNotations.
 Compute (
   map (λ n,
     (n, QG_of_nat_pair 1 3 * QG_of_nat (Nat.log2_up n) ≤ QG_of_nat (pi n))%QG
