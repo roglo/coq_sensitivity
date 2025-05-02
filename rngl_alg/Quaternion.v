@@ -10,6 +10,7 @@ Import Init.Nat.
 Require Import RingLike.RingLike.
 Require Import RingLike.IterAdd.
 Require Import RingLike.Misc.
+Require Import Sensitivity.Misc.
 Require Import Sensitivity.MyVector.
 
 Fixpoint comb_elem_rest A (la : list A) :=
@@ -65,6 +66,7 @@ Compute (List.map (λ i, (i, glip i)) (pair_comb [1;2;3;4;5;6])).
 Compute
   (List.filter (λ ij, has_no_dup (snd ij))
      (List.map (λ i, (i, glip i)) (pair_comb (List.seq 1 6)))).
+
 ...
 
 ([(1, 4); (2, 6); (3, 5)], [3; 4; 2]);
