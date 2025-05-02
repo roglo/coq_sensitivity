@@ -2907,6 +2907,27 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
 
 (* *)
 
+(*
+Theorem lap_mul_1_l :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ la, (1 * la)%lap = la.
+Proof.
+intros Hon Hos *.
+set (rol := lap_ring_like_op).
+set (rop := lap_ring_like_prop Hos).
+replace (1 * la)%lap with (1 * la)%L. 2: {
+  cbn.
+  rewrite Nat.sub_0_r.
+}
+apply (rngl_mul_1_l).
+progress unfold rngl_has_1.
+cbn.
+progress unfold rngl_has_1 in Hon.
+progress unfold lap_opt_one.
+now destruct (rngl_opt_one T).
+*)
+
 Definition is_empty_list {A} (la : list A) :=
   match la with [] => true | _ => false end.
 Definition has_polyn_prop {T} {ro : ring_like_op T} (la : list T) :=
