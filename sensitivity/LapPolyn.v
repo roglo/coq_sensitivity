@@ -472,8 +472,8 @@ Qed.
 
 (* lap opposite or subtraction *)
 
-(* cannot define opposite or subtraction because [1]-[1]=[0],
-   but should be [] *)
+(* cannot define opposite or subtraction because [1]-[1] returns
+   [0], instead of [] *)
 Definition lap_opt_opp_or_subt :
   option ((list T → list T) + (list T → list T → list T)) :=
   None.
