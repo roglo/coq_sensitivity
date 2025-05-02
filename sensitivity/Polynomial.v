@@ -1329,6 +1329,45 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
 }
 apply (rngl_1_neq_0_iff Hon), (rngl_eqb_neq Hed) in Hch; rewrite Hch.
 cbn - [ lap_mul ].
+(*
+(* perhaps could be a clean version of lap_mul_1_l *)
+progress replace [1%L] with (@lap_one T ro) by easy.
+set (rol := lap_ring_like_op).
+set (rop := lap_ring_like_prop Hed Hos).
+assert (Honl : rngl_has_1 (list T) = true). {
+  progress unfold rngl_has_1.
+  progress unfold rngl_has_1 in Hon.
+  cbn.
+  progress unfold lap_opt_one.
+  now destruct rngl_opt_one.
+}
+replace (1 * la)%lap with (1 * la)%L. 2: {
+  rewrite (rngl_mul_1_l Honl).
+  symmetry.
+  cbn.
+  destruct la as [| a]; [ easy | ].
+  cbn.
+  rewrite rngl_summation_only_one.
+  rewrite (rngl_mul_1_l Hon).
+  progress f_equal.
+Search (lap_convol_mul 1).
+Print lap_convol_mul.
+Search (lap_convol_mul _ _ 1 _).
+...
+Theorem lap_convol_mul_cons :
+  lap_convol_mul 1 (a :: la) 1
+
+  destruct la as [| b]; [ easy | ].
+  cbn.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+...
+}
+rewrite rngl_mul_1_l; [ | easy ].
+now apply (has_polyn_prop_lap_norm Hed).
+...
+*)
 rewrite (lap_mul_1_l Hon Hos).
 now apply (has_polyn_prop_lap_norm Hed).
 Qed.
