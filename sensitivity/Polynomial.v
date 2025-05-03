@@ -10,6 +10,7 @@ Require Import RingLike.RingLike.
 Require Import RingLike.PermutationFun.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterAnd.
+Require Import RingLike.LapRingLike.
 
 Require Import Misc.
 Require Import SortingFun.
@@ -1000,7 +1001,7 @@ Qed.
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem lap_rngl_of_nat :
-  let lop := lap_ring_like_op in
+  let lop := lap_ring_like_op Hed in
   rngl_has_1 (list T) = true →
   ∀ n, rngl_of_nat n = if Nat.eq_dec n 0 then [] else [rngl_of_nat n].
 Proof.
@@ -1882,7 +1883,7 @@ now injection IHi; clear IHi; intros; subst a la.
 Qed.
 
 Theorem lap_polyn_rngl_of_nat :
-  let lop := lap_ring_like_op in
+  let lop := lap_ring_like_op Hed in
   let rop := polyn_ring_like_op in
   ∀ n, lap (rngl_of_nat n) = lap_norm (rngl_of_nat n).
 Proof.
@@ -1962,7 +1963,7 @@ Theorem polyn_characteristic_prop : let rop := polyn_ring_like_op in
   else not_applicable.
 Proof.
 intros rop; subst rop.
-set (rol := lap_ring_like_op).
+set (rol := lap_ring_like_op Hed).
 assert (Honl : rngl_has_1 (list T) = true). {
   progress unfold rngl_has_1; cbn.
   progress unfold lap_opt_one; cbn.
@@ -1991,7 +1992,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hcz| Hcz]. {
   }
   apply eq_polyn_eq; cbn.
   rewrite lap_polyn_rngl_of_nat.
-  rewrite (lap_rngl_of_nat Honl).
+  rewrite (lap_rngl_of_nat Hed Honl).
   destruct (Nat.eq_dec _ _) as [Hc1| Hc1]; [ easy | ].
   rewrite Hch; cbn.
   now rewrite (rngl_eqb_refl Hed).
@@ -2416,7 +2417,7 @@ apply lap_prop.
 Qed.
 
 Theorem lap_norm_lap_rngl_summation :
-  let rol := lap_ring_like_op in
+  let rol := lap_ring_like_op Hed in
   let rop := polyn_ring_like_op in
   ∀ b e f,
   lap_norm (lap (∑ (i = b, e), f i)) = lap_norm (∑ (i = b, e), lap (f i)).
@@ -2438,7 +2439,7 @@ apply lap_norm_idemp.
 Qed.
 
 Theorem lap_norm_rngl_summation_idemp :
-  let rol := lap_ring_like_op in
+  let rol := lap_ring_like_op Hed in
   ∀ b e f,
   lap_norm (∑ (i = b, e), lap_norm (f i)) = lap_norm (∑ (i = b, e), f i).
 Proof.
