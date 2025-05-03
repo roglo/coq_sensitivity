@@ -1,5 +1,9 @@
 (* LapPolyn.v *)
 
+(* to be removed one day because already done in package RingLike in
+   file LapRingLike.v; however, everything is not done out there; so
+   to be checked out *)
+
 (* lists as polynomials ; the fact that the coefficient of the highest degree
    is not zero is not tested. It is going to be tested in Polynomial.v. *)
 
@@ -123,7 +127,7 @@ Definition lap_mul la lb :=
 (* *)
 
 Definition lap_opt_one :=
-  match rngl_opt_one with
+  match rngl_opt_one T with
   | Some one => Some [one]
   | None => None
   end.
@@ -613,9 +617,9 @@ Theorem eq_lap_norm_eq_length : ∀ la lb,
 Proof.
 intros * Hll Hlen.
 unfold lap_norm in Hll.
-apply List_rev_rev in Hll.
+apply List.rev_inj in Hll.
 setoid_rewrite <- List.length_rev in Hlen.
-enough (H : List.rev la = List.rev lb) by now apply List_rev_rev in H.
+enough (H : List.rev la = List.rev lb) by now apply List.rev_inj in H.
 remember (List.rev la) as l; clear la Heql; rename l into la.
 remember (List.rev lb) as l; clear lb Heql; rename l into lb.
 revert la Hll Hlen.

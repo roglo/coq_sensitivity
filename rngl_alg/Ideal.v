@@ -42,7 +42,7 @@ Context {ip : ideal_prop P}.
 
 Definition I_zero : ideal P := mk_I 0 ip_zero.
 Definition I_opt_one : option (ideal P) :=
-  match rngl_opt_one  with
+  match rngl_opt_one T with
   | Some one =>
       match Bool.bool_dec (P one) true with
       | left ip_one => Some (mk_I one ip_one)
