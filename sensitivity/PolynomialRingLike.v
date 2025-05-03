@@ -10,8 +10,8 @@ Import List.ListNotations Init.Nat.
 Require Import RingLike.RingLike.
 Require Import RingLike.IterAdd.
 Require Import RingLike.LapRingLike.
+Require Import RingLike.Misc.
 
-Require Import Misc.
 Require Import LapPolyn.
 
 Section a.
@@ -115,8 +115,8 @@ split; intros Hla. {
   apply (eq_strip_0s_nil Hed 0%L) with (i := List.length la - S i) in Hla. {
     rewrite List.rev_nth in Hla; [ | flia Hila ].
     rewrite <- Nat_succ_sub_succ_r in Hla; [ | easy ].
-    rewrite Nat_sub_sub_distr in Hla; [ | flia Hila ].
-    now rewrite Nat.add_comm, Nat.add_sub in Hla.
+    rewrite Nat.sub_sub_distr in Hla; [ | flia Hila | easy ].
+    now rewrite Nat.sub_diag, Nat.add_0_l in Hla.
   }
   now rewrite List.length_rev; apply Nat.sub_lt.
 }
@@ -508,8 +508,8 @@ destruct lc as [| c]. {
       specialize (H1 H); clear H.
       rewrite List.rev_nth in H1. {
         rewrite <- Nat_succ_sub_succ_r in H1; [ | easy ].
-        rewrite Nat_sub_sub_distr in H1; [ | now apply Nat.lt_le_incl ].
-        now rewrite Nat.add_comm, Nat.add_sub in H1.
+        rewrite Nat.sub_sub_distr in H1; [ | now apply Nat.lt_le_incl | easy ].
+        now rewrite Nat.sub_diag in H1.
       }
       now apply Nat.sub_lt.
     }
@@ -532,8 +532,8 @@ destruct lc as [| c]. {
       specialize (H1 H); clear H.
       rewrite List.rev_nth in H1. {
         rewrite <- Nat_succ_sub_succ_r in H1; [ | easy ].
-        rewrite Nat_sub_sub_distr in H1; [ | now apply Nat.lt_le_incl ].
-        now rewrite Nat.add_comm, Nat.add_sub in H1.
+        rewrite Nat.sub_sub_distr in H1; [ | now apply Nat.lt_le_incl | easy ].
+        now rewrite Nat.sub_diag in H1.
       }
       now apply Nat.sub_lt.
     }

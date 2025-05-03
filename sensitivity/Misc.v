@@ -923,13 +923,6 @@ subst n.
 apply List_map_nth_seq.
 Qed.
 
-Theorem List_rev_symm :
-  ∀ A (la lb : list A), List.rev la = lb → la = List.rev lb.
-Proof.
-intros * Hab.
-now subst lb; rewrite List.rev_involutive.
-Qed.
-
 Theorem List_rev_seq_nth :
   ∀ len sta n d, n < len →
   List.nth n (List.rev (List.seq sta len)) d = sta + len - S n.
@@ -1028,13 +1021,6 @@ f_equal; [ apply (Hll a1 0) | ].
 apply IHl1; [ easy | ].
 intros.
 now specialize (Hll d (S i)).
-Qed.
-
-Theorem List_last_rev : ∀ A (l : list A) d,
-  List.last (List.rev l) d = List.hd d l.
-Proof.
-intros.
-destruct l as [| a]; [ easy | apply List.last_last ].
 Qed.
 
 (* common for all iterators *)
