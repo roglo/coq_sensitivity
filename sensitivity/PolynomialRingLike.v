@@ -1004,6 +1004,7 @@ Qed.
 
 (*
 Arguments rngl_opt_one T {ring_like_op}.
+*)
 
 Theorem lap_rngl_of_nat :
   let lop := lap_ring_like_op Hed in
@@ -1030,6 +1031,7 @@ progress unfold lap_opt_one.
 now destruct (rngl_opt_one T).
 Qed.
 
+(*
 Theorem eq_lap_add_nil : ∀ la lb, (la + lb = [])%lap → la = [] ∧ lb = [].
 Proof.
 intros * Hab.
@@ -1597,7 +1599,6 @@ destruct (Sumbool.sumbool_of_bool true); [ | easy ].
 now apply polyn_mul_div.
 Qed.
 
-(*
 Theorem polyn_opt_mul_quot_r :
   let _ := polyn_ring_like_op in
   if (rngl_has_quot (polyn T) && negb (rngl_mul_is_comm T))%bool then
@@ -1611,6 +1612,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
 Qed.
 
+(*
 Theorem polyn_opt_eqb_eq :
   let rop := polyn_ring_like_op in
   if rngl_has_eq_dec (polyn T) then ∀ a b : polyn T, (a =? b)%L = true ↔ a = b
@@ -1620,6 +1622,7 @@ intros rop; subst rop.
 intros a b; cbn.
 now destruct (polyn_eq_dec a b).
 Qed.
+*)
 
 Theorem lap_polyn_rngl_of_nat_char_0 :
   let _ := polyn_ring_like_op in
@@ -1849,6 +1852,7 @@ Qed.
 
 (* *)
 
+(*
 Theorem eq_nth_lap_subt_0 :
   rngl_has_subt T = true →
   ∀ la lb,
