@@ -81,7 +81,6 @@ apply is_empty_list_empty in H1.
 now apply List.app_eq_nil in H1.
 Qed.
 
-(*
 Theorem all_0_lap_norm_nil : ∀ la,
   (∀ i, List.nth i la 0%L = 0%L)
   ↔ lap_norm la = [].
@@ -190,7 +189,6 @@ intros.
 rewrite (lap_norm_app_repeat_0 la) at 2.
 rewrite List.length_app; flia.
 Qed.
-*)
 
 Theorem lap_quot_is_norm :
   rngl_has_1 T = true →
@@ -269,6 +267,7 @@ unfold lap_norm.
 rewrite List.rev_involutive.
 now rewrite strip_0s_idemp.
 Qed.
+*)
 
 Theorem lap_add_norm_idemp_r : ∀ la lb,
   lap_norm (la + lap_norm lb) = lap_norm (la + lb).
@@ -655,6 +654,7 @@ rewrite <- Hlc.
 apply lap_norm_convol_mul_norm_r.
 Qed.
 
+(*
 Theorem lap_mul_length : ∀ la lb,
   List.length (la * lb)%lap =
     match (la, lb) with
@@ -1071,6 +1071,7 @@ Context (Hed : rngl_has_eq_dec T = true).
 (*
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
+*)
 
 (* polyn_eq is equivalent to lap_eq *)
 
@@ -1102,6 +1103,7 @@ destruct H1 as [H1| H1]. {
 }
 Qed.
 
+(*
 (* polyn_eqb is an equality *)
 
 Theorem polyn_eqb_eq : ∀ (eqb : T → T → bool),
@@ -1233,18 +1235,25 @@ Existing Instance polyn_ring_like_op.
 (* Another way is to add at the beginning of the theorem
   let _ := polyn_ring_like_op in
 *)
+*)
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
 
 Notation "0" := polyn_zero : polyn_scope.
+(*
 Notation "1" := polyn_one : polyn_scope.
 Notation "- a" := (polyn_opp a) : polyn_scope.
+*)
 Notation "a + b" := (polyn_add a b) : polyn_scope.
+(*
 Notation "a - b" := (polyn_sub a b) : polyn_scope.
+*)
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
+(*
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
 Notation "'mkp' x" := (mk_polyn x _) (at level 0, x at level 0): polyn_scope.
+*)
 
 Theorem polyn_add_comm : ∀ a b, (a + b)%pol = (b + a)%pol.
 Proof.
@@ -1252,7 +1261,6 @@ intros.
 unfold "+"%pol.
 now rewrite lap_add_comm.
 Qed.
-*)
 
 (* had to add this version for polyn_ring_like_prop, I don't know
    why (othewize, Coq error). Not required for polyn_add_assoc, I
@@ -1265,7 +1273,6 @@ intros.
 apply polyn_add_comm.
 Qed.
 
-(*
 Theorem polyn_add_assoc : ∀ pa pb pc,
   (pa + (pb + pc) = (pa + pb) + pc)%pol.
 Proof.
@@ -1305,6 +1312,7 @@ rewrite (lap_mul_norm_idemp_r Hos Hed).
 now rewrite lap_mul_assoc.
 Qed.
 
+(*
 Theorem polyn_mul_1_l : ∀ p, (1 * p)%pol = p.
 Proof.
 intros (la, lapr).
