@@ -110,7 +110,7 @@ rewrite List.app_nil_r.
 f_equal; f_equal.
 rewrite (lap_convol_mul_l_succ_l Hos).
 rewrite List_map2_rngl_add_0_l.
-now symmetry; apply (lap_convol_mul_1_l Hon Hos).
+now symmetry; apply (lap_convol_mul_1_l Hos Hon).
 Qed.
 
 End a.
