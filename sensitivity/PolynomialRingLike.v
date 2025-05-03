@@ -24,7 +24,6 @@ Context {rp : ring_like_prop T}.
 Context (Hos : rngl_has_opp_or_subt T = true).
 Context (Hed : rngl_has_eq_dec T = true).
 
-(*
 Theorem eq_strip_0s_cons : ∀ la lb b,
   strip_0s la = b :: lb
   → b ≠ 0%L ∧
@@ -57,7 +56,6 @@ split; [ easy | ].
 exists 0.
 now cbn.
 Qed.
-*)
 
 Theorem polyn_norm_prop : ∀ la, has_polyn_prop (lap_norm la) = true.
 Proof.
@@ -234,7 +232,6 @@ cbn in Hqr.
 now apply (rngl_neqb_neq Hed).
 Qed.
 
-(*
 Theorem lap_rem_is_norm : ∀ la lb,
   has_polyn_prop la = true
   → has_polyn_prop lb = true
@@ -260,6 +257,7 @@ right; cbn; rewrite List.last_last.
 now rewrite Hrz.
 Qed.
 
+(*
 Theorem lap_norm_idemp : ∀ la, lap_norm (lap_norm la) = lap_norm la.
 Proof.
 intros.
@@ -747,6 +745,7 @@ f_equal.
 rewrite (List_cons_is_app a).
 now apply (lap_convol_mul_x_l Hon).
 Qed.
+*)
 
 Theorem list_nth_lap_opp :
   rngl_has_opp T = true →
@@ -982,7 +981,7 @@ rewrite lap_mul_length in Hab2.
 destruct lb as [| b]; [ easy | clear Hbz ].
 remember (lap_norm (la - lq)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. 2: {
-  rewrite List.length_app in Hab2; cbn in Hab2.
+  cbn in Hab2.
   cbn in Hrb; flia Hrb Hab2.
 }
 apply eq_sym, List.length_zero_iff_nil in Hab2.
@@ -1003,6 +1002,7 @@ rewrite (list_nth_lap_sub Hop) in H1.
 now apply -> (rngl_sub_move_0_r Hop) in H1.
 Qed.
 
+(*
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem lap_rngl_of_nat :
@@ -1062,9 +1062,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-(*
 Context (Hon : rngl_has_1 T = true).
-*)
 Context (Hos : rngl_has_opp_or_subt T = true).
 Context (Hed : rngl_has_eq_dec T = true).
 
@@ -1241,10 +1239,8 @@ Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
 
 Notation "0" := polyn_zero : polyn_scope.
-(*
 Notation "1" := polyn_one : polyn_scope.
 Notation "- a" := (polyn_opp a) : polyn_scope.
-*)
 Notation "a + b" := (polyn_add a b) : polyn_scope.
 (*
 Notation "a - b" := (polyn_sub a b) : polyn_scope.
@@ -1312,7 +1308,6 @@ rewrite (lap_mul_norm_idemp_r Hos Hed).
 now rewrite lap_mul_assoc.
 Qed.
 
-(*
 Theorem polyn_mul_1_l : ∀ p, (1 * p)%pol = p.
 Proof.
 intros (la, lapr).
@@ -1370,6 +1365,7 @@ apply eq_polyn_eq; cbn.
 now rewrite (lap_mul_comm Hic).
 Qed.
 
+(*
 Theorem polyn_mul_comm :
   rngl_mul_is_comm T = true →
   ∀ a b : polyn T, (a * b)%pol = (b * a)%pol.
@@ -1379,6 +1375,7 @@ specialize polyn_opt_mul_comm as H1.
 rewrite Hic in H1.
 apply H1.
 Qed.
+*)
 
 (* optional right multiplication by 1; not required if multiplication
    is commutative *)
@@ -1487,6 +1484,7 @@ destruct (Sumbool.sumbool_of_bool (rngl_has_inv T)); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
+(*
 Theorem polyn_div_mod :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
@@ -1537,8 +1535,11 @@ Qed.
 
 Notation "a + b" := (polyn_add a b) : polyn_scope.
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
+*)
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
+(*
 Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
+*)
 
 Theorem polyn_mul_div :
   rngl_mul_is_comm T = true →
@@ -1596,6 +1597,7 @@ destruct (Sumbool.sumbool_of_bool true); [ | easy ].
 now apply polyn_mul_div.
 Qed.
 
+(*
 Theorem polyn_opt_mul_quot_r :
   let _ := polyn_ring_like_op in
   if (rngl_has_quot (polyn T) && negb (rngl_mul_is_comm T))%bool then
@@ -1972,6 +1974,7 @@ unfold lap_add in H2.
 rewrite Hab, Nat.sub_diag in H2.
 now do 2 rewrite List.app_nil_r in H2.
 Qed.
+*)
 
 Theorem rngl_has_opp_rngl_polyn_has_opp :
   let rop := polyn_ring_like_op in
@@ -2149,6 +2152,7 @@ rewrite Hop, Hsu in H1.
 apply H1.
 Qed.
 
+(*
 Definition polyn_opt_has_no_subt (_ : True) := 12.
 *)
 
