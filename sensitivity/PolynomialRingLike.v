@@ -20,11 +20,11 @@ Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
-(*
 Context {rp : ring_like_prop T}.
 Context (Hos : rngl_has_opp_or_subt T = true).
 Context (Hed : rngl_has_eq_dec T = true).
 
+(*
 Theorem eq_strip_0s_cons : ∀ la lb b,
   strip_0s la = b :: lb
   → b ≠ 0%L ∧
@@ -190,6 +190,7 @@ intros.
 rewrite (lap_norm_app_repeat_0 la) at 2.
 rewrite List.length_app; flia.
 Qed.
+*)
 
 Theorem lap_quot_is_norm :
   rngl_has_1 T = true →
@@ -235,6 +236,7 @@ cbn in Hqr.
 now apply (rngl_neqb_neq Hed).
 Qed.
 
+(*
 Theorem lap_rem_is_norm : ∀ la lb,
   has_polyn_prop la = true
   → has_polyn_prop lb = true
@@ -1053,20 +1055,20 @@ Record polyn T {ro : ring_like_op T} := mk_polyn
 
 Arguments mk_polyn {T ro} lap%_lap.
 Arguments lap {T ro}.
-(*
 Arguments lap_prop {T ro}.
-*)
 
 Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
-(*
 Context {rp : ring_like_prop T}.
+(*
 Context (Hon : rngl_has_1 T = true).
+*)
 Context (Hos : rngl_has_opp_or_subt T = true).
 Context (Hed : rngl_has_eq_dec T = true).
 
+(*
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
 
@@ -1122,6 +1124,7 @@ split; intros Hpq. {
   now apply list_eqb_eq.
 }
 Qed.
+*)
 
 Definition polyn_of_norm_lap la :=
   mk_polyn (lap_norm la) (polyn_norm_prop la).
@@ -1130,19 +1133,16 @@ Definition polyn_of_const c :=
   polyn_of_norm_lap [c].
 
 Arguments polyn_of_const c%_L.
-*)
 
 Definition polyn_zero := mk_polyn [] eq_refl.
-(*
 Definition polyn_one := polyn_of_const 1.
-*)
 
 Definition polyn_norm la := mk_polyn (lap_norm la) (polyn_norm_prop la).
 Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
-(*
 Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
 
 Definition polyn_subt p1 p2 := polyn_norm (lap_subt (lap p1) (lap p2)).
+(*
 Definition polyn_sub p1 p2 :=
   if rngl_has_opp T then polyn_add p1 (polyn_opp p2)
   else if rngl_has_subt T then polyn_subt p1 p2
@@ -1151,7 +1151,6 @@ Definition polyn_sub p1 p2 :=
 
 Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
-(*
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
   match Sumbool.sumbool_of_bool (rngl_has_1 T) with
   | left Hon =>
@@ -1168,6 +1167,7 @@ Definition polyn_quot (pa pb : polyn T) : polyn T :=
       polyn_zero
   end.
 
+(*
 Definition polyn_rem (pa pb : polyn T) : polyn T :=
   let lq := lap_rem (lap pa) (lap pb) in
   mk_polyn lq
@@ -1177,6 +1177,7 @@ Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
   (polyn_quot pa pb, polyn_rem pa pb).
 
 Definition polyn_x_power n := polyn_of_norm_lap (lap_x_power n).
+*)
 
 (* polyn opposite or subtraction *)
 
@@ -1208,7 +1209,6 @@ Definition polyn_opt_inv_or_quot :
       end
   | right _ => None
   end.
-*)
 
 Definition polyn_ring_like_op : ring_like_op (polyn T) :=
   {| rngl_zero := polyn_zero;
