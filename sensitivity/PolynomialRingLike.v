@@ -257,16 +257,6 @@ right; cbn; rewrite List.last_last.
 now rewrite Hrz.
 Qed.
 
-(*
-Theorem lap_norm_idemp : ∀ la, lap_norm (lap_norm la) = lap_norm la.
-Proof.
-intros.
-unfold lap_norm.
-rewrite List.rev_involutive.
-now rewrite strip_0s_idemp.
-Qed.
-*)
-
 Theorem lap_add_norm_idemp_r : ∀ la lb,
   lap_norm (la + lap_norm lb) = lap_norm (la + lb).
 Proof.
@@ -652,101 +642,6 @@ rewrite <- Hlc.
 apply lap_norm_convol_mul_norm_r.
 Qed.
 
-(*
-Theorem lap_mul_length : ∀ la lb,
-  List.length (la * lb)%lap =
-    match (la, lb) with
-    | ([], _) | (_, []) => 0
-    | _ => List.length (la ++ lb) - 1
-    end.
-Proof.
-intros.
-destruct la as [| a]; [ easy | ].
-destruct lb as [| b]; [ easy | cbn ].
-rewrite Nat.sub_0_r, Nat.add_succ_r; cbn.
-f_equal.
-rewrite lap_convol_mul_length.
-rewrite Nat.sub_0_r, List.length_app; cbn.
-now rewrite Nat.add_succ_r.
-Qed.
-
-Theorem lap_add_const_l :
-  ∀ a la, ([a] + la)%lap = (a + List.hd 0 la)%L :: List.tl la.
-Proof.
-intros.
-destruct la as [| b]; [ easy | ].
-cbn; f_equal.
-rewrite Nat.sub_0_r, List.app_nil_r.
-apply List_map2_rngl_add_0_l.
-Qed.
-
-Theorem lap_add_const_r :
-  ∀ a la, (la + [a])%lap = (List.hd 0 la + a)%L :: List.tl la.
-Proof.
-intros.
-destruct la as [| b]; [ easy | ].
-cbn; f_equal.
-rewrite Nat.sub_0_r, List.app_nil_r.
-apply List_map2_rngl_add_0_r.
-Qed.
-
-Theorem lap_convol_mul_x_l :
-  rngl_has_1 T = true →
-  ∀ la lb i len,
-  i = S (List.length la)
-  → len = List.length lb
-  → lap_convol_mul [0%L; 1%L] (la ++ lb) i len = lb.
-Proof.
-intros Hon * Hi Hlen.
-revert la lb i Hi Hlen.
-induction len; intros. {
-  now symmetry in Hlen; apply List.length_zero_iff_nil in Hlen.
-}
-cbn.
-destruct lb as [| b]; [ easy | ].
-cbn in Hlen.
-apply Nat.succ_inj in Hlen.
-f_equal. {
-  rewrite (rngl_summation_split3 1); [ | flia Hi ].
-  rewrite rngl_summation_only_one.
-  rewrite Nat.sub_diag, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_l, (rngl_mul_1_l Hon).
-  rewrite Hi, Nat_sub_succ_1.
-  rewrite List.app_nth2; [ | now unfold ge ].
-  rewrite Nat.sub_diag.
-  rewrite List_nth_0_cons.
-  rewrite all_0_rngl_summation_0; [ apply rngl_add_0_r | ].
-  intros j Hj.
-  destruct j; [ flia Hj | ].
-  destruct j; [ flia Hj | ].
-  rewrite Tauto_match_nat_same.
-  apply (rngl_mul_0_l Hos).
-}
-rewrite (List_cons_is_app b).
-rewrite List.app_assoc.
-apply IHlen; [ | easy ].
-rewrite List.length_app, Nat.add_1_r.
-now f_equal.
-Qed.
-
-Theorem lap_mul_x_l :
-  rngl_has_1 T = true →
-  ∀ la, la ≠ [] → ([0; 1]%L * la)%lap = 0%L :: la.
-Proof.
-intros Hon * Hla; cbn.
-destruct la as [| a]; [ easy | clear Hla ].
-rewrite rngl_summation_only_one.
-rewrite (rngl_mul_0_l Hos).
-f_equal; cbn.
-unfold iter_seq, iter_list; cbn.
-rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-rewrite rngl_add_0_l, (rngl_mul_1_l Hon).
-f_equal.
-rewrite (List_cons_is_app a).
-now apply (lap_convol_mul_x_l Hon).
-Qed.
-*)
-
 Theorem list_nth_lap_opp :
   rngl_has_opp T = true →
   ∀ k la, (List.nth k (lap_opp la) 0 = - List.nth k la 0)%L.
@@ -1002,10 +897,6 @@ rewrite (list_nth_lap_sub Hop) in H1.
 now apply -> (rngl_sub_move_0_r Hop) in H1.
 Qed.
 
-(*
-Arguments rngl_opt_one T {ring_like_op}.
-*)
-
 Theorem lap_rngl_of_nat :
   let lop := lap_ring_like_op Hed in
   rngl_has_1 (list T) = true →
@@ -1031,23 +922,7 @@ progress unfold lap_opt_one.
 now destruct (rngl_opt_one T).
 Qed.
 
-(*
-Theorem eq_lap_add_nil : ∀ la lb, (la + lb = [])%lap → la = [] ∧ lb = [].
-Proof.
-intros * Hab.
-destruct la as [| a]; cbn in Hab. {
-  rewrite Nat.sub_0_r, List.app_nil_r in Hab.
-  now rewrite List_map2_rngl_add_0_l in Hab.
-}
-now destruct lb.
-Qed.
-*)
 End a.
-
-(*
-Declare Scope lap_scope.
-Delimit Scope lap_scope with lap.
-*)
 
 (* polynomials *)
 
@@ -1067,11 +942,6 @@ Context {rp : ring_like_prop T}.
 Context (Hon : rngl_has_1 T = true).
 Context (Hos : rngl_has_opp_or_subt T = true).
 Context (Hed : rngl_has_eq_dec T = true).
-
-(*
-Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
-  list_eqv eqb (lap P) (lap Q).
-*)
 
 (* polyn_eq is equivalent to lap_eq *)
 
@@ -1103,31 +973,6 @@ destruct H1 as [H1| H1]. {
 }
 Qed.
 
-(*
-(* polyn_eqb is an equality *)
-
-Theorem polyn_eqb_eq : ∀ (eqb : T → T → bool),
-  equality eqb →
-  ∀ (P Q : polyn T),
-  polyn_eqb eqb P Q = true ↔ P = Q.
-Proof.
-intros * Heqb *.
-split; intros Hpq. {
-  unfold polyn_eqb in Hpq.
-  apply list_eqb_eq in Hpq; [ | easy ].
-  destruct P as (P, Pprop).
-  destruct Q as (Q, Qprop).
-  cbn in Hpq; cbn.
-  destruct Hpq.
-  f_equal.
-  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-} {
-  subst Q.
-  now apply list_eqb_eq.
-}
-Qed.
-*)
-
 Definition polyn_of_norm_lap la :=
   mk_polyn (lap_norm la) (polyn_norm_prop la).
 
@@ -1144,12 +989,6 @@ Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
 Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
 
 Definition polyn_subt p1 p2 := polyn_norm (lap_subt (lap p1) (lap p2)).
-(*
-Definition polyn_sub p1 p2 :=
-  if rngl_has_opp T then polyn_add p1 (polyn_opp p2)
-  else if rngl_has_subt T then polyn_subt p1 p2
-  else polyn_zero.
-*)
 
 Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
@@ -1168,18 +1007,6 @@ Definition polyn_quot (pa pb : polyn T) : polyn T :=
   | right _ =>
       polyn_zero
   end.
-
-(*
-Definition polyn_rem (pa pb : polyn T) : polyn T :=
-  let lq := lap_rem (lap pa) (lap pb) in
-  mk_polyn lq
-    (lap_rem_is_norm Hed (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
-
-Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
-  (polyn_quot pa pb, polyn_rem pa pb).
-
-Definition polyn_x_power n := polyn_of_norm_lap (lap_x_power n).
-*)
 
 (* polyn opposite or subtraction *)
 
@@ -1223,7 +1050,6 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_opt_eq_dec := Some polyn_eq_dec;
      rngl_opt_leb := None |}.
 
-(*
 (* allows to use ring-like theorems on polynomials
 Canonical Structure polyn_ring_like_op.
 *)
@@ -1235,7 +1061,6 @@ Existing Instance polyn_ring_like_op.
 (* Another way is to add at the beginning of the theorem
   let _ := polyn_ring_like_op in
 *)
-*)
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
@@ -1244,31 +1069,16 @@ Notation "0" := polyn_zero : polyn_scope.
 Notation "1" := polyn_one : polyn_scope.
 Notation "- a" := (polyn_opp a) : polyn_scope.
 Notation "a + b" := (polyn_add a b) : polyn_scope.
-(*
-Notation "a - b" := (polyn_sub a b) : polyn_scope.
-*)
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
-(*
-Notation "a / b" := (polyn_quot a b) : polyn_scope.
-Notation "'mkp' x" := (mk_polyn x _) (at level 0, x at level 0): polyn_scope.
-*)
 
-Theorem polyn_add_comm : ∀ a b, (a + b)%pol = (b + a)%pol.
-Proof.
-intros.
-unfold "+"%pol.
-now rewrite lap_add_comm.
-Qed.
-
-(* had to add this version for polyn_ring_like_prop, I don't know
-   why (othewize, Coq error). Not required for polyn_add_assoc, I
-   don't understand. *)
-Theorem polyn_add_comm' :
+Theorem polyn_add_comm :
   let rop := polyn_ring_like_op in
   ∀ a b : polyn T, (a + b)%L = (b + a)%L.
 Proof.
 intros.
-apply polyn_add_comm.
+cbn.
+progress unfold "+"%pol.
+now rewrite lap_add_comm.
 Qed.
 
 Theorem polyn_add_assoc : ∀ pa pb pc,
@@ -1366,18 +1176,6 @@ intros.
 apply eq_polyn_eq; cbn.
 now rewrite (lap_mul_comm Hic).
 Qed.
-
-(*
-Theorem polyn_mul_comm :
-  rngl_mul_is_comm T = true →
-  ∀ a b : polyn T, (a * b)%pol = (b * a)%pol.
-Proof.
-intros Hic *.
-specialize polyn_opt_mul_comm as H1.
-rewrite Hic in H1.
-apply H1.
-Qed.
-*)
 
 (* optional right multiplication by 1; not required if multiplication
    is commutative *)
@@ -1486,62 +1284,7 @@ destruct (Sumbool.sumbool_of_bool (rngl_has_inv T)); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
-(*
-Theorem polyn_div_mod :
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  ∀ pa pb pq pr : polyn T,
-  pb ≠ 0%pol
-  → polyn_quot_rem pa pb = (pq, pr)
-  → pa = (pb * pq + pr)%pol ∧ List.length (lap pr) < List.length (lap pb).
-Proof.
-intros * Hic Hop Hiv * Hbz Hab.
-destruct pa as (la, Hpa).
-destruct pb as (lb, Hpb).
-destruct pq as (lq, Hpq).
-destruct pr as (lr, Hpr); cbn.
-move lb before la; move lq before lb; move lr before lq.
-specialize (lap_div_mod Hed Hon Hic Hop Hiv la lb) as H1.
-specialize (H1 lq lr Hpa).
-assert (H : (List.last lb 0 ≠ 0)%L). {
-  apply (rngl_neqb_neq Hed).
-  destruct lb; [ | easy ].
-  exfalso; apply Hbz.
-  now apply eq_polyn_eq.
-}
-specialize (H1 H Hpr); clear H.
-assert (H : lap_quot_rem la lb = (lq, lr)). {
-  unfold polyn_quot_rem in Hab.
-  unfold polyn_quot, polyn_rem in Hab; cbn in Hab.
-  destruct (Sumbool.sumbool_of_bool (rngl_has_1 T)) as [Hon2| Hon2]. {
-    destruct (Sumbool.sumbool_of_bool (rngl_has_inv T)) as [Hiv2| Hiv2]. {
-      injection Hab; clear Hab; intros; subst lr lq.
-      unfold lap_quot_rem.
-      unfold lap_quot, lap_rem.
-      now destruct (rlap_quot_rem _ _).
-    }
-    congruence.
-  }
-  congruence.
-}
-specialize (H1 H); clear H.
-destruct H1 as (H1, H2).
-split; [ | easy ].
-apply eq_polyn_eq; cbn.
-rewrite fold_lap_norm, fold_lap_add.
-rewrite (lap_add_norm_idemp_l Hed).
-rewrite <- H1; symmetry.
-now apply has_polyn_prop_lap_norm.
-Qed.
-
-Notation "a + b" := (polyn_add a b) : polyn_scope.
-Notation "a * b" := (polyn_mul a b) : polyn_scope.
-*)
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
-(*
-Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
-*)
 
 Theorem polyn_mul_div :
   rngl_mul_is_comm T = true →
@@ -1611,18 +1354,6 @@ unfold polyn_opt_inv_or_quot.
 destruct (Sumbool.sumbool_of_bool _) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
 Qed.
-
-(*
-Theorem polyn_opt_eqb_eq :
-  let rop := polyn_ring_like_op in
-  if rngl_has_eq_dec (polyn T) then ∀ a b : polyn T, (a =? b)%L = true ↔ a = b
-  else not_applicable.
-Proof.
-intros rop; subst rop.
-intros a b; cbn.
-now destruct (polyn_eq_dec a b).
-Qed.
-*)
 
 Theorem lap_polyn_rngl_of_nat_char_0 :
   let _ := polyn_ring_like_op in
@@ -1852,134 +1583,6 @@ Qed.
 
 (* *)
 
-(*
-Theorem eq_nth_lap_subt_0 :
-  rngl_has_subt T = true →
-  ∀ la lb,
-  (∀ i, List.nth i la 0%L = List.nth i lb 0%L)
-  → ∀ i, List.nth i (lap_subt la lb) 0%L = 0%L.
-Proof.
-intros Hsu * Hab *.
-revert i lb Hab.
-induction la as [| a]; intros; cbn. {
-  rewrite Nat.sub_0_r, List.app_nil_r.
-  destruct (lt_dec i (List.length lb)) as [Hil| Hil]. {
-    rewrite (List_map2_nth 0%L 0%L); [ | | easy ]. 2: {
-      now rewrite List.repeat_length.
-    }
-    rewrite <- Hab, List_nth_nil.
-    rewrite List_nth_repeat.
-    destruct (lt_dec _ _) as [H| H]; [ clear H | easy ].
-    unfold rngl_subt.
-    unfold rngl_has_opp_or_subt in Hos.
-    specialize (rngl_add_sub Hos 0 0) as H1.
-    rewrite rngl_add_0_r in H1.
-    unfold rngl_sub, rngl_has_opp, rngl_has_subt, rngl_subt in H1.
-    remember (rngl_opt_opp_or_subt T) as os eqn:Hos'; symmetry in Hos'.
-    destruct os as [os| ]; [ | easy ].
-    now destruct os.
-  }
-  apply Nat.nlt_ge in Hil.
-  apply List.nth_overflow.
-  now rewrite List_length_map2, List.repeat_length, Nat.min_id.
-}
-destruct lb as [| b]. {
-  cbn - [ List.nth ].
-  rewrite List.app_nil_r, (rngl_subt_0_r Hsu).
-  rewrite (List_map2_rngl_subt_0_r Hsu); [ | easy ].
-  now rewrite Hab, List_nth_nil.
-}
-destruct i; cbn. {
-  specialize (Hab 0); cbn in Hab; subst b.
-  apply (rngl_subt_diag Hos).
-}
-apply IHla.
-intros j.
-now specialize (Hab (S j)).
-Qed.
-
-(* *)
-
-Theorem lap_subt_app_r :
-  ∀ la lb lc,
-  List.length la ≤ List.length lb
-  → lap_subt la (lb ++ lc) = lap_subt la lb ++ List.map (rngl_subt 0) lc.
-Proof.
-intros * Hab.
-revert lb lc Hab.
-induction la as [| a]; intros. {
-  cbn.
-  do 2 rewrite List.app_nil_r, Nat.sub_0_r.
-  rewrite List.length_app.
-  rewrite List.repeat_app.
-  rewrite List_map2_app_app; [ | apply List.repeat_length ].
-  f_equal.
-  rewrite (List_map2_map_min 0%L 0%L).
-  rewrite List.repeat_length, Nat.min_id.
-  symmetry.
-  rewrite (List_map_map_seq 0%L).
-  apply List.map_ext_in.
-  intros i Hi.
-  apply List.in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
-  rewrite List_nth_repeat.
-  now destruct (lt_dec _ _).
-}
-destruct lb as [| b]; [ easy | ].
-cbn in Hab; apply Nat.succ_le_mono in Hab.
-cbn; do 2 rewrite fold_lap_subt.
-now f_equal; apply IHla.
-Qed.
-
-Theorem lap_norm_add_subt :
-  rngl_has_subt T = true →
-  ∀ la lb,
-  List.length la = List.length lb
-  → lap_subt (lap_norm (la + lb)) lb = la.
-Proof.
-intros Hsu * Hab.
-assert (Hop : rngl_has_opp T = false). {
-  unfold rngl_has_subt in Hsu.
-  unfold rngl_has_opp.
-  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-  now destruct os.
-}
-move Hop after Hsu.
-specialize (lap_subt_norm_idemp_l Hed Hsu) as H1.
-specialize (H1 (la + lb)%lap lb).
-apply (eq_lap_norm_eq_length Hed) in H1. 2: {
-  do 2 rewrite lap_subt_length.
-  rewrite lap_add_length.
-  rewrite <- Hab, Nat.max_id, Nat.max_id.
-  apply Nat.max_r.
-  etransitivity; [ apply (lap_norm_length_le Hed) | ].
-  rewrite lap_add_length.
-  now rewrite Hab, Nat.max_id.
-}
-rewrite H1; clear H1.
-unfold lap_subt.
-rewrite lap_add_length.
-rewrite Hab, Nat.max_id.
-rewrite Nat.sub_diag.
-do 2 rewrite List.app_nil_r.
-revert lb Hab.
-induction la as [| a]; intros. {
-  now symmetry in Hab; apply List.length_zero_iff_nil in Hab; subst lb.
-}
-destruct lb as [| b]; [ easy | ].
-cbn in Hab; apply Nat.succ_inj in Hab; cbn.
-rewrite Hab, Nat.sub_diag.
-do 2 rewrite List.app_nil_r.
-specialize (rngl_add_sub Hos) as H1.
-unfold rngl_sub in H1.
-rewrite Hop, Hsu in H1.
-rewrite H1; f_equal.
-specialize (IHla _ Hab) as H2.
-unfold lap_add in H2.
-rewrite Hab, Nat.sub_diag in H2.
-now do 2 rewrite List.app_nil_r in H2.
-Qed.
-*)
-
 Theorem rngl_has_opp_rngl_polyn_has_opp :
   let rop := polyn_ring_like_op in
   rngl_has_opp T = rngl_has_opp (polyn T).
@@ -2156,16 +1759,12 @@ rewrite Hop, Hsu in H1.
 apply H1.
 Qed.
 
-(*
-Definition polyn_opt_has_no_subt (_ : True) := 12.
-*)
-
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;
-     rngl_add_comm := polyn_add_comm';
+     rngl_add_comm := polyn_add_comm;
      rngl_add_assoc := polyn_add_assoc;
      rngl_add_0_l := polyn_add_0_l;
      rngl_mul_assoc := polyn_mul_assoc;
