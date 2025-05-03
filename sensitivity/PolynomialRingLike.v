@@ -12,7 +12,6 @@ Require Import RingLike.IterAdd.
 Require Import RingLike.LapRingLike.
 Require Import RingLike.Misc.
 
-(****************)
 Section a.
 
 Context {T : Type}.
@@ -1996,8 +1995,6 @@ Qed.
 End a.
 
 Arguments lap_quot_rem {T ro} (la lb)%_lap.
-
-(****************)
 
 Section a.
 
