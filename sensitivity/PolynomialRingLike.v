@@ -3766,3 +3766,5 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_characteristic_prop := polyn_characteristic_prop;
      rngl_opt_ord := NA;
      rngl_opt_archimedean := NA |}.
+
+End a.

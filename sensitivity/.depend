@@ -10,7 +10,8 @@ Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v
 MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v Misc.vo
 PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo Pigeonhole.vo SortRank.vo SortingFun.vo
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
-Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v LapPolyn.vo Misc.vo SortingFun.vo
+Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v LapPolyn.vo Misc.vo PolynomialRingLike.vo SortingFun.vo
+PolynomialRingLike.vo PolynomialRingLike.glob PolynomialRingLike.v.beautified PolynomialRingLike.required_vo: PolynomialRingLike.v
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo SortingFun.vo
 Signature.vo Signature.glob Signature.v.beautified Signature.required_vo: Signature.v Misc.vo PermutSeq.vo SortRank.vo SortingFun.vo
 SortRank.vo SortRank.glob SortRank.v.beautified SortRank.required_vo: SortRank.v Misc.vo SortingFun.vo
