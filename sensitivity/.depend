@@ -1,8 +1,7 @@
-Algebraic.vo Algebraic.glob Algebraic.v.beautified Algebraic.required_vo: Algebraic.v Comatrix.vo Determinant.vo LapPolyn.vo Matrix.vo Misc.vo MyVector.vo PermutSeq.vo Polynomial.vo Signature.vo
+Algebraic.vo Algebraic.glob Algebraic.v.beautified Algebraic.required_vo: Algebraic.v Comatrix.vo Determinant.vo Matrix.vo Misc.vo MyVector.vo PermutSeq.vo Polynomial.vo Signature.vo
 CauchyBinet.vo CauchyBinet.glob CauchyBinet.v.beautified CauchyBinet.required_vo: CauchyBinet.v Determinant.vo Matrix.vo Misc.vo PermutSeq.vo Signature.vo SortRank.vo SortingFun.vo
 Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v Determinant.vo Matrix.vo Misc.vo MyVector.vo PermutSeq.vo Pigeonhole.vo Signature.vo SortRank.vo SortingFun.vo
 Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Matrix.vo Misc.vo MyVector.vo PermutSeq.vo Signature.vo SortRank.vo SortingFun.vo
-LapPolyn.vo LapPolyn.glob LapPolyn.v.beautified LapPolyn.required_vo: LapPolyn.v Misc.vo
 Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v CauchyBinet.vo Comatrix.vo Determinant.vo Matrix.vo Misc.vo MyVector.vo Signature.vo
 Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Matrix.vo Misc.vo MyVector.vo
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo MyVector.vo Signature.vo
@@ -10,7 +9,7 @@ Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v
 MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v Misc.vo
 PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo Pigeonhole.vo SortRank.vo SortingFun.vo
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
-Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v LapPolyn.vo Misc.vo PolynomialRingLike.vo SortingFun.vo
+Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v Misc.vo PolynomialRingLike.vo SortingFun.vo
 PolynomialRingLike.vo PolynomialRingLike.glob PolynomialRingLike.v.beautified PolynomialRingLike.required_vo: PolynomialRingLike.v
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo SortingFun.vo
 Signature.vo Signature.glob Signature.v.beautified Signature.required_vo: Signature.v Misc.vo PermutSeq.vo SortRank.vo SortingFun.vo

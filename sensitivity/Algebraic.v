@@ -11,7 +11,7 @@ Require Import RingLike.IterAdd.
 Require Import RingLike.IterAnd.
 Require Import RingLike.IterMul.
 Require Import Misc.
-Require Import LapPolyn Polynomial Matrix Determinant Comatrix.
+Require Import Polynomial Matrix Determinant Comatrix.
 Require Import Signature PermutSeq MyVector.
 Import matrix_Notations.
 
