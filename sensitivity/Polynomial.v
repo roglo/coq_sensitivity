@@ -15,7 +15,6 @@ Require Import PolynomialRingLike.
 
 Require Import Misc.
 Require Import SortingFun.
-Require Import LapPolyn.
 
 Section a.
 
@@ -39,8 +38,23 @@ Definition polyn_rem (pa pb : polyn T) : polyn T :=
   mk_polyn lq
     (lap_rem_is_norm Hed (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
 
+Definition rlap_horner {A} (zero : A) (add mul : A → A → A) rla x :=
+  iter_list rla (λ accu a, add (mul accu x) a) zero.
+
+Definition eval_rlap :=
+  rlap_horner 0%L rngl_add rngl_mul.
+
+Definition eval_lap la x :=
+  eval_rlap (List.rev la) x.
+
 Definition eval_polyn pol :=
   eval_lap (lap pol).
+
+Definition rlap_compose rla rlb :=
+  rlap_horner [] lap_add lap_mul (List.map (λ a, [a]) rla) (List.rev rlb).
+
+Definition lap_compose la lb :=
+  rlap_compose (List.rev la) (List.rev lb).
 
 Definition polyn_compose p q :=
   polyn_of_norm_lap (lap_compose (lap p) (lap q)).
