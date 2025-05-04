@@ -11,7 +11,7 @@ Require Import RingLike.PermutationFun.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterAnd.
 Require Import RingLike.LapRingLike.
-Require Import PolynomialRingLike.
+Require Import RingLike.PolynomialRingLike.
 
 Require Import Misc.
 Require Import SortingFun.
