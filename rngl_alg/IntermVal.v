@@ -354,8 +354,8 @@ Theorem An_Bn_are_Cauchy_sequences :
   rngl_has_inv T = true →
   rngl_is_archimedean T = true →
   ∀ P a b, (a ≤ b)%L →
-  is_Cauchy_sequence rngl_distance (λ n : nat, fst (AnBn P a b n)) ∧
-  is_Cauchy_sequence rngl_distance (λ n : nat, snd (AnBn P a b n)).
+  is_Cauchy_sequence rngl_dist (λ n : nat, fst (AnBn P a b n)) ∧
+  is_Cauchy_sequence rngl_dist (λ n : nat, snd (AnBn P a b n)).
 Proof.
 intros Hon Hiv Har * Hab.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -562,8 +562,8 @@ Qed.
 
 Theorem limit_opp :
   ∀ u lim,
-  is_limit_when_seq_tends_to_inf rngl_distance u lim
-  → is_limit_when_seq_tends_to_inf rngl_distance (λ n, (- u n)%L) (- lim)%L.
+  is_limit_when_seq_tends_to_inf rngl_dist u lim
+  → is_limit_when_seq_tends_to_inf rngl_dist (λ n, (- u n)%L) (- lim)%L.
 Proof.
 intros * Hu.
 intros ε Hε.
@@ -580,10 +580,10 @@ now apply HN.
 Qed.
 
 Theorem gen_limit_ext_in :
-  ∀ {A} (dist : distance A) u v lim,
+  ∀ {A} (da : A → A → T) u v lim,
   (∀ n, u n = v n)
-  → is_limit_when_seq_tends_to_inf dist u lim
-  → is_limit_when_seq_tends_to_inf dist v lim.
+  → is_limit_when_seq_tends_to_inf da u lim
+  → is_limit_when_seq_tends_to_inf da v lim.
 Proof.
 intros * Huv Hu ε Hε.
 destruct (Hu ε Hε) as (N, HN).
@@ -598,8 +598,8 @@ Theorem limit_between_An_and_Bn :
   rngl_has_inv T = true →
   ∀ a b lim P,
   (a ≤ b)%L
-  → is_limit_when_seq_tends_to_inf rngl_distance (λ n, fst (AnBn P a b n)) lim
-  → is_limit_when_seq_tends_to_inf rngl_distance (λ n, snd (AnBn P a b n)) lim
+  → is_limit_when_seq_tends_to_inf rngl_dist (λ n, fst (AnBn P a b n)) lim
+  → is_limit_when_seq_tends_to_inf rngl_dist (λ n, snd (AnBn P a b n)) lim
   → ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
 Proof.
 intros Hon Hiv.
@@ -792,7 +792,7 @@ Theorem intermediate_value_prop_1 :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ f,
-  is_continuous rngl_le rngl_distance rngl_distance f →
+  is_continuous rngl_le rngl_dist rngl_dist f →
   ∀ a b c u,
   (a < b)%L
   → (f a < u)%L
@@ -884,7 +884,7 @@ Qed.
 Theorem intermediate_value_prop_2 :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ f, is_continuous rngl_le rngl_distance rngl_distance f →
+  ∀ f, is_continuous rngl_le rngl_dist rngl_dist f →
   ∀ a b c u,
   (a < b)%L
   → (u < f b)%L
@@ -985,13 +985,13 @@ Theorem exists_supremum :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_is_archimedean T = true →
-  is_complete T rngl_distance →
+  is_complete T rngl_dist →
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x ≤ b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L ∧
-    is_limit_when_seq_tends_to_inf rngl_distance (λ n, fst (AnBn P a b n)) c ∧
-    is_limit_when_seq_tends_to_inf rngl_distance (λ n, snd (AnBn P a b n)) c.
+    is_limit_when_seq_tends_to_inf rngl_dist (λ n, fst (AnBn P a b n)) c ∧
+    is_limit_when_seq_tends_to_inf rngl_dist (λ n, snd (AnBn P a b n)) c.
 Proof.
 intros Hon Hiv Har Hco.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -1049,7 +1049,7 @@ destruct Hac as (lima, Hal).
 destruct Hbc as (limb, Hbl).
 move limb before lima.
 assert
-  (Hl : (is_limit_when_seq_tends_to_inf rngl_distance (λ n, (u n - v n)) 0)%L). {
+  (Hl : (is_limit_when_seq_tends_to_inf rngl_dist (λ n, (u n - v n)) 0)%L). {
   intros ε Hε.
   progress unfold u.
   progress unfold v.
@@ -1086,7 +1086,7 @@ assert
 assert (Hlab : lima = limb). {
   generalize Hbl; intros Hblv.
   apply limit_opp in Hbl.
-  specialize (limit_add Hon Hop Hiv Hor rngl_distance) as H1.
+  specialize (limit_add Hon Hop Hiv Hor (rngl_dist_is_dist Hop Hor)) as H1.
   specialize (H1 (rngl_dist_add_add_le Hop Hor)).
   specialize (H1 _ _ _ _ Hal Hbl).
   rewrite (rngl_add_opp_r Hop) in H1.
@@ -1094,7 +1094,7 @@ assert (Hlab : lima = limb). {
     now intros; rewrite (rngl_add_opp_r Hop).
   }
   apply (rngl_sub_move_0_r Hop).
-  eapply (limit_unique Hon Hop Hiv Hor _ rngl_distance).
+  eapply (limit_unique Hon Hop Hiv Hor (rngl_dist_is_dist Hop Hor)).
   apply H1.
   apply Hl.
 }
@@ -1238,8 +1238,8 @@ Theorem intermediate_value_le :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_is_archimedean T = true →
-  is_complete T rngl_distance →
-  ∀ f, is_continuous rngl_le rngl_distance rngl_distance f
+  is_complete T rngl_dist →
+  ∀ f, is_continuous rngl_le rngl_dist rngl_dist f
   → ∀ a b u, (a ≤ b)%L
   → (f a ≤ u ≤ f b)%L
   → ∃ c : T, (a ≤ c ≤ b)%L ∧ f c = u.
@@ -1591,7 +1591,7 @@ Theorem upper_bound_property :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_is_archimedean T = true →
-  is_complete T rngl_distance →
+  is_complete T rngl_dist →
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x ≤ b)%L)
@@ -1606,7 +1606,7 @@ Theorem lower_bound_property :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_is_archimedean T = true →
-  is_complete T rngl_distance →
+  is_complete T rngl_dist →
   ∀ (P : T → Prop) a b,
   P b
   → (∀ x, P x → (a ≤ x)%L)
@@ -1638,8 +1638,8 @@ Theorem intermediate_value :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_is_archimedean T = true →
-  is_complete T rngl_distance →
-  ∀ f, is_continuous rngl_le rngl_distance rngl_distance f
+  is_complete T rngl_dist →
+  ∀ f, is_continuous rngl_le rngl_dist rngl_dist f
   → ∀ a b u, (a ≤ b)%L
   → (rngl_min (f a) (f b) ≤ u ≤ rngl_max (f a) (f b))%L
   → ∃ c, (a ≤ c ≤ b)%L ∧ f c = u.
@@ -1654,7 +1654,7 @@ destruct ab; [ now apply (H1 _ Hfc) | ].
 specialize (H1 (λ x, (- f x))%L).
 cbn in H1.
 assert
-  (H : is_continuous rngl_le rngl_distance rngl_distance (λ x, (- f x))%L). {
+  (H : is_continuous rngl_le rngl_dist rngl_dist (λ x, (- f x))%L). {
   intros x.
   specialize (Hfc x).
   destruct Hfc as (Hfcl, Hfcr).

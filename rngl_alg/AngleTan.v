@@ -27,8 +27,8 @@ Definition rngl_tan θ := (rngl_sin θ / rngl_cos θ)%L.
 
 Theorem rngl_tan_derivative :
   ∀ θ₀, (rngl_cos θ₀ ≠ 0%L) →
-  is_derivative_at angle_lt_for_deriv angle_eucl_distance
-    rngl_distance rngl_tan (λ θ, (1 / (rngl_cos θ)²)%L) θ₀.
+  is_derivative_at angle_lt_for_deriv angle_eucl_dist
+    rngl_dist rngl_tan (λ θ, (1 / (rngl_cos θ)²)%L) θ₀.
 Proof.
 destruct_ac.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
@@ -48,10 +48,10 @@ assert (H : ∀ x, ¬ angle_lt_for_deriv x x). {
 }
 specialize (H1 H).
 specialize (H2 H); clear H.
-specialize (H1 angle_eucl_distance).
-specialize (H2 angle_eucl_distance).
+specialize (H1 angle_eucl_dist).
+specialize (H2 angle_eucl_dist).
 specialize (H1 rngl_cos (rngl_opp ° rngl_sin)).
-specialize (H2 rngl_sin).
+specialize (H2 angle_eucl_dist_is_dist rngl_sin).
 specialize (H1 θ₀ Hczz).
 specialize (H1 (rngl_cos_derivative _)).
 specialize (H2 (rngl_inv ° rngl_cos)).

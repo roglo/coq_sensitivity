@@ -772,7 +772,7 @@ Qed.
 Theorem dist_diag : ∀ A dist (a : A), is_dist dist → dist a a = 0%L.
 Proof.
 intros * Hd.
-now apply (dist_separation dist Hd).
+now apply (dist_separation Hd).
 Qed.
 
 Theorem rngl_squ_lt_squ_nonneg :
@@ -1207,7 +1207,7 @@ apply rngl_sin_nonneg_is_pos; [ | | easy ]. {
 Qed.
 
 Theorem is_Cauchy_sequence_eq_compat :
-  ∀ A (dist : distance A) a b f g,
+  ∀ A (dist : A → A → T) a b f g,
   (∀ i, f (i + a) = g (i + b))
   → is_Cauchy_sequence dist f
   → is_Cauchy_sequence dist g.
@@ -1268,8 +1268,8 @@ Theorem rngl_limit_sub_l_limit :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a u l,
-  is_limit_when_seq_tends_to_inf rngl_distance (λ i, (a - u i)%L) (a - l)%L
-  → is_limit_when_seq_tends_to_inf rngl_distance u l.
+  is_limit_when_seq_tends_to_inf rngl_dist (λ i, (a - u i)%L) (a - l)%L
+  → is_limit_when_seq_tends_to_inf rngl_dist u l.
 Proof.
 intros Hop Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
