@@ -5,7 +5,7 @@
 
 Require Import Utf8 Arith.
 
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 
 Section a.

@@ -1848,7 +1848,7 @@ Qed.
 
 (* *)
 
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 
 Definition QG_ring_like_op : ring_like_op QG :=
   {| rngl_zero := 0%QG;

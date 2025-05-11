@@ -306,7 +306,7 @@ Qed.
 
 (* *)
 
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 
 Instance Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_zero := Zn_of_nat n 0;

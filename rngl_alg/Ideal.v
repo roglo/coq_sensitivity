@@ -3,7 +3,7 @@
 (* ideals on a RingLike *)
 
 From Stdlib Require Import Utf8 Arith.
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 Require Import RingLike.Misc.
 
 Record ideal {T} (P : T → bool) := mk_I

@@ -60,7 +60,7 @@ Definition gi_div α β := fst (gi_eucl_div α β).
 
 Notation "α / β" := (gi_div α β) : G_scope.
 
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 
 Canonical Structure gauss_int_ring_like_op : ring_like_op gauss_int :=
   {| rngl_zero := gi_zero;

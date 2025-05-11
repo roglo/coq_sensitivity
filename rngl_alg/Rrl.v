@@ -5,7 +5,7 @@ From Stdlib Require Import Utf8.
 From Stdlib Require Import Reals.Cauchy.ConstructiveCauchyReals.
 From Stdlib Require Import Reals.Cauchy.ConstructiveCauchyRealsMult.
 From Stdlib Require Import QArith.
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 
 Axiom CReal_appart_or_eq : ∀ x y, (x # y)%CReal + (x = y).
 
@@ -263,7 +263,7 @@ Definition CComplex_ring_like_prop : ring_like_op CComplex :=
 
 Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Reals.
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 
 Instance reals_ring_like_op : ring_like_op R :=
   {| rngl_zero := R0;

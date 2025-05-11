@@ -4,7 +4,7 @@
 Set Implicit Arguments.
 From Stdlib Require Import Utf8.
 
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 Require Import Rational.
 Import Q.Notations.
 

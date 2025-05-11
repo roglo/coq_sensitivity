@@ -3,7 +3,7 @@ Set Nested Proofs Allowed.
 
 From Stdlib Require Import Utf8 ZArith.
 
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 
 Require Import TrigoWithoutPi.Angle TrigoWithoutPi.TrigoWithoutPiExt.

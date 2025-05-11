@@ -16,7 +16,7 @@ From Stdlib Require Import Utf8 Arith.
 From Stdlib Require Import Sorted.
 Import Init.Nat List List.ListNotations.
 
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterMul.
 Require Import Misc MyVector.

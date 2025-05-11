@@ -1,7 +1,7 @@
 (* RingLike on angles *)
 
 From Stdlib Require Import Utf8.
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 Require Import TrigoWithoutPi.Angle.
 
 Section a.

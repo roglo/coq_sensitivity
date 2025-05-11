@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 Require Import Utf8.
 
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 Require Import RingLike.Misc.
 Require Import Sensitivity.MyVector.
 Require Import Misc.

@@ -6,7 +6,7 @@ From Stdlib Require Import Utf8 ZArith.
 Require Import Init.Nat.
 Import List.ListNotations.
 
-Require Import RingLike.RingLike.
+Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 Require Import RingLike.IterAdd.
 Require Import RingLike.Misc.
