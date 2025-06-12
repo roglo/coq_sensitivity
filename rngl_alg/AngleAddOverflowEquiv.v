@@ -923,7 +923,7 @@ split; intros H12. {
         rewrite Hi1; cbn.
         apply (rngl_has_eq_dec_or_is_ordered_r Hor).
       } {
-        apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+        apply (rngl_inv_pos Hon Hop Hiv Hor).
         apply (rl_sqrt_pos Hon Hos Hor).
         apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
       }

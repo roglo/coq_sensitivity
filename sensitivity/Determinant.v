@@ -9,7 +9,7 @@ Require Import RingLike.Core.
 Require Import RingLike.PermutationFun.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterMul.
-Require Import RingLike.NatRingLike.
+Require Import RingLike.Nat_algebra.
 
 Require Import Misc.
 Require Import SortingFun SortRank.
@@ -89,16 +89,17 @@ Definition det' (M : matrix T) :=
    remaining terms, whose ε is not 0, i.e. 1 or -1, are the ones when all
    selected columns are different. It holds n^n terms *)
 
-Definition cart_prod_rep_seq n := cart_prod (List.repeat (List.seq 1 n) n).
+Definition List_cart_prod_rep_seq n :=
+  List_cart_prod (List.repeat (List.seq 1 n) n).
 
 (*
-Compute (cart_prod_rep_seq 3).
-Compute (cart_prod (repeat (seq 0 10) 2)).
+Compute (List_cart_prod_rep_seq 3).
+Compute (List_cart_prod (repeat (seq 0 10) 2)).
 *)
 
 Definition det'' (M : matrix T) :=
   let n := mat_nrows M in
-  ∑ (l ∈ cart_prod_rep_seq n), ε l * ∏ (i = 1, n), mat_el M i l.(i).
+  ∑ (l ∈ List_cart_prod_rep_seq n), ε l * ∏ (i = 1, n), mat_el M i l.(i).
 
 (* *)
 
@@ -219,12 +220,12 @@ intros l1 Hl1.
 now apply Hll; right.
 Qed.
 
-Theorem cart_prod_rep_length_seq :
-  ∀ n, n ≠ 0 → length (cart_prod_rep_seq n) = n ^ n.
+Theorem List_cart_prod_rep_length_seq :
+  ∀ n, n ≠ 0 → length (List_cart_prod_rep_seq n) = n ^ n.
 Proof.
 intros * Hnz.
-unfold cart_prod_rep_seq.
-rewrite cart_prod_length; [ | now destruct n ].
+unfold List_cart_prod_rep_seq.
+rewrite List_cart_prod_length; [ | now destruct n ].
 rewrite iter_list_mul_same_length with (n := n). 2: {
   intros l Hl.
   apply List.repeat_spec in Hl; subst l.
@@ -233,10 +234,10 @@ rewrite iter_list_mul_same_length with (n := n). 2: {
 f_equal; apply List.repeat_length.
 Qed.
 
-Fixpoint cart_prod_rep_seq_inv n l :=
+Fixpoint List_cart_prod_rep_seq_inv n l :=
   match l with
   | [] => 0
-  | a :: l' => pred a * n ^ length l' + cart_prod_rep_seq_inv n l'
+  | a :: l' => pred a * n ^ length l' + List_cart_prod_rep_seq_inv n l'
   end.
 
 Fixpoint old_cart_prod_rep_seq_inv_loop n l :=
@@ -259,12 +260,12 @@ Compute (
 Theorem in_cart_prod_repeat_iff : ∀ m n l,
   n = 0 ∧ l = [] ∨
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
-  ↔ l ∈ cart_prod (List.repeat (List.seq 1 m) n).
+  ↔ l ∈ List_cart_prod (List.repeat (List.seq 1 m) n).
 Proof.
 intros.
 split. {
   intros [(Hnz, H1)| (Hnz & Hn & Hm)]; [ now subst n l; left | ].
-  apply (in_cart_prod_iff 0).
+  apply (List_in_cart_prod_iff 0).
   rewrite List.repeat_length.
   split; [ easy | ].
   intros i Hi.
@@ -279,7 +280,7 @@ split. {
   now apply Nat.lt_succ_r.
 } {
   intros Hl.
-  apply (in_cart_prod_iff 0) in Hl.
+  apply (List_in_cart_prod_iff 0) in Hl.
   rewrite List.repeat_length in Hl.
   destruct Hl as (Hln, Hl).
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -305,14 +306,14 @@ Qed.
 Theorem in_cart_prod_rep_seq_iff : ∀ n l,
   n = 0 ∧ l = [] ∨
   n ≠ 0 ∧ length l = n ∧ (∀ i, i ∈ l → 1 ≤ i ≤ n)
-  ↔ l ∈ cart_prod_rep_seq n.
+  ↔ l ∈ List_cart_prod_rep_seq n.
 Proof.
 intros.
 now apply in_cart_prod_repeat_iff.
 Qed.
 
 Theorem NoDup_cart_prod_repeat : ∀ m n,
-  List.NoDup (cart_prod (List.repeat (List.seq 1 m) n)).
+  List.NoDup (List_cart_prod (List.repeat (List.seq 1 m) n)).
 Proof.
 intros.
 revert m.
@@ -321,7 +322,7 @@ induction n; intros. {
 }
 cbn.
 specialize (IHn m) as H1.
-remember (cart_prod (List.repeat (List.seq 1 m) n)) as ll eqn:Hll.
+remember (List_cart_prod (List.repeat (List.seq 1 m) n)) as ll eqn:Hll.
 rewrite List.flat_map_concat_map.
 apply NoDup_concat_if. {
   intros l Hl.
@@ -353,27 +354,28 @@ rewrite List.seq_nth in Hji; [ | easy ].
 now apply Nat.succ_inj in Hji; symmetry in Hji.
 Qed.
 
-Theorem NoDup_cart_prod_rep_seq : ∀ n, List.NoDup (cart_prod_rep_seq n).
+Theorem NoDup_cart_prod_rep_seq : ∀ n, List.NoDup (List_cart_prod_rep_seq n).
 Proof.
 intros n.
-unfold cart_prod_rep_seq.
+unfold List_cart_prod_rep_seq.
 apply NoDup_cart_prod_repeat.
 Qed.
 
-Theorem cart_prod_rep_seq_inj : ∀ [n i j],
+Theorem List_cart_prod_rep_seq_inj : ∀ [n i j],
   n ≠ 0
   → i < n ^ n
   → j < n ^ n
-  → List.nth i (cart_prod_rep_seq n) [] = List.nth j (cart_prod_rep_seq n) []
+  → List.nth i (List_cart_prod_rep_seq n) [] =
+    List.nth j (List_cart_prod_rep_seq n) []
   → i = j.
 Proof.
 intros * Hnz Hi Hj Hij.
-apply (List.NoDup_nth (cart_prod_rep_seq n) []); [ | | | easy ]. {
+apply (List.NoDup_nth (List_cart_prod_rep_seq n) []); [ | | | easy ]. {
   apply NoDup_cart_prod_rep_seq.
 } {
-  now rewrite cart_prod_rep_length_seq.
+  now rewrite List_cart_prod_rep_length_seq.
 } {
-  now rewrite cart_prod_rep_length_seq.
+  now rewrite List_cart_prod_rep_length_seq.
 }
 Qed.
 
@@ -548,7 +550,7 @@ cbn.
 assert
   (Hincl :
      canon_sym_gr_list_list n ⊂
-       List.map (List.map pred) (cart_prod_rep_seq n)). {
+       List.map (List.map pred) (List_cart_prod_rep_seq n)). {
   intros l Hl.
   apply List.in_map_iff in Hl.
   apply List.in_map_iff.
@@ -579,8 +581,8 @@ assert
   now apply canon_sym_gr_list_ub.
 }
 symmetry.
-replace (cart_prod_rep_seq n) with
-    (List.map (λ l, List.map S (List.map pred l)) (cart_prod_rep_seq n)). 2: {
+replace (List_cart_prod_rep_seq n) with
+    (List.map (λ l, List.map S (List.map pred l)) (List_cart_prod_rep_seq n)). 2: {
   erewrite List.map_ext_in. 2: {
     intros l Hl.
     rewrite List.map_map.
@@ -600,9 +602,9 @@ replace (cart_prod_rep_seq n) with
 rewrite <- List.map_map.
 rewrite rngl_summation_list_map.
 assert (H1 :
-  ∑ (l ∈ List.map (List.map pred) (cart_prod_rep_seq n)),
+  ∑ (l ∈ List.map (List.map pred) (List_cart_prod_rep_seq n)),
   ε l * ∏ (j = 1, n), mat_el M j (l.(j) + 1) =
-  ∑ (l ∈ List.map (List.map pred) (cart_prod_rep_seq n)),
+  ∑ (l ∈ List.map (List.map pred) (List_cart_prod_rep_seq n)),
   if
     ListDec.In_dec (List.list_eq_dec Nat.eq_dec) l (canon_sym_gr_list_list n)
   then

@@ -9,7 +9,7 @@ From Stdlib Require Import Utf8 Arith.
 Import List.ListNotations.
 Require Import Init.Nat.
 Require Import RingLike.IterAdd.
-Require Import RingLike.NatRingLike.
+Require Import RingLike.Nat_algebra.
 
 Require Import Misc SortingFun.
 

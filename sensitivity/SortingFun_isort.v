@@ -73,15 +73,15 @@ Theorem permutation_cons_isort_insert : ∀ {A} {eqb : A → _} (rel : A → _),
 Proof.
 intros * Heqb * Hpab; cbn.
 apply permutation_cons_l_iff.
-remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
+remember (List_extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl a) as H1.
+  specialize (proj1 (List_extract_None_iff _ _) Hlxl a) as H1.
   specialize (in_isort_insert_id rel a lb) as H.
   specialize (H1 H); clear H.
   now rewrite (equality_refl Heqb) in H1.
 }
-apply extract_Some_iff in Hlxl.
+apply List_extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hli).
 apply Heqb in H; subst x.
 apply (permutation_trans Heqb) with (lb := lb); [ easy | ].

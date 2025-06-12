@@ -1951,12 +1951,12 @@ apply Nat.nlt_ge in Hdb.
 rename a into i.
 apply (permutation_sym Nat.eqb_eq).
 apply permutation_cons_l_iff.
-remember (extract (Nat.eqb b) la) as lxl eqn:Hlxl.
+remember (List_extract (Nat.eqb b) la) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 remember (List.length lb) as n eqn:Hn.
 assert (Hdm : d mod n! < n!) by (apply Nat.mod_upper_bound, fact_neq_0).
 destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (proj1 (List_extract_None_iff _ _) Hlxl) as H1.
   rewrite <- Hla in H1.
   destruct i. {
     rewrite List_nth_0_cons in H1.
@@ -1996,7 +1996,7 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (H1 (or_intror H)).
   now rewrite (equality_refl Nat.eqb_eq) in H1.
 }
-apply extract_Some_iff in Hlxl.
+apply List_extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb).
 apply Nat.eqb_eq in H; subst x.
 apply (permutation_sym Nat.eqb_eq).

@@ -205,20 +205,20 @@ destruct ab. {
   apply IHla; [ | easy ].
   now apply sorted_cons in Hsb.
 }
-remember (extract (eqb a) lb) as lxl eqn:Hlxl.
+remember (List_extract (eqb a) lb) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((befa, x), afta)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
+apply List_extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbefa & H & Hlb).
 apply Heqb in H; subst x.
 subst lb.
 apply (permutation_sym Heqb) in Hpab.
 cbn in Hpab.
 apply permutation_cons_l_iff in Hpab.
-remember (extract (eqb b) la) as lxl eqn:Hlxl.
+remember (List_extract (eqb b) la) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
+apply List_extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbefb & H & Hlb).
 apply Heqb in H; subst x.
 subst la.

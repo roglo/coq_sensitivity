@@ -10,8 +10,8 @@ Require Import RingLike.Core.
 Require Import RingLike.PermutationFun.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterAnd.
-Require Import RingLike.LapRingLike.
-Require Import RingLike.PolynomialRingLike.
+Require Import RingLike.Lap_algebra.
+Require Import RingLike.Polynomial_algebra.
 
 Require Import Misc.
 Require Import SortingFun.

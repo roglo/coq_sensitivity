@@ -824,9 +824,9 @@ induction la as [| a]; intros; cbn. {
   now apply permutation_nil_l in Hp; subst lb.
 }
 apply permutation_cons_l_iff in Hp.
-remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+remember (List_extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
+apply List_extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & Hx & Haft).
 apply Nat.eqb_eq in Hx; subst x.
 remember (i ?= a) as ia eqn:Hia; symmetry in Hia.
@@ -2106,9 +2106,9 @@ induction la as [| a]; intros; cbn. {
   now apply permutation_nil_l in Hpab; subst lb.
 }
 apply permutation_cons_l_iff in Hpab.
-remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+remember (List_extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
+apply List_extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & Hx & Haft).
 apply Nat.eqb_eq in Hx; subst x.
 specialize (IHla (bef ++ aft) Hpab) as H1.

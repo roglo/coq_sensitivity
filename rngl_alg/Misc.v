@@ -4,7 +4,7 @@ Set Nested Proofs Allowed.
 
 From Stdlib Require Import Utf8 Arith.
 Require Import RingLike.PermutationFun.
-Require Import RingLike.Misc.
+Require Import RingLike.Utils RingLike.Misc.
 Import List.
 
 (* (a ^ b) mod c defined like that so that we can use "Compute"
@@ -363,9 +363,9 @@ induction la as [| a]; intros; cbn. {
   now apply permutation_nil_l in Hpab; subst lb.
 }
 apply permutation_cons_l_iff in Hpab.
-remember (extract (Nat.eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+remember (List_extract (Nat.eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
+apply List_extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb).
 apply Nat.eqb_eq in H; subst x.
 subst lb.

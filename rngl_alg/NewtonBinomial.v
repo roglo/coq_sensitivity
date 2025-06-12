@@ -7,6 +7,7 @@ From Stdlib Require Import Utf8 Arith.
 Require Import RingLike.Core.
 Require Import RingLike.IterAdd.
 Require Import RingLike.Misc.
+Require Import RingLike.Utils.
 Require Import Misc.
 
 Section a.

@@ -89,9 +89,9 @@ destruct ac. {
   specialize (IHla _ _ _ Hlc) as H1.
   apply permutation_cons_l_iff in H1.
   cbn in H1; rewrite Hab in H1.
-  remember (extract (eqb a) ld) as lxl eqn:Hlxl; symmetry in Hlxl.
+  remember (List_extract (eqb a) ld) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-  apply extract_Some_iff in Hlxl.
+  apply List_extract_Some_iff in Hlxl.
   destruct Hlxl as (H2 & H & H3).
   apply Heqb in H; subst x.
   cbn in H1 |-*.

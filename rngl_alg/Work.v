@@ -10,6 +10,7 @@ Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 Require Import RingLike.IterAdd.
 Require Import RingLike.Misc.
+Require Import RingLike.Utils.
 
 Require Import TrigoWithoutPi.TacChangeAngle.
 Require Import TrigoWithoutPi.Angle TrigoWithoutPi.TrigoWithoutPiExt.
