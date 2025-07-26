@@ -1691,8 +1691,7 @@ Qed.
 
 Theorem QG_archimedean :
   ∀ a b : QG, (0 < a)%QG →
-  ∃ n : nat,
-  (b < List.fold_right QG_add 0 (List.repeat a n))%QG.
+  {n : nat | (b < List.fold_right QG_add 0 (List.repeat a n))%QG}.
 Proof.
 intros * Ha *.
 exists (Z.to_nat (Z_of_QG (b / a)) + 1)%nat.
