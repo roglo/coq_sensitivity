@@ -129,7 +129,7 @@ Definition I_eq_dec (eq_dec : ∀ a b : T, {a = b} + {a ≠ b}) (a b : ideal P) 
 
 Theorem I_opt_eq_dec : option (∀ a b : ideal P, {a = b} + {a ≠ b}).
 Proof.
-destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | apply None ].
+destruct (rngl_opt_eq_dec T) as [rngl_eq_dec| ]; [ | apply None ].
 specialize (I_eq_dec rngl_eq_dec) as H1.
 eapply Some.
 intros.

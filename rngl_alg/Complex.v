@@ -596,7 +596,7 @@ Qed.
 Theorem gc_opt_mul_inv_diag_r :
   if (rngl_has_inv (GComplex T) && rngl_has_1 (GComplex T) &&
       negb (rngl_mul_is_comm T))%bool then
-    ∀ a : GComplex T, a ≠ 0%L → (a / a)%L = 1%L
+    ∀ a : GComplex T, a ≠ 0%L → (a * a⁻¹)%L = 1%L
   else not_applicable.
 Proof.
 cbn.
