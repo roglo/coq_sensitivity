@@ -303,6 +303,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
   move b before a.
   rewrite (rngl_sub_opp_r Hop).
   rewrite (rngl_opp_add_distr Hop).
+  rewrite (rngl_opp_sub_swap Hop).
   rewrite (rngl_add_sub_assoc Hop).
   rewrite (rngl_sub_add Hop).
   rewrite <- (rngl_add_opp_l Hop).
@@ -1014,6 +1015,7 @@ progress unfold "°".
 cbn.
 rewrite (rngl_opp_0 Hop).
 rewrite <- (rngl_opp_add_distr Hop).
+rewrite (rngl_add_comm 1).
 destruct is_left. {
   rewrite (rngl_mul_1_l Hon).
   rewrite rngl_cos_angle_eucl_dist_straight_r.

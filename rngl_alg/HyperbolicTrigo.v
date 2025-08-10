@@ -907,6 +907,7 @@ do 2 rewrite (rngl_mul_comm Hic (rngl_cosh θ1)).
 do 2 rewrite (rngl_mul_comm Hic (rngl_sinh θ1)).
 f_equal.
 rewrite (rngl_opp_add_distr Hop).
+rewrite (rngl_opp_sub_swap Hop).
 now rewrite (rngl_add_opp_r Hop).
 Qed.
 

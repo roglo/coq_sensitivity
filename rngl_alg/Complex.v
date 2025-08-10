@@ -342,6 +342,7 @@ apply eq_gc_eq; cbn.
 progress unfold rngl_sub; rewrite Hop.
 do 4 rewrite rngl_mul_add_distr_l.
 rewrite (rngl_opp_add_distr Hop).
+rewrite (rngl_opp_sub_swap Hop).
 progress unfold rngl_sub; rewrite Hop.
 do 4 rewrite <- rngl_add_assoc.
 split; f_equal. {
@@ -424,6 +425,7 @@ do 4 rewrite rngl_mul_add_distr_r.
 progress unfold rngl_sub.
 rewrite Hop.
 rewrite (rngl_opp_add_distr Hop).
+rewrite (rngl_opp_sub_swap Hop).
 do 4 rewrite <- rngl_add_assoc.
 split; f_equal. {
   progress unfold rngl_sub.

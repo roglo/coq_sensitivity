@@ -573,7 +573,6 @@ intros n Hn.
 cbn.
 progress unfold rngl_dist.
 rewrite <- (rngl_opp_add_distr Hop).
-rewrite rngl_add_comm.
 rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_abs_opp Hop Hor).
 now apply HN.
