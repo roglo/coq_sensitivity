@@ -1184,7 +1184,7 @@ destruct zs. 2: {
 }
 rewrite (rngl_mul_1_l Hon).
 (* lemma to do, perhaps *)
-apply (rngl_lt_iff Hor).
+apply (rngl_le_neq Hor).
 split. {
   apply rl_sqrt_nonneg.
   apply rngl_1_add_cos_div_2_nonneg.

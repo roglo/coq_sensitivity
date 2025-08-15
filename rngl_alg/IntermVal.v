@@ -1264,11 +1264,11 @@ destruct (rngl_eq_dec Heo (f b) u) as [Hbu| Hbu]. {
 }
 assert (H : (f a < u < f b)%L). {
   apply not_eq_sym in Hbu.
-  now split; apply (rngl_lt_iff Hor).
+  now split; apply (rngl_le_neq Hor).
 }
 clear Hfab Hau Hbu; rename H into Hfab.
 assert (H : (a < b)%L). {
-  apply (rngl_lt_iff Hor).
+  apply (rngl_le_neq Hor).
   split; [ easy | ].
   intros H; subst b.
   destruct Hfab as (Hfau, Hfua).
@@ -1326,11 +1326,11 @@ assert (Hzη2 : (0 < η2)%L). {
   apply not_eq_sym in Hac.
   apply rngl_min_glb_lt. {
     apply (rngl_lt_0_sub Hop Hor).
-    apply (rngl_lt_iff Hor); split; [ | easy ].
+    apply (rngl_le_neq Hor); split; [ | easy ].
     now apply Hub1.
   } {
     apply (rngl_lt_0_sub Hop Hor).
-    now apply (rngl_lt_iff Hor).
+    now apply (rngl_le_neq Hor).
   }
 }
 assert

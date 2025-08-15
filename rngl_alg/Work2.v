@@ -1174,7 +1174,7 @@ Theorem rngl_sin_nonneg_is_pos :
 Proof.
 intros * Hz Hs Hsz.
 destruct_ac.
-apply (rngl_lt_iff Hor).
+apply (rngl_le_neq Hor).
 split; [ easy | ].
 intros H; symmetry in H.
 apply eq_rngl_sin_0 in H.

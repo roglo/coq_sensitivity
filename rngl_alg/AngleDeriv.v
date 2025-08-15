@@ -511,7 +511,7 @@ destruct zstz. {
   apply rngl_leb_le in Hzstz, Hts.
   apply rngl_nlt_ge in Hts.
   apply Hts; clear Hts.
-  apply (rngl_lt_iff Hor).
+  apply (rngl_le_neq Hor).
   split; [ apply rngl_cos_bound | ].
   intros H; symmetry in H.
   apply eq_rngl_cos_opp_1 in H; subst θ₀.
@@ -1262,12 +1262,12 @@ exists (rngl_min3 x y (rngl_min η η')); subst x y.
 split. {
   apply rngl_min_glb_lt; [ | now apply rngl_min_glb_lt ].
   apply rngl_min_glb_lt. {
-    apply (rngl_lt_iff Hor).
+    apply (rngl_le_neq Hor).
     split; [ apply angle_eucl_dist_nonneg | ].
     intros H; symmetry in H.
     now apply angle_eucl_dist_separation in H.
   } {
-    apply (rngl_lt_iff Hor).
+    apply (rngl_le_neq Hor).
     split; [ apply angle_eucl_dist_nonneg | ].
     intros H; symmetry in H.
     now apply angle_eucl_dist_separation in H.
@@ -1400,12 +1400,12 @@ exists (rngl_min3 x y (rngl_min η η')); subst x y.
 split. {
   apply rngl_min_glb_lt; [ | now apply rngl_min_glb_lt ].
   apply rngl_min_glb_lt. {
-    apply (rngl_lt_iff Hor).
+    apply (rngl_le_neq Hor).
     split; [ apply angle_eucl_dist_nonneg | ].
     intros H; symmetry in H.
     now apply angle_eucl_dist_separation in H.
   } {
-    apply (rngl_lt_iff Hor).
+    apply (rngl_le_neq Hor).
     split; [ apply angle_eucl_dist_nonneg | ].
     intros H; symmetry in H.
     now apply angle_eucl_dist_separation in H.
