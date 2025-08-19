@@ -188,7 +188,8 @@ Definition Q_ring_like_ord :=
      rngl_ord_add_le_compat := Q_add_le_compat;
      rngl_ord_mul_le_compat_nonneg := Q_mul_le_compat_nonneg;
      rngl_ord_mul_le_compat_nonpos := Q_mul_le_compat_nonpos;
-     rngl_ord_not_le := Q_not_le |}.
+     rngl_ord_not_le := Q_not_le;
+     rngl_ord_opt_sub_add := NA |}.
 
 Definition Q_ring_like_prop :=
   {| rngl_mul_is_comm := true;
