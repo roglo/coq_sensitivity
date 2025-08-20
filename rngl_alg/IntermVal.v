@@ -955,7 +955,7 @@ destruct (is_upper_bound P x) as [Hux| Hux]. 2: {
     rewrite (rngl_mul_2_r Hon).
     apply (rngl_add_le_mono_l Hop Hor).
     apply rngl_max_lub; [ now apply (rngl_lt_le_incl Hor)| ].
-    apply (rngl_le_sub_nonneg Hop Hor).
+    apply (rngl_le_sub_l Hop Hor).
     now apply (rngl_lt_le_incl Hor).
   }
   specialize (H3 H).

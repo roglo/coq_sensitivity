@@ -793,7 +793,7 @@ rewrite Htt.
 rewrite (rngl_mul_1_l Hon).
 destruct (rngl_le_dec Hor 1 (angle_eucl_dist θ 0)) as [H1d| H1d]. {
   eapply (rngl_le_trans Hor); [ | apply H1d ].
-  apply (rngl_le_sub_nonneg Hop Hor).
+  apply (rngl_le_sub_l Hop Hor).
   apply rl_sqrt_nonneg.
   apply rngl_1_add_cos_div_2_nonneg.
 }
@@ -838,7 +838,7 @@ cbn.
 destruct (rngl_le_dec Hor 1 (angle_eucl_dist θ angle_straight))
   as [H1s| H1s]. {
   eapply (rngl_le_trans Hor); [ | apply H1s ].
-  apply (rngl_le_sub_nonneg Hop Hor).
+  apply (rngl_le_sub_l Hop Hor).
   apply rl_sqrt_nonneg.
   apply rngl_1_sub_cos_div_2_nonneg.
 }
