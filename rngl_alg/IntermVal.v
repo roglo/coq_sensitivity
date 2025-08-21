@@ -384,7 +384,7 @@ split. {
      N = log2 ((b-a)/ε) + 1 should work. *)
   specialize (H1 ((b - a) / ε + 1))%L.
   rewrite (rngl_abs_nonneg_eq Hop Hor) in H1. 2: {
-    apply (rngl_add_nonneg_nonneg Hor). 2: {
+    apply (rngl_le_0_add Hor). 2: {
       apply (rngl_0_le_1 Hon Hos Hor).
     }
     apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
@@ -456,7 +456,7 @@ split. {
      N = log2 ((b-a)/ε) + 1 should work. *)
   specialize (H1 ((b - a) / ε + 1))%L.
   rewrite (rngl_abs_nonneg_eq Hop Hor) in H1. 2: {
-    apply (rngl_add_nonneg_nonneg Hor). 2: {
+    apply (rngl_le_0_add Hor). 2: {
       apply (rngl_0_le_1 Hon Hos Hor).
     }
     apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].

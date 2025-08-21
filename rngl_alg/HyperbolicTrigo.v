@@ -314,7 +314,7 @@ destruct (rngl_le_dec Hor 0 y') as [Hzy'| Hzy']. {
   apply (rngl_0_le_1 Hon Hos Hor).
 }
 apply (rngl_nle_gt_iff Hor) in Hzy, Hzy'.
-apply (rngl_add_nonneg_nonneg Hor).
+apply (rngl_le_0_add Hor).
 now apply (rngl_mul_nonneg_nonneg Hos Hor).
 apply (rngl_lt_le_incl Hor) in Hzy, Hzy'.
 now apply (rngl_mul_nonpos_nonpos Hos Hor).
@@ -1177,7 +1177,7 @@ Theorem rngl_add_cosh_nonneg :
 Proof.
 destruct_hc.
 intros.
-apply (rngl_add_nonneg_nonneg Hor); apply rngl_cosh_nonneg.
+apply (rngl_le_0_add Hor); apply rngl_cosh_nonneg.
 Qed.
 
 Theorem rngl_sinh_sub_anticomm :
