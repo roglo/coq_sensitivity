@@ -149,7 +149,7 @@ apply (rngl_div_nonneg Hon Hop Hiv Hor). {
   split; [ apply (rngl_add_squ_nonneg Hos Hor) | ].
   intros H1; symmetry in H1.
   cbn in Hz.
-  apply (rngl_eq_add_0 Hor) in H1; cycle 1. {
+  apply (rngl_eq_add_0 Hos Hor) in H1; cycle 1. {
     apply (rngl_squ_nonneg Hos Hor).
   } {
     apply (rngl_squ_nonneg Hos Hor).
@@ -547,7 +547,7 @@ cbn.
 eapply (rngl_le_trans Hor). {
   apply (gc_modl_triangular Hic Hon Hop Hiv Hor).
 }
-apply (rngl_add_le_mono_r Hop Hor).
+apply (rngl_add_le_mono_r Hos Hor).
 apply IHl.
 Qed.
 
