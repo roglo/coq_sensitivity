@@ -504,20 +504,63 @@ destruct rngl_opt_leb as [le| ]; [ | easy ].
 apply (H2 Hab Hba).
 Qed.
 
-Theorem I_ord_add_le_compat :
+(*
+Theorem rngl_is_ordered_ideal :
+  let roi := I_ring_like_op in
+  rngl_is_ordered (ideal P) = rngl_is_ordered T.
+*)
+
+Theorem I_ord_add_le_mono_l :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
-  ∀ a b c d : ideal P, (a ≤ b)%L → (c ≤ d)%L → (a + c ≤ b + d)%L.
+  if rngl_has_opp_or_subt (ideal P) then
+    ∀ a b c : ideal P, (b ≤ c)%L ↔ (a + b ≤ a + c)%L
+  else not_applicable.
 Proof.
-intros roi Hor.
+intros roi Hori.
+cbn.
+remember (rngl_has_opp_or_subt (ideal P)) as osi eqn:Hosi.
+symmetry in Hosi.
+destruct osi; [ | easy ].
+intros.
+split; intros Hbc. {
+  generalize Hori; intros Hor.
+progress unfold rngl_is_ordered in Hor.
+cbn in Hor.
+progress unfold I_opt_leb in Hor.
+...
+specialize rngl_is_ordered_ideal as H.
+cbn in H.
+Set Printing All.
+progress unfold I_ring_like_op in H.
+cbn in H.
+progress unfold rngl_is_ordered in H.
+cbn in H.
+...
+rewrite H in Hor.
+  rewrite rngl_is_ordered_ideal in Hor.
+...
+  apply rngl_is_ordered_ideal in Hor.
+...
+  specialize (rngl_add_le_mono Hos Hor) as H2.
+  progress unfold rngl_le in H2.
+  progress unfold rngl_le in Hbc.
+  progress unfold rngl_le.
+  cbn in Hbc |-*.
+  progress unfold I_opt_leb in Hbc.
+  progress unfold I_opt_leb.
+  destruct rngl_opt_leb as [leb| ]; [ | easy ].
+...
+intros roi Hos Hor.
 intros * Hab Hcd.
 specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hor; cbn in Hor.
-progress unfold I_opt_leb in Hor.
+generalize Hor; intros H2.
+progress unfold rngl_is_ordered in H2; cbn in H2.
+progress unfold I_opt_leb in H2.
 progress unfold rngl_is_ordered in H1.
-destruct rngl_opt_leb; [ cbn in H1 | easy ].
+destruct rngl_opt_leb; [ clear H2; cbn in H1 | easy ].
 ...
-specialize rngl_ord_add_le_compat as H2.
+specialize (rngl_add_le_mono Hos Hor) as H2.
 specialize (H2 (i_val a) (i_val b) (i_val c) (i_val d)).
 progress unfold rngl_le in Hab, Hcd.
 progress unfold rngl_le in H2.
@@ -532,6 +575,7 @@ progress unfold I_opt_leb.
 destruct rngl_opt_leb as [le| ]; [ | easy ].
 apply (H2 Hab Hcd).
 Qed.
+*)
 
 Theorem I_ord_mul_le_compat_nonneg :
   let roi := I_ring_like_op in
@@ -736,10 +780,16 @@ Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
      rngl_ord_le_refl := I_ord_le_refl Hor;
      rngl_ord_le_antisymm := I_ord_le_antisymm Hor;
      rngl_ord_le_trans := I_ord_le_trans Hor;
+(*
      rngl_ord_add_le_compat := I_ord_add_le_compat Hor;
+*)
+     rngl_ord_add_le_mono_l := I_ord_add_le_mono_l Hor;
+(**)
      rngl_ord_mul_le_compat_nonneg := I_ord_mul_le_compat_nonneg Hor;
      rngl_ord_mul_le_compat_nonpos := I_ord_mul_le_compat_nonpos Hor;
      rngl_ord_not_le := I_ord_not_le Hor |}.
+
+...
 
 Theorem I_ring_like_ord :
   let roi := I_ring_like_op in
