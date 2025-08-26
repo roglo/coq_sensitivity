@@ -100,7 +100,7 @@ rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_sub_sub_distr Hop).
 progress unfold rngl_sub at 2.
 rewrite Hop.
-apply (rngl_add_lt_mono_l Hop Hor).
+apply (rngl_add_lt_mono_l Hos Hor).
 rewrite (rngl_opp_sub_distr Hop).
 apply (rngl_lt_add_lt_sub_r Hop Hor).
 rewrite <- (rngl_add_sub_swap Hop).
@@ -1082,7 +1082,7 @@ split; intros H12. {
     progress sin_cos_add_sub_right_hyp T Hzs12.
     progress sin_cos_add_sub_right_goal T.
     apply (rngl_lt_le_incl Hor) in Hzc1.
-    apply (rngl_le_0_add Hor); [ | easy ].
+    apply (rngl_le_0_add Hos Hor); [ | easy ].
     apply (rngl_lt_le_incl Hor) in Hzs1, Hc2z.
     now apply rngl_sin_add_nonneg.
   } {

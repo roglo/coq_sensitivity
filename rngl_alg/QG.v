@@ -1092,16 +1092,6 @@ do 2 rewrite (QG_add_comm _ c).
 apply QG_add_le_mono_l.
 Qed.
 
-Theorem QG_add_le_compat : ∀ a b c d : QG, (a ≤ b → c ≤ d → a + c ≤ b + d)%QG.
-Proof.
-intros * Hab Hcd.
-apply QG_le_trans with (y := (b + c)%QG). {
-  now apply QG_add_le_mono_r.
-} {
-  now apply QG_add_le_mono_l.
-}
-Qed.
-
 Theorem QG_opp_involutive: ∀ a : QG, (- - a)%QG = a.
 Proof.
 intros.
@@ -1866,10 +1856,12 @@ Definition QG_ring_like_ord :=
      rngl_ord_le_refl := QG_le_refl;
      rngl_ord_le_antisymm := QG_le_antisymm;
      rngl_ord_le_trans := QG_le_trans;
-     rngl_ord_add_le_compat := QG_add_le_compat;
+     rngl_ord_add_le_mono_l := QG_add_le_mono_l;
      rngl_ord_mul_le_compat_nonneg := QG_mul_le_compat_nonneg;
      rngl_ord_mul_le_compat_nonpos := QG_mul_le_compat_nonpos;
      rngl_ord_not_le := QG_not_le |}.
+
+
 
 Theorem QG_integral :
   let roq := QG_ring_like_op in

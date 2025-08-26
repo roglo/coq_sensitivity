@@ -1021,6 +1021,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   progress sin_cos_add_sub_right_hyp T Hs2.
   progress sin_cos_add_sub_right_hyp T Hzc2.
   progress sin_cos_add_sub_right_goal T.
+...
   apply (rngl_le_0_add Hor); [ | easy ].
   apply (rngl_lt_le_incl Hor) in Hzc2.
   apply rngl_sin_add_nonneg; try easy.

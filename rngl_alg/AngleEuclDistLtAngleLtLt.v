@@ -124,7 +124,7 @@ rewrite <- rngl_sin_sub in Hc1312.
 apply (rngl_lt_add_lt_sub_l Hop Hor) in Hc1312.
 assert (H2 : (rngl_sin θ3 < rngl_sin θ2)%L). {
   eapply (rngl_le_lt_trans Hor); [ | apply Hc1312 ].
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_mul_nonneg_nonneg Hos Hor).
   now apply (rngl_lt_le_incl Hor).
   apply (rngl_le_0_sub Hop Hor).
@@ -167,7 +167,7 @@ rewrite <- (rngl_mul_sub_distr_l Hop).
 apply (rngl_le_0_sub Hop Hor).
 rewrite (rngl_add_sub_swap Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
-apply (rngl_le_0_add Hor).
+apply (rngl_le_0_add Hos Hor).
 apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
 now apply (rngl_le_0_sub Hop Hor).
 apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
@@ -215,8 +215,8 @@ destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3)) as [Hs23| Hs23]. {
   rewrite <- (rngl_add_sub_assoc Hop).
   rewrite (rngl_mul_comm Hic (rngl_sin θ3)).
   rewrite <- (rngl_mul_sub_distr_l Hop).
-  apply (rngl_le_0_add Hor). {
-    apply (rngl_le_0_add Hor). {
+  apply (rngl_le_0_add Hos Hor). {
+    apply (rngl_le_0_add Hos Hor). {
       now apply (rngl_mul_nonneg_nonneg Hos Hor).
     }
     now apply (rngl_mul_nonneg_nonneg Hos Hor).
@@ -273,7 +273,7 @@ apply (rngl_mul_nonneg_nonneg Hos Hor). {
   now apply rngl_sin_add_nonneg.
 }
 rewrite rngl_cos_sub.
-apply (rngl_le_0_add Hor). {
+apply (rngl_le_0_add Hos Hor). {
   apply (rngl_mul_nonneg_nonneg Hos Hor).
   apply rngl_cos_div_2_nonneg.
   now apply rngl_sin_add_nonneg.
