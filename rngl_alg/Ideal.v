@@ -516,6 +516,7 @@ progress unfold rngl_is_ordered in Hor; cbn in Hor.
 progress unfold I_opt_leb in Hor.
 progress unfold rngl_is_ordered in H1.
 destruct rngl_opt_leb; [ cbn in H1 | easy ].
+...
 specialize rngl_ord_add_le_compat as H2.
 specialize (H2 (i_val a) (i_val b) (i_val c) (i_val d)).
 progress unfold rngl_le in Hab, Hcd.

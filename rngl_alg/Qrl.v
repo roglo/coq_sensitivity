@@ -164,19 +164,24 @@ exfalso; apply H3.
 now apply (Q.le_trans _ b).
 Qed.
 
-Theorem Q_add_le_compat :
-  ∀ a b c d : Q,
-  Q_leb a b = true → Q_leb c d = true → Q_leb (a + c)%Q (b + d)%Q = true.
+Theorem Q_add_le_mono_l :
+  ∀ a b c : Q, Q_leb b c = true ↔ Q_leb (a + b) (a + c) = true.
 Proof.
-intros * Hab Hcd.
-progress unfold Q_leb in Hab.
-progress unfold Q_leb in Hcd.
-progress unfold Q_leb.
-destruct (Q.le_dec a b) as [H1| ]; [ | easy ].
-destruct (Q.le_dec c d) as [H2| ]; [ | easy ].
-destruct (Q.le_dec (a + c) (b + d)) as [| H3]; [ easy | ].
-exfalso; apply H3.
-now apply Q.add_le_mono.
+intros.
+split; intros Hbc. {
+  progress unfold Q_leb in Hbc.
+  progress unfold Q_leb.
+  destruct (Q.le_dec b c) as [H1| ]; [ | easy ].
+  destruct (Q.le_dec (a + b) (a + c)) as [| H3]; [ easy | ].
+  exfalso; apply H3.
+  now apply Q.add_le_mono.
+} {
+  progress unfold Q_leb in Hbc.
+  progress unfold Q_leb.
+  destruct (Q.le_dec b c) as [| H1]; [ easy | ].
+  destruct (Q.le_dec (a + b) (a + c)) as [H3| ]; [ | easy ].
+  now apply Q.add_le_mono_l in H3.
+}
 Qed.
 
 Definition Q_ring_like_ord :=
@@ -185,10 +190,11 @@ Definition Q_ring_like_ord :=
      rngl_ord_le_refl := Q_le_refl;
      rngl_ord_le_antisymm := Q_le_antisymm;
      rngl_ord_le_trans := Q_le_trans;
-     rngl_ord_add_le_compat := Q_add_le_compat;
+     rngl_ord_add_le_mono_l := Q_add_le_mono_l;
      rngl_ord_mul_le_compat_nonneg := Q_mul_le_compat_nonneg;
      rngl_ord_mul_le_compat_nonpos := Q_mul_le_compat_nonpos;
-     rngl_ord_not_le := Q_not_le |}.
+     rngl_ord_not_le := Q_not_le
+   |}.
 
 Definition Q_ring_like_prop :=
   {| rngl_mul_is_comm := true;
