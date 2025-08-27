@@ -219,7 +219,7 @@ destruct zs. {
     rewrite Hu in Hxz.
     progress unfold seq_angle_to_div_nat in Hxz.
     apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2). {
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii 2). {
       apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
     }
     now rewrite rngl_mul_0_r.
