@@ -1025,7 +1025,7 @@ assert (Hr : zr = (ρ * rngl_cos (rngl_acos (zr / ρ)))%L). {
   apply (rngl_between_opp_1_and_1 Hon Hop Hor Hii).
   rewrite <- (rngl_squ_1 Hon).
   apply (rngl_abs_le_squ_le Hop Hor).
-  rewrite (rngl_abs_1 Hon Hos Hor).
+  rewrite (rngl_abs_1 Hon Hos Hiq Hor).
   rewrite (rngl_abs_div Hon Hop Hiv Hed Hor); [ | easy ].
   rewrite (rngl_abs_nonneg_eq Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hor).
@@ -1279,7 +1279,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
       now apply Nat.pow_nonzero.
     }
     do 2 rewrite <- (rngl_of_nat_mul Hon Hos).
-    apply (rngl_of_nat_inj_le Hon Hos Hc1 Hor).
+    apply (rngl_of_nat_inj_le Hon Hos Hiq Hc1 Hor).
     rewrite Nat.mul_comm.
     eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le | ].
     now rewrite Nat.mul_comm, Nat.div_mul.
@@ -1316,7 +1316,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
       now rewrite Nat.add_comm.
     }
     rewrite (rngl_mul_1_l Hon).
-    apply (rngl_of_nat_inj_le Hon Hos Hc1 Hor).
+    apply (rngl_of_nat_inj_le Hon Hos Hiq Hc1 Hor).
     now apply HM.
   }
   clear a Heqc.

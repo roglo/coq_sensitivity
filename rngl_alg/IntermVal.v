@@ -1083,7 +1083,7 @@ assert
   rewrite <- (rngl_mul_nat_comm Hon Hos).
   apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
   eapply (rngl_lt_le_trans Hor); [ apply HN | ].
-  apply (rngl_of_nat_inj_le Hon Hos Hc1 Hor).
+  apply (rngl_of_nat_inj_le Hon Hos Hiq Hc1 Hor).
   eapply Nat.le_trans; [ apply Hn | ].
   apply Nat.log2_up_le_pow2; [ flia Hn | ].
   now apply Nat.log2_up_le_lin.
@@ -1165,7 +1165,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
       }
       rewrite <- (rngl_of_nat_pow Hon Hos).
       eapply (rngl_lt_le_trans Hor); [ apply Hxn1 | ].
-      apply (rngl_of_nat_inj_le Hon Hos Hc1 Hor).
+      apply (rngl_of_nat_inj_le Hon Hos Hiq Hc1 Hor).
       rewrite Nat.add_1_r.
       apply Nat.le_succ_l.
       now apply Nat.pow_gt_lin_r.
@@ -1231,7 +1231,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
   replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
   rewrite <- (rngl_of_nat_pow Hon Hos).
   eapply (rngl_lt_le_trans Hor); [ apply Hxn1 | ].
-  apply (rngl_of_nat_inj_le Hon Hos Hc1 Hor).
+  apply (rngl_of_nat_inj_le Hon Hos Hiq Hc1 Hor).
   rewrite Nat.add_1_r.
   apply Nat.le_succ_l.
   now apply Nat.pow_gt_lin_r.

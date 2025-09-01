@@ -110,10 +110,10 @@ assert (H : (1 ≤ c²)%L). {
 replace 1%L with 1²%L in H by apply (rngl_mul_1_l Hon).
 rewrite <- (rngl_squ_abs Hop c) in H.
 rewrite <- (rngl_squ_abs Hop 1%L) in H.
-apply (rngl_square_le_simpl_nonneg Hop Hor Hii) in H. 2: {
+apply (rngl_square_le_simpl_nonneg Hon Hop Hiq Hor) in H. 2: {
   apply (rngl_abs_nonneg Hop Hor).
 }
-rewrite (rngl_abs_1 Hon Hos Hor) in H.
+rewrite (rngl_abs_1 Hon Hos Hiq Hor) in H.
 now rewrite (rngl_abs_nonneg_eq Hop Hor) in H.
 Qed.
 
