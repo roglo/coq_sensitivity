@@ -333,7 +333,7 @@ destruct zc2. {
     apply (rngl_mul_nonpos_nonneg Hon Hop Hiq Hor); [ easy | ].
     now apply (rngl_lt_le_incl Hor).
   } {
-    now apply (rngl_mul_pos_pos Hos Hor).
+    now apply (rngl_mul_pos_pos Hon Hop Hiq Hor).
   }
 } {
   apply (rngl_ltb_ge_iff Hor) in Hzc2.
@@ -345,7 +345,7 @@ destruct zc2. {
   }
   specialize (rngl_lt_le_incl Hor _ _ Hzs1) as H.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
-  apply (rngl_abs_lt_squ_lt Hop Hor Hii) in Hc12. 2: {
+  apply (rngl_abs_lt_squ_lt Hon Hop Hiq Hor) in Hc12. 2: {
     apply (rngl_mul_comm Hic).
   }
   apply (rngl_squ_lt_abs_lt Hon Hop Hiq Hor).
@@ -916,11 +916,7 @@ split; intros H12. {
       rewrite Hiv.
       (* lemma *)
       rewrite (rngl_mul_comm Hic).
-      apply (rngl_mul_pos_neg Hop Hor). {
-        rewrite Bool.orb_true_iff; right.
-        rewrite Hi1; cbn.
-        apply (rngl_has_eq_dec_or_is_ordered_r Hor).
-      } {
+      apply (rngl_mul_pos_neg Hon Hop Hiq Hor). {
         apply (rngl_inv_pos Hon Hop Hiv Hor).
         apply (rl_sqrt_pos Hon Hos Hor).
         apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
