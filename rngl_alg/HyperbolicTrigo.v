@@ -239,7 +239,7 @@ apply (rngl_eqb_eq Hed) in Hxy, Hxy'.
 apply rngl_leb_le in Hzx, Hzx'.
 assert (Hyx : (y ≤ x)%L). {
   destruct (rngl_le_dec Hor 0 y) as [Hzy| Hzy]. {
-    apply (rngl_le_squ_le Hop Hor Hii); [ easy | easy | ].
+    apply (rngl_le_squ_le Hon Hop Hiq Hor); [ easy | easy | ].
     apply (rngl_sub_move_r Hop) in Hxy.
     rewrite Hxy.
     apply (rngl_le_add_l Hos Hor).
@@ -251,7 +251,7 @@ assert (Hyx : (y ≤ x)%L). {
 }
 assert (Hyx' : (y' ≤ x')%L). {
   destruct (rngl_le_dec Hor 0 y') as [Hzy'| Hzy']. {
-    apply (rngl_le_squ_le Hop Hor Hii); [ easy | easy | ].
+    apply (rngl_le_squ_le Hon Hop Hiq Hor); [ easy | easy | ].
     apply (rngl_sub_move_r Hop) in Hxy'.
     rewrite Hxy'.
     apply (rngl_le_add_l Hos Hor).
@@ -282,7 +282,7 @@ destruct (rngl_le_dec Hor 0 y) as [Hzy| Hzy]. {
   apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
-  apply (rngl_le_squ_le Hop Hor Hii); [ | easy | ]. {
+  apply (rngl_le_squ_le Hon Hop Hiq Hor); [ | easy | ]. {
     apply (rngl_lt_le_incl Hor) in Hzy'.
     (* todo: rename rngl_opp_nonneg_nonpos into rngl_le_0_opp, perhaps? *)
     now apply (rngl_opp_nonneg_nonpos Hop Hor).
@@ -303,7 +303,7 @@ destruct (rngl_le_dec Hor 0 y') as [Hzy'| Hzy']. {
   apply (rngl_mul_nonneg_nonneg Hos Hor); [ | easy ].
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
-  apply (rngl_le_squ_le Hop Hor Hii); [ | easy | ]. {
+  apply (rngl_le_squ_le Hon Hop Hiq Hor); [ | easy | ]. {
     apply (rngl_lt_le_incl Hor) in Hzy.
     (* todo: rename rngl_opp_nonneg_nonpos into rngl_le_0_opp, perhaps? *)
     now apply (rngl_opp_nonneg_nonpos Hop Hor).
@@ -1021,7 +1021,7 @@ split. {
   apply (rngl_sub_move_l Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2 in Hss.
   apply (rngl_sub_le_mono_r Hop Hor) in Hss.
-  apply (rngl_le_squ_le Hop Hor Hii) in Hss; [ easy | | ].
+  apply (rngl_le_squ_le Hon Hop Hiq Hor) in Hss; [ easy | | ].
   apply rngl_cosh_nonneg.
   apply rngl_cosh_nonneg.
 } {
@@ -1030,7 +1030,7 @@ split. {
   apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2 in Hcc.
   apply (rngl_add_le_mono_l Hos Hor) in Hcc.
-  now apply (rngl_le_squ_le Hop Hor Hii) in Hcc.
+  now apply (rngl_le_squ_le Hon Hop Hiq Hor) in Hcc.
 }
 Qed.
 
