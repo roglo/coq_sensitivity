@@ -261,7 +261,7 @@ split. 2: {
   apply rngl_leb_le.
   apply rl_sqrt_nonneg.
   apply (rngl_le_div_r Hon Hop Hiv Hor).
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
@@ -287,7 +287,7 @@ rewrite (rngl_squ_sqrt Hon). 2: {
 Abort. (*
 ...
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_comm.
@@ -298,7 +298,7 @@ Abort. (*
 }
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   rewrite (rngl_mul_0_l Hos).
   apply (rngl_le_0_sub Hop Hor).
@@ -310,7 +310,7 @@ rewrite (rngl_add_sub_swap Hop).
 rewrite (rngl_sub_diag Hos).
 rewrite rngl_add_0_l.
 apply (rngl_div_diag Hon Hiq).
-apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
 ...
 *)
 

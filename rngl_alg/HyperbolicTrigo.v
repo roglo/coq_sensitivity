@@ -162,7 +162,7 @@ Proof.
 destruct_hc.
 intros.
 apply (rngl_le_trans Hor _ 1).
-apply (rngl_0_le_1 Hon Hos Hor).
+apply (rngl_0_le_1 Hon Hos Hiq Hor).
 apply rngl_cosh_bound.
 Qed.
 
@@ -189,7 +189,7 @@ rewrite (rngl_sub_0_r Hos).
 apply Bool.andb_true_iff.
 split; [ apply (rngl_eqb_refl Hed) | ].
 apply rngl_leb_le.
-apply (rngl_0_le_1 Hon Hos Hor).
+apply (rngl_0_le_1 Hon Hos Hiq Hor).
 Qed.
 
 Definition hangle_zero :=
@@ -242,7 +242,7 @@ assert (Hyx : (y ≤ x)%L). {
     apply (rngl_sub_move_r Hop) in Hxy.
     rewrite Hxy.
     apply (rngl_le_add_l Hos Hor).
-    apply (rngl_0_le_1 Hon Hos Hor).
+    apply (rngl_0_le_1 Hon Hos Hiq Hor).
   }
   apply (rngl_nle_gt_iff Hor) in Hzy.
   apply (rngl_lt_le_incl Hor) in Hzy.
@@ -254,7 +254,7 @@ assert (Hyx' : (y' ≤ x')%L). {
     apply (rngl_sub_move_r Hop) in Hxy'.
     rewrite Hxy'.
     apply (rngl_le_add_l Hos Hor).
-    apply (rngl_0_le_1 Hon Hos Hor).
+    apply (rngl_0_le_1 Hon Hos Hiq Hor).
   }
   apply (rngl_nle_gt_iff Hor) in Hzy'.
   apply (rngl_lt_le_incl Hor) in Hzy'.
@@ -290,7 +290,7 @@ destruct (rngl_le_dec Hor 0 y) as [Hzy| Hzy]. {
   apply (rngl_sub_move_r Hop) in Hxy'.
   rewrite Hxy'.
   apply (rngl_le_add_l Hos Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_0_le_1 Hon Hos Hiq Hor).
 }
 destruct (rngl_le_dec Hor 0 y') as [Hzy'| Hzy']. {
   apply (rngl_nle_gt_iff Hor) in Hzy.
@@ -311,7 +311,7 @@ destruct (rngl_le_dec Hor 0 y') as [Hzy'| Hzy']. {
   apply (rngl_sub_move_r Hop) in Hxy.
   rewrite Hxy.
   apply (rngl_le_add_l Hos Hor).
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_0_le_1 Hon Hos Hiq Hor).
 }
 apply (rngl_nle_gt_iff Hor) in Hzy, Hzy'.
 apply (rngl_le_0_add Hos Hor).
@@ -359,7 +359,7 @@ split. 2: {
   apply rngl_leb_le.
   apply rl_sqrt_nonneg.
   apply (rngl_le_div_r Hon Hop Hiv Hor).
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
@@ -369,7 +369,7 @@ split. 2: {
 apply (rngl_eqb_eq Hed).
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_comm.
@@ -379,7 +379,7 @@ rewrite (rngl_squ_sqrt Hon). 2: {
 }
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   rewrite (rngl_mul_0_l Hos).
   apply (rngl_le_0_sub Hop Hor).
@@ -391,7 +391,7 @@ rewrite (rngl_add_sub_swap Hop).
 rewrite (rngl_sub_diag Hos).
 rewrite rngl_add_0_l.
 apply (rngl_div_diag Hon Hiq).
-apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
 Qed.
 
 Definition hangle_div_2 a :=
@@ -433,7 +433,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hza.
 apply eq_hangle_eq.
-specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
 progress unfold hangle_mul_nat.
 progress unfold hangle_div_2.
 progress unfold hangle_add.
@@ -467,13 +467,13 @@ assert (Hz1sc : (0 ≤ rngl_cosh a - 1)%L). {
 }
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   now rewrite (rngl_mul_0_l Hos).
 }
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   now rewrite (rngl_mul_0_l Hos).
 }
@@ -497,13 +497,13 @@ rewrite rngl_mul_assoc.
 rewrite <- rl_nth_root_mul; cycle 1. {
   rewrite (rngl_mul_inv_r Hiv).
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   now rewrite (rngl_mul_0_l Hos).
 } {
   rewrite (rngl_mul_inv_r Hiv).
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   now rewrite (rngl_mul_0_l Hos).
 }
@@ -519,7 +519,7 @@ rewrite rl_nth_root_mul; cycle 1; [ easy | | ]. {
 assert (Hz2 : (0 ≤ 2⁻¹)%L). {
   apply (rngl_lt_le_incl Hor).
   apply (rngl_inv_pos Hon Hop Hiv Hor).
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 rewrite rl_nth_root_mul; [ | easy | easy ].
 do 2 rewrite rngl_mul_assoc.
@@ -1474,7 +1474,7 @@ apply eq_hangle_eq; cbn.
 rewrite (rngl_leb_refl Hor).
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_div_diag Hon Hiq). 2: {
-  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
 }
 rewrite (rl_sqrt_1 Hon Hop Hor). 2: {
   rewrite Bool.orb_true_iff; right.
@@ -1483,7 +1483,7 @@ rewrite (rl_sqrt_1 Hon Hop Hor). 2: {
 f_equal.
 rewrite (rngl_sub_diag Hos).
 rewrite (rngl_div_0_l Hos Hi1). 2: {
-  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
 }
 apply (rl_sqrt_0 Hon Hop Hor).
 rewrite Bool.orb_true_iff; right.
@@ -1780,14 +1780,14 @@ destruct zs. {
   cbn; rewrite Hzs, (rngl_mul_1_l Hon).
   rewrite (rngl_squ_sqrt Hon). 2: {
     apply (rngl_le_div_r Hon Hop Hiv Hor). {
-      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
     }
     rewrite (rngl_mul_0_l Hos).
     apply (rngl_le_opp_l Hop Hor).
     apply rngl_cos_bound.
   }
   rewrite (rngl_div_mul Hon Hiv). 2: {
-    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+    apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   }
   rewrite rngl_add_comm.
   rewrite (rngl_add_sub Hos).
@@ -1803,14 +1803,14 @@ destruct zs. {
   rewrite Hzs, (rngl_mul_1_l Hon).
   rewrite (rngl_squ_sqrt Hon). 2: {
     apply (rngl_le_div_r Hon Hop Hiv Hor). {
-      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
     }
     rewrite (rngl_mul_0_l Hos).
     apply (rngl_le_opp_l Hop Hor).
     apply rngl_cos_bound.
   }
   rewrite (rngl_div_mul Hon Hiv). 2: {
-    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+    apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   }
   rewrite rngl_add_comm.
   rewrite (rngl_add_sub Hos).

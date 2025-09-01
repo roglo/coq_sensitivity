@@ -863,7 +863,6 @@ Instance mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
      rngl_opt_mul_inv_diag_l := NA;
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
-     rngl_opt_mul_quot_r := NA;
      rngl_opt_integral := squ_mat_integral eq_dec n;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := squ_mat_characteristic_prop eq_dec n;

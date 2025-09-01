@@ -391,7 +391,7 @@ destruct (angle_eq_dec θ angle_straight) as [Hts'| Hts']. {
   rewrite angle_eucl_dist_diag.
   symmetry.
   apply (rngl_div_0_l Hos Hi1).
-  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
 }
 rewrite angle_eucl_dist_is_2_mul_sin_sub_div_2.
 rewrite angle_sub_0_r.
@@ -406,7 +406,7 @@ rewrite angle_div_2_mul_2.
 rewrite (rngl_mul_comm Hic).
 symmetry.
 apply (rngl_mul_div Hi1).
-apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
 Qed.
 
 Theorem rngl_sin_add_div_2_if_angle_eucl_dist :
@@ -578,7 +578,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (_ * _)%L).
   apply H1.
 }
-specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 intros.
 cbn.
@@ -633,7 +633,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (_ * _)%L).
   apply H1.
 }
-specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 intros * Hts.
 cbn.
@@ -726,7 +726,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (_ + _)%L), (H1 2%L).
   now apply (rngl_le_refl Hor).
 }
-specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+specialize (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 intros * Ha1.
 rewrite rngl_add_comm.
@@ -756,7 +756,7 @@ apply (rngl_mul_le_compat_nonneg Hor). {
   apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
 }
-specialize (rngl_0_le_1 Hon Hos Hor) as H01.
+specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H01.
 split. {
   apply (rngl_le_0_add Hos Hor); [ | easy ].
   apply (rngl_le_0_add Hos Hor); [ | easy ].
@@ -783,7 +783,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (_ - _)%L), (H1 (angle_eucl_dist _ _)).
   now apply (rngl_le_refl Hor).
 }
-specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+specialize (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as Hz2'.
 intros * Htt.
 cbn.
@@ -832,7 +832,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (_ - _)%L), (H1 (angle_eucl_dist _ _)).
   now apply (rngl_le_refl Hor).
 }
-specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+specialize (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor) as Hz2.
 intros.
 cbn.
 destruct (rngl_le_dec Hor 1 (angle_eucl_dist θ angle_straight))
@@ -944,7 +944,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * ε Hε; rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+specialize (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor) as Hz2.
 intros * ε Hε; cbn.
 progress unfold "°".
 cbn.
@@ -1005,7 +1005,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * ε Hε; rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+specialize (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor) as Hz2.
 intros * ε Hε; cbn.
 exists ε.
 split; [ easy | ].
@@ -1084,7 +1084,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * ε Hε; rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+specialize (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor) as Hz2.
 specialize (rngl_0_le_2 Hon Hos Hor) as H20.
 intros * ε Hε; cbn.
 exists ε.
@@ -1150,7 +1150,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * ε Hε; rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
+specialize (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor) as Hz2.
 intros * ε Hε; cbn.
 exists ε.
 split; [ easy | ].
@@ -1239,8 +1239,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * ε Hε; rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
-specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+specialize (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor) as Hz2.
+specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
 intros.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.
@@ -1377,8 +1377,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * ε Hε; rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-specialize (rngl_0_lt_2 Hon Hos Hc1 Hor) as Hz2.
-specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+specialize (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor) as Hz2.
+specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
 intros.
 destruct (angle_eq_dec θ₀ 0) as [Htz| Htz]. {
   subst θ₀.

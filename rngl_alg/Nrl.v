@@ -323,15 +323,6 @@ Section a.
 
 Context {n : nat}.
 
-Theorem Zn_opt_mul_quot_r :
-  let roz := Zn_ring_like_op in
-  if (rngl_has_quot (Zn n) && negb true)%bool then
-    ∀ a b : Zn n, b ≠ 0%L → (b * a / b)%L = a
-  else not_applicable.
-Proof.
-now intros; rewrite Bool.andb_false_r.
-Qed.
-
 Theorem proj1_sig_Zn_of_nat :
   let roz := Zn_ring_like_op n in
   ∀ i, proj1_sig (rngl_mul_nat 1 i) = i mod at_least_1 n.
@@ -413,7 +404,6 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) :
      rngl_opt_mul_inv_diag_l := Zn_opt_mul_inv_diag_l NA n;
      rngl_opt_mul_inv_diag_r := Zn_opt_mul_inv_diag_r NA n;
      rngl_opt_mul_div := Zn_opt_mul_div NA n;
-     rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
      rngl_opt_integral := Zn_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := Zn_characteristic_prop;

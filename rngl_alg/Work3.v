@@ -402,7 +402,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Haz.
 do 2 rewrite <- (rngl_div_1_l Hon Hiv).
 rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | | easy ]. 2: {
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_0_le_1 Hon Hos Hiq Hor).
 }
 f_equal; symmetry.
 apply (rl_sqrt_1 Hon Hop Hor Hii).
@@ -1165,7 +1165,7 @@ destruct (rngl_eq_dec Heo M 0) as [Hmz| Hmz]. {
   rewrite (gc_modl_0 Hon Hop Hor Hii) in Hx.
   apply rngl_nle_gt in Hx.
   apply Hx; clear Hx.
-  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_0_le_1 Hon Hos Hiq Hor).
 }
 assert (HzM : (0 < M)%L). {
   apply (rngl_le_neq Hor).
@@ -1801,7 +1801,7 @@ assert (H2 : (‖ 1 / z ‖ * rngl_of_nat n * m ≤ ‖ z ‖)%L). {
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
   progress unfold R₀.
   apply (rngl_le_add_l Hor).
-  apply (rngl_le_trans Hor _ 1); [ apply (rngl_0_le_1 Hon Hos Hor) | ].
+  apply (rngl_le_trans Hor _ 1); [ apply (rngl_0_le_1 Hon Hos Hiq Hor) | ].
   apply (rngl_le_add_r Hor).
   now apply (rngl_lt_le_incl Hor) in HM.
 }
@@ -2122,7 +2122,7 @@ assert (H2 : (‖ 1 / z ‖ * rngl_of_nat n * m < ‖ z ‖)%L). {
   eapply (rngl_le_lt_trans Hor); [ | apply H1 ].
   rewrite <- rngl_mul_assoc.
   rewrite <- (rngl_mul_1_l Hon).
-  apply (rngl_mul_le_mono_pos_r Hop Hor Hii). {
+  apply (rngl_mul_le_mono_pos_r Hon Hop Hiq Hor). {
     apply (rngl_mul_pos_pos Hop Hor Hii). 2: {
 ...
     rewrite <- rngl_of_nat_0.

@@ -827,7 +827,7 @@ rewrite (rngl_squ_sqrt Hon). 2: {
   apply rngl_1_add_cos_div_2_nonneg.
 }
 apply -> (rngl_lt_div_r Hon Hop Hiv Hor). 2: {
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 rewrite (rngl_mul_comm Hic).
 apply (rngl_lt_sub_lt_add_l Hop Hor).
@@ -892,7 +892,7 @@ destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
 do 2 rewrite rngl_cos_mul_2_l' in H12.
 apply (rngl_sub_le_mono_r Hop Hor) in H12.
 apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in H12. 2: {
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 apply (rngl_squ_le_abs_le Hop Hor Hii) in H12.
 apply (rngl_lt_le_incl Hor) in Hzs21, Hzs22.
@@ -924,11 +924,11 @@ rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 destruct Hzs22 as [(_, Hzs22)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
@@ -947,7 +947,7 @@ destruct Hzs22 as [(_, Hzs22)| (H1, H2)]. 2: {
 do 2 rewrite rngl_cos_mul_2_l' in H12.
 apply (rngl_sub_le_mono_r Hop Hor) in H12.
 apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in H12. 2: {
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 apply (rngl_squ_le_abs_le Hop Hor Hii) in H12.
 rewrite (rngl_abs_nonneg_eq Hop Hor) in H12; [ | easy ].
@@ -978,7 +978,7 @@ apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs21.
 apply (rngl_lt_mul_0_if Hos Hor) in Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
@@ -1238,7 +1238,7 @@ intros * (H12, H2s).
 progress unfold angle_ltb in H12.
 progress unfold angle_leb in H2s.
 cbn in H2s.
-specialize (rngl_0_le_1 Hon Hos Hor) as H1.
+specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H1.
 apply rngl_leb_le in H1.
 rewrite H1 in H2s; clear H1.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
