@@ -264,22 +264,19 @@ Theorem Rayleigh_quotient_of_eigenvector :
   → (M • V = μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
-intros Hon Hic Hop Hii Hin Hdo * Hvz Hmv.
+intros Hon Hic Hop Hii Hiv Hor * Hvz Hmv.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 specialize (proj2 rngl_has_inv_and_1_or_quot_iff) as Hi1.
-specialize (Hi1 (or_introl (conj Hin Hon))).
+specialize (Hi1 (or_introl (conj Hiv Hon))).
 unfold Rayleigh_quotient.
 rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
 apply (rngl_mul_div Hi1).
 intros H.
-...
-apply eq_vect_squ_0 in H; [ easy | easy | | easy ].
-apply Bool.orb_true_iff in Hii.
-apply Bool.orb_true_iff.
-now right.
+now apply (eq_vect_squ_0 Hon Hop Hiq Hor) in H.
 Qed.
 
 Definition is_orthogonal_matrix (M : matrix T) :=
