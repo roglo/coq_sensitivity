@@ -146,11 +146,10 @@ destruct i. {
 rewrite Nat_sub_succ_1.
 destruct i. {
   apply rngl_integral in Haz; [ now destruct Haz | easy | ].
-...
-  apply Bool.orb_true_iff in Hdo.
-  apply Bool.orb_true_iff.
-  destruct Hdo as [Hdo| Hdo]; [ now left | right ].
-  rewrite Hdo.
+  apply Bool.orb_true_iff; right.
+  apply Bool.andb_true_iff.
+  split.
+  apply (rngl_has_1_has_inv_or_quot_has_inv_and_1_or_quot Hon Hiq).
   apply (rngl_has_eq_dec_or_is_ordered_r Hor).
 }
 cbn.
@@ -215,8 +214,9 @@ Theorem RQ_mul_scal_prop :
   → Rayleigh_quotient M (c × V) = Rayleigh_quotient M V.
 Proof.
 intros Hof * Hsm Hsr Hcz.
-destruct Hof as (Hon & Hic & Hop & Heq & Hin & Hch & Hor).
+destruct Hof as (Hon & Hic & Hop & Heq & Hiv & Hch & Hor).
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 destruct (vect_eq_dec Heq V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
@@ -235,30 +235,21 @@ rewrite vect_scal_mul_dot_mul_comm; [ | easy ].
 rewrite vect_scal_mul_dot_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
-rewrite Hin.
-rewrite (rngl_inv_mul_distr Hon Hos Hin); cycle 1. {
+rewrite Hiv.
+rewrite (rngl_inv_mul_distr Hon Hos Hiv); cycle 1. {
   intros H.
-  apply (rngl_eq_mul_0_l Hos) in H; [ easy | | easy ].
-  apply Bool.orb_true_iff; right.
-  apply rngl_has_inv_and_1_or_quot_iff; left.
-  easy.
+  now apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
 } {
   intros H.
-  apply eq_vect_squ_0 in H; [ | easy | | easy ]. 2: {
-    apply Bool.orb_true_iff; right.
-    now apply rngl_has_inv_and_1_or_quot_iff; left.
-  }
+  apply (eq_vect_squ_0 Hon Hop Hiq Hor) in H.
   now rewrite Hsr in H.
 }
 rewrite rngl_mul_assoc.
 rewrite rngl_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
-rewrite (rngl_mul_inv_diag_l Hon Hin); [ now rewrite rngl_mul_1_l | ].
+rewrite (rngl_mul_inv_diag_l Hon Hiv); [ now rewrite rngl_mul_1_l | ].
 intros H; apply Hcz.
-apply (rngl_eq_mul_0_l Hos) in H; [ easy | | easy ].
-apply Bool.orb_true_iff; right.
-apply rngl_has_inv_and_1_or_quot_iff; left.
-easy.
+now apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
 Qed.
 
 Theorem Rayleigh_quotient_of_eigenvector :
@@ -284,6 +275,7 @@ rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
 apply (rngl_mul_div Hi1).
 intros H.
+...
 apply eq_vect_squ_0 in H; [ easy | easy | | easy ].
 apply Bool.orb_true_iff in Hii.
 apply Bool.orb_true_iff.
