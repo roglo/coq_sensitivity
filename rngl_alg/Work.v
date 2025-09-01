@@ -219,7 +219,7 @@ destruct zs. {
     rewrite Hu in Hxz.
     progress unfold seq_angle_to_div_nat in Hxz.
     apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii 2). {
+    apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor 2). {
       apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
     }
     now rewrite rngl_mul_0_r.
@@ -656,7 +656,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
-  apply (rngl_mul_pos_pos Hos Hor Hii). {
+  apply (rngl_mul_pos_pos Hon Hop Hiq Hor). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
@@ -799,7 +799,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
-  apply (rngl_mul_pos_pos Hos Hor Hii). {
+  apply (rngl_mul_pos_pos Hon Hop Hiq Hor). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
@@ -863,7 +863,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
-  apply (rngl_mul_pos_pos Hos Hor Hii). {
+  apply (rngl_mul_pos_pos Hon Hop Hiq Hor). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
@@ -950,7 +950,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
-  apply (rngl_mul_pos_pos Hos Hor Hii). {
+  apply (rngl_mul_pos_pos Hon Hop Hiq Hor). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
@@ -1017,7 +1017,7 @@ specialize rl_sqrt_half_nonneg as Hzs.
 intros * Hcz.
 rewrite rngl_cos_mul_2_l in Hcz.
 apply -> (rngl_lt_sub_0 Hop Hor) in Hcz.
-apply (rngl_squ_lt_abs_lt Hop Hor Hii) in Hcz.
+apply (rngl_squ_lt_abs_lt Hon Hop Hiq Hor) in Hcz.
 destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
   rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_sin _)) in Hcz; [ | easy ].
   left.

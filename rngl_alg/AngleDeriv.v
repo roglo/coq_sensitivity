@@ -580,7 +580,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
 specialize (rngl_0_le_2 Hon Hos Hiq Hor) as Hz2'.
-specialize (rngl_0_le_2 Hon Hos Hiq Hor) as Hz2'.
 intros.
 cbn.
 rewrite angle_eucl_dist_is_sqrt.
@@ -721,6 +720,7 @@ Theorem rngl_squ_div_2_add_1_sub_squ_mul_2_le_2 :
 Proof.
 intros Hic Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -754,7 +754,7 @@ apply (rngl_mul_le_compat_nonneg Hon Hiq Hor). {
   split; [ apply (rngl_squ_nonneg Hon Hos Hiq Hor) | ].
   rewrite <- (rngl_mul_1_l Hon a) at 2.
   progress unfold rngl_squ.
-  apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
+  apply (rngl_mul_le_mono_nonneg_r Hon Hop Hiq Hor); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
 }
 specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H01.
@@ -807,7 +807,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor (_ - _)). 2: {
   now apply (rngl_lt_le_incl Hor) in H1d.
 }
 rewrite <- (rl_sqrt_squ Hon Hop Hor).
-apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
+apply (rl_sqrt_le_rl_sqrt Hon Hop Hiq Hor). {
   apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
 apply (rngl_le_div_r Hon Hop Hiv Hor _²); [ easy | ].
@@ -852,7 +852,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor (_ - _)). 2: {
   now apply (rngl_lt_le_incl Hor) in H1s.
 }
 rewrite <- (rl_sqrt_squ Hon Hop Hor).
-apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
+apply (rl_sqrt_le_rl_sqrt Hon Hop Hiq Hor). {
   apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
 apply (rngl_le_div_r Hon Hop Hiv Hor _²); [ easy | ].
@@ -988,8 +988,8 @@ rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
 apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
 eapply (rngl_lt_le_trans Hor _ ε); [ easy | ].
 rewrite <- (rngl_mul_1_r Hon ε) at 1.
-apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-apply (rngl_1_le_2 Hon Hos Hor).
+apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor); [ easy | ].
+apply (rngl_1_le_2 Hon Hos Hiq Hor).
 Qed.
 
 Theorem rngl_cos_left_or_right_derivative_at_straight :
@@ -1041,8 +1041,8 @@ destruct is_left. {
   apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
   eapply (rngl_lt_le_trans Hor _ ε); [ easy | ].
   rewrite <- (rngl_mul_1_r Hon ε) at 1.
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-  apply (rngl_1_le_2 Hon Hos Hor).
+  apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor); [ easy | ].
+  apply (rngl_1_le_2 Hon Hos Hiq Hor).
 } {
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
@@ -1067,8 +1067,8 @@ destruct is_left. {
   apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
   eapply (rngl_lt_le_trans Hor _ ε); [ easy | ].
   rewrite <- (rngl_mul_1_r Hon ε) at 1.
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-  apply (rngl_1_le_2 Hon Hos Hor).
+  apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor); [ easy | ].
+  apply (rngl_1_le_2 Hon Hos Hiq Hor).
 }
 Qed.
 
@@ -1232,7 +1232,6 @@ Theorem rngl_cos_left_or_right_derivative :
     ((rngl_opp ° rngl_sin) θ₀).
 Proof.
 destruct_ac.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -1370,7 +1369,6 @@ Theorem rngl_sin_left_or_right_derivative :
     angle_eucl_dist rngl_dist rngl_sin θ₀ (rngl_cos θ₀).
 Proof.
 destruct_ac.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {

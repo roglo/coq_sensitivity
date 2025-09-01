@@ -43,14 +43,14 @@ destruct sab. {
   apply rngl_leb_le in Hsab.
   apply (rngl_leb_gt Hor) in Hab.
   apply (rngl_le_antisymm Hor); [ easy | ].
-  apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii); [ easy | ].
+  apply (rl_sqrt_le_rl_sqrt Hon Hop Hiq Hor); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
 }
 destruct ab; [ | easy ].
 apply (rngl_leb_gt Hor) in Hsab.
 apply rngl_leb_le in Hab.
 apply (rngl_le_antisymm Hor); [ now apply (rngl_lt_le_incl Hor) | ].
-now apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii).
+now apply (rl_sqrt_le_rl_sqrt Hon Hop Hiq Hor).
 Qed.
 
 Theorem quadrant_1_rngl_cos_sub_lt :

@@ -822,7 +822,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor √_). 2: {
   apply rl_sqrt_nonneg.
   apply rngl_1_add_cos_div_2_nonneg.
 }
-apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+apply (rngl_squ_lt_abs_lt Hon Hop Hiq Hor).
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply rngl_1_add_cos_div_2_nonneg.
 }
@@ -891,10 +891,10 @@ destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
 }
 do 2 rewrite rngl_cos_mul_2_l' in H12.
 apply (rngl_sub_le_mono_r Hop Hor) in H12.
-apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in H12. 2: {
+apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor) in H12. 2: {
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
-apply (rngl_squ_le_abs_le Hop Hor Hii) in H12.
+apply (rngl_squ_le_abs_le Hon Hop Hiq Hor) in H12.
 apply (rngl_lt_le_incl Hor) in Hzs21, Hzs22.
 rewrite (rngl_abs_nonpos_eq Hop Hor) in H12; [ | easy ].
 rewrite (rngl_abs_nonpos_eq Hop Hor) in H12; [ | easy ].
@@ -946,10 +946,10 @@ destruct Hzs22 as [(_, Hzs22)| (H1, H2)]. 2: {
 }
 do 2 rewrite rngl_cos_mul_2_l' in H12.
 apply (rngl_sub_le_mono_r Hop Hor) in H12.
-apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in H12. 2: {
+apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor) in H12. 2: {
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
-apply (rngl_squ_le_abs_le Hop Hor Hii) in H12.
+apply (rngl_squ_le_abs_le Hon Hop Hiq Hor) in H12.
 rewrite (rngl_abs_nonneg_eq Hop Hor) in H12; [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor) in H12; [ | easy ].
 easy.
@@ -1142,10 +1142,10 @@ destruct (rngl_le_dec Hor a² 1) as [Ha1| H1a]. {
   rewrite rngl_leb_0_sqrt; [ | now apply (rngl_le_0_sub Hop Hor) ].
   split. {
     apply rngl_leb_le.
-    now apply (rngl_between_opp_1_and_1 Hon Hop Hor Hii) in Ha1.
+    now apply (rngl_between_opp_1_and_1 Hon Hop Hiq Hor) in Ha1.
   } {
     apply rngl_leb_le.
-    now apply (rngl_between_opp_1_and_1 Hon Hop Hor Hii) in Ha1.
+    now apply (rngl_between_opp_1_and_1 Hon Hop Hiq Hor) in Ha1.
   }
 } {
   split; [ apply angle_le_refl | ].

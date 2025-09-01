@@ -114,7 +114,7 @@ rewrite (rngl_summation_shift (2 ^ n + 1)). 2: {
 rewrite Nat.add_comm, Nat.add_sub.
 rewrite <- Nat.add_assoc.
 rewrite Nat.add_sub.
-apply (rngl_le_trans Hor _ 1); [ | apply (rngl_1_le_2 Hon Hos Hor) ].
+apply (rngl_le_trans Hor _ 1); [ | apply (rngl_1_le_2 Hon Hos Hiq Hor) ].
 apply harmonic_sum_after_2_pow_bound.
 apply Nat.le_add_r.
 Qed.
