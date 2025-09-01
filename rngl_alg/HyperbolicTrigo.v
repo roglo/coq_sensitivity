@@ -204,7 +204,6 @@ Theorem hangle_add_prop :
     (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L.
 Proof.
 destruct_hc.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
 rewrite (rngl_add_comm (rngl_sinh a * _)%L).
 destruct a as (x, y, Hxy).
@@ -265,21 +264,21 @@ destruct (rngl_le_dec Hor 0 y) as [Hzy| Hzy]. {
   destruct (rngl_le_dec Hor 0 y') as [Hzy'| Hzy']. {
     apply (rngl_le_trans Hor _ (y * y' + y * y')). 2: {
       apply (rngl_add_le_mono_r Hos Hor).
-      now apply (rngl_mul_le_compat_nonneg Hor).
+      now apply (rngl_mul_le_compat_nonneg Hon Hiq Hor).
     }
     rewrite <- (rngl_mul_2_l Hon).
-    apply (rngl_mul_nonneg_nonneg Hos Hor).
-    apply (rngl_0_le_2 Hon Hos Hor).
-    now apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
+    apply (rngl_0_le_2 Hon Hos Hiq Hor).
+    now apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
   }
   apply (rngl_nle_gt_iff Hor) in Hzy'.
-  clear - Hzx' Hyx Hzy Hii Hzy' Hxy' hc Hor Hop Hon Hos.
+  clear - Hzx' Hyx Hzy Hzy' Hxy' hc Hor Hop Hon Hos Hiq.
   apply (rngl_le_trans Hor _ (y * x' + y * y')). 2: {
     apply (rngl_add_le_mono_r Hos Hor).
-    now apply (rngl_mul_le_mono_nonneg_r Hop Hor).
+    now apply (rngl_mul_le_mono_nonneg_r Hon Hop Hiq Hor).
   }
   rewrite <- rngl_mul_add_distr_l.
-  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+  apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor); [ easy | ].
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
   apply (rngl_le_squ_le Hon Hop Hiq Hor); [ | easy | ]. {
@@ -297,10 +296,10 @@ destruct (rngl_le_dec Hor 0 y') as [Hzy'| Hzy']. {
   apply (rngl_nle_gt_iff Hor) in Hzy.
   apply (rngl_le_trans Hor _ (x * y' + y * y')). 2: {
     apply (rngl_add_le_mono_r Hos Hor).
-    now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+    now apply (rngl_mul_le_mono_nonneg_l Hon Hop Hiq Hor).
   }
   rewrite <- rngl_mul_add_distr_r.
-  apply (rngl_mul_nonneg_nonneg Hos Hor); [ | easy ].
+  apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor); [ | easy ].
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
   apply (rngl_le_squ_le Hon Hop Hiq Hor); [ | easy | ]. {
@@ -316,9 +315,9 @@ destruct (rngl_le_dec Hor 0 y') as [Hzy'| Hzy']. {
 }
 apply (rngl_nle_gt_iff Hor) in Hzy, Hzy'.
 apply (rngl_le_0_add Hos Hor).
-now apply (rngl_mul_nonneg_nonneg Hos Hor).
+now apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
 apply (rngl_lt_le_incl Hor) in Hzy, Hzy'.
-now apply (rngl_mul_nonpos_nonpos Hos Hor).
+now apply (rngl_mul_nonpos_nonpos Hon Hos Hiq Hor).
 Qed.
 
 Definition hangle_add a b :=
@@ -333,7 +332,6 @@ Theorem hangle_nonneg_div_2_prop :
     (ε * √((rngl_cosh a - 1) / 2)).
 Proof.
 destruct_hc.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 intros.
 progress unfold cosh2_sinh2_prop.
 assert (Hε : (ε² = 1)%L). {
@@ -365,7 +363,8 @@ split. 2: {
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
   apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
-  apply (rngl_opp_1_le_1 Hon Hop Hor).
+  apply (rngl_opp_1_le_1 Hon Hop Hiq Hor).
+  apply (rngl_opp_1_le_1 Hon Hop Hiq Hor).
 }
 apply (rngl_eqb_eq Hed).
 rewrite (rngl_squ_sqrt Hon). 2: {
@@ -376,7 +375,7 @@ rewrite (rngl_squ_sqrt Hon). 2: {
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
   apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
-  apply (rngl_opp_1_le_1 Hon Hop Hor).
+  apply (rngl_opp_1_le_1 Hon Hop Hiq Hor).
 }
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
@@ -511,7 +510,7 @@ rewrite <- rl_nth_root_mul; cycle 1. {
 rewrite (rngl_mul_mul_swap Hic (_ - 1)%L).
 do 3 rewrite <- rngl_mul_assoc.
 rewrite rl_nth_root_mul; cycle 1; [ easy | | ]. {
-  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+  apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor); [ easy | ].
   apply (rngl_mul_diag_nonneg Hos Hor).
 }
 rewrite rl_nth_root_mul; cycle 1; [ easy | | ]. {

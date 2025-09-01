@@ -266,7 +266,7 @@ split. 2: {
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
   apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
-  apply (rngl_opp_1_le_1 Hon Hop Hor).
+  apply (rngl_opp_1_le_1 Hon Hop Hiq Hor).
 }
 *)
 apply (rngl_eqb_eq Hed).
@@ -294,7 +294,7 @@ Abort. (*
   apply (rngl_le_opp_l Hop Hor).
 ...
   apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
-  apply (rngl_opp_1_le_1 Hon Hop Hor).
+  apply (rngl_opp_1_le_1 Hon Hop Hiq Hor).
 }
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {

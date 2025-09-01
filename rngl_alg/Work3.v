@@ -1701,7 +1701,7 @@ assert (Hr : (0 < R₀)%L). {
   remember (P.[n]) as d eqn:Hd.
 *)
   destruct n; [ easy | clear Hnz ].
-  apply (rngl_mul_nonneg_nonneg Hos Hor). {
+  apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor). {
     rewrite <- rngl_of_nat_0.
     now apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
   }
@@ -1779,7 +1779,7 @@ assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
   apply (rngl_le_0_add Hor). {
     now apply (rngl_lt_le_incl Hor) in HM.
   }
-  apply (rngl_mul_nonneg_nonneg Hos Hor). {
+  apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor). {
     apply (rngl_of_nat_nonneg Hon Hos Hor).
   }
   subst m.
@@ -1920,7 +1920,7 @@ assert
   now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
 }
 clear H2.
-apply (rngl_mul_le_mono_nonneg_l Hop Hor (‖ z ^ (n - 1) ‖))%L in H1. 2: {
+apply (rngl_mul_le_mono_nonneg_l Hon Hop Hiq Hor (‖ z ^ (n - 1) ‖))%L in H1. 2: {
   apply (gc_modl_nonneg Hop Hor).
 }
 rewrite (rngl_mul_comm Hic) in H1.
@@ -2011,7 +2011,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   eapply (rngl_lt_le_trans Hor); [ apply Hrz | ].
 ...
   eapply (rngl_lt_le_trans Hor). 2: {
-    apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+    apply (rngl_mul_le_mono_nonneg_l Hon Hop Hiq Hor).
     apply (gc_modl_nonneg Hop Hor).
   }
 ...

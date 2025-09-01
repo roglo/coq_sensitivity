@@ -74,7 +74,7 @@ rewrite <- rl_sqrt_mul; cycle 1.
 apply rngl_1_sub_cos_div_2_nonneg.
 apply rngl_1_add_cos_div_2_nonneg.
 apply (rl_sqrt_lt_rl_sqrt Hon Hor).
-apply (rngl_mul_nonneg_nonneg Hos Hor).
+apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
 apply rngl_1_add_cos_div_2_nonneg.
 apply rngl_1_sub_cos_div_2_nonneg.
 do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
@@ -692,9 +692,9 @@ split; intros H12. {
           rewrite (rngl_sub_mul_r_diag_l Hon Hop).
           apply (rngl_le_trans Hor _ 0). {
             apply (rngl_opp_nonpos_nonneg Hop Hor).
-            now apply (rngl_mul_nonneg_nonneg Hos Hor).
+            now apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
           }
-          apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+          apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor); [ easy | ].
           apply (rngl_le_0_sub Hop Hor).
           apply rngl_cos_bound.
         }

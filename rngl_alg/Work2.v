@@ -876,11 +876,11 @@ rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_lt_mul_0_if Hos Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
-  apply (rngl_0_le_2 Hon Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hiq Hor).
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
-  apply (rngl_0_le_2 Hon Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hiq Hor).
 }
 apply (rngl_lt_mul_0_if Hos Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
@@ -982,7 +982,7 @@ destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
-  apply (rngl_0_le_2 Hon Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hiq Hor).
 }
 apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs21.
 apply (rngl_lt_mul_0_if Hos Hor) in Hzs22.
@@ -1261,7 +1261,7 @@ Theorem rngl_squ_le_diag :
 Proof.
 intros Hon Hop Hor * Ha.
 rewrite <- (rngl_mul_1_r Hon a) at 2.
-now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+now apply (rngl_mul_le_mono_nonneg_l Hon Hop Hiq Hor).
 Qed.
 
 Theorem rngl_limit_sub_l_limit :

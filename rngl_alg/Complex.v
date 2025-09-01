@@ -1747,7 +1747,7 @@ rewrite rl_sqrt_mul; [ | | easy ]. 2: {
   now apply (rngl_lt_le_incl Hor).
 }
 split; intros Hθθ. {
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+  apply (rngl_mul_le_mono_nonneg_l Hon Hop Hiq Hor). {
     apply rl_sqrt_nonneg.
     now apply (rngl_lt_le_incl Hor).
   }
@@ -1825,8 +1825,8 @@ assert (Hza2 : (0 ≤ a / 2)%L). {
   now rewrite (rngl_mul_0_l Hos).
 }
 assert (Hz2a : (0 ≤ 2 * a)%L). {
-  apply (rngl_mul_nonneg_nonneg Hos Hor); [ | easy ].
-  apply (rngl_0_le_2 Hon Hos Hor).
+  apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor); [ | easy ].
+  apply (rngl_0_le_2 Hon Hos Hiq Hor).
 }
 assert (H2z : (2 ≠ 0)%L) by apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
 rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
@@ -2315,12 +2315,12 @@ rewrite rngl_mul_assoc.
 rewrite (rngl_sub_mul_l_diag_r Hon Hop).
 destruct (rngl_le_dec Hor 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
   rewrite <- (rngl_mul_1_r Hon 1%L) at 4.
-  apply (rngl_mul_le_compat_nonneg Hor); [ | easy ].
+  apply (rngl_mul_le_compat_nonneg Hon Hiq Hor); [ | easy ].
   split; [ easy | ].
   apply (rngl_le_sub_le_add_r Hop Hor).
   rewrite <- (rngl_mul_1_r Hon 2%L) at 2.
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | easy ].
-  apply (rngl_0_le_2 Hon Hos Hor).
+  apply (rngl_mul_le_mono_nonneg_l Hon Hop Hiq Hor); [ | easy ].
+  apply (rngl_0_le_2 Hon Hos Hiq Hor).
 }
 apply (rngl_nle_gt_iff Hor) in H2cz.
 apply (rngl_le_trans Hor _ 0)%L. 2: {

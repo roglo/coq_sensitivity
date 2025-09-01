@@ -1087,7 +1087,7 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
     exfalso.
     apply rngl_nle_gt in H.
     apply H; clear H.
-    apply (rngl_0_le_2 Hon Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hiq Hor).
   }
   right.
   change_angle_opp θ.
