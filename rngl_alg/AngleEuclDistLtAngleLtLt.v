@@ -252,7 +252,7 @@ apply (rngl_mul_nonneg_nonneg Hos Hor). {
     symmetry in H1.
     apply rngl_nlt_ge in Hzc3.
     apply Hzc3; rewrite H1.
-    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+    apply (rngl_opp_1_lt_0 Hon Hop Hiq Hor Hc1).
     progress unfold angle_leb.
     apply rngl_leb_le in Hzs2.
     rewrite Hzs2; cbn.
@@ -370,7 +370,7 @@ destruct Hzs2; subst θ2. {
 }
 apply rngl_nlt_ge in Hzc2.
 apply Hzc2.
-apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+apply (rngl_opp_1_lt_0 Hon Hop Hiq Hor Hc1).
 Qed.
 
 Theorem rngl_sin_sub_nonneg_rngl_cos_lt :
