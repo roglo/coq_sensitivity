@@ -648,11 +648,11 @@ rewrite List_nth_cart_prod_same_length with (n := n). {
 Qed.
 
 Theorem det_isort_rows_with_dup :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_characteristic T = 0 →
-  (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true →
   ∀ A kl,
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -661,7 +661,7 @@ Theorem det_isort_rows_with_dup :
   → det (mat_select_rows kl A) =
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
-intros Hon Hop Hic Hch Hii * Hcm Hac Hkl Hadk.
+intros Hic Hon Hop Hiq Hch * Hcm Hac Hkl Hadk.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -1054,11 +1054,11 @@ split; intros Hla. {
 Qed.
 
 Theorem det_isort_rows :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_characteristic T = 0 →
-  (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true →
   ∀ A kl,
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -1066,13 +1066,13 @@ Theorem det_isort_rows :
   → det (mat_select_rows kl A) =
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
-intros Hon Hop Hic Hch Hii * Hcm Hac Hkl.
+intros Hic Hon Hop Hiq Hch * Hcm Hac Hkl.
 remember (no_dup Nat.eqb kl) as adk eqn:Hadk; symmetry in Hadk.
 destruct adk. {
   apply det_isort_rows_no_dup; try easy.
   now intros H; rewrite H in Hch.
 } {
-  now apply det_isort_rows_with_dup.
+  now apply (det_isort_rows_with_dup Hic Hon Hop Hiq Hch).
 }
 Qed.
 
@@ -1748,11 +1748,11 @@ now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
 Lemma Cauchy_Binet_formula_step_4 :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_characteristic T = 0 →
-  (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true →
   ∀ [m n] [B] f, m ≠ 0 →
   is_correct_matrix B = true
   → mat_nrows B = n
@@ -1762,10 +1762,10 @@ Lemma Cauchy_Binet_formula_step_4 :
     ∑ (kl ∈ List_cart_prod (List.repeat (List.seq 1 n) m)),
       ε kl * f kl * det (mat_select_rows (isort Nat.leb kl) B).
 Proof.
-intros Hon Hop Hic Hch Hii * Hmz Hcb Hbr Hbc.
+intros Hic Hon Hop Hiq Hch * Hmz Hcb Hbr Hbc.
 apply rngl_summation_list_eq_compat.
 intros la Hla.
-rewrite (det_isort_rows Hon Hop Hic Hch Hii _ _ Hcb); cycle 1. {
+rewrite (det_isort_rows Hic Hon Hop Hiq Hch _ _ Hcb); cycle 1. {
   apply List_in_cart_prod_length in Hla.
   rewrite List.repeat_length in Hla.
   congruence.
@@ -2054,12 +2054,13 @@ Theorem Cauchy_Binet_formula :
      det (mat_select_cols jl A) * det (mat_select_rows jl B).
 Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
+assert (Hic : rngl_mul_is_comm T = true) by now destruct Hif.
 assert (Hon : rngl_has_1 T = true) by now destruct Hif.
 assert (Hop : rngl_has_opp T = true) by now destruct Hif.
 assert (Hiv : rngl_has_inv T = true) by now destruct Hif.
-assert (Hic : rngl_mul_is_comm T = true) by now destruct Hif.
 assert (Hch : rngl_characteristic T = 0) by now destruct Hif.
 assert (H10 : rngl_characteristic T ≠ 1) by now rewrite Hch.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hi1.
 assert
   (Hii : (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true). {
@@ -2109,7 +2110,7 @@ rewrite (Cauchy_Binet_formula_step_3 Hon Hop H10 _ Hmz Hcb Hbr Hbc).
     (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_4 Hon Hop Hic Hch Hii _ Hmz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_4 Hic Hon Hop Hiq Hch _ Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ List_cart_prod (repeat (List.seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *

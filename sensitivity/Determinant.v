@@ -1502,8 +1502,8 @@ Qed.
 Theorem determinant_same_rows :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_characteristic T = 0 →
-  (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T) p q,
   is_square_matrix M = true
   → p ≠ q
@@ -1512,7 +1512,7 @@ Theorem determinant_same_rows :
   → (∀ j, 1 ≤ j → mat_el M p j = mat_el M q j)
   → det M = 0%L.
 Proof.
-intros Hic Hop Hch Hii * Hsm Hpq Hpn Hqn Hjpq.
+intros Hic Hop Hiq Hch * Hsm Hpq Hpn Hqn Hjpq.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -1544,7 +1544,7 @@ assert (HM : det M = (- det M)%L). {
     rewrite Nat_sub_succ_1 in Hjpq.
     apply Hjpq; flia.
   }
-  destruct (Nat.eq_dec i (q - 1)) as [Hiq| Hiq]. {
+  destruct (Nat.eq_dec i (q - 1)) as [Hiq1| Hiq1]. {
     subst i.
     rewrite List_map_nth_seq with (d := 0%L); symmetry.
     rewrite List_map_nth_seq with (d := 0%L); symmetry.
@@ -1562,7 +1562,7 @@ assert (HM : det M = (- det M)%L). {
   easy.
 }
 apply rngl_add_move_0_r in HM; [ | easy ].
-now apply (eq_rngl_add_same_0 Hon Hos Hii Hch) in HM.
+now apply (eq_rngl_add_same_0 Hon Hos Hiq Hch) in HM.
 Qed.
 
 (* transpositions list of permutation *)

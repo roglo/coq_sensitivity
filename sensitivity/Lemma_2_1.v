@@ -99,12 +99,13 @@ Definition in_ordered_field :=
   rngl_is_ordered T = true.
 
 Theorem eq_vect_squ_0 :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
   ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.
-intros Hop Hdo Hor * Hvvz.
+intros Hon Hop Hiq Hor * Hvvz.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -119,7 +120,7 @@ induction la as [| a]; intros; [ cbn in Hi; flia Hi | ].
 cbn in Hvvz, Hi.
 rewrite rngl_summation_list_cons in Hvvz.
 apply (rngl_eq_add_0 Hos Hor) in Hvvz; cycle 1. {
-  apply (rngl_mul_diag_nonneg Hos Hor).
+  apply (rngl_mul_diag_nonneg Hon Hos Hiq Hor).
 } {
   clear a Hvvz Hi IHla.
   induction la as [| a]. {
@@ -129,7 +130,7 @@ apply (rngl_eq_add_0 Hos Hor) in Hvvz; cycle 1. {
   cbn.
   rewrite rngl_summation_list_cons.
   apply (rngl_le_trans Hor _ (a * a)). {
-    apply (rngl_mul_diag_nonneg Hos Hor).
+    apply (rngl_mul_diag_nonneg Hon Hos Hiq Hor).
   }
   rewrite <- rngl_add_0_r at 1.
   now apply (rngl_add_le_mono_l Hos Hor).
@@ -145,6 +146,7 @@ destruct i. {
 rewrite Nat_sub_succ_1.
 destruct i. {
   apply rngl_integral in Haz; [ now destruct Haz | easy | ].
+...
   apply Bool.orb_true_iff in Hdo.
   apply Bool.orb_true_iff.
   destruct Hdo as [Hdo| Hdo]; [ now left | right ].
