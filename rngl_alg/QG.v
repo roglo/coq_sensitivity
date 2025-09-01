@@ -1894,7 +1894,6 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_inv_diag_l := QG_mul_inv_diag_l;
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
-     rngl_opt_mul_quot_r := NA;
      rngl_opt_integral := QG_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := QG_characteristic_prop;

@@ -750,7 +750,7 @@ rewrite (rngl_add_mul_l_diag_l Hon).
 rewrite (rngl_mul_comm Hic 2).
 rewrite <- rngl_mul_assoc.
 apply (rngl_mul_le_compat_nonneg Hor). {
-  split; [ apply (rngl_squ_nonneg Hos Hor) | ].
+  split; [ apply (rngl_squ_nonneg Hon Hos Hiq Hor) | ].
   rewrite <- (rngl_mul_1_l Hon a) at 2.
   progress unfold rngl_squ.
   apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
@@ -807,7 +807,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor (_ - _)). 2: {
 }
 rewrite <- (rl_sqrt_squ Hon Hop Hor).
 apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
-  apply (rngl_squ_nonneg Hos Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
 apply (rngl_le_div_r Hon Hop Hiv Hor _²); [ easy | ].
 rewrite rngl_cos_angle_eucl_dist_0_r.
@@ -852,7 +852,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor (_ - _)). 2: {
 }
 rewrite <- (rl_sqrt_squ Hon Hop Hor).
 apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
-  apply (rngl_squ_nonneg Hos Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
 apply (rngl_le_div_r Hon Hop Hiv Hor _²); [ easy | ].
 rewrite rngl_cos_angle_eucl_dist_straight_r.

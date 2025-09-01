@@ -106,7 +106,7 @@ apply (rngl_lt_add_lt_sub_r Hop Hor).
 rewrite <- (rngl_add_sub_swap Hop).
 apply (rngl_lt_sub_lt_add_l Hop Hor).
 do 2 rewrite <- (rngl_mul_2_l Hon (rngl_cos _)).
-apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). {
+apply (rngl_mul_lt_mono_pos_l Hon Hop Hiq Hor). {
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 easy.

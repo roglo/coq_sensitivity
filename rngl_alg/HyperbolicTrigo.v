@@ -49,11 +49,12 @@ Bind Scope hangle_scope with hangle.
 Ltac destruct_hc :=
   set (Hic := hc_ic);
   set (Hop := hc_op);
+  set (Hiv := hc_iv);
   set (Hed := hc_ed);
   set (Hor := hc_or);
   specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos;
+  specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq;
   specialize hc_on as Hon;
-  specialize hc_iv as Hiv;
   specialize hc_c2 as Hc2.
 
 Section a.
@@ -104,7 +105,7 @@ assert (H : (1 ≤ c²)%L). {
   apply (rngl_sub_move_r Hop) in Hcs.
   rewrite Hcs.
   apply (rngl_le_add_r Hos Hor).
-  apply (rngl_squ_nonneg Hos Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
 replace 1%L with 1²%L in H by apply (rngl_mul_1_l Hon).
 rewrite <- (rngl_squ_abs Hop c) in H.
@@ -149,7 +150,7 @@ rewrite H in H1.
 rewrite (rngl_squ_0 Hos) in H1.
 apply (rngl_sub_move_l Hop) in H1.
 rewrite (rngl_sub_0_l Hop) in H1.
-specialize (rngl_squ_nonneg Hos Hor (rngl_sinh θ))%L as H2.
+specialize (rngl_squ_nonneg Hon Hos Hiq Hor (rngl_sinh θ))%L as H2.
 apply rngl_nlt_ge in H2.
 apply H2; clear H2.
 rewrite H1.
@@ -1538,9 +1539,9 @@ apply (eq_rl_sqrt_0 Hon Hos) in H12. 2: {
   apply (rngl_add_squ_nonneg Hos Hor).
 }
 apply (rngl_eq_add_0 Hos Hor) in H12; cycle 1. {
-  apply (rngl_squ_nonneg Hos Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 } {
-  apply (rngl_squ_nonneg Hos Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
 destruct H12 as (Hc, Hs).
 apply (eq_rngl_squ_0 Hos) in Hc, Hs; cycle 1. {

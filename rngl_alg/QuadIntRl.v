@@ -1206,7 +1206,6 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_inv_diag_l := NA;
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := quad_int_mul_div;
-     rngl_opt_mul_quot_r := NA;
      rngl_opt_integral := quad_int_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := quad_int_characteristic_prop;

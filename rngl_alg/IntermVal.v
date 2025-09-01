@@ -426,10 +426,10 @@ split. {
   }
   eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
     apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := ε) in HM2; [ | easy ].
+  apply (rngl_mul_lt_mono_pos_r Hon Hop Hiq Hor ε) in HM2; [ | easy ].
   rewrite (rngl_div_mul Hon Hiv) in HM2. 2: {
     intros H; rewrite H in Hε.
     now apply (rngl_lt_irrefl Hor) in Hε.
@@ -438,10 +438,10 @@ split. {
   apply (rngl_le_lt_trans Hor _ (ε * rngl_of_nat M)). {
     now apply (rngl_lt_le_incl Hor).
   }
-  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
+  apply (rngl_mul_lt_mono_pos_l Hon Hop Hiq Hor); [ easy | ].
   replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
   rewrite <- (rngl_of_nat_pow Hon Hos).
-  apply (rngl_of_nat_inj_lt Hon Hos Hc1 Hor).
+  apply (rngl_of_nat_inj_lt Hon Hos Hiq Hc1 Hor).
   apply Nat.log2_up_le_pow2; [ easy | cbn ].
   apply Nat.min_glb. {
     eapply Nat.le_trans; [ | apply Hp ].
@@ -498,10 +498,10 @@ split. {
   }
   eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
     apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := ε) in HM2; [ | easy ].
+  apply (rngl_mul_lt_mono_pos_r Hon Hop Hiq Hor) with (a := ε) in HM2; [ | easy ].
   rewrite (rngl_div_mul Hon Hiv) in HM2. 2: {
     intros H; rewrite H in Hε.
     now apply (rngl_lt_irrefl Hor) in Hε.
@@ -510,10 +510,10 @@ split. {
   apply (rngl_le_lt_trans Hor _ (ε * rngl_of_nat M)). {
     now apply (rngl_lt_le_incl Hor).
   }
-  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
+  apply (rngl_mul_lt_mono_pos_l Hon Hop Hiq Hor); [ easy | ].
   replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
   rewrite <- (rngl_of_nat_pow Hon Hos).
-  apply (rngl_of_nat_inj_lt Hon Hos Hc1 Hor).
+  apply (rngl_of_nat_inj_lt Hon Hos Hiq Hc1 Hor).
   apply Nat.log2_up_le_pow2; [ easy | cbn ].
   apply Nat.min_glb. {
     eapply Nat.le_trans; [ | apply Hp ].
@@ -535,6 +535,7 @@ Theorem rngl_abs_An_Bn_le :
 Proof.
 intros Hon Hiv * Hab * Habn.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
   rewrite (H (rngl_abs _))%L.
@@ -555,7 +556,7 @@ rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_div_nonneg Hon Hop Hiv Hor). {
     now apply (rngl_le_0_sub Hop Hor).
   } {
-    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
     apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
 }
@@ -605,6 +606,7 @@ Theorem limit_between_An_and_Bn :
 Proof.
 intros Hon Hiv.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hab Hal Hbl * Habn.
@@ -802,6 +804,7 @@ Theorem intermediate_value_prop_1 :
 Proof.
 intros Hon Hiv * Hfc * Hab Hfab Hub1.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite (H1 a), (H1 b) in Hab.
@@ -897,6 +900,7 @@ Theorem intermediate_value_prop_2 :
 Proof.
 intros Hon Hiv * Hfc * Hab Hub Hc.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite (H1 a), (H1 b) in Hab.
@@ -1054,7 +1058,7 @@ assert
   intros ε Hε.
   progress unfold u.
   progress unfold v.
-  specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+  specialize (int_part Hon Hop Hiq Hc1 Hor Har) as H1.
   specialize (H1 ((b - a) / ε)%L).
   destruct H1 as (N, HN).
   rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
@@ -1071,7 +1075,7 @@ assert
     apply surjective_pairing.
   }
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
     apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
@@ -1124,7 +1128,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
        (b - a) / (lim - c) < 2 ^ n, if
        (b - a) / (lim - c) < n *)
     set (x := ((b - a) / (lim - c))%L).
-    destruct (int_part Hon Hop Hc1 Hor Har x) as (n & Hnx & Hxn1).
+    destruct (int_part Hon Hop Hiq Hc1 Hor Har x) as (n & Hnx & Hxn1).
     destruct (Hin n _ _ (surjective_pairing _)) as (y & Hny & Hy).
     assert (Hcy : (c < y)%L). {
       eapply (rngl_lt_le_trans Hor); [ | apply Hny ].
@@ -1142,7 +1146,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
         now apply (rngl_sub_le_mono_r Hop Hor).
       }
       apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-        apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+        apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
         apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
       }
       replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
@@ -1193,7 +1197,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
      c'est-à-dire (b - a) / (c - lim) < 2 ^ n
      ça marche si (b - a) / (c - lim) < n *)
   set (x := ((b - a) / (c - lim))%L).
-  destruct (int_part Hon Hop Hc1 Hor Har x) as (n & Hnx & Hxn1).
+  destruct (int_part Hon Hop Hiq Hc1 Hor Har x) as (n & Hnx & Hxn1).
   remember (AnBn P a b n) as abn eqn:Habn; symmetry in Habn.
   destruct abn as (an, bn).
   specialize (Han n _ _ Habn c) as H1.
@@ -1206,7 +1210,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
   }
   apply (rngl_lt_add_lt_sub_l Hop Hor).
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
     apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.

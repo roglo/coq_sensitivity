@@ -150,9 +150,9 @@ apply (rngl_div_nonneg Hon Hop Hiv Hor). {
   intros H1; symmetry in H1.
   cbn in Hz.
   apply (rngl_eq_add_0 Hos Hor) in H1; cycle 1. {
-    apply (rngl_squ_nonneg Hos Hor).
+    apply (rngl_squ_nonneg Hon Hos Hiq Hor).
   } {
-    apply (rngl_squ_nonneg Hos Hor).
+    apply (rngl_squ_nonneg Hon Hos Hiq Hor).
   }
   destruct H1 as (H1, H2).
   apply (eq_rngl_squ_0 Hos Hio) in H1, H2.
@@ -330,7 +330,7 @@ intros Hon Hos Hiv Hor.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Haz.
 apply (eq_rl_sqrt_0 Hon Hos) in Haz. {
-  apply (rl_integral_modulus_prop Hos Hor Hii) in Haz.
+  apply (rl_integral_modulus_prop Hon Hop Hiq Hor) in Haz.
   now apply eq_gc_eq.
 }
 apply (rngl_add_squ_nonneg Hos Hor).
@@ -428,7 +428,7 @@ remember ((gre a)² + (gim a)²)%L as ρ eqn:Hρ.
 assert (Hrz : ρ ≠ 0%L). {
   intros H; apply Haz.
   subst ρ.
-  apply (rl_integral_modulus_prop Hos Hor Hii) in H.
+  apply (rl_integral_modulus_prop Hon Hop Hiq Hor) in H.
   now apply eq_gc_eq.
 }
 rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
@@ -512,7 +512,7 @@ do 2 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_r Hiv).
 rewrite (rngl_div_diag Hon Hiq). 2: {
   intros H; subst ρ.
-  apply (rl_integral_modulus_prop Hos Hor Hii) in H.
+  apply (rl_integral_modulus_prop Hon Hop Hiq Hor) in H.
   now apply Hbz, eq_gc_eq.
 }
 now do 2 rewrite (rngl_mul_1_r Hon).
@@ -749,7 +749,7 @@ assert (Hra : gre a = 0%L). {
   do 2 rewrite fold_rngl_squ in Habr.
   apply (rngl_eq_mul_0_l Hos Hii) in Habr; [ easy | ].
   intros H; apply Hbz.
-  apply (rl_integral_modulus_prop Hos Hor Hii) in H.
+  apply (rl_integral_modulus_prop Hon Hop Hiq Hor) in H.
   now apply eq_gc_eq.
 }
 rewrite Hra in Habr, Habi.
@@ -1184,7 +1184,7 @@ enough (H :
   intros z Hrz.
   destruct H as (Hzr, H).
   specialize (H z Hrz).
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii M) in H; [ | easy ].
+  apply (rngl_mul_lt_mono_pos_r Hon Hop Hiq Hor M) in H; [ | easy ].
   rewrite (rngl_div_mul Hon Hiv) in H; [ | easy ].
   rewrite <- (rngl_mul_summation_distr_l Hos).
   now rewrite (rngl_mul_comm Hic).
@@ -1237,7 +1237,7 @@ apply (rngl_le_lt_trans Hor _ (∑ (k = 1, n), 1 / ‖ z ‖)). {
   }
   apply (rngl_le_inv_inv Hon Hop Hiv Hor); [ | easy | ]. {
     rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
-    now apply (rngl_pow_pos_pos Hon Hos Hiv Hc1 Hor).
+    now apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
   }
   rewrite <- (rngl_pow_1_r Hon (‖ z ‖)) at 1.
   rewrite (gc_modl_pow Hic Hon Hop Hor Hii).

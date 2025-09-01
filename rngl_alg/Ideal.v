@@ -551,6 +551,16 @@ Qed.
 Theorem I_ord_mul_le_compat_nonneg :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
+  if (rngl_has_1 (ideal P) && rngl_has_inv_or_quot (ideal P))%bool then
+    ∀ a b c d : ideal P, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
+  else not_applicable.
+Proof.
+intros roi Hor.
+...
+
+Theorem I_ord_mul_le_compat_nonneg :
+  let roi := I_ring_like_op in
+  rngl_is_ordered (ideal P) = true →
   ∀ a b c d : ideal P, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L.
 Proof.
 intros roi Hor.
@@ -571,6 +581,7 @@ progress unfold I_opt_leb in Hac.
 progress unfold I_opt_leb in Hbd.
 progress unfold I_opt_leb.
 destruct rngl_opt_leb as [le| ]; [ | easy ].
+...
 now apply H1.
 Qed.
 
@@ -597,6 +608,7 @@ progress unfold rngl_le in H2.
 destruct rngl_opt_leb; [ cbn in H1 | easy ].
 now apply H2.
 Qed.
+*)
 
 Theorem I_ord_not_le :
   let roi := I_ring_like_op in
@@ -752,9 +764,11 @@ Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
      rngl_ord_le_antisymm := I_ord_le_antisymm Hor;
      rngl_ord_le_trans := I_ord_le_trans Hor;
      rngl_ord_add_le_mono_l := I_ord_add_le_mono_l Hor;
-     rngl_ord_mul_le_compat_nonneg := I_ord_mul_le_compat_nonneg Hor;
-     rngl_ord_mul_le_compat_nonpos := I_ord_mul_le_compat_nonpos Hor;
+     rngl_ord_mul_le_compat_nonneg := true; (*I_ord_mul_le_compat_nonneg Hor;*)
+     rngl_ord_mul_le_compat_nonpos := true; (*I_ord_mul_le_compat_nonpos Hor;*)
      rngl_ord_not_le := I_ord_not_le Hor |}.
+
+...
 
 Theorem I_ring_like_ord :
   let roi := I_ring_like_op in

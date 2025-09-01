@@ -99,7 +99,7 @@ rewrite (rngl_add_sub_swap Hop) in Hc1312.
 rewrite <- (rngl_mul_sub_distr_l Hop) in Hc1312.
 apply (rngl_lt_add_lt_sub_r Hop Hor) in Hc1312.
 rewrite <- (rngl_mul_sub_distr_l Hop) in Hc1312.
-apply (rngl_mul_lt_mono_pos_l Hop Hor Hii (rngl_sin θ1) _ _ Hzs1) in
+apply (rngl_mul_lt_mono_pos_l Hon Hop Hiq Hor (rngl_sin θ1) _ _ Hzs1) in
   Hc1312.
 do 2 rewrite rngl_mul_assoc in Hc1312.
 rewrite fold_rngl_squ in Hc1312.
