@@ -164,7 +164,7 @@ destruct zs. {
   rewrite <- angle_mul_2_l in Hzsm |-*.
   rewrite rngl_sin_mul_2_l in Hzsm.
   rewrite rngl_cos_mul_2_l'.
-  apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
+  apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hzsm.
   remember (rngl_cos (u i)) as x eqn:Hx.
   rewrite Hu in Hx.
   progress unfold seq_angle_to_div_nat in Hx.
@@ -225,7 +225,7 @@ destruct zs. {
     now rewrite rngl_mul_0_r.
   }
   (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
-  apply (rngl_2_x2_sub_1_le_x Hon Hop Hor).
+  apply (rngl_2_x2_sub_1_le_x Hon Hop Hiq Hor).
   rewrite <- Hx in Hzsm.
   split; [ easy | ].
   subst x; apply rngl_cos_bound.
@@ -1080,9 +1080,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize rl_sqrt_half_nonneg as Hzs.
 intros * Hsz.
 rewrite rngl_sin_mul_2_l in Hsz.
-apply (rngl_lt_mul_0_if Hos Hor) in Hsz.
+apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hsz.
 destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
-  apply (rngl_lt_mul_0_if Hos Hor) in H2sz.
+  apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in H2sz.
   destruct H2sz as [(H, _)| (_, Hcz)]. {
     exfalso.
     apply rngl_nle_gt in H.
@@ -1120,7 +1120,7 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   rewrite (rngl_opp_0 Hop).
   apply (rngl_le_refl Hor).
 }
-apply (rngl_mul_pos_cancel_l Hop Hor Hii) in Hz2s. 2: {
+apply (rngl_mul_pos_cancel_l Hon Hop Hiq Hor) in Hz2s. 2: {
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 left.
