@@ -1148,7 +1148,7 @@ enough (H :
 destruct (rngl_eq_dec Heo M 0) as [Hmz| Hmz]. {
   subst M; rewrite Hmz.
   exists 1%L.
-  split; [ apply (rngl_0_lt_1 Hon Hos Hc1 Hor) | ].
+  split; [ apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor) | ].
   intros x Hx.
   rewrite all_0_rngl_summation_0. 2: {
     intros i Hi.
@@ -1220,20 +1220,20 @@ enough (H :
 exists (rngl_max 1 (rngl_of_nat n / (ε * ‖ a.[n] ‖ / M))).
 split. {
   apply (rngl_max_lt_iff Hor); left.
-  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
 }
 intros z Hrz.
 assert (Hzx : (0 < ‖ z ‖)%L). {
   eapply (rngl_lt_trans Hor); [ | apply Hrz ].
   apply (rngl_max_lt_iff Hor); left.
-  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
 }
 apply (rngl_le_lt_trans Hor _ (∑ (k = 1, n), 1 / ‖ z ‖)). {
   apply (rngl_summation_le_compat Hor).
   intros i Hi.
 ...
   apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
-    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
   }
   apply (rngl_le_inv_inv Hon Hop Hiv Hor); [ | easy | ]. {
     rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
@@ -1685,7 +1685,7 @@ exists R₀.
 assert (Hr : (0 < R₀)%L). {
   progress unfold R₀.
   apply (rngl_lt_le_trans Hor _ 1). {
-    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
   }
   rewrite <- rngl_add_assoc.
   apply (rngl_le_add_r Hor).

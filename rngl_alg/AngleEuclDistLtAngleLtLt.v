@@ -29,11 +29,11 @@ Context {ac : angle_ctx T}.
 Theorem rngl_sqrt_min_distr :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b, (0 ≤ a)%L → (0 ≤ b)%L → rngl_min √a √b = √(rngl_min a b)%L.
 Proof.
-intros Hon Hop Hor Hii * Hza Hzb.
+intros Hon Hop Hiq Hor * Hza Hzb.
 progress unfold rngl_min.
 remember (√a ≤? √b)%L as sab eqn:Hsab.
 remember (a ≤? b)%L as ab eqn:Hab.
@@ -366,7 +366,7 @@ apply eq_rngl_sin_0 in Hzs2.
 destruct Hzs2; subst θ2. {
   apply rngl_nlt_ge in Hzc1.
   apply Hzc1.
-  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
 }
 apply rngl_nlt_ge in Hzc2.
 apply Hzc2.
@@ -409,7 +409,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     apply (rngl_le_0_sub Hop Hor).
     apply (rngl_le_trans Hor _ 0). {
       apply (rngl_lt_le_incl Hor) in Hc1z.
-      now apply (rngl_mul_nonpos_nonneg Hop Hor).
+      now apply (rngl_mul_nonpos_nonneg Hon Hop Hiq Hor).
     }
     now apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
   }
@@ -428,7 +428,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
   destruct Hzs1; subst θ1; [ | easy ].
   apply rngl_nlt_ge in Hzc2.
   apply Hzc2.
-  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
 }
 apply (rngl_nle_gt_iff Hor) in Hc2z.
 change_angle_sub_l θ1 angle_straight.

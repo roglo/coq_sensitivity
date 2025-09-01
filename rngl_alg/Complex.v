@@ -2027,7 +2027,6 @@ induction n; intros. {
     progress unfold rngl_div in H.
     rewrite Hiv in H.
     apply (rngl_eq_mul_0_l Hon Hos Hiq) in H. 2: {
-    apply (rngl_eq_mul_0_l Hon Hos Hiq) in H. 2: {
       apply (rngl_inv_neq_0 Hon Hos Hiv).
       apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
     }
@@ -2306,10 +2305,11 @@ Qed.
 Theorem rngl_2_x2_sub_1_le_x :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
   ∀ x, (0 ≤ x ≤ 1)%L → (2 * x² - 1 ≤ x)%L.
 Proof.
-intros Hon Hop Hor.
+intros Hon Hop Hiq Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hx.
 apply (rngl_le_sub_le_add_l Hop Hor).
@@ -2331,7 +2331,7 @@ apply (rngl_le_trans Hor _ 0)%L. 2: {
   apply (rngl_0_le_1 Hon Hos Hiq Hor).
 }
 apply (rngl_lt_le_incl Hor) in H2cz.
-now apply (rngl_mul_nonpos_nonneg Hop Hor).
+now apply (rngl_mul_nonpos_nonneg Hon Hop Hiq Hor).
 Qed.
 
 End a.

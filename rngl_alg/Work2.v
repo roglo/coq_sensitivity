@@ -940,7 +940,7 @@ destruct Hzs22 as [(_, Hzs22)| (H1, H2)]. 2: {
   apply eq_rngl_sin_0 in H1.
   destruct H1; subst θ2. {
     exfalso; apply rngl_nlt_ge in H2; apply H2.
-    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
   }
   apply rngl_cos_bound.
 }
@@ -992,7 +992,7 @@ destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
   apply eq_rngl_sin_0 in H1.
   destruct H1; subst θ1; [ | easy ].
   exfalso; apply rngl_nlt_ge in H2; apply H2.
-  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
 }
 destruct Hzs22 as [(H1, _)| (_, Hzs22)]. {
   now apply rngl_nle_gt in H1.

@@ -179,7 +179,7 @@ destruct zs. {
         exfalso; apply rngl_nlt_ge in H2.
         apply H2; clear H2.
         rewrite Hxz.
-        apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+        apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
       } {
         rewrite Hxz in Hx; cbn in Hx; subst x.
         exfalso; clear H1 H2 Hzs.
