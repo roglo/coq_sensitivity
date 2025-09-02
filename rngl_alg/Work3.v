@@ -424,7 +424,7 @@ Theorem gc_modl_inv :
 Proof.
 intros Hic Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 intros * Haz.
 progress unfold gc_modl.
 cbn.
@@ -434,7 +434,6 @@ remember ((gre a)² + (gim a)²)%L as ρ eqn:Hρ.
 assert (Hrz : ρ ≠ 0%L). {
   intros H; apply Haz.
   subst ρ.
-...
   apply (rl_integral_modulus_prop Hon Hop Hiq Hor) in H.
   now apply eq_gc_eq.
 }
@@ -465,11 +464,13 @@ Theorem gc_modl_div :
   rngl_is_ordered T = true →
   ∀ a b, b ≠ 0%C → ‖ (a / b) ‖ = (‖ a ‖ / ‖ b ‖)%L.
 Proof.
-intros Hic Hon Hop Hiv Hor * Hbz.
+intros Hic Hon Hop Hiv Hor.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+intros * Hbz.
 progress unfold gc_div.
 progress unfold rngl_div.
 rewrite Hiv.
-rewrite (gc_modl_mul Hic Hon Hop Hor).
+rewrite (gc_modl_mul Hic Hon Hop Hiq Hor).
 f_equal.
 symmetry.
 now apply (gc_modl_inv Hic Hon Hop Hiv Hor).
@@ -728,7 +729,7 @@ Theorem gc_eq_mul_0_l :
 Proof.
 intros Hic Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 intros * Hab Hbz.
 apply eq_gc_eq in Hab.
@@ -813,16 +814,16 @@ Theorem gc_modl_pow :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ z n, (‖ z ^ n ‖ = ‖ z ‖ ^ n)%L.
 Proof.
-intros Hic Hon Hop Hor Hii *.
+intros Hic Hon Hop Hiq Hor *.
 induction n; cbn. {
   rewrite rngl_1_gc_1.
-  apply (gc_modl_1 Hon Hop Hor Hii).
+  apply (gc_modl_1 Hon Hop Hiq Hor).
 }
-rewrite (gc_modl_mul Hic Hon Hop Hor).
+rewrite (gc_modl_mul Hic Hon Hop Hiq Hor).
 rewrite rngl_pow_gc_pow.
 now rewrite IHn.
 Qed.
@@ -1035,7 +1036,7 @@ intros Hic Hon Hos Hiv * Hbz.
 progress unfold rngl_div.
 rewrite Hiv.
 rewrite (rngl_pow_mul_l Hic Hon).
-now rewrite (rngl_inv_pow Hic Hon Hiv Hos _ _ Hbz).
+now rewrite (rngl_inv_pow Hon Hos Hiv _ _ Hbz).
 Qed.
 
 (* to be completed
