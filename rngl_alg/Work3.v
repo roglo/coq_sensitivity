@@ -88,14 +88,16 @@ Qed.
 
 Theorem gc_has_nth_root :
   rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
   is_complete T rngl_dist →
   ∀ z : GComplex T, ∀ n, n ≠ 0 → ∃ z', (z' ^ n)%C = z.
 Proof.
-intros Hic Hop Hor Hcz Har Hco.
+intros Hic Hon Hop Hiq Hor Hcz Har Hco.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hnz.
 specialize (polar z _ _ (eq_refl _) (eq_refl)) as H1.
@@ -138,6 +140,7 @@ Theorem gc_modl_div_nonneg :
 Proof.
 intros Hon Hop Hiv Hor * Hz.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor) as Hio.
 apply (rngl_div_nonneg Hon Hop Hiv Hor). {
@@ -207,11 +210,13 @@ split; apply (rngl_mul_1_r Hon).
 Qed.
 
 Theorem gc_modl_nonneg :
+  rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
   ∀ z, (0 ≤ ‖ z ‖)%L.
 Proof.
-intros Hos Hor *.
+intros Hon Hos Hiq Hor *.
 progress unfold gc_modl.
 progress unfold rl_modl.
 apply rl_sqrt_nonneg.
@@ -305,10 +310,11 @@ Theorem gc_modl_mul :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
   ∀ a b, ‖ (a * b) ‖ = (‖ a ‖ * ‖ b ‖)%L.
 Proof.
-intros Hic Hon Hop Hor.
+intros Hic Hon Hop Hiq Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros *.
 progress unfold gc_modl.

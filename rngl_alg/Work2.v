@@ -776,14 +776,15 @@ now apply (dist_separation Hd).
 Qed.
 
 Theorem rngl_squ_lt_squ_nonneg :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b, (a * b = b * a → 0 ≤ a → a < b → a² < b²)%L.
 Proof.
-intros Hop Hor Hid.
+intros Hon Hop Hiq Hor.
 intros * Habc Hza Hab.
-apply (rngl_abs_lt_squ_lt Hop Hor Hid _ _ Habc).
+apply (rngl_abs_lt_squ_lt Hon Hop Hiq Hor _ _ Habc).
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
 apply (rngl_le_trans Hor _ a); [ easy | ].
@@ -1119,11 +1120,11 @@ rewrite rngl_sin_acos; [ | easy ].
 rewrite rngl_sin_acos; [ | easy ].
 rewrite rngl_leb_0_sqrt. 2: {
   apply (rngl_le_0_sub Hop Hor).
-  now apply (rngl_squ_le_1 Hon Hop Hor).
+  now apply (rngl_squ_le_1 Hon Hop Hiq Hor).
 }
 rewrite rngl_leb_0_sqrt. 2: {
   apply (rngl_le_0_sub Hop Hor).
-  now apply (rngl_squ_le_1 Hon Hop Hor).
+  now apply (rngl_squ_le_1 Hon Hop Hiq Hor).
 }
 now apply rngl_ltb_lt.
 Qed.
@@ -1162,7 +1163,7 @@ progress unfold rngl_acos in Haz.
 progress fold Hor in Haz.
 destruct (rngl_le_dec Hor a² 1) as [Ha1| H1a]; [ now injection Haz | ].
 exfalso; apply H1a.
-now apply (rngl_squ_le_1 Hon Hop Hor) in H1a1.
+now apply (rngl_squ_le_1 Hon Hop Hiq Hor) in H1a1.
 Qed.
 
 Theorem rngl_sin_nonneg_is_pos :
@@ -1256,10 +1257,11 @@ Qed.
 Theorem rngl_squ_le_diag :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
   ∀ a, (0 ≤ a ≤ 1 → a² ≤ a)%L.
 Proof.
-intros Hon Hop Hor * Ha.
+intros Hon Hop Hiq Hor * Ha.
 rewrite <- (rngl_mul_1_r Hon a) at 2.
 now apply (rngl_mul_le_mono_nonneg_l Hon Hop Hiq Hor).
 Qed.
