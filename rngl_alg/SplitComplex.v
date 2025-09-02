@@ -59,10 +59,10 @@ Definition sc_div a b := sc_mul a (sc_inv b).
 
 Definition sc_opt_one := Some sc_one.
 
-Definition sc_opt_opp_or_subt :=
-  match rngl_opt_opp_or_subt T with
+Definition sc_opt_opp_or_psub :=
+  match rngl_opt_opp_or_psub T with
   | Some (inl opp) => Some (inl sc_opp)
-  | Some (inr subt) => Some (inr sc_sub)
+  | Some (inr psub) => Some (inr sc_sub)
   | None => None
   end.
 
@@ -91,7 +91,7 @@ Instance sc_ring_like_op : ring_like_op (SplitComplex T) :=
      rngl_add := sc_add;
      rngl_mul := sc_mul;
      rngl_opt_one := sc_opt_one;
-     rngl_opt_opp_or_subt := sc_opt_opp_or_subt;
+     rngl_opt_opp_or_psub := sc_opt_opp_or_psub;
      rngl_opt_inv_or_quot := sc_opt_inv_or_quot;
      rngl_opt_eq_dec := sc_opt_eq_dec;
      rngl_opt_leb := sc_opt_leb |}.

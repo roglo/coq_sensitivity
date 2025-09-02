@@ -651,7 +651,7 @@ Theorem det_isort_rows_with_dup :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_characteristic T = 0 →
   ∀ A kl,
   is_correct_matrix A = true
@@ -662,7 +662,7 @@ Theorem det_isort_rows_with_dup :
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
 intros Hic Hon Hop Hiq Hch * Hcm Hac Hkl Hadk.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 apply (no_dup_false_iff Nat.eqb_eq) in Hadk.
@@ -738,7 +738,7 @@ Theorem det_isort_rows_no_dup :
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
 intros Hon Hop Hic Hch * Hcm Hac Hkl Hadk.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   apply List.length_zero_iff_nil in Hkz; subst kl.
@@ -1057,7 +1057,7 @@ Theorem det_isort_rows :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_characteristic T = 0 →
   ∀ A kl,
   is_correct_matrix A = true
@@ -1290,7 +1290,7 @@ Theorem rngl_summation_cart_prod_repeat_filter_no_dup :
     ε kl * f kl.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 assert (Hel : equality (list_eqv eqb)). {
@@ -1608,7 +1608,7 @@ Lemma Cauchy_Binet_formula_step_2 :
     (∑ (l ∈ List_cart_prod_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)).
 Proof.
 intros Hon Hop Hic * Hmz.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -1751,7 +1751,7 @@ Lemma Cauchy_Binet_formula_step_4 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_characteristic T = 0 →
   ∀ [m n] [B] f, m ≠ 0 →
   is_correct_matrix B = true
@@ -1792,7 +1792,7 @@ Lemma Cauchy_Binet_formula_step_5_1 :
     det (mat_select_rows jl B).
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
@@ -2060,13 +2060,13 @@ assert (Hop : rngl_has_opp T = true) by now destruct Hif.
 assert (Hiv : rngl_has_inv T = true) by now destruct Hif.
 assert (Hch : rngl_characteristic T = 0) by now destruct Hif.
 assert (H10 : rngl_characteristic T ≠ 1) by now rewrite Hch.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hi1.
 assert
-  (Hii : (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true). {
+  (Hii : (rngl_is_integral_domain T || rngl_has_inv_or_pdiv T)%bool = true). {
   destruct Hif.
   apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_or_quot_iff; left.
+  now apply rngl_has_inv_or_pdiv_iff; left.
 }
 clear Hif.
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {

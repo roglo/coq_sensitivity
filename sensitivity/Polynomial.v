@@ -22,7 +22,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context (Hon : rngl_has_1 T = true).
-Context (Hos : rngl_has_opp_or_subt T = true).
+Context (Hos : rngl_has_opp_or_psub T = true).
 Context (Hed : rngl_has_eq_dec T = true).
 
 Theorem lap_norm_idemp : ∀ la, lap_norm (lap_norm la) = lap_norm la.
@@ -209,20 +209,20 @@ Require Import RnglAlg.MatRl.
 Definition mat_of_polyn_ring_like_op n T
   (ro : ring_like_op T) (rp : ring_like_prop T) eqb
   (Heq : rngl_has_eq_dec T = true)
-  (Hos : rngl_has_opp_or_subt T = true) :
+  (Hos : rngl_has_opp_or_psub T = true) :
     ring_like_op (square_matrix n (polyn T)) :=
   mat_ring_like_op (polyn_ring_like_op Heq Hos) (polyn_eqb eqb).
 
 Theorem polyn_has_opp :
   ∀ T (ro : ring_like_op T) (rp : ring_like_prop T) Heq Hop,
   @rngl_has_opp (polyn T)
-    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_subt Hop)) = true.
+    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_psub Hop)) = true.
 Proof.
 intros.
 unfold rngl_has_opp in Hop |-*.
 unfold polyn_ring_like_op; cbn.
-unfold polyn_opt_opp_or_subt; cbn.
-remember rngl_opt_opp_or_subt as os eqn:Hos; symmetry in Hos.
+unfold polyn_opt_opp_or_psub; cbn.
+remember rngl_opt_opp_or_psub as os eqn:Hos; symmetry in Hos.
 destruct os as [os| ]; [ | easy ].
 now destruct os.
 Qed.
@@ -231,7 +231,7 @@ Definition mat_of_polyn_ring_like_prop n T ro rp eqb
   (Heq : rngl_has_eq_dec T = true) (Hop : rngl_has_opp T = true) :
     ring_like_prop (square_matrix n (polyn T)) :=
   @mat_ring_like_prop _
-    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_subt Hop))
-    (@polyn_ring_like_prop _ ro rp Heq (rngl_has_opp_has_opp_or_subt Hop))
+    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_psub Hop))
+    (@polyn_ring_like_prop _ ro rp Heq (rngl_has_opp_has_opp_or_psub Hop))
     (polyn_has_opp rp Heq Hop) (polyn_eqb eqb) n.
 *)

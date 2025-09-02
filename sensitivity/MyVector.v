@@ -86,7 +86,7 @@ Definition vect_dot_mul' (U V : vector T) :=
   vect_el U i * vect_el V i.
 
 Theorem vect_dot_mul_dot_mul' :
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   ∀ U V,
   vect_dot_mul U V = vect_dot_mul' U V.
 Proof.
@@ -159,7 +159,7 @@ apply rngl_mul_assoc.
 Qed.
 
 Theorem vect_mul_scal_reg_r :
-  rngl_has_inv_and_1_or_quot T = true →
+  rngl_has_inv_and_1_or_pdiv T = true →
   rngl_has_eq_dec T = true →
   ∀ (V : vector T) a b,
   V ≠ vect_zero (vect_size V)
@@ -196,7 +196,7 @@ Theorem vect_mul_scal_size : ∀ a V, vect_size (a × V) = vect_size V.
 Proof. now intros; cbn; rewrite List.length_map. Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   rngl_mul_is_comm T = true →
   ∀ (a : T) (U V : vector T),
   ≺ U, a × V ≻ = (a * ≺ U, V ≻)%L.
@@ -218,7 +218,7 @@ now apply rngl_mul_comm.
 Qed.
 
 Theorem vect_scal_mul_dot_mul_comm :
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   ∀ (a : T) (U V : vector T),
   ≺ a × U, V ≻ = (a * ≺ U, V ≻)%L.
 Proof.
@@ -262,7 +262,7 @@ destruct uv. {
 Qed.
 
 Theorem vect_mul_scal_0_l :
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   ∀ v, (0%L × v)%V = mk_vect (List.repeat 0%L (vect_size v)).
 Proof.
 intros Hos *.
@@ -403,8 +403,8 @@ Theorem vect_mul_scal_l_sub_distr_r :
   ∀ a b u, ((a - b)%L × u)%V = (a × u - b × u)%V.
 Proof.
 intros Hop *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
+assert (Hos : rngl_has_opp_or_psub T = true). {
+  now apply rngl_has_opp_or_psub_iff; left.
 }
 move Hos before Hop.
 unfold "×", vect_sub, vect_add; cbn; f_equal.

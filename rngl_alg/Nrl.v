@@ -208,24 +208,24 @@ destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
 }
 Qed.
 
-Definition Zn_opt_inv_or_quot n :=
+Definition Zn_opt_inv_or_pdiv n :=
   if is_prime n then Some (inl (Zn_inv n) : _ + (Zn n → Zn n → Zn n))
   else None.
 
 Definition Zn_has_inv n :=
-  match Zn_opt_inv_or_quot n with
+  match Zn_opt_inv_or_pdiv n with
   | Some (inl _) => true
   | _ => false
   end.
 
-Definition Zn_has_quot n :=
-  match Zn_opt_inv_or_quot n with
+Definition Zn_has_pdiv n :=
+  match Zn_opt_inv_or_pdiv n with
   | Some (inr _) => true
   | _ => false
   end.
 
 Definition Zn_inv' n a :=
-  match Zn_opt_inv_or_quot n with
+  match Zn_opt_inv_or_pdiv n with
   | Some (inl rngl_inv) => rngl_inv a
   | _ => Zn_of_nat n 0
   end.
@@ -244,7 +244,7 @@ intros.
 progress unfold Zn_has_inv.
 progress unfold Zn_has_1.
 progress unfold Zn_inv'.
-progress unfold Zn_opt_inv_or_quot.
+progress unfold Zn_opt_inv_or_pdiv.
 remember (is_prime n) as p eqn:Hp.
 symmetry in Hp.
 destruct p; [ cbn | easy ].
@@ -296,11 +296,11 @@ Qed.
 
 Theorem Zn_opt_mul_div :
   ∀ {not_applicable : Prop} (NA : not_applicable) n {P},
-  if Zn_has_quot n then P else not_applicable.
+  if Zn_has_pdiv n then P else not_applicable.
 Proof.
 intros.
-progress unfold Zn_has_quot; cbn.
-progress unfold Zn_opt_inv_or_quot.
+progress unfold Zn_has_pdiv; cbn.
+progress unfold Zn_opt_inv_or_pdiv.
 now destruct (is_prime n).
 Qed.
 
@@ -313,8 +313,8 @@ Instance Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
      rngl_opt_one := Some (Zn_of_nat n 1);
-     rngl_opt_opp_or_subt := Some (inl (Zn_opp n));
-     rngl_opt_inv_or_quot := Zn_opt_inv_or_quot n;
+     rngl_opt_opp_or_psub := Some (inl (Zn_opp n));
+     rngl_opt_inv_or_pdiv := Zn_opt_inv_or_pdiv n;
      rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := Some (Zn_eq_dec n);
      rngl_opt_leb := None |}.

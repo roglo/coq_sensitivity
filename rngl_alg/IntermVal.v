@@ -103,8 +103,8 @@ Theorem rngl_middle_in_middle :
   ∀ a b, (a ≤ b → a ≤ (a + b) / 2 ≤ b)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hab.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -140,12 +140,12 @@ Theorem AnBn_interval :
     bn = (an + (b - a) / 2 ^ n)%L.
 Proof.
 intros Hon Hop Hiv Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+assert (Hiq : rngl_has_inv_or_pdiv T = true). {
+  now apply rngl_has_inv_or_pdiv_iff; left.
 }
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
+assert (Hi1 : rngl_has_inv_and_1_or_pdiv T = true). {
+  now apply rngl_has_inv_and_1_or_pdiv_iff; left.
 }
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -272,9 +272,9 @@ Theorem rngl_abs_AnBn_sub_AnBn_le :
     (rngl_abs (bp - bq) ≤ (b - a) / 2 ^ p)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hab * Hpq * Ha Hb.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+assert (Hiq : rngl_has_inv_or_pdiv T = true). {
+  now apply rngl_has_inv_or_pdiv_iff; left.
 }
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -359,8 +359,8 @@ Theorem An_Bn_are_Cauchy_sequences :
   is_Cauchy_sequence rngl_dist (λ n : nat, snd (AnBn P a b n)).
 Proof.
 intros Hon Hiv Har * Hab.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -534,8 +534,8 @@ Theorem rngl_abs_An_Bn_le :
   → (rngl_abs (an - bn) ≤ (b - a) / 2 ^ n)%L.
 Proof.
 intros Hon Hiv * Hab * Habn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
   rewrite (H (rngl_abs _))%L.
@@ -605,8 +605,8 @@ Theorem limit_between_An_and_Bn :
   → ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
 Proof.
 intros Hon Hiv.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hab Hal Hbl * Habn.
@@ -803,8 +803,8 @@ Theorem intermediate_value_prop_1 :
   → c ≠ a.
 Proof.
 intros Hon Hiv * Hfc * Hab Hfab Hub1.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite (H1 a), (H1 b) in Hab.
@@ -899,8 +899,8 @@ Theorem intermediate_value_prop_2 :
   → c ≠ b.
 Proof.
 intros Hon Hiv * Hfc * Hab Hub Hc.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite (H1 a), (H1 b) in Hab.
@@ -999,9 +999,9 @@ Theorem exists_supremum :
     is_limit_when_seq_tends_to_inf rngl_dist (λ n, snd (AnBn P a b n)) c.
 Proof.
 intros Hon Hiv Har Hco.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+assert (Hiq : rngl_has_inv_or_pdiv T = true). {
+  now apply rngl_has_inv_or_pdiv_iff; left.
 }
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -1250,8 +1250,8 @@ Theorem intermediate_value_le :
   → ∃ c : T, (a ≤ c ≤ b)%L ∧ f c = u.
 Proof.
 intros Hon Hiv Har Hco * Hfc * Hab Hfab.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.

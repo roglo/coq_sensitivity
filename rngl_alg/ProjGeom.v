@@ -65,7 +65,7 @@ Ltac destruct_pphc :=
   set (Hop := pphc_op);
   set (Hed := pphc_ed);
   set (Hor := pphc_or);
-  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos;
+  specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos;
   specialize pphc_on as Hon;
   specialize pphc_iv as Hiv.
 (*

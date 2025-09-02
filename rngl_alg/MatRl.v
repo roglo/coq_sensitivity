@@ -180,8 +180,8 @@ Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
      rngl_add := square_matrix_add;
      rngl_mul := square_matrix_mul;
      rngl_opt_one := Some (smI n);
-     rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
-     rngl_opt_inv_or_quot := None;
+     rngl_opt_opp_or_psub := Some (inl square_matrix_opp);
+     rngl_opt_inv_or_pdiv := None;
 (**)
      rngl_opt_is_zero_divisor := Some (mat_is_zero_divisor n);
 (*
@@ -215,7 +215,7 @@ intros; cbn.
 progress unfold rngl_of_nat.
 progress unfold rngl_mul_nat.
 progress unfold mul_nat; cbn.
-specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff (or_introl Hop)) as Hos.
 induction m; cbn. {
   unfold "×"%M, mZ, mI.
   f_equal; cbn.
@@ -625,7 +625,7 @@ Theorem squ_mat_integral eq_dec n :
   → A = 0%L ∨ B = 0%L ∨ rngl_is_zero_divisor A ∨ rngl_is_zero_divisor B.
 Proof.
 (**)
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hab.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   left.
@@ -710,7 +710,7 @@ Theorem squ_mat_characteristic_prop :
    ∧ rngl_of_nat ch = 0%L.
 Proof.
 intros eq_dec n rom *.
-specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff (or_introl Hop)) as Hos.
 move Hos before Hop.
 subst ch.
 rewrite (if_eqb_eq_dec n).

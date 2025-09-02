@@ -30,7 +30,7 @@ assert (Hop : rngl_has_opp QG = true) by easy.
 assert (Hiv : rngl_has_inv QG = true) by easy.
 assert (Hc1 : rngl_characteristic QG ≠ 1) by easy.
 assert (Hor : rngl_is_ordered QG = true) by easy.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hnk.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
@@ -86,7 +86,7 @@ assert (Hop : rngl_has_opp QG = true) by easy.
 assert (Hiv : rngl_has_inv QG = true) by easy.
 assert (Hor : rngl_is_ordered QG = true) by easy.
 assert (Hc1 : rngl_characteristic QG ≠ 1) by easy.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * H1n.
 progress unfold QG_of_nat.
 induction n; [ now rewrite rngl_summation_empty | ].
@@ -127,7 +127,7 @@ assert (Hop : rngl_has_opp QG = true) by easy.
 assert (Hiv : rngl_has_inv QG = true) by easy.
 assert (Hor : rngl_is_ordered QG = true) by easy.
 assert (Hc1 : rngl_characteristic QG ≠ 1) by easy.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * H1n.
 progress unfold QG_of_nat.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ flia Hnz H1n | ].

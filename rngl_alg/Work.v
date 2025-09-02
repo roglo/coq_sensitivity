@@ -34,7 +34,7 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
 Theorem gc_pow_im_0 :
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   ∀ n x, (mk_gc x 0%L ^ n)%C = (mk_gc (x ^ n) 0)%C.
 Proof.
 intros Hos *.
@@ -352,7 +352,7 @@ Theorem gc_pow_re_0 :
        mk_gc 0 ((minus_one_pow (n / 2)) * (y ^ n))%L)%C.
 Proof.
 intros Hon Hic Hop.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros.
 remember (Nat.even n) as b eqn:Hb; symmetry in Hb.
 destruct b. {
@@ -486,12 +486,12 @@ assert (Honc : rngl_has_1 (GComplex T) = true). {
   subst gro grp.
   now destruct (rngl_opt_one T).
 }
-assert (Hosc : rngl_has_opp_or_subt (GComplex T) = true). {
-  progress unfold rngl_has_opp_or_subt in Hos.
-  progress unfold rngl_has_opp_or_subt.
+assert (Hosc : rngl_has_opp_or_psub (GComplex T) = true). {
+  progress unfold rngl_has_opp_or_psub in Hos.
+  progress unfold rngl_has_opp_or_psub.
   cbn.
-  progress unfold gc_opt_opp_or_subt.
-  destruct rngl_opt_opp_or_subt as [s| ]; [ | easy ].
+  progress unfold gc_opt_opp_or_psub.
+  destruct rngl_opt_opp_or_psub as [s| ]; [ | easy ].
   now destruct s.
 }
 specialize (H1 Hic Honc Hosc n).

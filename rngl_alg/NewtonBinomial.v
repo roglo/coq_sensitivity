@@ -19,7 +19,7 @@ Context {rp : ring_like_prop T}.
 Theorem newton_binomial :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   ∀ n a b,
   ((a + b) ^ n)%L =
     (∑ (k = 0, n), rngl_of_nat (binomial n k) * a ^ (n - k) * b ^ k)%L.

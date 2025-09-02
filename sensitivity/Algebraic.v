@@ -82,7 +82,7 @@ Qed.
 
 Theorem lap_x_power_add :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   rngl_has_eq_dec T = true →
   ∀ a b, lap_x_power (a + b) = (lap_x_power a * lap_x_power b)%lap.
 Proof.
@@ -158,7 +158,7 @@ Qed.
 
 Theorem polyn_x_power_add :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   rngl_has_eq_dec T = true →
   ∀ a b, polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
 Proof.
@@ -187,7 +187,7 @@ Qed.
 
 Theorem lap_norm_mul_x_power_r :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
   rngl_has_eq_dec T = true →
@@ -203,7 +203,7 @@ apply (lap_x_power_has_polyn_prop Hon Hch Hed).
 Qed.
 
 Theorem polyn_of_const_add :
-  ∀ (Hos : rngl_has_opp_or_subt T = true),
+  ∀ (Hos : rngl_has_opp_or_psub T = true),
   ∀ (Hed : rngl_has_eq_dec T = true),
   ∀ (rop := polyn_ring_like_op Hos Hed),
   ∀ a b,
@@ -242,8 +242,8 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]. {
 Qed.
 
 Theorem polyn_of_const_mul :
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
-  ∀ (Hos : rngl_has_opp_or_subt T = true),
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_pdiv T)%bool = true →
+  ∀ (Hos : rngl_has_opp_or_psub T = true),
   ∀ (Hed : rngl_has_eq_dec T = true),
   ∀ (rop := polyn_ring_like_op Hos Hed),
   ∀ a b,
@@ -287,7 +287,7 @@ Arguments polyn_ring_like_prop T {ro rp} Hon Hos Hed.
 
 Theorem polyn_of_const_rngl_summation :
   rngl_has_1 T = true →
-  ∀ (Hos : rngl_has_opp_or_subt T = true),
+  ∀ (Hos : rngl_has_opp_or_psub T = true),
   ∀ (Hed : rngl_has_eq_dec T = true),
   ∀ (rop := polyn_ring_like_op T Hos Hed),
   ∀ b e f,
@@ -342,19 +342,19 @@ destruct (Sumbool.sumbool_of_bool _) as [Ha| Ha]. {
 }
 Qed.
 
-Theorem polyn_has_opp_or_subt :
+Theorem polyn_has_opp_or_psub :
   ∀ (Hop : rngl_has_opp T = true),
   ∀ (Hed : rngl_has_eq_dec T = true),
-  ∀ (Hos := rngl_has_opp_has_opp_or_subt Hop),
+  ∀ (Hos := rngl_has_opp_has_opp_or_psub Hop),
   ∀ (rop := polyn_ring_like_op T Hos Hed),
-  rngl_has_opp_or_subt (polyn T) = true.
+  rngl_has_opp_or_psub (polyn T) = true.
 Proof.
 intros.
 subst rop Hos.
 unfold rngl_has_opp in Hop.
-unfold rngl_has_opp_or_subt; cbn.
-unfold polyn_opt_opp_or_subt.
-remember rngl_opt_opp_or_subt as os eqn:Hos; symmetry in Hos.
+unfold rngl_has_opp_or_psub; cbn.
+unfold polyn_opt_opp_or_psub.
+remember rngl_opt_opp_or_psub as os eqn:Hos; symmetry in Hos.
 destruct os; [ | easy ].
 now destruct s.
 Qed.
@@ -390,18 +390,18 @@ destruct (Sumbool.sumbool_of_bool _) as [Hoaz| Hoaz]. {
 }
 Qed.
 
-Theorem rngl_has_opp_has_opp_or_subt :
-  rngl_has_opp T = true → rngl_has_opp_or_subt T = true.
+Theorem rngl_has_opp_has_opp_or_psub :
+  rngl_has_opp T = true → rngl_has_opp_or_psub T = true.
 Proof.
 intros Hop.
 unfold rngl_has_opp in Hop.
-unfold rngl_has_opp_or_subt.
-now destruct rngl_opt_opp_or_subt.
+unfold rngl_has_opp_or_psub.
+now destruct rngl_opt_opp_or_psub.
 Defined.
 
 (*
-Definition rngl_has_opp_has_opp_or_subt (Hop : rngl_has_opp = true) :=
-  match rngl_has_opp_or_subt_iff with
+Definition rngl_has_opp_has_opp_or_psub (Hop : rngl_has_opp = true) :=
+  match rngl_has_opp_or_psub_iff with
   | conj x x0 => x0
   end (or_introl Hop).
 *)
@@ -410,12 +410,12 @@ Theorem polyn_of_const_minus_one_pow :
   rngl_has_1 T = true →
   ∀ (Hop : rngl_has_opp T = true),
   ∀ (Hed : rngl_has_eq_dec T = true),
-  ∀ (rop := polyn_ring_like_op T (rngl_has_opp_has_opp_or_subt Hop) Hed),
+  ∀ (rop := polyn_ring_like_op T (rngl_has_opp_has_opp_or_psub Hop) Hed),
   ∀ n, polyn_of_const (minus_one_pow n) = minus_one_pow n.
 Proof.
 intros Hon *.
 assert (Honp : rngl_has_1 (polyn T) = true) by easy.
-set (Hos := rngl_has_opp_has_opp_or_subt Hop) in rop.
+set (Hos := rngl_has_opp_has_opp_or_psub Hop) in rop.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
   specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
   apply eq_polyn_eq; cbn.
@@ -423,8 +423,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
   rewrite (rngl_eqb_refl Hed); cbn.
   set (rpp := polyn_ring_like_prop T Hon Hos Hed).
   specialize (polyn_characteristic_prop (polyn T)) as H2.
-  assert (Hosp : rngl_has_opp_or_subt (polyn T) = true). {
-    now specialize (polyn_has_opp_or_subt Hop Hed) as H3.
+  assert (Hosp : rngl_has_opp_or_psub (polyn T) = true). {
+    now specialize (polyn_has_opp_or_psub Hop Hed) as H3.
   }
   specialize (H2 Honp Hosp).
   assert (Hedp : rngl_has_eq_dec (polyn T) = true) by easy.
@@ -444,12 +444,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
   clear - H1 Hed.
   rewrite (H1 1%L).
   unfold rngl_opp; cbn.
-  unfold polyn_opt_opp_or_subt.
+  unfold polyn_opt_opp_or_psub.
   subst Hos; cbn.
-  specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as H2.
-  unfold rngl_has_opp_or_subt in H2.
-  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-  destruct os as [opp| subt ]; [ | easy ].
+  specialize (proj2 rngl_has_opp_or_psub_iff (or_introl Hop)) as H2.
+  unfold rngl_has_opp_or_psub in H2.
+  destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
+  destruct os as [opp| psub ]; [ | easy ].
   subst rop; cbn.
   now rewrite (rngl_eqb_refl Hed); cbn.
 }
@@ -477,13 +477,13 @@ destruct (n mod 2) as [| m]; cbn. {
   now apply rngl_1_neq_0_iff in Hch.
 }
 unfold rngl_opp; cbn.
-specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as H2.
-unfold rngl_has_opp_or_subt in H2.
-unfold polyn_opt_opp_or_subt; cbn.
-remember (rngl_opt_opp_or_subt T) as os eqn:Hos'; symmetry in Hos'.
+specialize (proj2 rngl_has_opp_or_psub_iff (or_introl Hop)) as H2.
+unfold rngl_has_opp_or_psub in H2.
+unfold polyn_opt_opp_or_psub; cbn.
+remember (rngl_opt_opp_or_psub T) as os eqn:Hos'; symmetry in Hos'.
 destruct os as [os| ]; [ | easy ].
 subst rop; cbn.
-destruct os as [opp| subt ]. {
+destruct os as [opp| psub ]. {
   assert (Hoo : ∀ x, opp x = rngl_opp x). {
     intros.
     unfold rngl_opp.
@@ -510,42 +510,42 @@ destruct os as [opp| subt ]. {
   now apply rngl_1_neq_0_iff in Hch.
 }
 generalize Hop; intros Hsu.
-apply rngl_has_opp_has_no_subt in Hsu.
+apply rngl_has_opp_has_no_psub in Hsu.
 move Hsu before Hop.
-unfold rngl_has_subt in Hsu.
+unfold rngl_has_psub in Hsu.
 now rewrite Hos' in Hsu.
 Qed.
 
 Theorem det_polyn_of_const :
   rngl_has_1 T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_or_pdiv T)%bool = true →
   rngl_characteristic T ≠ 1 →
   ∀ (Hop : rngl_has_opp T = true),
   ∀ (Hed : rngl_has_eq_dec T = true),
-  ∀ (rop := polyn_ring_like_op T (rngl_has_opp_has_opp_or_subt Hop) Hed),
+  ∀ (rop := polyn_ring_like_op T (rngl_has_opp_has_opp_or_psub Hop) Hed),
   ∀ (ll : list (list T)),
   det {| mat_list_list := List.map (λ l, List.map polyn_of_const l) ll |} =
   polyn_of_const (det {| mat_list_list := ll |}).
 Proof.
 intros Hon Hii Hch *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 replace rop with (polyn_ring_like_op T Hos Hed). 2: {
   subst rop.
   unfold polyn_ring_like_op; cbn.
   f_equal.
-  unfold rngl_has_opp_has_opp_or_subt.
-  unfold rngl_has_opp_or_subt in Hos.
+  unfold rngl_has_opp_has_opp_or_psub.
+  unfold rngl_has_opp_or_psub in Hos.
   f_equal.
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 }
 subst rop.
 set (rop := polyn_ring_like_op T Hos Hed).
-assert (Hosp : rngl_has_opp_or_subt (polyn T) = true). {
-  unfold rngl_has_opp_or_subt; cbn.
-  unfold polyn_opt_opp_or_subt.
+assert (Hosp : rngl_has_opp_or_psub (polyn T) = true). {
+  unfold rngl_has_opp_or_psub; cbn.
+  unfold polyn_opt_opp_or_psub.
   unfold rngl_has_opp in Hop.
   clear - Hop.
-  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
   now destruct os.
 }
 rewrite List.length_map.
@@ -559,12 +559,12 @@ intros i Hi.
 assert
   (Hi1 :
     (rngl_is_integral_domain T ||
-       rngl_has_inv_and_1_or_quot T)%bool = true). {
+       rngl_has_inv_and_1_or_pdiv T)%bool = true). {
   apply Bool.orb_true_iff in Hii.
   apply Bool.orb_true_iff.
   destruct Hii as [Hii | Hii]; [ now left | right ].
-  apply rngl_has_inv_or_quot_iff in Hii.
-  apply rngl_has_inv_and_1_or_quot_iff.
+  apply rngl_has_inv_or_pdiv_iff in Hii.
+  apply rngl_has_inv_and_1_or_pdiv_iff.
   now destruct Hii; [ left | right ].
 }
 rewrite (polyn_of_const_mul Hi1 Hos Hed).
@@ -644,8 +644,8 @@ unfold lap_resultant.
 unfold rlap_sylvester_mat.
 rewrite <- Hll.
 specialize (@cramer's_rule_by_mul (polyn T)) as Hcr.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  apply rngl_has_opp_or_subt_iff; left.
+assert (Hos : rngl_has_opp_or_psub T = true). {
+  apply rngl_has_opp_or_psub_iff; left.
   apply (cf_has_opp Hif).
 }
 assert (Hon : rngl_has_1 T = true) by apply (cf_has_1 Hif).
@@ -658,23 +658,23 @@ generalize Hif; intros H.
 destruct H as (_, Hic, Hop, Hin, _, Hch).
 assert (Hopp : rngl_has_opp (polyn T) = true). {
   unfold rngl_has_opp; cbn.
-  unfold polyn_opt_opp_or_subt.
+  unfold polyn_opt_opp_or_psub.
   unfold rngl_has_opp in Hop.
-  destruct rngl_opt_opp_or_subt as [s| ]; [ | easy ].
+  destruct rngl_opt_opp_or_psub as [s| ]; [ | easy ].
   now destruct s.
 }
 specialize (Hcr eq_refl Hopp Hic Hch).
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  apply rngl_has_inv_or_quot_iff.
+assert (Hiq : rngl_has_inv_or_pdiv T = true). {
+  apply rngl_has_inv_or_pdiv_iff.
   now rewrite Hin; left.
 }
-assert (Hiqp : rngl_has_inv_or_quot (polyn T) = true). {
-  apply rngl_has_inv_or_quot_iff.
-  unfold rngl_has_inv, rngl_has_quot; cbn.
-  unfold polyn_opt_inv_or_quot.
+assert (Hiqp : rngl_has_inv_or_pdiv (polyn T) = true). {
+  apply rngl_has_inv_or_pdiv_iff.
+  unfold rngl_has_inv, rngl_has_pdiv; cbn.
+  unfold polyn_opt_inv_or_pdiv.
   rewrite Hic, Hop, Hin; cbn.
   unfold rngl_has_inv in Hin.
-  destruct rngl_opt_inv_or_quot; [ now right | easy ].
+  destruct rngl_opt_inv_or_pdiv; [ now right | easy ].
 }
 rewrite Hiqp, Bool.orb_comm in Hcr.
 specialize (Hcr eq_refl).
@@ -923,11 +923,11 @@ assert (H : (sm • u)%V = v). {
     remember (∑ (j = _, _), _) as x in |-*; subst x.
     rewrite <- rngl_mul_summation_distr_l. 2: {
       clear - Hop.
-      unfold rngl_has_opp_or_subt in Hos |-*; cbn.
+      unfold rngl_has_opp_or_psub in Hos |-*; cbn.
       unfold rngl_has_opp in Hop.
       subst rop.
-      unfold polyn_opt_opp_or_subt.
-      remember (rngl_opt_opp_or_subt T) as x eqn:Hx.
+      unfold polyn_opt_opp_or_psub.
+      remember (rngl_opt_opp_or_psub T) as x eqn:Hx.
       destruct x as [x| ]; [ | easy ].
       now destruct x.
     }
@@ -1017,7 +1017,7 @@ assert (H : (sm • u)%V = v). {
     erewrite List.map_ext_in; [ | now intros; rewrite (rngl_mul_1_l Hon) ].
     rewrite List.map_id.
     (* cannot apply rngl_mul_summation_list_distr because it requires
-       rngl_has_opp_or_subt, which is false on laps *)
+       rngl_has_opp_or_psub, which is false on laps *)
     (* mul_iter_list_distr_l_test is more general, does not requires
        that, but I must decompose the whole processus ; I should make
        a lemma *)
@@ -1355,14 +1355,14 @@ Open Scope Z_scope.
 
 Compute (
   let zro := Z_ring_like_op in
-  rlap_quot_rem _ [4; 0; 6] [2; 1]).
+  rlap_pdiv_rem _ [4; 0; 6] [2; 1]).
 (*
      = ([2; -1], [7])
      : list Z * list Z
 *)
 Compute (
   let zro := Z_ring_like_op in
-  rlap_quot_rem _ [1; 0; 1] [1; 0; -2]).
+  rlap_pdiv_rem _ [1; 0; 1] [1; 0; -2]).
 (*
      = ([1], [0; 3])
      : list Z * list Z
@@ -1383,7 +1383,7 @@ Definition Q_r_algeb_mul :=
 
 Compute (
   let qro := Q_ring_like_op in
-  rlap_quot_rem _ [4; 0; 6] [2; 1]).
+  rlap_pdiv_rem _ [4; 0; 6] [2; 1]).
 (*
      = ([〈2〉; 〈-1〉], [〈7〉])
      : list Q * list Q
@@ -1391,7 +1391,7 @@ Compute (
 
 Compute (
   let qro := Q_ring_like_op in
-  rlap_quot_rem _ [1; 0; 1] [1; 0; -2]).
+  rlap_pdiv_rem _ [1; 0; 1] [1; 0; -2]).
 (*
      = ([〈1〉], [0; 〈3〉])
      : list Q * list Q
@@ -1550,7 +1550,7 @@ Compute (
 (* example in video https://www.youtube.com/watch?v=WvbAfhOH4ik *)
 Compute (
   let qro := Q_ring_like_op in
-  rlap_quot_rem _ [1;0;0;-2;8;1;0;-16;-2] [1;0;0;0;8;1]).
+  rlap_pdiv_rem _ [1;0;0;-2;8;1;0;-16;-2] [1;0;0;0;8;1]).
 
 (*
 Compute (

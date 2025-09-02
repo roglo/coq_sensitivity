@@ -388,7 +388,7 @@ Theorem det_is_det' :
   → det M = det' M.
 Proof.
 intros Hop * Hm.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 unfold det'.
@@ -513,7 +513,7 @@ Theorem det'_is_det'' :
   ∀ (M : matrix T), det' M = det'' M.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
@@ -730,7 +730,7 @@ Theorem determinant_multilinear :
         b * det (mat_repl_vect i M V))%L.
 Proof.
 intros Hic Hop * Hsm Hr Hu Hv Hi.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 specialize (squ_mat_ncols _ Hsm) as Hcn.
@@ -1146,7 +1146,7 @@ Theorem determinant_alternating :
   → det (mat_swap_rows p q M) = (- det M)%L.
 Proof.
 intros Hic Hop * Hpq Hp Hq Hsm.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 rewrite (det_is_det' Hop). 2: {
@@ -1502,7 +1502,7 @@ Qed.
 Theorem determinant_same_rows :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_characteristic T = 0 →
   ∀ (M : matrix T) p q,
   is_square_matrix M = true
@@ -1513,7 +1513,7 @@ Theorem determinant_same_rows :
   → det M = 0%L.
 Proof.
 intros Hic Hop Hiq Hch * Hsm Hpq Hpn Hqn Hjpq.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
@@ -2430,7 +2430,7 @@ now rewrite mat_subm_transp.
 Qed.
 
 Theorem det_mI :
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   ∀ n, det (mI n) = 1%L.
 Proof.
 intros Hop *; cbn.

@@ -101,12 +101,12 @@ Definition in_ordered_field :=
 Theorem eq_vect_squ_0 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_is_ordered T = true →
   ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.
 intros Hon Hop Hiq Hor * Hvvz.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 unfold vect_dot_mul in Hvvz.
@@ -149,7 +149,7 @@ destruct i. {
   apply Bool.orb_true_iff; right.
   apply Bool.andb_true_iff.
   split.
-  apply (rngl_has_1_has_inv_or_quot_has_inv_and_1_or_quot Hon Hiq).
+  apply (rngl_has_1_has_inv_or_pdiv_has_inv_and_1_or_pdiv Hon Hiq).
   apply (rngl_has_eq_dec_or_is_ordered_r Hor).
 }
 cbn.
@@ -159,7 +159,7 @@ flia Hi.
 Qed.
 
 Theorem Rayleigh_quotient_mul_scal_l_zero :
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   ∀ c M,
   Rayleigh_quotient M (c × vect_zero (mat_nrows M)) =
   Rayleigh_quotient M (vect_zero (mat_nrows M)).
@@ -215,8 +215,8 @@ Theorem RQ_mul_scal_prop :
 Proof.
 intros Hof * Hsm Hsr Hcz.
 destruct Hof as (Hon & Hic & Hop & Heq & Hiv & Hch & Hor).
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 destruct (vect_eq_dec Heq V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
@@ -265,11 +265,11 @@ Theorem Rayleigh_quotient_of_eigenvector :
   → Rayleigh_quotient M V = μ.
 Proof.
 intros Hon Hic Hop Hii Hiv Hor * Hvz Hmv.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
-specialize (proj2 rngl_has_inv_and_1_or_quot_iff) as Hi1.
+specialize (proj2 rngl_has_inv_and_1_or_pdiv_iff) as Hi1.
 specialize (Hi1 (or_introl (conj Hiv Hon))).
 unfold Rayleigh_quotient.
 rewrite Hmv.
@@ -383,7 +383,7 @@ Qed.
 
 Theorem mat_mul_vect_dot_vect :
   rngl_mul_is_comm T = true →
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   ∀ (M : matrix T) U V,
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -471,7 +471,7 @@ Qed.
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   rngl_has_eq_dec T = true →
   rngl_has_inv T = true →
   ∀ n (M : matrix T) ev eV A,
@@ -482,7 +482,7 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → (A⁺ * A = mI n)%M.
 Proof.
 intros Hon Hic Hos Heq Hin * Hsy Hr Hvv Hm.
-specialize (proj2 rngl_has_inv_and_1_or_quot_iff) as Hi1.
+specialize (proj2 rngl_has_inv_and_1_or_pdiv_iff) as Hi1.
 specialize (Hi1 (or_introl (conj Hin Hon))).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n A | ].
 rewrite Hm.
@@ -640,7 +640,7 @@ Qed.
    see the comment for the theorem below *)
 Lemma diagonalized_matrix_prop_1 :
   rngl_mul_is_comm T = true →
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   ∀ n (M : matrix T) ev eV D U,
   mat_nrows M = n
   → length eV = n
@@ -935,7 +935,7 @@ intros Hif * Hrn Hlev Hevn Hsy Hvv * Hd Ho.
 assert (H10 : rngl_characteristic T ≠ 1). {
   now rewrite (cf_characteristic Hif).
 }
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 assert (H : rngl_has_opp T = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.
@@ -1091,8 +1091,8 @@ assert
            (≺ U • v, D • (U • v) ≻ / ≺ U • v, U • v ≻)%L). {
   intros v Hsv.
   destruct Hof as (Hic & Hop & Heq & Hde & Hit & Hiv & Hor).
-  assert (Hos : rngl_has_opp_or_subt T = true). {
-    now apply rngl_has_opp_or_subt_iff; left.
+  assert (Hos : rngl_has_opp_or_psub T = true). {
+    now apply rngl_has_opp_or_psub_iff; left.
   }
   unfold eigenvalues_and_norm_vectors in HeV.
   destruct HeV as (Hvs & Hvd & Hvn & Hmv).

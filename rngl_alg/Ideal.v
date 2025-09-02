@@ -17,12 +17,12 @@ Arguments i_mem {T P} i%_L.
 Class ideal_prop {T} {ro : ring_like_op T} (P : T → bool) := mk_ip
   { ip_zero : P rngl_zero = true;
     ip_add : ∀ a b, P a = true → P b = true → P (a + b)%L = true;
-    ip_opp_or_subt :
-      match rngl_opt_opp_or_subt T with
+    ip_opp_or_psub :
+      match rngl_opt_opp_or_psub T with
       | Some (inl opp) =>
           ∀ a, P a = true → P (opp a)%L = true
-      | Some (inr subt) =>
-          ∀ a b, P a = true → P b = true → P (subt a b) = true
+      | Some (inr psub) =>
+          ∀ a b, P a = true → P b = true → P (psub a b) = true
       | None =>
           not_applicable
       end;
@@ -66,10 +66,10 @@ Definition I_mul (a b : ideal P) : ideal P :=
 Theorem I_opp_prop : ∀ a : ideal P, P (- i_val a)%L = true.
 Proof.
 intros.
-specialize ip_opp_or_subt as H1.
+specialize ip_opp_or_psub as H1.
 unfold rngl_opp.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | apply ip_zero ].
-destruct os as [opp| subt]; [ | apply ip_zero ].
+destruct rngl_opt_opp_or_psub as [os| ]; [ | apply ip_zero ].
+destruct os as [opp| psub]; [ | apply ip_zero ].
 apply H1, a.
 Qed.
 
@@ -78,19 +78,19 @@ Definition I_opp (a : ideal P) : ideal P :=
 
 (* subtraction *)
 
-Theorem I_subt_prop :
-  ∀ (a b : ideal P), P (rngl_subt (i_val a) (i_val b)) = true.
+Theorem I_psub_prop :
+  ∀ (a b : ideal P), P (rngl_psub (i_val a) (i_val b)) = true.
 Proof.
 intros.
-specialize ip_opp_or_subt as H1.
-unfold rngl_subt.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | apply ip_zero ].
-destruct os as [opp| subt]; [ apply ip_zero | ].
+specialize ip_opp_or_psub as H1.
+unfold rngl_psub.
+destruct rngl_opt_opp_or_psub as [os| ]; [ | apply ip_zero ].
+destruct os as [opp| psub]; [ apply ip_zero | ].
 apply H1; [ apply a | apply b ].
 Qed.
 
-Definition I_subt (a b : ideal P) : ideal P :=
-  mk_I (rngl_subt (i_val a) (i_val b)) (I_subt_prop a b).
+Definition I_psub (a b : ideal P) : ideal P :=
+  mk_I (rngl_psub (i_val a) (i_val b)) (I_psub_prop a b).
 
 (* less equal *)
 
@@ -148,13 +148,13 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
      rngl_add := I_add;
      rngl_mul := I_mul;
      rngl_opt_one := I_opt_one;
-     rngl_opt_opp_or_subt :=
-       match rngl_opt_opp_or_subt T with
+     rngl_opt_opp_or_psub :=
+       match rngl_opt_opp_or_psub T with
        | Some (inl _) => Some (inl I_opp)
-       | Some (inr _) => Some (inr I_subt)
+       | Some (inr _) => Some (inr I_psub)
        | None => None
        end;
-     rngl_opt_inv_or_quot := None;
+     rngl_opt_inv_or_pdiv := None;
      rngl_opt_is_zero_divisor :=
        match rngl_opt_is_zero_divisor T with
        | Some f => Some (λ i, f (i_val i))
@@ -287,127 +287,127 @@ intros.
 specialize (eq_refl (@rngl_has_opp T ro)) as Hop.
 unfold rngl_has_opp in Hop at 2.
 unfold rngl_has_opp, rngl_opp; cbn.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-destruct os as [opp| subt]; [ | easy ].
+destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
+destruct os as [opp| psub]; [ | easy ].
 intros; apply eq_ideal_eq, (rngl_add_opp_diag_l Hop).
 Qed.
 
-Theorem rngl_has_subt_I_has_subt :
+Theorem rngl_has_psub_I_has_psub :
   let roi := I_ring_like_op in
-  rngl_has_subt T = rngl_has_subt (ideal P).
+  rngl_has_psub T = rngl_has_psub (ideal P).
 Proof.
-progress unfold rngl_has_subt; cbn.
-remember (rngl_opt_opp_or_subt T) as os eqn:Hos.
+progress unfold rngl_has_psub; cbn.
+remember (rngl_opt_opp_or_psub T) as os eqn:Hos.
 symmetry in Hos.
 destruct os as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
 Theorem I_opt_add_sub : let roi := I_ring_like_op in
-  if rngl_has_subt (ideal P) then ∀ a b : ideal P, (a + b - b)%L = a
+  if rngl_has_psub (ideal P) then ∀ a b : ideal P, (a + b - b)%L = a
   else not_applicable.
 Proof.
 intros.
-remember (rngl_has_subt (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
+remember (rngl_has_psub (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
 destruct sui; [ | easy ].
-specialize (rngl_has_subt_has_no_opp Hsui) as Hopi.
-assert (Hsu : @rngl_has_subt T ro = true). {
-  unfold rngl_has_subt in Hsui |-*.
+specialize (rngl_has_psub_has_no_opp Hsui) as Hopi.
+assert (Hsu : @rngl_has_psub T ro = true). {
+  unfold rngl_has_psub in Hsui |-*.
   cbn in Hsui.
-  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
   now destruct os.
 }
-specialize (rngl_has_subt_has_no_opp Hsu) as Hop.
+specialize (rngl_has_psub_has_no_opp Hsu) as Hop.
 intros.
 apply eq_ideal_eq; cbn.
 specialize rngl_opt_add_sub as H1.
-unfold rngl_has_subt in H1.
-unfold rngl_sub, rngl_subt.
+unfold rngl_has_psub in H1.
+unfold rngl_sub, rngl_psub.
 rewrite Hopi, Hsui.
 unfold rngl_sub in H1.
 rewrite Hsu, Hop in H1.
-progress unfold rngl_has_subt in Hsui, Hsu.
+progress unfold rngl_has_psub in Hsui, Hsu.
 progress unfold rngl_has_opp in Hopi, Hop.
 progress unfold roi.
 progress unfold roi in Hopi.
 progress unfold roi in Hsui.
 cbn in Hsui, Hopi, Hsu, Hop |-*.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-destruct os as [opp| subt]; [ easy | ].
-unfold I_subt, I_add; cbn.
+destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
+destruct os as [opp| psub]; [ easy | ].
+unfold I_psub, I_add; cbn.
 apply H1.
 Qed.
 
 Theorem I_opt_sub_add_distr :
   let roi := I_ring_like_op in
-  if rngl_has_subt (ideal P) then
+  if rngl_has_psub (ideal P) then
     ∀ a b c : ideal P, (a - (b + c))%L = (a - b - c)%L
   else not_applicable.
 Proof.
 intros.
-remember (rngl_has_subt (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
+remember (rngl_has_psub (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
 destruct sui; [ | easy ].
-specialize (rngl_has_subt_has_no_opp Hsui) as Hopi.
-assert (Hsu : @rngl_has_subt T ro = true). {
-  unfold rngl_has_subt in Hsui |-*.
+specialize (rngl_has_psub_has_no_opp Hsui) as Hopi.
+assert (Hsu : @rngl_has_psub T ro = true). {
+  unfold rngl_has_psub in Hsui |-*.
   cbn in Hsui.
-  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
   now destruct os.
 }
-specialize (rngl_has_subt_has_no_opp Hsu) as Hop.
+specialize (rngl_has_psub_has_no_opp Hsu) as Hop.
 intros.
 apply eq_ideal_eq; cbn.
 specialize rngl_opt_sub_add_distr as H1.
-unfold rngl_has_subt in H1.
-unfold rngl_sub, rngl_subt.
+unfold rngl_has_psub in H1.
+unfold rngl_sub, rngl_psub.
 rewrite Hopi, Hsui.
 unfold rngl_sub in H1.
 rewrite Hsu, Hop in H1.
-progress unfold rngl_has_subt in Hsui, Hsu.
+progress unfold rngl_has_psub in Hsui, Hsu.
 progress unfold rngl_has_opp in Hopi, Hop.
 progress unfold roi.
 progress unfold roi in Hopi.
 progress unfold roi in Hsui.
 cbn in Hsui, Hopi, Hsu, Hop |-*.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-destruct os as [opp| subt]; [ easy | ].
-unfold I_subt, I_add; cbn.
+destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
+destruct os as [opp| psub]; [ easy | ].
+unfold I_psub, I_add; cbn.
 apply H1.
 Qed.
 
 Theorem I_opt_sub_0_l :
   let roi := I_ring_like_op in
-  if rngl_has_subt (ideal P) then ∀ a : ideal P, (0 - a)%L = 0%L
+  if rngl_has_psub (ideal P) then ∀ a : ideal P, (0 - a)%L = 0%L
   else not_applicable.
 Proof.
 intros.
-remember (rngl_has_subt (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
+remember (rngl_has_psub (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
 destruct sui; [ | easy ].
-specialize (rngl_has_subt_has_no_opp Hsui) as Hopi.
-assert (Hsu : @rngl_has_subt T ro = true). {
-  unfold rngl_has_subt in Hsui |-*.
+specialize (rngl_has_psub_has_no_opp Hsui) as Hopi.
+assert (Hsu : @rngl_has_psub T ro = true). {
+  unfold rngl_has_psub in Hsui |-*.
   cbn in Hsui.
-  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
   now destruct os.
 }
-specialize (rngl_has_subt_has_no_opp Hsu) as Hop.
+specialize (rngl_has_psub_has_no_opp Hsu) as Hop.
 intros.
 apply eq_ideal_eq; cbn.
 specialize rngl_opt_sub_0_l as H1.
-unfold rngl_has_subt in H1.
-unfold rngl_sub, rngl_subt.
+unfold rngl_has_psub in H1.
+unfold rngl_sub, rngl_psub.
 rewrite Hopi, Hsui.
 unfold rngl_sub in H1.
 rewrite Hsu, Hop in H1.
-progress unfold rngl_has_subt in Hsui, Hsu.
+progress unfold rngl_has_psub in Hsui, Hsu.
 progress unfold rngl_has_opp in Hopi, Hop.
 progress unfold roi.
 progress unfold roi in Hopi.
 progress unfold roi in Hsui.
 cbn in Hsui, Hopi, Hsu, Hop |-*.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-destruct os as [opp| subt]; [ easy | ].
-unfold I_subt, I_add; cbn.
+destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
+destruct os as [opp| psub]; [ easy | ].
+unfold I_psub, I_add; cbn.
 apply H1.
 Qed.
 
@@ -514,31 +514,31 @@ progress unfold I_opt_leb.
 now destruct rngl_opt_leb.
 Qed.
 
-Theorem rngl_has_opp_or_subt_ideal :
+Theorem rngl_has_opp_or_psub_ideal :
   let roi := I_ring_like_op : ring_like_op (ideal P) in
-  rngl_has_opp_or_subt (ideal P) = rngl_has_opp_or_subt T.
+  rngl_has_opp_or_psub (ideal P) = rngl_has_opp_or_psub T.
 Proof.
 intros.
-progress unfold rngl_has_opp_or_subt; cbn.
-destruct (rngl_opt_opp_or_subt T) as [os| ]; [ | easy ].
+progress unfold rngl_has_opp_or_psub; cbn.
+destruct (rngl_opt_opp_or_psub T) as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
 Theorem I_ord_add_le_mono_l :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
-  if rngl_has_opp_or_subt (ideal P) then
+  if rngl_has_opp_or_psub (ideal P) then
     ∀ a b c : ideal P, (b ≤ c)%L ↔ (a + b ≤ a + c)%L
   else not_applicable.
 Proof.
 intros roi Hor; cbn.
 progress unfold roi in Hor.
 rewrite rngl_is_ordered_ideal in Hor.
-remember (rngl_has_opp_or_subt (ideal P)) as os eqn:Hos.
+remember (rngl_has_opp_or_psub (ideal P)) as os eqn:Hos.
 symmetry in Hos.
 destruct os; [ | easy ].
 progress unfold roi in Hos.
-rewrite rngl_has_opp_or_subt_ideal in Hos.
+rewrite rngl_has_opp_or_psub_ideal in Hos.
 intros.
 specialize (rngl_add_le_mono_l Hos Hor) as H2.
 specialize (H2 (i_val a) (i_val b) (i_val c)).
@@ -551,7 +551,7 @@ Qed.
 Theorem I_ord_mul_le_compat_nonneg :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
-  if (rngl_has_1 (ideal P) && rngl_has_inv_or_quot (ideal P))%bool then
+  if (rngl_has_1 (ideal P) && rngl_has_inv_or_pdiv (ideal P))%bool then
     ∀ a b c d : ideal P, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
   else not_applicable.
 Proof.
@@ -562,7 +562,7 @@ Qed.
 Theorem I_ord_mul_le_compat_nonpos :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
-  if (rngl_has_1 (ideal P) && rngl_has_inv_or_quot (ideal P))%bool then
+  if (rngl_has_1 (ideal P) && rngl_has_inv_or_pdiv (ideal P))%bool then
     ∀ a b c d : ideal P, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
   else not_applicable.
 Proof.

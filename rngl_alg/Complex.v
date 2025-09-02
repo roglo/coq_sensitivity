@@ -35,7 +35,7 @@ Arguments gre {T} GComplex%_L.
 Arguments gim {T} GComplex%_L.
 
 Arguments rngl_opt_eq_dec T {ring_like_op}.
-Arguments rngl_opt_inv_or_quot T {ring_like_op}.
+Arguments rngl_opt_inv_or_pdiv T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.
 
 Section a.
@@ -110,15 +110,15 @@ Definition gc_inv c :=
 Definition gc_div (ca cb : GComplex T) :=
   gc_mul ca (gc_inv cb).
 
-Definition gc_opt_opp_or_subt :
+Definition gc_opt_opp_or_psub :
     option
       ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T))
   :=
-  match rngl_opt_opp_or_subt T with
+  match rngl_opt_opp_or_psub T with
   | Some (inl opp) =>
       Some (inl (λ c, mk_gc (opp (gre c)) (opp (gim c))))
-  | Some (inr subt) =>
-      Some (inr (λ c d, mk_gc (subt (gre c) (gre d)) (subt (gim c) (gim d))))
+  | Some (inr psub) =>
+      Some (inr (λ c d, mk_gc (psub (gre c) (gre d)) (psub (gim c) (gim d))))
   | None =>
       None
   end.
@@ -131,12 +131,12 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-Definition gc_opt_inv_or_quot :
+Definition gc_opt_inv_or_pdiv :
   option
     ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
-  match rngl_opt_inv_or_quot T with
+  match rngl_opt_inv_or_pdiv T with
   | Some (inl inv) => if rngl_mul_is_comm T then Some (inl gc_inv) else None
-  | Some (inr quot) => None (* à voir *)
+  | Some (inr pdiv) => None (* à voir *)
   | None => None
   end.
 
@@ -144,7 +144,7 @@ Definition gc_opt_inv_or_quot :
 Theorem rl_integral_modulus_prop :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_is_ordered T = true →
   ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L.
 Proof.
@@ -187,8 +187,8 @@ Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
 
 End a.
 
-Arguments gc_opt_opp_or_subt T {ro}.
-Arguments gc_opt_inv_or_quot T {ro rp}.
+Arguments gc_opt_opp_or_psub T {ro}.
+Arguments gc_opt_inv_or_pdiv T {ro rp}.
 
 Instance gc_ring_like_op T
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
@@ -197,8 +197,8 @@ Instance gc_ring_like_op T
      rngl_add := gc_add;
      rngl_mul := gc_mul;
      rngl_opt_one := gc_opt_one;
-     rngl_opt_opp_or_subt := gc_opt_opp_or_subt T;
-     rngl_opt_inv_or_quot := gc_opt_inv_or_quot T;
+     rngl_opt_opp_or_psub := gc_opt_opp_or_psub T;
+     rngl_opt_inv_or_pdiv := gc_opt_inv_or_pdiv T;
      rngl_opt_is_zero_divisor := gc_opt_is_zero_divisor;
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
@@ -231,12 +231,12 @@ Context {ac : angle_ctx T}.
 Theorem rngl_between_opp_1_and_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_is_ordered T = true →
   ∀ a, (a² ≤ 1 → -1 ≤ a ≤ 1)%L.
 Proof.
 intros Hon Hop Hiq Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Ha.
 rewrite <- (rngl_squ_1 Hon) in Ha.
 apply (rngl_squ_le_abs_le Hon Hop Hiq Hor) in Ha.
@@ -282,7 +282,7 @@ Theorem gc_mul_assoc :
   ∀ a b c : GComplex T, (a * (b * c))%C = (a * b * c)%C.
 Proof.
 intros * Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 progress unfold gc_mul; cbn.
 do 2 rewrite (rngl_mul_sub_distr_l Hop).
 do 2 rewrite (rngl_mul_sub_distr_r Hop).
@@ -307,7 +307,7 @@ f_equal. {
 Qed.
 
 Theorem gc_opt_mul_1_l :
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   if rngl_has_1 (GComplex T) then ∀ a : GComplex T, (1 * a)%L = a
   else not_applicable.
 Proof.
@@ -380,7 +380,7 @@ now rewrite Hic in H1.
 Qed.
 
 Theorem gc_opt_mul_1_r :
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp_or_psub T = true →
   if rngl_mul_is_comm T then not_applicable
   else if rngl_has_1 (GComplex T) then ∀ a : GComplex T, (a * 1)%L = a
   else not_applicable.
@@ -453,51 +453,51 @@ intros.
 apply eq_gc_eq; cbn.
 specialize (rngl_add_opp_diag_l Hop) as H1.
 progress unfold rngl_opp; cbn.
-progress unfold gc_opt_opp_or_subt; cbn.
+progress unfold gc_opt_opp_or_psub; cbn.
 progress unfold rngl_has_opp in Hop.
 progress unfold rngl_opp in H1.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-destruct os as [opp| subt]; [ cbn | easy ].
+destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
+destruct os as [opp| psub]; [ cbn | easy ].
 now do 2 rewrite H1.
 Qed.
 
 Theorem gc_opt_add_sub :
-  rngl_has_subt T = false →
-  if rngl_has_subt (GComplex T) then ∀ a b : GComplex T, (a + b - b)%L = a
+  rngl_has_psub T = false →
+  if rngl_has_psub (GComplex T) then ∀ a b : GComplex T, (a + b - b)%L = a
   else not_applicable.
 Proof.
 intros * Hsu.
-progress unfold rngl_has_subt; cbn.
-progress unfold gc_opt_opp_or_subt.
-progress unfold rngl_has_subt in Hsu.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+progress unfold rngl_has_psub; cbn.
+progress unfold gc_opt_opp_or_psub.
+progress unfold rngl_has_psub in Hsu.
+destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
 Theorem gc_opt_sub_add_distr :
-  rngl_has_subt T = false →
-  if rngl_has_subt (GComplex T) then
+  rngl_has_psub T = false →
+  if rngl_has_psub (GComplex T) then
     ∀ a b c : GComplex T, (a - (b + c))%L = (a - b - c)%L
   else not_applicable.
 Proof.
 intros * Hsu.
-progress unfold rngl_has_subt; cbn.
-progress unfold gc_opt_opp_or_subt.
-progress unfold rngl_has_subt in Hsu.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+progress unfold rngl_has_psub; cbn.
+progress unfold gc_opt_opp_or_psub.
+progress unfold rngl_has_psub in Hsu.
+destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
 Theorem gc_opt_sub_0_l :
-  rngl_has_subt T = false →
-  if rngl_has_subt (GComplex T) then ∀ a : GComplex T, (0 - a)%L = 0%L
+  rngl_has_psub T = false →
+  if rngl_has_psub (GComplex T) then ∀ a : GComplex T, (0 - a)%L = 0%L
   else not_applicable.
 Proof.
 intros * Hsu.
-progress unfold rngl_has_subt; cbn.
-progress unfold gc_opt_opp_or_subt.
-progress unfold rngl_has_subt in Hsu.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+progress unfold rngl_has_psub; cbn.
+progress unfold gc_opt_opp_or_psub.
+progress unfold rngl_has_psub in Hsu.
+destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
@@ -508,12 +508,12 @@ Theorem gc_inv_re :
   gre a⁻¹ = (gre a / (gre a * gre a + gim a * gim a))%L.
 Proof.
 intros Hic Hiv * Haz.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 progress unfold rngl_inv; cbn.
-progress unfold gc_opt_inv_or_quot.
-progress unfold rngl_has_inv_or_quot in Hiq.
+progress unfold gc_opt_inv_or_pdiv.
+progress unfold rngl_has_inv_or_pdiv in Hiq.
 progress unfold rngl_has_inv in Hiv.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+destruct (rngl_opt_inv_or_pdiv T) as [iq| ]; [ | easy ].
 destruct iq; [ | easy ].
 now rewrite Hic.
 Qed.
@@ -525,12 +525,12 @@ Theorem gc_inv_im :
   gim a⁻¹ = (- gim a / (gre a * gre a + gim a * gim a))%L.
 Proof.
 intros Hic Hiv * Haz.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 progress unfold rngl_inv; cbn.
-progress unfold gc_opt_inv_or_quot.
-progress unfold rngl_has_inv_or_quot in Hiq.
+progress unfold gc_opt_inv_or_pdiv.
+progress unfold rngl_has_inv_or_pdiv in Hiq.
 progress unfold rngl_has_inv in Hiv.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+destruct (rngl_opt_inv_or_pdiv T) as [iq| ]; [ | easy ].
 destruct iq; [ | easy ].
 now rewrite Hic.
 Qed.
@@ -546,8 +546,8 @@ Theorem gc_opt_mul_inv_diag_l :
   else not_applicable.
 Proof.
 intros Hon Hic Hop Hiv Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 cbn.
 remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc; symmetry in Hivc.
@@ -611,22 +611,22 @@ rewrite Bool.andb_true_r.
 remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
 progress unfold rngl_has_inv in Hivc; cbn in Hivc.
-progress unfold gc_opt_inv_or_quot in Hivc.
+progress unfold gc_opt_inv_or_pdiv in Hivc.
 rewrite Hic in Hivc.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+destruct (rngl_opt_inv_or_pdiv T) as [iq| ]; [ | easy ].
 now destruct iq.
 Qed.
 
 Theorem gc_opt_mul_div :
-  if rngl_has_quot (GComplex T) then
+  if rngl_has_pdiv (GComplex T) then
     ∀ a b : GComplex T, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
 Proof.
-progress unfold rngl_has_quot; cbn.
-progress unfold gc_opt_inv_or_quot.
-remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq; symmetry in Hiq.
+progress unfold rngl_has_pdiv; cbn.
+progress unfold gc_opt_inv_or_pdiv.
+remember (rngl_opt_inv_or_pdiv T) as iq eqn:Hiq; symmetry in Hiq.
 destruct iq as [iq| ]; [ | easy ].
-destruct iq as [inv| quot]; [ | easy ].
+destruct iq as [inv| pdiv]; [ | easy ].
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 now destruct ic.
 Qed.
@@ -635,14 +635,14 @@ Theorem gc_integral :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec_or_order T)%bool =
+     rngl_has_inv_and_1_or_pdiv T && rngl_has_eq_dec_or_order T)%bool =
      true →
   ∀ a b : GComplex T,
   (a * b)%L = 0%L
   → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros Hic Hop Hio.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hab.
 right; right.
 progress unfold rngl_is_zero_divisor.
@@ -715,7 +715,7 @@ destruct H2 as [H2| H2]. {
 }
 (*
 intros Hic Hop Heo Hio.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hab.
 now right; right; left.
 *)
@@ -802,9 +802,9 @@ Context {Hiv : rngl_has_inv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
 
 Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
-  let Hos := rngl_has_opp_has_opp_or_subt Hop in
-  let Hsu := rngl_has_opp_has_no_subt Hop in
-  let Hio := rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor in
+  let Hos := rngl_has_opp_has_opp_or_psub Hop in
+  let Hsu := rngl_has_opp_has_no_psub Hop in
+  let Hio := rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
@@ -855,10 +855,10 @@ Theorem le_rl_sqrt_add :
   ∀ a b, (0 ≤ b → a ≤ rl_sqrt (rngl_squ a + b))%L.
 Proof.
 intros Hon Hop Hiv Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Hzb.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 apply (rngl_le_trans Hor _ (rngl_abs a)). {
   apply (rngl_le_abs_diag Hop Hor).
 }
@@ -885,8 +885,8 @@ Theorem rl_sqrt_div_squ_squ :
   (-1 ≤ x / rl_sqrt (rngl_squ x + rngl_squ y) ≤ 1)%L.
 Proof.
 intros Hon Hop Hiv Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hxyz.
 assert (Hxy : (0 ≤ x² + y²)%L). {
@@ -972,7 +972,7 @@ Theorem polar :
   → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
 destruct_ac.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -1159,9 +1159,9 @@ Theorem rngl_rat_frac_part_lt_1 :
   → (rngl_of_nat a / rngl_of_nat b - rngl_of_nat (a / b) < 1)%L.
 Proof.
 intros Hon Hop Hiv Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 intros * Hrbz.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1214,11 +1214,11 @@ Theorem rat_is_inf_sum_of_inv_rad_pow :
        (rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
 intros Hon Hic Hop Hiv Hor Har.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * H2r Hbz.
 intros ε Hε.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1656,14 +1656,14 @@ Qed.
 Theorem angle_eucl_dist_sin_cos :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_is_ordered T = true →
   ∀ θ,
   ((angle_eucl_dist θ angle_right)² =
      (1 - rngl_sin θ)² + (rngl_cos θ)²)%L.
 Proof.
 intros Hon Hop Hiq Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros.
 progress unfold angle_eucl_dist.
 progress unfold rl_modl.
@@ -1680,7 +1680,7 @@ Theorem rngl_sin_angle_eucl_dist_right_r :
   ∀ θ, (rngl_sin θ = 1 - (angle_eucl_dist θ angle_right)² / 2)%L.
 Proof.
 destruct_ac.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -1812,9 +1812,9 @@ Theorem rl_sqrt_div_2 :
   ∀ a, (0 ≤ a → √(a / 2) = √(2 * a) / 2)%L.
 Proof.
 intros Hon Hic Hop Hiv Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -2305,12 +2305,12 @@ Qed.
 Theorem rngl_2_x2_sub_1_le_x :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_is_ordered T = true →
   ∀ x, (0 ≤ x ≤ 1)%L → (2 * x² - 1 ≤ x)%L.
 Proof.
 intros Hon Hop Hiq Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hx.
 apply (rngl_le_sub_le_add_l Hop Hor).
 apply (rngl_le_sub_le_add_r Hop Hor).

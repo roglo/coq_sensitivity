@@ -52,8 +52,8 @@ Ltac destruct_hc :=
   set (Hiv := hc_iv);
   set (Hed := hc_ed);
   set (Hor := hc_or);
-  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos;
-  specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq;
+  specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos;
+  specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq;
   specialize hc_on as Hon;
   specialize hc_c2 as Hc2.
 
@@ -1073,7 +1073,7 @@ Theorem eq_rngl_cosh_1 : ∀ θ, rngl_cosh θ = 1%L ↔ θ = 0%H.
 Proof.
 destruct_hc.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 intros.
 split; intros Hθ; [ | now subst θ ].
 specialize (cosh2_sinh2_1 θ) as H1.
@@ -1111,7 +1111,7 @@ rewrite Hcc in H1.
 rewrite <- H2 in H1; clear H2.
 apply (eq_rngl_squ_rngl_abs Hop Hor) in H1; cycle 1. {
   apply Bool.orb_true_iff; right.
-  apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
+  apply (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv).
 } {
   apply (rngl_mul_comm Hic).
 }
@@ -1463,7 +1463,7 @@ Qed.
 Theorem hangle_0_div_2 : (0 /₂ = 0)%H.
 Proof.
 destruct_hc.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_hangle_0 Hc1) as H1.
   apply H1.
@@ -1482,7 +1482,7 @@ rewrite (rngl_div_0_l Hos Hi1). 2: {
 }
 apply (rl_sqrt_0 Hon Hop Hor).
 rewrite Bool.orb_true_iff; right.
-apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
+apply (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv).
 Qed.
 
 Theorem hangle_opp_0 : (- 0)%H = 0%H.
@@ -1514,8 +1514,8 @@ Theorem hangle_eucl_dist_separation :
   ∀ θ1 θ2, hangle_eucl_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
 destruct_hc.
-specialize (rngl_int_dom_or_inv_1_or_quot_r Hon Hiq) as Hii.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_or_pdiv_r Hon Hiq) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 intros *.
 progress unfold hangle_eucl_dist.

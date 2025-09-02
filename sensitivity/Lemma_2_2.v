@@ -345,7 +345,7 @@ Theorem lemma_2_A_n_2_eq_n_I :
   ∀ n, (mA n * mA n)%M = (rngl_mul_nat 1 n × mI (2 ^ n))%M.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 unfold "*"%M, "×"%M.
@@ -1600,7 +1600,7 @@ Theorem An_eigen_equation_for_sqrt_n :
   end.
 Proof.
 intros Hic Hop Hin Heq * Hμ.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 destruct n. {
@@ -1793,10 +1793,10 @@ Theorem A_n_eigenvalue_squared_is_n :
   → (μ * μ)%L = rngl_mul_nat 1 n.
 Proof.
 intros Hic Hop Heq Hin * Hvs Hvr Hav.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
+assert (Hi1 : rngl_has_inv_and_1_or_pdiv T = true). {
+  now apply rngl_has_inv_and_1_or_pdiv_iff; left.
 }
-specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
+specialize (proj2 rngl_has_inv_or_pdiv_iff) as Hiq.
 specialize (Hiq (or_introl Hin)).
 move Hiq before Hin.
 specialize (lemma_2_A_n_2_eq_n_I Hop n) as Ha.
@@ -1840,7 +1840,7 @@ Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_mul_nat 1 n)%L.
 Proof.
 intros Hic Hop Heq Hin H10 *.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before H10.
 split. {

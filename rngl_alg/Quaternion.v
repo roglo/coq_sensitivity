@@ -385,8 +385,8 @@ Theorem vect_dot_cross_mul_assoc :
   → ≺ u * v, w ≻ = ≺ u, v * w ≻.
 Proof.
 intros Hop * Hu Hv Hw Hn3.
-assert (Hos : rngl_has_opp_or_subt = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
+assert (Hos : rngl_has_opp_or_psub = true). {
+  now apply rngl_has_opp_or_psub_iff; left.
 }
 move Hos before Hop.
 progress unfold vect_dot_mul.
@@ -679,7 +679,7 @@ easy.
 Qed.
 
 Theorem vect_scal_cross_mul_assoc_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_psub = true →
   ∀ a u v, (a × (u * v) = (a × u) * v)%V.
 Proof.
 intros Hos *.
@@ -710,7 +710,7 @@ easy.
 Qed.
 
 Theorem vect_cross_scal_mul_assoc :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_psub = true →
   rngl_mul_is_comm = true →
   ∀ a u v,
   vect_size u = vect_size v
@@ -760,8 +760,8 @@ Theorem vect_cross_mul_mul_r :
   → (u * (v * w) = ≺ u, w ≻ × v - ≺ u, v ≻ × w)%V.
 Proof.
 intros Hop Hic * Hn2 Hu Hv Hw.
-assert (Hos : rngl_has_opp_or_subt = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
+assert (Hos : rngl_has_opp_or_psub = true). {
+  now apply rngl_has_opp_or_psub_iff; left.
 }
 move Hos before Hop.
 progress unfold "*"%V, vect_dot_mul, "×"%V, vect_sub, vect_add.
@@ -979,8 +979,8 @@ Theorem nion_mul_assoc :
   → ((a * b) * c)%H = (a * (b * c))%H.
 Proof.
 intros Hop Hic n (a, u) (b, v) (c, w) Hn3 Hu Hv Hw; cbn in Hu, Hv, Hw |-*.
-assert (Hos : rngl_has_opp_or_subt = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
+assert (Hos : rngl_has_opp_or_psub = true). {
+  now apply rngl_has_opp_or_psub_iff; left.
 }
 move Hos before Hop.
 f_equal. {
@@ -1120,8 +1120,8 @@ Theorem nion_mul_altern :
 Proof.
 intros Hop Hic n (a, u) (b, v) Hu Hv.
 (* supposed to be true when n = 7 *)
-assert (Hos : rngl_has_opp_or_subt = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
+assert (Hos : rngl_has_opp_or_psub = true). {
+  now apply rngl_has_opp_or_psub_iff; left.
 }
 cbn in Hu, Hv |-*.
 f_equal. {

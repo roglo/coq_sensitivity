@@ -1085,7 +1085,7 @@ Theorem determinant_with_bad_row :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_characteristic _ = 0 →
   ∀ i k (M : matrix T),
   is_square_matrix M = true
@@ -1256,14 +1256,14 @@ Theorem matrix_comatrix_transp_mul :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_characteristic T = 0 →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hic Hon Hop Hiq Hch * Hsm.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 destruct M as (ll); cbn - [ det ].
@@ -1446,7 +1446,7 @@ Theorem comatrix_transp_matrix_mul :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_characteristic T = 0 →
   ∀ (M : matrix T),
   is_square_matrix M = true
@@ -1454,7 +1454,7 @@ Theorem comatrix_transp_matrix_mul :
 Proof.
 intros Hic Hon Hop Hiq Hch * Hsm.
 assert (H10 : rngl_characteristic T ≠ 1) by now rewrite Hch.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 destruct M as (ll); cbn - [ det ].
 destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
@@ -1654,7 +1654,7 @@ Theorem mat_mul_inv_diag_r :
 Proof.
 intros Hif * Hsm Hdz.
 destruct Hif as (Hon, Hic, Hop, Hiv, Hde, Hch).
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   rewrite Hrz; cbn.
   unfold mat_nrows in Hrz.
@@ -1689,7 +1689,7 @@ Theorem mat_mul_inv_diag_l :
 Proof.
 intros Hif * Hsm Hdz.
 destruct Hif as (Hon, Hic, Hop, Hiv, Hde, Hch).
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 unfold mat_inv.
 rewrite mat_mul_scal_l_mul; [ | easy | ]. 2: {
   apply squ_mat_is_corr.
@@ -1744,7 +1744,7 @@ Proof.
 intros Hif * Hsm Hmz.
 generalize Hif; intros H.
 destruct H as (Hon, Hic, Hop, Hiv, Hde, Hch).
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (matrix_comatrix_transp_mul Hic Hon Hop Hiq Hch) as H1.
 specialize (H1 M Hsm).
 specialize (mat_mul_inv_diag_l Hif M Hsm Hmz) as H3.
@@ -1758,7 +1758,7 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   unfold mat_transp; cbn.
   rewrite rngl_inv_1; [ | easy | easy | now rewrite Hch ].
   rewrite (rngl_div_1_r Hon); cycle 1. {
-    now apply rngl_has_inv_or_quot_iff; left.
+    now apply rngl_has_inv_or_pdiv_iff; left.
   } {
     now rewrite Hch.
   }
@@ -1953,7 +1953,7 @@ Theorem cramer's_rule_by_mul :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_characteristic T = 0 →
   ∀ [M : matrix T] [U V : vector T],
   is_square_matrix M = true
@@ -2009,7 +2009,7 @@ Theorem cramer's_rule :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_characteristic T = 0 →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
@@ -2020,13 +2020,13 @@ Theorem cramer's_rule :
   vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
 intros Hon Hop Hic Hiq Hch * Hsm Hum Hmz Hmuv k Hk.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_or_quot_iff in Hiq.
-  apply rngl_has_inv_and_1_or_quot_iff.
+assert (Hi1 : rngl_has_inv_and_1_or_pdiv T = true). {
+  apply rngl_has_inv_or_pdiv_iff in Hiq.
+  apply rngl_has_inv_and_1_or_pdiv_iff.
   now destruct Hiq; [ left | right ].
 }
 assert
-  (Hii : (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true). {
+  (Hii : (rngl_is_integral_domain T || rngl_has_inv_or_pdiv T)%bool = true). {
   rewrite Hiq.
   now apply Bool.orb_true_iff; right.
 }

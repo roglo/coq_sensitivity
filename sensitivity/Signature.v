@@ -60,8 +60,8 @@ Definition test_ring_like_op :=
        | One => b
        end;
      rngl_opt_one := Some One;
-     rngl_opt_opp_or_subt := Some (inl test_opp);
-     rngl_opt_inv_or_quot := None;
+     rngl_opt_opp_or_psub := Some (inl test_opp);
+     rngl_opt_inv_or_pdiv := None;
      rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := None;
      rngl_opt_leb := None |}.
@@ -339,7 +339,7 @@ Theorem ε_in :
   ∀ la, ε la ∈ [-1; 0; 1]%L.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 induction la as [| a]; cbn; [ now right; right; left | ].
@@ -368,7 +368,7 @@ Theorem ε_aux_mul_comm :
   ∀ i la a, (ε_aux i la * a = a * ε_aux i la)%L.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 specialize (ε_aux_in Hop i la) as H1.
@@ -494,7 +494,7 @@ Theorem ε_aux_mul_ε_app_from_ε_cons_app_lt :
   → (ε_aux a la * ε (la ++ [b]))%L = (- ε (b :: la ++ [a]))%L.
 Proof.
 intros Hop * Hab.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 revert a b Hab.
@@ -597,7 +597,7 @@ Theorem ε_aux_mul_ε_app_from_ε_cons_app_gt :
   → (ε_aux a la * ε (la ++ [b]))%L = ε (b :: la ++ [a]).
 Proof.
 intros Hop * Hc.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 revert a b Hc.
@@ -698,7 +698,7 @@ Theorem ε_cons_from_ε_app :
   ∀ a la, ε (a :: la) = (minus_one_pow (List.length la) * ε (la ++ [a]))%L.
 Proof.
 intros Hop *; cbn.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 revert a.
@@ -768,7 +768,7 @@ Theorem ε_app_cons2 :
     (minus_one_pow (List.length lb) * ε (la ++ lb ++ [a]))%L.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 revert a lb.
@@ -1135,7 +1135,7 @@ induction p as [| j]; intros; cbn. {
 }
 destruct (i ?= j). {
   symmetry; apply rngl_mul_0_r.
-  now apply rngl_has_opp_or_subt_iff; left.
+  now apply rngl_has_opp_or_psub_iff; left.
 } {
   apply IHp.
   intros k l Hk Hl.
@@ -2058,7 +2058,7 @@ Theorem ε_dup :
   ∀ i l1 l2 l3, ε (l1 ++ i :: l2 ++ i :: l3) = 0%L.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos after Hop.
 revert i l2 l3.

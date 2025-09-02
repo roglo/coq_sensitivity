@@ -51,8 +51,8 @@ Instance CReal_ring_like_op : ring_like_op CReal :=
      rngl_add := CReal_plus;
      rngl_mul := CReal_mult;
      rngl_opt_one := Some 1%CReal;
-     rngl_opt_opp_or_subt := Some (inl CReal_opp);
-     rngl_opt_inv_or_quot := Some (inl CReal_inv');
+     rngl_opt_opp_or_psub := Some (inl CReal_opp);
+     rngl_opt_inv_or_pdiv := Some (inl CReal_inv');
      rngl_opt_is_zero_divisor := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := Some CReal_eq_dec;
      rngl_opt_leb := None (*Some CRealLe*) |}.
@@ -240,8 +240,8 @@ Definition CComplex_ring_like_op : ring_like_op CComplex :=
      rngl_add := CComplex_add;
      rngl_mul := CComplex_mul;
      rngl_opt_one := Some CComplex_one;
-     rngl_opt_opp_or_subt := Some (inl CComplex_opp);
-     rngl_opt_inv_or_quot := Some (inl CComplex_inv);
+     rngl_opt_opp_or_psub := Some (inl CComplex_opp);
+     rngl_opt_inv_or_pdiv := Some (inl CComplex_inv);
      rngl_opt_is_zero_divisor := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := None;
      rngl_opt_leb := None |}.
@@ -269,8 +269,8 @@ Instance reals_ring_like_op : ring_like_op R :=
      rngl_add := Rplus;
      rngl_mul := Rmult;
      rngl_opt_one := Some R1;
-     rngl_opt_opp_or_subt := Some (inl Ropp);
-     rngl_opt_inv_or_quot := Some (inl Rinv);
+     rngl_opt_opp_or_psub := Some (inl Ropp);
+     rngl_opt_inv_or_pdiv := Some (inl Rinv);
      rngl_opt_is_zero_divisor := None;
      rngl_opt_eq_dec := None;
      rngl_opt_leb := None (*Some Rle*) |}.
@@ -374,7 +374,7 @@ Record complex := mk_c {re : R; im : R}.
 
 (*
 Arguments rngl_has_dec_le T {ro ring_like_prop}.
-Arguments rngl_opt_inv_or_quot T {ring_like_op}.
+Arguments rngl_opt_inv_or_pdiv T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.
 *)
 
@@ -431,8 +431,8 @@ Definition complex_ring_like_op : ring_like_op complex :=
      rngl_add := complex_add;
      rngl_mul := complex_mul;
      rngl_opt_one := Some complex_one;
-     rngl_opt_opp_or_subt := Some (inl complex_opp);
-     rngl_opt_inv_or_quot := Some (inl complex_inv);
+     rngl_opt_opp_or_psub := Some (inl complex_opp);
+     rngl_opt_inv_or_pdiv := Some (inl complex_inv);
      rngl_opt_eqb := None;
      rngl_opt_le := None |}.
 
@@ -547,18 +547,18 @@ Theorem complex_inv_re {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   re a⁻¹ = (re a / (re a * re a + im a * im a))%L.
 Proof.
 intros * Hiv Hic * Haz.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
+assert (Hiq : rngl_has_inv_or_pdiv T = true). {
+  now apply rngl_has_inv_or_pdiv_iff; left.
 }
 progress unfold rngl_inv; cbn.
-progress unfold complex_opt_inv_or_quot.
-progress unfold rngl_has_inv_or_quot in Hiq.
+progress unfold complex_opt_inv_or_pdiv.
+progress unfold rngl_has_inv_or_pdiv in Hiq.
 progress unfold rngl_div.
 rewrite Hiv, Hic.
 generalize Hiv; intros H.
 progress unfold rngl_has_inv in H.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
-destruct iq as [inv| quot]; [ | easy ].
+destruct (rngl_opt_inv_or_pdiv T) as [iq| ]; [ | easy ].
+destruct iq as [inv| pdiv]; [ | easy ].
 symmetry; apply (fold_rngl_div Hiv).
 Qed.
 
@@ -571,13 +571,13 @@ Theorem complex_inv_im {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
 Proof.
 intros * Hiv Hic * Haz.
 progress unfold rngl_inv; cbn.
-progress unfold complex_opt_inv_or_quot.
+progress unfold complex_opt_inv_or_pdiv.
 progress unfold rngl_div.
 rewrite Hiv, Hic.
 generalize Hiv; intros H.
 progress unfold rngl_has_inv in H.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
-destruct iq as [inv| quot]; [ | easy ].
+destruct (rngl_opt_inv_or_pdiv T) as [iq| ]; [ | easy ].
+destruct iq as [inv| pdiv]; [ | easy ].
 symmetry; apply (fold_rngl_div Hiv).
 Qed.
 *)
@@ -604,7 +604,7 @@ Definition complex_ring_like_prop : ring_like_prop complex :=
      rngl_opt_mul_inv_l := complex_opt_mul_inv_l Hop;
      rngl_opt_mul_inv_r := 42;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
-     rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
+     rngl_opt_mul_pdiv_r := ?rngl_opt_mul_pdiv_r;
      rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
      rngl_opt_integral := ?rngl_opt_integral;
      rngl_opt_alg_closed := ?rngl_opt_alg_closed;

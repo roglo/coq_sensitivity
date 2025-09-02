@@ -778,7 +778,7 @@ Qed.
 Theorem rngl_squ_lt_squ_nonneg :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_is_ordered T = true →
   ∀ a b, (a * b = b * a → 0 ≤ a → a < b → a² < b²)%L.
 Proof.
@@ -1257,7 +1257,7 @@ Qed.
 Theorem rngl_squ_le_diag :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_or_pdiv T = true →
   rngl_is_ordered T = true →
   ∀ a, (0 ≤ a ≤ 1 → a² ≤ a)%L.
 Proof.
@@ -1274,7 +1274,7 @@ Theorem rngl_limit_sub_l_limit :
   → is_limit_when_seq_tends_to_inf rngl_dist u l.
 Proof.
 intros Hop Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hlim.
 intros ε Hε.
 specialize (Hlim ε Hε).
