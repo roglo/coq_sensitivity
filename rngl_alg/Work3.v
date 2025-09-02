@@ -327,13 +327,13 @@ Qed.
 
 Theorem eq_gc_modl_0 :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  rngl_has_inv T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
   ∀ a, ‖ a ‖ = 0%L → a = 0%C.
 Proof.
-intros Hon Hos Hiv Hor.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros Hon Hop Hiq Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Haz.
 apply (eq_rl_sqrt_0 Hon Hos) in Haz. {
   apply (rl_integral_modulus_prop Hon Hop Hiq Hor) in Haz.
@@ -345,11 +345,11 @@ Qed.
 Theorem gc_modl_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv_or_quot T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ‖ 1 ‖ = 1%L.
 Proof.
-intros Hon Hop Hor Hii.
+intros Hon Hop Hiq Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold gc_modl.
 progress unfold rl_modl.
@@ -357,7 +357,7 @@ cbn.
 rewrite (rngl_squ_1 Hon).
 rewrite (rngl_squ_0 Hos).
 rewrite rngl_add_0_r.
-apply (rl_sqrt_1 Hon Hop Hiq Hor Hii).
+apply (rl_sqrt_1 Hon Hop Hiq Hor).
 Qed.
 
 Theorem gc_div_1_r :
@@ -404,14 +404,14 @@ Theorem rngl_inv_sqrt :
 Proof.
 intros Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 intros * Haz.
 do 2 rewrite <- (rngl_div_1_l Hon Hiv).
 rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | | easy ]. 2: {
   apply (rngl_0_le_1 Hon Hos Hiq Hor).
 }
 f_equal; symmetry.
-apply (rl_sqrt_1 Hon Hop Hiq Hor Hii).
+apply (rl_sqrt_1 Hon Hop Hiq Hor).
 Qed.
 
 Theorem gc_modl_inv :
@@ -434,6 +434,7 @@ remember ((gre a)² + (gim a)²)%L as ρ eqn:Hρ.
 assert (Hrz : ρ ≠ 0%L). {
   intros H; apply Haz.
   subst ρ.
+...
   apply (rl_integral_modulus_prop Hon Hop Hiq Hor) in H.
   now apply eq_gc_eq.
 }
