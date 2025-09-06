@@ -8,6 +8,7 @@ Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 Require Import RingLike.Misc.
 
+Require Import TrigoWithoutPi.Core.
 Require Import TrigoWithoutPi.Angle.
 Require Import TrigoWithoutPi.AngleDiv2.
 Require Import TrigoWithoutPi.TrigoWithoutPiExt.

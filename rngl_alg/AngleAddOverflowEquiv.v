@@ -6,6 +6,7 @@ From Stdlib Require Import Utf8 ZArith.
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 
+Require Import TrigoWithoutPi.Core.
 Require Import TrigoWithoutPi.Angle TrigoWithoutPi.TrigoWithoutPiExt.
 Require Import TrigoWithoutPi.AngleAddOverflowLe TrigoWithoutPi.AngleAddLeMonoL.
 Require Import TrigoWithoutPi.Angle_order.

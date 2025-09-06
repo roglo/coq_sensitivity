@@ -12,6 +12,7 @@ Require Import RingLike.IterAdd.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
 
+Require Import TrigoWithoutPi.Core.
 Require Import TrigoWithoutPi.TacChangeAngle.
 Require Import TrigoWithoutPi.Angle TrigoWithoutPi.TrigoWithoutPiExt.
 Require Import TrigoWithoutPi.Angle_order.
