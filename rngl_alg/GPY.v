@@ -9,7 +9,7 @@ Require Import RingLike.Misc.
 Require Import RingLike.Core.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterMul.
-Require Import RingLike.NatRingLike.
+Require Import RingLike.Nat_algebra.
 Require Import QG.
 
 Section a.

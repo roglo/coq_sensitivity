@@ -1,8 +1,6 @@
 AngleAddOverflowEquiv.vo AngleAddOverflowEquiv.glob AngleAddOverflowEquiv.v.beautified AngleAddOverflowEquiv.required_vo: AngleAddOverflowEquiv.v Complex.vo
-AngleDeriv.vo AngleDeriv.glob AngleDeriv.v.beautified AngleDeriv.required_vo: AngleDeriv.v
 AngleEuclDistLtAngleLtLt.vo AngleEuclDistLtAngleLtLt.glob AngleEuclDistLtAngleLtLt.v.beautified AngleEuclDistLtAngleLtLt.required_vo: AngleEuclDistLtAngleLtLt.v Complex.vo
 AngleRl.vo AngleRl.glob AngleRl.v.beautified AngleRl.required_vo: AngleRl.v
-AngleTan.vo AngleTan.glob AngleTan.v.beautified AngleTan.required_vo: AngleTan.v AngleDeriv.vo
 Complex.vo Complex.glob Complex.v.beautified Complex.required_vo: Complex.v Misc.vo
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v Misc.vo
 GPY.vo GPY.glob GPY.v.beautified GPY.required_vo: GPY.v QG.vo

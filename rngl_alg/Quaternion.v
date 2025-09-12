@@ -152,7 +152,7 @@ Notation "U ∗" := (nion_conj U) (at level 1, format "U ∗") : H_scope.
 Notation "U * V" := (nion_mul U V) : H_scope.
 
 Require Import ZArith.
-Require Import RingLike.ZRingLike.
+Require Import RingLike.Z_algebra.
 Open Scope Z_scope.
 
 (* trinions: i²=-1 j²=-1 ij=0 *)
