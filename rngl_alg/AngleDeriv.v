@@ -8,7 +8,7 @@ Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 Require Import RingLike.Misc.
 
-Require Import TrigoWithoutPi.Core.
+Require Import TrigoWithoutPi.AngleDef.
 Require Import TrigoWithoutPi.Angle.
 Require Import TrigoWithoutPi.AngleDiv2.
 Require Import TrigoWithoutPi.TrigoWithoutPiExt.
@@ -17,6 +17,7 @@ Require Import TrigoWithoutPi.AngleDiv2Add.
 Require Import TrigoWithoutPi.AngleDivNat.
 Require Import TrigoWithoutPi.SeqAngleIsCauchy.
 Require Import TrigoWithoutPi.AngleTypeIsComplete.
+Require Import TrigoWithoutPi.Distance.
 Require Import TrigoWithoutPi.TacChangeAngle.
 
 Notation "a '°' b" := (comp a b) (at level 40, left associativity).

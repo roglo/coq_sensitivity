@@ -2,8 +2,8 @@
 
 From Stdlib Require Import Utf8.
 Require Import RingLike.Core.
-Require Import TrigoWithoutPi.Core.
 Require Import TrigoWithoutPi.Angle.
+Require Import TrigoWithoutPi.AngleDef.
 
 Section a.
 
