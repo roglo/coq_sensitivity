@@ -1091,8 +1091,7 @@ rewrite Hnt in H1.
 now apply angle_le_0_r in H1.
 Qed.
 
-Theorem rngl_leb_0_sqrt :
-  ∀ a, (0 ≤ a)%L → (0 ≤? √a)%L = true.
+Theorem rngl_leb_0_sqrt : ∀ a, (0 ≤ a)%L → (0 ≤? √a)%L = true.
 Proof.
 intros * Hza.
 apply rngl_leb_le.
