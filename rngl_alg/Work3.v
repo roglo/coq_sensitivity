@@ -385,7 +385,7 @@ cbn.
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
 rewrite rngl_add_0_r.
-rewrite (rngl_div_1_r Hon Hiq Hc1).
+rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
 apply eq_gc_eq.
 cbn.
 do 2 rewrite (rngl_mul_1_r Hon).

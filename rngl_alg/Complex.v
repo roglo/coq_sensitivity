@@ -1306,7 +1306,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
   rewrite (rngl_of_nat_mul Hon Hos (a * rad ^ m / b)).
   rewrite (rngl_mul_div Hi1). 2: {
     rewrite (rngl_of_nat_pow Hon Hos).
-    apply (rngl_pow_nonzero Hon Hc1 Hos Hiq).
+    apply (rngl_pow_nonzero Hon Hos Hiq).
     intros H.
     rewrite H in Hzr.
     now apply (rngl_lt_irrefl Hor) in Hzr.

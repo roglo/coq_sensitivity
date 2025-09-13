@@ -169,7 +169,7 @@ induction n; intros. {
     split; [ apply (rngl_le_refl Hor) | ].
     split; [ easy | apply (rngl_le_refl Hor) ].
   }
-  cbn; rewrite (rngl_div_1_r Hon Hiq Hc1).
+  cbn; rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
   rewrite rngl_add_comm; symmetry.
   apply (rngl_sub_add Hop).
 }
@@ -195,7 +195,7 @@ destruct (is_upper_bound P _) as [H1| H1]. {
     rewrite (rngl_mul_1_r Hon).
     apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   } {
-    now apply (rngl_pow_nonzero Hon Hc1 Hos Hiq).
+    now apply (rngl_pow_nonzero Hon Hos Hiq).
   }
   f_equal.
   rewrite (rngl_mul_1_r Hon).
@@ -218,7 +218,7 @@ destruct (is_upper_bound P _) as [H1| H1]. {
     rewrite (rngl_mul_1_r Hon).
     apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   } {
-    now apply (rngl_pow_nonzero Hon Hc1 Hos Hiq).
+    now apply (rngl_pow_nonzero Hon Hos Hiq).
   }
   f_equal.
   rewrite (rngl_mul_1_r Hon).
@@ -285,7 +285,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
   intros.
-  apply (rngl_pow_nonzero Hon Hc1 Hos Hiq).
+  apply (rngl_pow_nonzero Hon Hos Hiq).
   apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
 }
 specialize (AnBn_interval Hon Hop Hiv Hor) as Habi.
@@ -301,7 +301,7 @@ rewrite (rngl_opp_sub_distr Hop).
 revert a b q Hab Hpq Ha Hb.
 induction p; intros. {
   cbn.
-  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
   cbn in Ha.
   injection Ha; clear Ha; intros; subst ap bp.
   split. {
@@ -401,7 +401,7 @@ split. {
   intros * Hp Hq.
   assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
     intros.
-    apply (rngl_pow_nonzero Hon Hc1 Hos Hiq).
+    apply (rngl_pow_nonzero Hon Hos Hiq).
     apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   }
   (* TODO: a lemma *)
@@ -426,7 +426,7 @@ split. {
   }
   eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
     apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   apply (rngl_mul_lt_mono_pos_r Hon Hop Hiq Hor ε) in HM2; [ | easy ].
@@ -473,7 +473,7 @@ split. {
   intros * Hp Hq.
   assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
     intros.
-    apply (rngl_pow_nonzero Hon Hc1 Hos Hiq).
+    apply (rngl_pow_nonzero Hon Hos Hiq).
     apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   }
   (* TODO: a lemma *)
@@ -498,7 +498,7 @@ split. {
   }
   eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
     apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   apply (rngl_mul_lt_mono_pos_r Hon Hop Hiq Hor) with (a := ε) in HM2; [ | easy ].
@@ -556,7 +556,7 @@ rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_div_nonneg Hon Hop Hiv Hor). {
     now apply (rngl_le_0_sub Hop Hor).
   } {
-    apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
     apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
 }
@@ -1075,7 +1075,7 @@ assert
     apply surjective_pairing.
   }
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
     apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
@@ -1146,7 +1146,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
         now apply (rngl_sub_le_mono_r Hop Hor).
       }
       apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-        apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
+        apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
         apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
       }
       replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
@@ -1210,7 +1210,7 @@ destruct (is_bound _ P lim) as [H1| H1]. {
   }
   apply (rngl_lt_add_lt_sub_l Hop Hor).
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_pow_pos_pos Hon Hop Hiv Hc1 Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
     apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
   }
   replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.

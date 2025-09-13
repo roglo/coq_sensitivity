@@ -1756,11 +1756,11 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   cbn.
   unfold mat_transp, mat_inv, com; cbn.
   unfold mat_transp; cbn.
-  rewrite rngl_inv_1; [ | easy | easy | now rewrite Hch ].
+  rewrite rngl_inv_1; [ | easy | easy | now rewrite Hch; right ].
   rewrite (rngl_div_1_r Hon); cycle 1. {
     now apply rngl_has_inv_or_pdiv_iff; left.
   } {
-    now rewrite Hch.
+    now rewrite Hch; right.
   }
   easy.
 }
