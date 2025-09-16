@@ -1120,11 +1120,11 @@ rewrite rngl_sin_acos; [ | easy ].
 rewrite rngl_sin_acos; [ | easy ].
 rewrite rngl_leb_0_sqrt. 2: {
   apply (rngl_le_0_sub Hop Hor).
-  now apply (rngl_squ_le_1 Hon Hop Hiq Hor).
+  now apply (rngl_squ_le_1_iff Hon Hop Hiq Hor).
 }
 rewrite rngl_leb_0_sqrt. 2: {
   apply (rngl_le_0_sub Hop Hor).
-  now apply (rngl_squ_le_1 Hon Hop Hiq Hor).
+  now apply (rngl_squ_le_1_iff Hon Hop Hiq Hor).
 }
 now apply rngl_ltb_lt.
 Qed.
@@ -1163,7 +1163,7 @@ progress unfold rngl_acos in Haz.
 progress fold Hor in Haz.
 destruct (rngl_le_dec Hor a² 1) as [Ha1| H1a]; [ now injection Haz | ].
 exfalso; apply H1a.
-now apply (rngl_squ_le_1 Hon Hop Hiq Hor) in H1a1.
+now apply (rngl_squ_le_1_iff Hon Hop Hiq Hor) in H1a1.
 Qed.
 
 Theorem rngl_sin_nonneg_is_pos :
