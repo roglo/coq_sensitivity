@@ -195,7 +195,7 @@ destruct (is_upper_bound P _) as [H1| H1]. {
     rewrite (rngl_mul_1_r Hon).
     apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   } {
-    now apply (rngl_pow_nonzero Hon Hos Hiq).
+    now apply (rngl_pow_neq_0 Hon Hos Hiq).
   }
   f_equal.
   rewrite (rngl_mul_1_r Hon).
@@ -218,7 +218,7 @@ destruct (is_upper_bound P _) as [H1| H1]. {
     rewrite (rngl_mul_1_r Hon).
     apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   } {
-    now apply (rngl_pow_nonzero Hon Hos Hiq).
+    now apply (rngl_pow_neq_0 Hon Hos Hiq).
   }
   f_equal.
   rewrite (rngl_mul_1_r Hon).
@@ -285,7 +285,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
   intros.
-  apply (rngl_pow_nonzero Hon Hos Hiq).
+  apply (rngl_pow_neq_0 Hon Hos Hiq).
   apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
 }
 specialize (AnBn_interval Hon Hop Hiv Hor) as Habi.
@@ -401,7 +401,7 @@ split. {
   intros * Hp Hq.
   assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
     intros.
-    apply (rngl_pow_nonzero Hon Hos Hiq).
+    apply (rngl_pow_neq_0 Hon Hos Hiq).
     apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   }
   (* TODO: a lemma *)
@@ -473,7 +473,7 @@ split. {
   intros * Hp Hq.
   assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
     intros.
-    apply (rngl_pow_nonzero Hon Hos Hiq).
+    apply (rngl_pow_neq_0 Hon Hos Hiq).
     apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   }
   (* TODO: a lemma *)
