@@ -10,15 +10,11 @@ Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 Require Import RingLike.Misc.
 
-Require Import TrigoWithoutPi.TacChangeAngle.
-Require Import TrigoWithoutPi.Angle TrigoWithoutPi.TrigoWithoutPiExt.
-Require Import TrigoWithoutPi.AngleDef TrigoWithoutPi.AngleAddOverflowEquiv.
-Require Import TrigoWithoutPi.Angle_order.
-Require Import TrigoWithoutPi.AngleDiv2.
+Require Import TrigoWithoutPi.Core.
 Require Import TrigoWithoutPi.AngleDiv2Add.
 Require Import TrigoWithoutPi.SeqAngleIsCauchy.
-Require Import TrigoWithoutPi.AngleAddOverflowLe.
-Require Import TrigoWithoutPi.AngleAddLeMonoL.
+Require Import TrigoWithoutPi.AngleAddOverflowEquiv.
+Require Import TrigoWithoutPi.TacChangeAngle.
 
 Require Import Misc.
 Require Import AngleEuclDistLtAngleLtLt.
