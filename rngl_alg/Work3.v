@@ -11,6 +11,7 @@ Require Import RingLike.IterAdd.
 Require Import RingLike.IterMax.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
+Require Import RingLike.IntermVal.
 
 Require Import TrigoWithoutPi.Core.
 Require Import TrigoWithoutPi.AngleDivNat.
@@ -19,7 +20,6 @@ Require Import Misc.
 Require Import Complex.
 Require Import Work.
 Require Import Work2.
-Require Import IntermVal.
 
 Section a.
 

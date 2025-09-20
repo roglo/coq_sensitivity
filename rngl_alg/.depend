@@ -8,7 +8,6 @@ GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Nat_ggcd.vo PQ.vo
 GaussIntRl.vo GaussIntRl.glob GaussIntRl.v.beautified GaussIntRl.required_vo: GaussIntRl.v
 HyperbolicTrigo.vo HyperbolicTrigo.glob HyperbolicTrigo.v.beautified HyperbolicTrigo.required_vo: HyperbolicTrigo.v
 Ideal.vo Ideal.glob Ideal.v.beautified Ideal.required_vo: Ideal.v
-IntermVal.vo IntermVal.glob IntermVal.v.beautified IntermVal.required_vo: IntermVal.v
 MatRl.vo MatRl.glob MatRl.v.beautified MatRl.required_vo: MatRl.v ../sensitivity/Comatrix.vo ../sensitivity/Determinant.vo ../sensitivity/Matrix.vo ../sensitivity/Misc.vo
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v Misc.vo
@@ -25,4 +24,4 @@ Rrl.vo Rrl.glob Rrl.v.beautified Rrl.required_vo: Rrl.v
 SplitComplex.vo SplitComplex.glob SplitComplex.v.beautified SplitComplex.required_vo: SplitComplex.v ../sensitivity/MyVector.vo Misc.vo
 Work.vo Work.glob Work.v.beautified Work.required_vo: Work.v AngleAddOverflowEquiv.vo Complex.vo Misc.vo NewtonBinomial.vo
 Work2.vo Work2.glob Work2.v.beautified Work2.required_vo: Work2.v AngleEuclDistLtAngleLtLt.vo Complex.vo Misc.vo Work.vo
-Work3.vo Work3.glob Work3.v.beautified Work3.required_vo: Work3.v Complex.vo IntermVal.vo Misc.vo Work.vo Work2.vo
+Work3.vo Work3.glob Work3.v.beautified Work3.required_vo: Work3.v Complex.vo Misc.vo Work.vo Work2.vo
