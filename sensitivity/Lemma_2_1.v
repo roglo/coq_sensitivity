@@ -217,9 +217,10 @@ intros Hof * Hsm Hsr Hcz.
 destruct Hof as (Hon & Hic & Hop & Heq & Hiv & Hch & Hor).
 specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
-destruct (vect_eq_dec Heq V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
+destruct (vect_eq_dec Heo V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
   subst V; cbn.
   now apply Rayleigh_quotient_mul_scal_l_zero.
 }
@@ -481,7 +482,8 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → A = mat_with_vect n eV
   → (A⁺ * A = mI n)%M.
 Proof.
-intros Hon Hic Hos Heq Hin * Hsy Hr Hvv Hm.
+intros Hon Hic Hos Hed Hin * Hsy Hr Hvv Hm.
+specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 specialize (proj2 rngl_has_inv_and_1_or_pdiv_iff) as Hi1.
 specialize (Hi1 (or_introl (conj Hin Hon))).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n A | ].

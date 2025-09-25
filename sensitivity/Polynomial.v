@@ -69,8 +69,10 @@ apply (has_polyn_prop_lap_norm Hed).
 apply lap_prop.
 Qed.
 
+Let Heo := rngl_has_eq_dec_or_is_ordered_l Hed.
+
 Theorem lap_norm_lap_rngl_summation :
-  let rol := lap_ring_like_op Hed in
+  let rol := lap_ring_like_op Heo in
   let rop := polyn_ring_like_op Hos Hed in
   ∀ b e f,
   lap_norm (lap (∑ (i = b, e), f i)) = lap_norm (∑ (i = b, e), lap (f i)).
@@ -85,14 +87,14 @@ induction n; intros; [ easy | ].
 rewrite List.seq_S; cbn.
 do 2 rewrite List.fold_left_app.
 cbn - [ lap_norm ].
-rewrite <- (lap_add_norm_idemp_l Hed).
+rewrite <- (lap_add_norm_idemp_l Heo).
 rewrite IHn.
-rewrite (lap_add_norm_idemp_l Hed).
+rewrite (lap_add_norm_idemp_l Heo).
 apply lap_norm_idemp.
 Qed.
 
 Theorem lap_norm_rngl_summation_idemp :
-  let rol := lap_ring_like_op Hed in
+  let rol := lap_ring_like_op Heo in
   ∀ b e f,
   lap_norm (∑ (i = b, e), lap_norm (f i)) = lap_norm (∑ (i = b, e), f i).
 Proof.
@@ -105,10 +107,10 @@ induction n; intros; [ easy | ].
 rewrite List.seq_S.
 do 2 rewrite List.fold_left_app.
 cbn - [ lap_norm ].
-rewrite <- (lap_add_norm_idemp_l Hed).
+rewrite <- (lap_add_norm_idemp_l Heo).
 rewrite IHn.
-rewrite (lap_add_norm_idemp_l Hed).
-rewrite (lap_add_norm_idemp_r Hed).
+rewrite (lap_add_norm_idemp_l Heo).
+rewrite (lap_add_norm_idemp_r Heo).
 easy.
 Qed.
 

@@ -1599,7 +1599,8 @@ Theorem An_eigen_equation_for_sqrt_n :
       → (mA (S n') • V = μ × V)%V
   end.
 Proof.
-intros Hic Hop Hin Heq * Hμ.
+intros Hic Hop Hin Hed * Hμ.
+specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -1792,7 +1793,8 @@ Theorem A_n_eigenvalue_squared_is_n :
   → (mA n • V = μ × V)%V
   → (μ * μ)%L = rngl_mul_nat 1 n.
 Proof.
-intros Hic Hop Heq Hin * Hvs Hvr Hav.
+intros Hic Hop Hed Hin * Hvs Hvr Hav.
+specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 assert (Hi1 : rngl_has_inv_and_1_or_pdiv T = true). {
   now apply rngl_has_inv_and_1_or_pdiv_iff; left.
 }
