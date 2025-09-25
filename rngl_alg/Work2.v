@@ -1007,11 +1007,13 @@ Proof.
 destruct_ac.
 intros * Hs1 Hs2 Hs12.
 destruct (rngl_leb_dec 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+  apply rngl_leb_le in Hzc1.
   apply (rngl_lt_le_incl Hor) in Hs1.
   destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
-...
+    apply rngl_leb_le in Hzc2.
     now apply quadrant_1_rngl_cos_add_le_cos_l.
   }
+  apply rngl_leb_nle in Hzc2.
   apply (rngl_nle_gt_iff Hor) in Hzc2.
   change_angle_sub_r θ2 angle_right.
   progress sin_cos_add_sub_right_hyp T Hs2.
@@ -1021,6 +1023,7 @@ destruct (rngl_leb_dec 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   apply (rngl_lt_le_incl Hor) in Hzc2.
   apply rngl_sin_add_nonneg; try easy.
 }
+apply rngl_leb_nle in Hzc1.
 apply (rngl_nle_gt_iff Hor) in Hzc1.
 destruct (rngl_eq_dec Heo (rngl_cos θ1) (-1)) as [Hco1| Hco1]. 2: {
   generalize Hzc1; intros H.
@@ -1126,13 +1129,12 @@ Qed.
 Theorem rngl_acos_bound : ∀ a, (0 ≤ rngl_acos a ≤ angle_straight)%A.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
 progress unfold rngl_acos.
-progress fold Hor.
 destruct (rngl_leb_dec a² 1) as [Ha1| H1a]. {
   progress unfold angle_leb.
   cbn.
+  apply rngl_leb_le in Ha1.
   rewrite (rngl_leb_refl Hor).
   rewrite rngl_leb_0_sqrt; [ | now apply (rngl_le_0_sub Hop Hor) ].
   split. {
@@ -1154,8 +1156,8 @@ Proof.
 destruct_ac.
 intros * H1a1 Haz.
 progress unfold rngl_acos in Haz.
-progress fold Hor in Haz.
 destruct (rngl_leb_dec a² 1) as [Ha1| H1a]; [ now injection Haz | ].
+apply rngl_leb_nle in H1a.
 exfalso; apply H1a.
 now apply (rngl_squ_le_1_iff Hon Hop Hiq Hor) in H1a1.
 Qed.
