@@ -38,13 +38,13 @@ symmetry in Hsab, Hab.
 destruct sab. {
   destruct ab; [ easy | ].
   apply rngl_leb_le in Hsab.
-  apply (rngl_leb_gt Hor) in Hab.
+  apply (rngl_leb_gt_iff Hor) in Hab.
   apply (rngl_le_antisymm Hor); [ easy | ].
   apply (rl_sqrt_le_rl_sqrt Hon Hop Hiq Hor); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
 }
 destruct ab; [ | easy ].
-apply (rngl_leb_gt Hor) in Hsab.
+apply (rngl_leb_gt_iff Hor) in Hsab.
 apply rngl_leb_le in Hab.
 apply (rngl_le_antisymm Hor); [ now apply (rngl_lt_le_incl Hor) | ].
 now apply (rl_sqrt_le_rl_sqrt Hon Hop Hiq Hor).
@@ -62,7 +62,6 @@ Theorem quadrant_1_rngl_cos_sub_lt :
   → (rngl_cos θ2 < rngl_cos θ3)%L.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hzs1 Hzs2 Hzs3 Hzc1 Hc12 Hc13 Hc1312.
 assert (H1 : (rngl_sin (θ1 - θ2) < rngl_sin (θ1 - θ3))%L). {
   apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff.
@@ -204,7 +203,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hzs1 Hzs2 Hzs3 Hzc1 Hzc2 Hzc3 H31.
 assert (Hz2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hos Hiq Hor).
-destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3)) as [Hs23| Hs23]. {
+destruct (rngl_leb_dec (rngl_sin θ2) (rngl_sin θ3)) as [Hs23| Hs23]. {
   rewrite rngl_cos_add.
   rewrite rngl_cos_sub.
   rewrite <- (rngl_add_sub_swap Hop).
@@ -219,8 +218,10 @@ destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3)) as [Hs23| Hs23]. {
     now apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
   }
   apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor); [ easy | ].
+  apply rngl_leb_le in Hs23.
   now apply (rngl_le_0_sub Hop Hor).
 }
+apply rngl_leb_nle in Hs23.
 apply (rngl_nle_gt_iff Hor) in Hs23.
 rewrite rngl_cos_add_rngl_cos.
 rewrite <- rngl_mul_assoc.
@@ -386,15 +387,20 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now rewrite (H1 θ1), (H1 θ2) in H12.
 }
 intros * H12 H1s Hzs1 Hzs2 Hzs21.
-destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
-  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+destruct (rngl_leb_dec 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+  apply rngl_leb_le in Hzc1.
+  destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+    apply rngl_leb_le in Hzc2.
     now apply quadrant_1_sin_sub_nonneg_cos_lt; try easy.
   }
+  apply rngl_leb_nle in Hc2z.
   apply (rngl_nle_gt_iff Hor) in Hc2z.
   now apply (rngl_lt_le_trans Hor _ 0).
 }
+apply rngl_leb_nle in Hc1z.
 apply (rngl_nle_gt_iff Hor) in Hc1z.
-destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+  apply rngl_leb_le in Hzc2.
   exfalso.
   rewrite rngl_sin_sub_anticomm in Hzs21.
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs21.
@@ -427,6 +433,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
   apply Hzc2.
   apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
 }
+apply rngl_leb_nle in Hc2z.
 apply (rngl_nle_gt_iff Hor) in Hc2z.
 change_angle_sub_l θ1 angle_straight.
 change_angle_sub_l θ2 angle_straight.
