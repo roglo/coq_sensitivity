@@ -129,8 +129,6 @@ Theorem angle_add_overflow_pow2_div_mul_pow2_diag :
       false.
 Proof.
 destruct_ac.
-specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros.
@@ -227,7 +225,7 @@ destruct zs. {
   split; [ easy | ].
   subst x; apply rngl_cos_bound.
 }
-apply (rngl_leb_gt Hor) in Hzs.
+apply (rngl_leb_gt_iff Hor) in Hzs.
 apply rngl_nle_gt in Hzs.
 exfalso.
 apply Hzs; clear Hzs.
@@ -481,6 +479,7 @@ assert (Honc : rngl_has_1 (GComplex T) = true). {
   progress unfold gc_opt_one.
   clear H1.
   subst gro grp.
+...
   now destruct (rngl_opt_one T).
 }
 assert (Hosc : rngl_has_opp_or_psub (GComplex T) = true). {
@@ -727,7 +726,7 @@ rewrite rngl_sin_5_right_div_2.
 rewrite rngl_cos_5_right_div_2.
 rewrite (rngl_leb_0_opp Hop Hor).
 generalize Hs; intros H.
-apply (rngl_leb_gt Hor) in H.
+apply (rngl_leb_gt_iff Hor) in H.
 rewrite H; clear H.
 remember (√(1 / 2) ≤? 0)%L as sz eqn:Hsz.
 symmetry in Hsz.
@@ -766,9 +765,9 @@ destruct sz. {
   apply Hsz; clear Hsz.
   apply (rl_sqrt_half_pos Hc1).
 }
-apply (rngl_leb_gt Hor) in Hs.
+apply (rngl_leb_gt_iff Hor) in Hs.
 rewrite Hs.
-apply (rngl_leb_gt Hor) in Hs.
+apply (rngl_leb_gt_iff Hor) in Hs.
 apply rngl_ltb_lt.
 rewrite rngl_cos_5_right_div_2.
 change_angle_add_r θ angle_straight.
@@ -822,7 +821,7 @@ specialize rl_sqrt_half_nonneg as Hzs.
 intros * Hcs Hs Hc.
 progress unfold angle_ltb.
 generalize Hs; intros H.
-apply (rngl_leb_gt Hor) in H.
+apply (rngl_leb_gt_iff Hor) in H.
 rewrite H; clear H.
 rewrite rngl_sin_7_right_div_2.
 rewrite rngl_cos_7_right_div_2.
@@ -976,7 +975,7 @@ progress unfold angle_ltb.
 rewrite rngl_sin_sub_straight_r.
 rewrite (rngl_leb_0_opp Hop Hor).
 generalize Hs; intros H.
-apply (rngl_leb_gt Hor) in H.
+apply (rngl_leb_gt_iff Hor) in H.
 rewrite H; clear H.
 rewrite rngl_sin_7_right_div_2.
 rewrite (rngl_leb_0_opp Hop Hor).

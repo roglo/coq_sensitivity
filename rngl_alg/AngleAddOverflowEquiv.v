@@ -1102,6 +1102,7 @@ split; intros H12. {
     apply rngl_leb_nle in Hs2z.
     apply (rngl_nle_gt_iff Hor) in Hs2z.
     destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+      apply rngl_leb_le in Hzc2.
       change_angle_add_r θ2 angle_right.
       progress sin_cos_add_sub_right_hyp T Hzc2.
       progress sin_cos_add_sub_right_hyp T Hs2z.
@@ -1111,7 +1112,6 @@ split; intros H12. {
       intros Hcc.
       assert (Hss : (0 ≤ rngl_sin (θ1 + θ2))%L). {
         apply (rngl_lt_le_incl Hor) in Hzs1, Hzc1, Hs2z.
-...
         now apply rngl_sin_add_nonneg.
       }
       assert (Haov : angle_add_overflow θ1 θ2 = false). {
@@ -1177,6 +1177,7 @@ split; intros H12. {
       }
       now apply (angle_div_2_not_straight Hc1) in H.
     }
+    apply rngl_leb_nle in Hc2z.
     apply (rngl_nle_gt_iff Hor) in Hc2z.
     change_angle_add_r θ2 angle_straight.
     progress sin_cos_add_sub_straight_hyp T Hc2z.
