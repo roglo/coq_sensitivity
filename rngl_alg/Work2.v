@@ -1025,12 +1025,14 @@ destruct (rngl_leb_dec 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
 }
 apply rngl_leb_nle in Hzc1.
 apply (rngl_nle_gt_iff Hor) in Hzc1.
-destruct (rngl_eq_dec Heo (rngl_cos θ1) (-1)) as [Hco1| Hco1]. 2: {
+destruct (rngl_eqb_dec (rngl_cos θ1) (-1)) as [Hco1| Hco1]. 2: {
+  apply (rngl_eqb_neq Heo) in Hco1.
   generalize Hzc1; intros H.
   apply (rngl_lt_le_incl Hor) in H.
   apply (rngl_lt_le_incl Hor) in Hs1.
   now apply angle_add_overflow_le_lemma_2.
 }
+apply (rngl_eqb_eq Heo) in Hco1.
 apply eq_rngl_cos_opp_1 in Hco1.
 rewrite Hco1 in Hs1.
 now apply (rngl_lt_irrefl Hor) in Hs1.
