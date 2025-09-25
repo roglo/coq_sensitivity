@@ -165,7 +165,8 @@ destruct zs. {
   progress unfold seq_angle_to_div_nat in Hx.
   rewrite <- Hx.
   destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
-    destruct (rngl_eq_dec Heo (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
+    destruct (rngl_eqb_dec (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
+      apply (rngl_eqb_eq Heo) in Hxz.
       rewrite Hu in Hxz.
       progress unfold seq_angle_to_div_nat in Hxz.
       apply eq_rngl_sin_0 in Hxz.
@@ -210,6 +211,7 @@ destruct zs. {
         apply (angle_div_2_lt_straight Hc1).
       }
     }
+    apply (rngl_eqb_neq Heo) in Hxz.
     exfalso.
     rewrite Hu in Hxz.
     progress unfold seq_angle_to_div_nat in Hxz.
