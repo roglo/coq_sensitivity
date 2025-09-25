@@ -1104,11 +1104,13 @@ Theorem rngl_cosh_eq :
 Proof.
 destruct_hc.
 intros * Hcc.
-destruct (rngl_eq_dec Heo (rngl_sinh θ1) (rngl_sinh θ2)) as [Hss| Hss]. {
+destruct (rngl_eqb_dec (rngl_sinh θ1) (rngl_sinh θ2)) as [Hss| Hss]. {
+  apply (rngl_eqb_eq Heo) in Hss.
   left.
   apply eq_hangle_eq.
   now rewrite Hcc, Hss.
 }
+apply (rngl_eqb_neq Heo) in Hss.
 right.
 apply eq_hangle_eq.
 rewrite Hcc; f_equal.
@@ -1145,10 +1147,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now rewrite (H1 θ1), (H1 θ2).
 }
 intros * Hss.
-destruct (rngl_eq_dec Heo (rngl_cosh θ1) (rngl_cosh θ2)) as [Hcc| Hcc]. {
+destruct (rngl_eqb_dec (rngl_cosh θ1) (rngl_cosh θ2)) as [Hcc| Hcc]. {
+  apply (rngl_eqb_eq Heo) in Hcc.
   apply eq_hangle_eq.
   now rewrite Hcc, Hss.
 }
+apply (rngl_eqb_neq Heo) in Hcc.
 apply eq_hangle_eq.
 exfalso; apply Hcc; clear Hcc.
 specialize (cosh2_sinh2_1 θ1) as H1.
