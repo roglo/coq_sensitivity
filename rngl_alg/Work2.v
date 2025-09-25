@@ -796,7 +796,6 @@ Theorem rngl_lt_cos_lt_cos_div2 :
   → (b < rngl_cos (θ /₂))%L.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hba Hzs Hc.
@@ -809,11 +808,13 @@ cbn.
 apply rngl_leb_le in Hzs.
 rewrite Hzs.
 rewrite (rngl_mul_1_l Hon).
-destruct (rngl_lt_dec Hor b 0) as [Hblz| Hbgz]. {
+destruct (rngl_ltb_dec b 0) as [Hblz| Hbgz]. {
+  apply rngl_ltb_lt in Hblz.
   eapply (rngl_lt_le_trans Hor _ 0); [ easy | ].
   apply rl_sqrt_nonneg.
   apply rngl_1_add_cos_div_2_nonneg.
 }
+apply rngl_ltb_nlt in Hbgz.
 apply (rngl_nlt_ge_iff Hor) in Hbgz.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor b); [ | easy ].
 rewrite <- (rngl_abs_nonneg_eq Hop Hor √_). 2: {
@@ -841,7 +842,6 @@ Theorem rngl_lt_add_cos_lt_add_cos_div2 :
   → (1 < b + rngl_cos (θ /₂))%L.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hba Hzs Ha.
 apply (rngl_lt_sub_lt_add_l Hop Hor).
 apply (rngl_lt_cos_lt_cos_div2 (1 - a)%L); [ | easy | ]. {
@@ -861,7 +861,6 @@ Theorem rngl_cos_sin_twice_lemma_1 :
   → (rngl_cos θ2 ≤ rngl_cos θ1)%L.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hzs1 Hzs2 Hzs21 Hzs22 H12.
@@ -909,7 +908,6 @@ Theorem rngl_cos_sin_twice_lemma_2 :
   → (rngl_cos θ2 ≤ rngl_cos θ1)%L.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hzs1 Hzs2 Hzs21 Hzs22 H12.
@@ -1007,11 +1005,11 @@ Theorem quadrant_1_2_rngl_cos_add_l_le_rngl_cos :
   → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
 Proof.
 destruct_ac.
-specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 intros * Hs1 Hs2 Hs12.
-destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+destruct (rngl_leb_dec 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   apply (rngl_lt_le_incl Hor) in Hs1.
-  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+  destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+...
     now apply quadrant_1_rngl_cos_add_le_cos_l.
   }
   apply (rngl_nle_gt_iff Hor) in Hzc2.
@@ -1132,7 +1130,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
 progress unfold rngl_acos.
 progress fold Hor.
-destruct (rngl_le_dec Hor a² 1) as [Ha1| H1a]. {
+destruct (rngl_leb_dec a² 1) as [Ha1| H1a]. {
   progress unfold angle_leb.
   cbn.
   rewrite (rngl_leb_refl Hor).
@@ -1157,7 +1155,7 @@ destruct_ac.
 intros * H1a1 Haz.
 progress unfold rngl_acos in Haz.
 progress fold Hor in Haz.
-destruct (rngl_le_dec Hor a² 1) as [Ha1| H1a]; [ now injection Haz | ].
+destruct (rngl_leb_dec a² 1) as [Ha1| H1a]; [ now injection Haz | ].
 exfalso; apply H1a.
 now apply (rngl_squ_le_1_iff Hon Hop Hiq Hor) in H1a1.
 Qed.
