@@ -479,7 +479,8 @@ assert (Honc : rngl_has_1 (GComplex T) = true). {
   progress unfold gc_opt_one.
   clear H1.
   subst gro grp.
-...
+  assert (rngl_opt_one T ≠ None) by now intros H; rewrite H in Hon.
+  clear Hon.
   now destruct (rngl_opt_one T).
 }
 assert (Hosc : rngl_has_opp_or_psub (GComplex T) = true). {
@@ -609,7 +610,6 @@ Theorem angle_right_div_2_lt :
   → (angle_right /₂ < θ)%A.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hcs Hs Hc.
@@ -745,7 +745,6 @@ Theorem quadrant_3_angle_lt_5_angle_right_div_2 :
   → (5 * (angle_right /₂) < θ)%A.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hsc Hs Hc.
@@ -810,7 +809,6 @@ Theorem quadrant_4_angle_lt_7_angle_right_div_2 :
   → (θ < 7 * (angle_right /₂))%A.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hcs Hs Hc.
@@ -899,7 +897,6 @@ Theorem quadrant_2_angle_lt_3_angle_right_div_2 :
   → (θ < 3 * (angle_right /₂))%A.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hcs Hs Hc.
@@ -1002,7 +999,6 @@ Theorem rngl_cos_mul_2_neg_if :
     (5 * (angle_right /₂) < θ < 7 * (angle_right /₂))%A.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * H2.
@@ -1014,14 +1010,17 @@ intros * Hcz.
 rewrite rngl_cos_mul_2_l in Hcz.
 apply -> (rngl_lt_sub_0 Hop Hor) in Hcz.
 apply (rngl_squ_lt_abs_lt Hon Hop Hiq Hor) in Hcz.
-destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
+destruct (rngl_leb_dec 0 (rngl_sin θ)) as [Hs| Hs]. {
+  apply rngl_leb_le in Hs.
   rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_sin _)) in Hcz; [ | easy ].
   left.
-  destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hc| Hc]. {
+  destruct (rngl_leb_dec 0 (rngl_cos θ)) as [Hc| Hc]. {
+    apply rngl_leb_le in Hc.
     rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
     split; [ now apply angle_right_div_2_lt | ].
     now apply quadrant_1_angle_lt_3_angle_right_div_2.
   } {
+    apply rngl_leb_nle in Hc.
     apply (rngl_nle_gt_iff Hor) in Hc.
     rewrite (rngl_abs_nonpos_eq Hop Hor) in Hcz. 2: {
       now apply (rngl_lt_le_incl Hor) in Hc.
@@ -1033,12 +1032,14 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
     }
   }
 } {
+  apply rngl_leb_nle in Hs.
   apply (rngl_nle_gt_iff Hor) in Hs.
   rewrite (rngl_abs_nonpos_eq Hop Hor (rngl_sin _)) in Hcz. 2: {
     now apply (rngl_lt_le_incl Hor) in Hs.
   }
   right.
-  destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hc| Hc]. {
+  destruct (rngl_leb_dec 0 (rngl_cos θ)) as [Hc| Hc]. {
+    apply rngl_leb_le in Hc.
     rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
     split. {
       now apply quadrant_4_angle_lt_5_angle_right_div_2.
@@ -1046,6 +1047,7 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
       now apply quadrant_4_angle_lt_7_angle_right_div_2.
     }
   }
+  apply rngl_leb_nle in Hc.
   apply (rngl_nle_gt_iff Hor) in Hc.
   rewrite (rngl_abs_nonpos_eq Hop Hor) in Hcz. 2: {
     now apply (rngl_lt_le_incl Hor) in Hc.
@@ -1066,7 +1068,6 @@ Theorem rngl_sin_mul_2_neg_if :
     (3 * angle_right < θ)%A.
 Proof.
 destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * H2.
