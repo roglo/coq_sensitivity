@@ -66,10 +66,12 @@ specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 intros * Hab.
 destruct a as (ra, ia).
 destruct b as (rb, ib); cbn.
-destruct (rngl_eq_dec Heo ra rb) as [Hrab| Hrab]. {
+destruct (rngl_eqb_dec ra rb) as [Hrab| Hrab]. {
+  apply (rngl_eqb_eq Heo) in Hrab.
   subst rb; right.
   now intros Hiab; apply Hab; clear Hab; subst ib.
 } {
+  apply (rngl_eqb_neq Heo) in Hrab.
   now left.
 }
 Qed.
@@ -156,14 +158,19 @@ intros Heo.
 intros.
 destruct a as (ra, ia).
 destruct b as (rb, ib).
-specialize (rngl_eq_dec Heo ra rb) as H1.
-specialize (rngl_eq_dec Heo ia ib) as H2.
-destruct H1 as [H1| H1]. {
+destruct (rngl_eqb_dec ra rb) as [H1| H1]. {
+  apply (rngl_eqb_eq Heo) in H1.
   subst rb.
-  destruct H2 as [H2| H2]; [ now subst ib; left | right ].
+  destruct (rngl_eqb_dec ia ib) as [H2| H2]. {
+   apply (rngl_eqb_eq Heo) in H2.
+   now subst ib; left.
+  }
+  apply (rngl_eqb_neq Heo) in H2.
+  right.
   intros H; apply H2.
   now injection H.
 } {
+  apply (rngl_eqb_neq Heo) in H1.
   right.
   intros H; apply H1.
   now injection H.
@@ -1944,7 +1951,8 @@ Theorem rngl_cos_div_pow_2_incr :
 Proof.
 destruct_ac; intros Hc1.
 intros * Htz.
-destruct (rngl_eq_dec Heo (rngl_cos θ) (-1)%L) as [Ht1| Ht1]. {
+destruct (rngl_eqb_dec (rngl_cos θ) (-1)%L) as [Ht1| Ht1]. {
+  apply (rngl_eqb_eq Heo) in Ht1.
   apply (eq_rngl_cos_opp_1) in Ht1.
   subst θ.
   rewrite angle_straight_div_2.
@@ -1979,6 +1987,7 @@ destruct (rngl_eq_dec Heo (rngl_cos θ) (-1)%L) as [Ht1| Ht1]. {
   intros H.
   now apply eq_angle_div_2_0 in H.
 }
+apply (rngl_eqb_neq Heo) in Ht1.
 revert θ Htz Ht1.
 induction n; intros. {
   cbn.
