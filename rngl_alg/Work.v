@@ -490,7 +490,8 @@ assert (Hosc : rngl_has_opp_or_psub (GComplex T) = true). {
   progress unfold rngl_has_opp_or_psub.
   cbn.
   progress unfold gc_opt_opp_or_psub.
-  destruct rngl_opt_opp_or_psub as [s| ]; [ | easy ].
+  generalize Hos; intros Hos'; clear Hos.
+  destruct (rngl_opt_opp_or_psub T) as [s| ]; [ | easy ].
   now destruct s.
 }
 specialize (H1 Hic Honc Hosc n).

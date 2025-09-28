@@ -1030,7 +1030,7 @@ assert (Hr : zr = (ρ * rngl_cos (rngl_acos (zr / ρ)))%L). {
   rewrite <- (rngl_squ_1 Hon).
   apply (rngl_abs_le_squ_le Hon Hop Hiq Hor).
   rewrite (rngl_abs_1 Hon Hos Hiq Hor).
-  rewrite (rngl_abs_div Hon Hop Hiv Hed Hor); [ | easy ].
+  rewrite (rngl_abs_div Hon Hop Hiv Hor); [ | easy ].
   rewrite (rngl_abs_nonneg_eq Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hor).
   }
@@ -1094,7 +1094,7 @@ destruct zzi. {
   apply (rngl_add_sub_eq_l Hos) in Hri.
   rewrite Hri.
   rewrite (rl_sqrt_squ Hon Hop Hor).
-  rewrite (rngl_abs_div Hon Hop Hiv Hed Hor); [ | easy ].
+  rewrite (rngl_abs_div Hon Hop Hiv Hor); [ | easy ].
   rewrite (rngl_abs_nonneg_eq Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hor).
   }
@@ -1117,7 +1117,7 @@ destruct zzi. {
   apply (rngl_add_sub_eq_l Hos) in Hri.
   rewrite Hri.
   rewrite (rl_sqrt_squ Hon Hop Hor).
-  rewrite (rngl_abs_div Hon Hop Hiv Hed Hor); [ | easy ].
+  rewrite (rngl_abs_div Hon Hop Hiv Hor); [ | easy ].
   rewrite (rngl_abs_nonneg_eq Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hor).
   }
