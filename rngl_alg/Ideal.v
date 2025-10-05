@@ -37,6 +37,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rr : ring_like_ord T}.
 Context {rp : ring_like_prop T}.
+Context {Hos : rngl_has_opp_or_psub T = true}.
 Context {Heo : rngl_has_eq_dec_or_order T = true}.
 
 (* 0 and 1 *)
@@ -51,7 +52,6 @@ subst.
 apply rngl_add_0_l.
 Qed.
 
-(* to be completed
 Theorem I_zero_opp_or_psub :
   match rngl_opt_opp_or_psub T with
   | Some (inl opp) => ∀ a : T, (a =? 0)%L = true → (opp a =? 0)%L = true
@@ -82,29 +82,46 @@ destruct su. {
   progress unfold rngl_sub in H.
   rewrite Hop, Hsu in H.
   progress unfold rngl_psub in H.
-...
+  progress unfold rngl_has_opp in Hop.
   destruct (rngl_opt_opp_or_psub T) as [op| ]; [ | easy ].
-  destruct op as [opp| ]. {
-...
-  intros a Ha.
-  apply (rngl_eqb_eq Heo) in Ha; subst a.
+  destruct op as [| psub ]; [ easy | ].
+  intros a b Ha Hb.
+  apply (rngl_eqb_eq Heo) in Ha, Hb; subst a b.
   now apply (rngl_eqb_eq Heo).
 }
-...
+progress unfold rngl_has_opp in Hop.
+progress unfold rngl_has_psub in Hsu.
+destruct (rngl_opt_opp_or_psub T) as [op| ]; [ | easy ].
+now destruct op.
+Qed.
+
+Theorem I_zero_mul_l :
+  ∀ a b : T, (b =? 0)%L = true → (a * b =? 0)%L = true.
+Proof.
+intros * H.
+apply (rngl_eqb_eq Heo) in H; subst.
+apply (rngl_eqb_eq Heo).
+apply (rngl_mul_0_r Hos).
+Qed.
+
+Theorem I_zero_mul_r :
+  ∀ a b : T, (a =? 0)%L = true → (a * b =? 0)%L = true.
+Proof.
+intros * H.
+apply (rngl_eqb_eq Heo) in H; subst.
+apply (rngl_eqb_eq Heo).
+apply (rngl_mul_0_l Hos).
+Qed.
 
 Definition I_zero : ideal T :=
-  {| ip_subtype := λ a, (a =? 0)%L;
+  {| ip_subtype a := (a =? 0)%L;
      ip_zero := rngl_eqb_refl Heo 0%L;
      ip_add := I_zero_add;
      ip_opp_or_psub := I_zero_opp_or_psub;
-     ip_mul_l := ?ip_mul_l;
-     ip_mul_r := ?ip_mul_r |}.
+     ip_mul_l := I_zero_mul_l;
+     ip_mul_r := I_zero_mul_r |}.
 
-
-...
-
-Definition I_zero {P} {ip : ideal P} : T := rngl_zero.
-
+(* to be completed
 Definition I_opt_one {P} {ip : ideal P}  : option T :=
   match rngl_opt_one T with
   | Some one =>
