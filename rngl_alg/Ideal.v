@@ -6,28 +6,30 @@ From Stdlib Require Import Utf8 Arith.
 Require Import RingLike.Core.
 Require Import RingLike.Misc.
 
-Record ideal {T} (P : T → bool) := mk_I
-  { i_val : T;
-    i_mem : P i_val = true }.
+(* ideal : non empty set (type) with some properties *)
 
-Arguments mk_I {T P} i_val%_L i_mem.
-Arguments i_val {T P} i%_L.
-Arguments i_mem {T P} i%_L.
-
-Class ideal_prop {T} {ro : ring_like_op T} (P : T → bool) := mk_ip
-  { ip_zero : P rngl_zero = true;
-    ip_add : ∀ a b, P a = true → P b = true → P (a + b)%L = true;
+Record ideal T {ro : ring_like_op T} := mk_ip
+  { ip_subtype : T → bool;
+    ip_zero : ip_subtype rngl_zero = true;
+    ip_add :
+      ∀ a b,
+        ip_subtype a = true
+        → ip_subtype b = true
+        → ip_subtype (a + b)%L = true;
     ip_opp_or_psub :
       match rngl_opt_opp_or_psub T with
       | Some (inl opp) =>
-          ∀ a, P a = true → P (opp a)%L = true
+          ∀ a, ip_subtype a = true → ip_subtype (opp a)%L = true
       | Some (inr psub) =>
-          ∀ a b, P a = true → P b = true → P (psub a b) = true
+          ∀ a b,
+          ip_subtype a = true
+          → ip_subtype b = true
+          → ip_subtype (psub a b) = true
       | None =>
           not_applicable
       end;
-    ip_mul_l : ∀ a b, P b = true → P (a * b)%L = true;
-    ip_mul_r : ∀ a b, P a = true → P (a * b)%L = true }.
+    ip_mul_l : ∀ a b, ip_subtype b = true → ip_subtype (a * b)%L = true;
+    ip_mul_r : ∀ a b, ip_subtype a = true → ip_subtype (a * b)%L = true }.
 
 Section a.
 
@@ -35,23 +37,47 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rr : ring_like_ord T}.
 Context {rp : ring_like_prop T}.
-Context {P : T → bool}.
-Context {ip : ideal_prop P}.
 
 (* 0 and 1 *)
 
-Definition I_zero : ideal P := mk_I 0 ip_zero.
-Definition I_opt_one : option (ideal P) :=
+(* to be completed
+Definition I_zero : ideal T :=
+  {| ip_subtype := true |}.
+...
+
+Definition I_zero {P} {ip : ideal P} : T := rngl_zero.
+
+Definition I_opt_one {P} {ip : ideal P}  : option T :=
   match rngl_opt_one T with
   | Some one =>
       match Bool.bool_dec (P one) true with
-      | left ip_one => Some (mk_I one ip_one)
+      | left ip_one => Some one
       | right _ => None
       end
   | None => None
   end.
 
 (* addition *)
+
+Theorem I_add_zero : ∀ P (ip : ideal P), P 0%L = true.
+Proof. intros; apply ip. Qed.
+
+(*
+Theorem I_add_add :
+  ∀ a b : T, P a = true → P b = true → P (a + b)%L = true.
+Proof.
+intros * Ha Hb.
+Admitted.
+*)
+
+Definition I_add P Q (a : ideal P) (Q : ideal Q) : ideal P :=
+  {| ip_zero := I_add_zero a;
+     ip_add := true;
+     ip_opp_or_psub := true;
+     ip_mul_l := ?ip_mul_l;
+     ip_mul_r := ?ip_mul_r |}.
+
+...
 
 Definition I_add (a b : ideal P): ideal P :=
   mk_I (i_val a + i_val b) (ip_add (i_val a) (i_val b) (i_mem a) (i_mem b)).
@@ -96,6 +122,7 @@ Definition I_psub (a b : ideal P) : ideal P :=
 
 (* present definition of rngl_ord_mul_le_compat_nonneg doesn't
    allow ideals to have order *)
+...
 Definition I_opt_leb : option (ideal P → ideal P → bool) := None.
 (*
 Definition I_opt_leb : option (ideal P → ideal P → bool) :=
@@ -776,5 +803,6 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_characteristic_prop := I_characteristic_prop;
      rngl_opt_ord := NA; (*I_ring_like_ord;*)
      rngl_opt_archimedean := NA |}.
+*)
 
 End a.
