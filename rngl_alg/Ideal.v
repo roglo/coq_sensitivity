@@ -2,13 +2,14 @@
 
 (* ideals on a RingLike *)
 
+Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith.
 Require Import RingLike.Core.
 Require Import RingLike.Misc.
 
 (* ideal : non empty set (type) with some properties *)
 
-Record ideal T {ro : ring_like_op T} := mk_ip
+Record ideal {T} {ro : ring_like_op T} := mk_ip
   { ip_subtype : T → Prop;
     ip_zero : ip_subtype rngl_zero;
     ip_add :
@@ -31,7 +32,7 @@ Record ideal T {ro : ring_like_op T} := mk_ip
     ip_mul_l : ∀ a b, ip_subtype b → ip_subtype (a * b)%L;
     ip_mul_r : ∀ a b, ip_subtype a → ip_subtype (a * b)%L }.
 
-Arguments ip_subtype {T ro} i x%_L.
+Arguments ideal T {ro}.
 
 Section a.
 
@@ -168,6 +169,8 @@ Theorem I_add_opp_or_psub a b :
   end.
 Proof.
 specialize (rngl_opp_add_distr) as H1.
+specialize (ip_opp_or_psub a) as Ha.
+specialize (ip_opp_or_psub b) as Hb.
 progress unfold rngl_has_opp in H1.
 progress unfold rngl_has_opp_or_psub in Hos.
 progress unfold rngl_sub in H1.
@@ -182,7 +185,21 @@ destruct os as [opp| psub]. {
   rewrite H1.
   exists (opp x1), (opp x2).
   split; [ easy | ].
-  split.
+  now split; [ apply Ha | apply Hb ].
+} {
+  intros * Hx Hy.
+  destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
+  destruct Hy as (y1 & y2 & Hy & Hy1 & Hy2).
+  subst.
+  exists (x1 - y1)%L, (x2 - y2)%L.
+(* bon, y a pas à chier, je crois bien qu'il faut qu'il y ait
+   un opposé, et qu'une soustraction primitive ne suffirait pas *)
+Theorem glop :
+  ∀ x1 x2 y1 y2, ((x1 + x2) - (y1 + y2) = (x1 - y1) + (x2 - y2))%L.
+Proof.
+intros.
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_add_sub_assoc).
 ...
 
 Definition I_add (a b : ideal T): ideal T :=
