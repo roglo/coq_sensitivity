@@ -71,7 +71,7 @@ rewrite <- rl_sqrt_mul; cycle 1.
 apply rngl_1_sub_cos_div_2_nonneg.
 apply rngl_1_add_cos_div_2_nonneg.
 apply (rl_sqrt_lt_rl_sqrt Hon Hiq Hor).
-apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
+apply (rngl_mul_nonneg_nonneg Hos Hor).
 apply rngl_1_add_cos_div_2_nonneg.
 apply rngl_1_sub_cos_div_2_nonneg.
 do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
@@ -135,7 +135,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros.
 cbn.
-specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H.
+specialize (rngl_0_le_1 Hon Hos Hor) as H.
 apply rngl_leb_le in H.
 rewrite H; clear H.
 rewrite (rngl_mul_1_l Hon).
@@ -161,7 +161,7 @@ Theorem rngl_cos_right_div_2 : rngl_cos (angle_right /₂) = √(1 / 2)%L.
 Proof.
 destruct_ac.
 cbn.
-specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H1.
+specialize (rngl_0_le_1 Hon Hos Hor) as H1.
 apply rngl_leb_le in H1.
 rewrite H1; clear H1.
 rewrite (rngl_mul_1_l Hon).
@@ -178,7 +178,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 cbn.
-specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H1.
+specialize (rngl_0_le_1 Hon Hos Hor) as H1.
 apply rngl_leb_le in H1.
 rewrite H1; clear H1.
 do 2 rewrite (rngl_mul_0_r Hos).
@@ -193,7 +193,7 @@ f_equal.
 rewrite fold_rngl_squ.
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_div_nonneg Hon Hop Hiv Hor). {
-    apply (rngl_0_le_1 Hon Hos Hiq Hor).
+    apply (rngl_0_le_1 Hon Hos Hor).
   }
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
@@ -214,7 +214,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 cbn.
-specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H1.
+specialize (rngl_0_le_1 Hon Hos Hor) as H1.
 apply rngl_leb_le in H1.
 rewrite H1; clear H1.
 do 2 rewrite (rngl_mul_0_r Hos).
@@ -228,7 +228,7 @@ rewrite rngl_add_0_l.
 rewrite fold_rngl_squ.
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_div_nonneg Hon Hop Hiv Hor). {
-    apply (rngl_0_le_1 Hon Hos Hiq Hor).
+    apply (rngl_0_le_1 Hon Hos Hor).
   }
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
@@ -270,7 +270,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 apply rl_sqrt_nonneg.
 apply (rngl_div_nonneg Hon Hop Hiv Hor).
-apply (rngl_0_le_1 Hon Hos Hiq Hor).
+apply (rngl_0_le_1 Hon Hos Hor).
 apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 Qed.
 
@@ -481,7 +481,7 @@ destruct zs. {
       now apply (rngl_le_trans Hor _ (rngl_sin θ)).
     }
     cbn.
-    specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H2.
+    specialize (rngl_0_le_1 Hon Hos Hor) as H2.
     apply rngl_leb_le in H2.
     rewrite H2; clear H2.
     rewrite (rngl_mul_1_l Hon).
@@ -687,9 +687,9 @@ split; intros H12. {
           rewrite (rngl_sub_mul_r_diag_l Hon Hop).
           apply (rngl_le_trans Hor _ 0). {
             apply (rngl_opp_nonpos_nonneg Hop Hor).
-            now apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
+            now apply (rngl_mul_nonneg_nonneg Hos Hor).
           }
-          apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor); [ easy | ].
+          apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
           apply (rngl_le_0_sub Hop Hor).
           apply rngl_cos_bound.
         }
@@ -934,7 +934,7 @@ split; intros H12. {
         apply angle_div_2_lt_compat.
         progress unfold angle_ltb.
         cbn - [ angle_add ].
-        specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H.
+        specialize (rngl_0_le_1 Hon Hos Hor) as H.
         apply rngl_leb_le in H.
         rewrite H; clear H.
         rename Hzs12 into Hc12z.
@@ -958,7 +958,7 @@ split; intros H12. {
         apply rngl_nlt_ge in Hzs12.
         apply Hzs12; clear Hzs12.
         rewrite H12; cbn.
-        apply (rngl_opp_1_lt_0 Hon Hop Hiq Hor Hc1).
+        apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
       }
       progress unfold angle_ltb.
       rewrite rngl_sin_5_right_div_2.
@@ -1170,7 +1170,7 @@ split; intros H12. {
         apply rngl_nlt_ge in Hss.
         apply Hss; clear Hss.
         rewrite H; cbn.
-        apply (rngl_opp_1_lt_0 Hon Hop Hiq Hor Hc1).
+        apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
       }
       now apply (angle_div_2_not_straight Hc1) in H.
     }

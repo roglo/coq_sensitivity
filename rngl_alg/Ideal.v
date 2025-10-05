@@ -540,7 +540,7 @@ destruct os; [ | easy ].
 progress unfold roi in Hos.
 rewrite rngl_has_opp_or_psub_ideal in Hos.
 intros.
-specialize (rngl_add_le_mono_l Hos Hor) as H2.
+specialize (rngl_add_le_mono_l Hor) as H2.
 specialize (H2 (i_val a) (i_val b) (i_val c)).
 progress unfold rngl_le in H2.
 progress unfold rngl_le; cbn.

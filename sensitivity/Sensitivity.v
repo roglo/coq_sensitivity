@@ -1597,7 +1597,7 @@ specialize @rngl_summation_le_compat as H1.
 specialize (H1 nat).
 specialize (H1 nat_ring_like_op nat_ring_like_prop).
 cbn in H1.
-specialize (H1 eq_refl eq_refl).
+specialize (H1 eq_refl).
 apply Nat.leb_le.
 apply H1.
 intros i Hi.

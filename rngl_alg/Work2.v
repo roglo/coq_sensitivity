@@ -873,11 +873,11 @@ rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
-  apply (rngl_0_le_2 Hon Hos Hiq Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
-  apply (rngl_0_le_2 Hon Hos Hiq Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
 }
 apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
@@ -978,7 +978,7 @@ destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
-  apply (rngl_0_le_2 Hon Hos Hiq Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
 }
 apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hzs21.
 apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hzs22.
@@ -1237,7 +1237,7 @@ intros * (H12, H2s).
 progress unfold angle_ltb in H12.
 progress unfold angle_leb in H2s.
 cbn in H2s.
-specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H1.
+specialize (rngl_0_le_1 Hon Hos Hor) as H1.
 apply rngl_leb_le in H1.
 rewrite H1 in H2s; clear H1.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
@@ -1261,7 +1261,7 @@ Theorem rngl_squ_le_diag :
 Proof.
 intros Hon Hop Hiq Hor * Ha.
 rewrite <- (rngl_mul_1_r Hon a) at 2.
-now apply (rngl_mul_le_mono_nonneg_l Hon Hop Hiq Hor).
+now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
 Qed.
 
 Theorem rngl_limit_sub_l_limit :
