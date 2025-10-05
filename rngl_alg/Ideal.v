@@ -155,11 +155,41 @@ apply rngl_add_add_swap.
 Qed.
 
 (* to be completed
+Theorem I_add_opp_or_psub a b :
+  match rngl_opt_opp_or_psub T with
+  | Some (inl opp) =>
+      ∀ x : T, I_add_subtype a b x → I_add_subtype a b (opp x)
+  | Some (inr psub) =>
+      ∀ x y : T,
+      I_add_subtype a b x
+      → I_add_subtype a b y
+      → I_add_subtype a b (psub x y)
+  | None => not_applicable
+  end.
+Proof.
+specialize (rngl_opp_add_distr) as H1.
+progress unfold rngl_has_opp in H1.
+progress unfold rngl_has_opp_or_psub in Hos.
+progress unfold rngl_sub in H1.
+progress unfold rngl_opp in H1.
+progress unfold rngl_has_opp in H1.
+destruct (rngl_opt_opp_or_psub T) as [os| ]; [ | easy ].
+destruct os as [opp| psub]. {
+  specialize (H1 eq_refl).
+  intros * Hx.
+  destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
+  subst.
+  rewrite H1.
+  exists (opp x1), (opp x2).
+  split; [ easy | ].
+  split.
+...
+
 Definition I_add (a b : ideal T): ideal T :=
   {| ip_subtype := I_add_subtype a b;
      ip_zero := I_add_zero a b;
      ip_add := I_add_add a b;
-     ip_opp_or_psub := true;
+     ip_opp_or_psub := I_add_opp_or_psub a b;
      ip_mul_l := true;
      ip_mul_r := true |}.
 
