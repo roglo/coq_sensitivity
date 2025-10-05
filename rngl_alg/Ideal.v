@@ -733,7 +733,7 @@ Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
      rngl_ord_le_antisymm := I_ord_le_antisymm Hor;
      rngl_ord_le_trans := I_ord_le_trans Hor;
      rngl_ord_add_le_mono_l := I_ord_add_le_mono_l Hor;
-     rngl_ord_mul_le_compat_nonneg := I_ord_mul_le_compat_nonneg Hor;
+     rngl_ord_mul_le_compat_nonneg := I_ord_mul_le_compat_nonneg Hor; (* fails *)
      rngl_ord_mul_le_compat_nonpos := I_ord_mul_le_compat_nonpos Hor;
      rngl_ord_not_le := I_ord_not_le Hor |}.
 
