@@ -38,7 +38,7 @@ apply (rngl_le_trans Hor _ (∑ (i = 1, n), 1 / rngl_of_nat k)). {
   apply (rngl_summation_le_compat Hor).
   intros i Hi.
   Time apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
-    apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
   }
   apply (rngl_le_inv_inv Hon Hop Hiv Hor). {
     apply (rngl_le_neq Hor).

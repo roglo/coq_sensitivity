@@ -826,7 +826,7 @@ rewrite (rngl_squ_sqrt Hon). 2: {
   apply rngl_1_add_cos_div_2_nonneg.
 }
 apply -> (rngl_lt_div_r Hon Hop Hiv Hor). 2: {
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 rewrite (rngl_mul_comm Hic).
 apply (rngl_lt_sub_lt_add_l Hop Hor).
@@ -870,7 +870,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hzs1 Hzs2 Hzs21 Hzs22 H12.
 rewrite rngl_sin_mul_2_l in Hzs21, Hzs22.
 rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
-apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hzs21, Hzs22.
+apply (rngl_lt_mul_0_if Hos Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
   apply (rngl_0_le_2 Hon Hos Hor).
@@ -879,7 +879,7 @@ destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
   apply (rngl_0_le_2 Hon Hos Hor).
 }
-apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hzs21, Hzs22.
+apply (rngl_lt_mul_0_if Hos Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
   now apply rngl_nle_gt in H.
 }
@@ -889,7 +889,7 @@ destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
 do 2 rewrite rngl_cos_mul_2_l' in H12.
 apply (rngl_sub_le_mono_r Hop Hor) in H12.
 apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor) in H12. 2: {
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 apply (rngl_squ_le_abs_le Hon Hop Hiq Hor) in H12.
 apply (rngl_lt_le_incl Hor) in Hzs21, Hzs22.
@@ -920,11 +920,11 @@ rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 destruct Hzs22 as [(_, Hzs22)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
@@ -936,14 +936,14 @@ destruct Hzs22 as [(_, Hzs22)| (H1, H2)]. 2: {
   apply eq_rngl_sin_0 in H1.
   destruct H1; subst θ2. {
     exfalso; apply rngl_nlt_ge in H2; apply H2.
-    apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
   }
   apply rngl_cos_bound.
 }
 do 2 rewrite rngl_cos_mul_2_l' in H12.
 apply (rngl_sub_le_mono_r Hop Hor) in H12.
 apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor) in H12. 2: {
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 apply (rngl_squ_le_abs_le Hon Hop Hiq Hor) in H12.
 rewrite (rngl_abs_nonneg_eq Hop Hor) in H12; [ | easy ].
@@ -971,24 +971,24 @@ intros * Hzs1 Hzs2 Hzs21 Hzs22 Ht1.
 rewrite rngl_sin_mul_2_l in Hzs21, Hzs22.
 rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hzs21.
-apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hzs22.
+apply (rngl_lt_mul_0_if Hos Hor) in Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
   apply (rngl_0_le_2 Hon Hos Hor).
 }
 apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hzs21.
-apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hzs22.
+apply (rngl_lt_mul_0_if Hos Hor) in Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
   apply (rngl_le_antisymm Hor) in H1; [ | easy ].
   symmetry in H1.
   apply eq_rngl_sin_0 in H1.
   destruct H1; subst θ1; [ | easy ].
   exfalso; apply rngl_nlt_ge in H2; apply H2.
-  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 destruct Hzs22 as [(H1, _)| (_, Hzs22)]. {
   now apply rngl_nle_gt in H1.

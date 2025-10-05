@@ -175,7 +175,7 @@ destruct zs. {
         exfalso; apply rngl_nlt_ge in H2.
         apply H2; clear H2.
         rewrite Hxz.
-        apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+        apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
       } {
         rewrite Hxz in Hx; cbn in Hx; subst x.
         exfalso; clear H1 H2 Hzs.
@@ -217,7 +217,7 @@ destruct zs. {
     progress unfold seq_angle_to_div_nat in Hxz.
     apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
     apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor 2). {
-      apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
     }
     now rewrite rngl_mul_0_r.
   }
@@ -1080,9 +1080,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize rl_sqrt_half_nonneg as Hzs.
 intros * Hsz.
 rewrite rngl_sin_mul_2_l in Hsz.
-apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hsz.
+apply (rngl_lt_mul_0_if Hos Hor) in Hsz.
 destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
-  apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in H2sz.
+  apply (rngl_lt_mul_0_if Hos Hor) in H2sz.
   destruct H2sz as [(H, _)| (_, Hcz)]. {
     exfalso.
     apply rngl_nle_gt in H.
@@ -1121,7 +1121,7 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   apply (rngl_le_refl Hor).
 }
 apply (rngl_mul_pos_cancel_l Hon Hop Hiq Hor) in Hz2s. 2: {
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 left.
 change_angle_sub_r θ angle_right.
@@ -1192,7 +1192,7 @@ split. {
 intros H; symmetry in H.
 apply (eq_rl_sqrt_0 Hon Hos) in H. 2: {
   apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
-    apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   }
   apply (rngl_le_opp_l Hop Hor).
   apply rngl_cos_bound.
@@ -1200,7 +1200,7 @@ apply (eq_rl_sqrt_0 Hon Hos) in H. 2: {
 (* lemma? *)
 apply (f_equal (λ a, rngl_mul a 2)) in H.
 rewrite (rngl_div_mul Hon Hiv) in H. 2: {
-  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 }
 rewrite (rngl_mul_0_l Hos) in H.
 (* lemma? *)

@@ -527,16 +527,13 @@ Qed.
 Theorem I_ord_add_le_mono_l :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
-  if rngl_has_opp_or_psub (ideal P) then
-    ∀ a b c : ideal P, (b ≤ c)%L ↔ (a + b ≤ a + c)%L
-  else not_applicable.
+  ∀ a b c : ideal P, (b ≤ c)%L ↔ (a + b ≤ a + c)%L.
 Proof.
 intros roi Hor; cbn.
 progress unfold roi in Hor.
 rewrite rngl_is_ordered_ideal in Hor.
 remember (rngl_has_opp_or_psub (ideal P)) as os eqn:Hos.
 symmetry in Hos.
-destruct os; [ | easy ].
 progress unfold roi in Hos.
 rewrite rngl_has_opp_or_psub_ideal in Hos.
 intros.
@@ -718,6 +715,9 @@ Fixpoint List_map {A B} (f : A → B) l :=
   | (a :: t)%list => (f a :: List_map f t)%list
   end.
 
+(* present definition of rngl_ord_mul_le_compat_nonneg doesn't
+   allow ideals to have order *)
+(*
 Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
   {| rngl_ord_le_dec := I_ord_le_dec Hor;
      rngl_ord_le_refl := I_ord_le_refl Hor;
@@ -766,5 +766,6 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_characteristic_prop := I_characteristic_prop;
      rngl_opt_ord := I_ring_like_ord;
      rngl_opt_archimedean := NA |}.
+*)
 
 End a.
