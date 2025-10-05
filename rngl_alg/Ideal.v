@@ -12,11 +12,7 @@ Require Import RingLike.Misc.
 Record ideal {T} {ro : ring_like_op T} := mk_ip
   { ip_subtype : T → Prop;
     ip_zero : ip_subtype rngl_zero;
-    ip_add :
-      ∀ a b,
-        ip_subtype a
-        → ip_subtype b
-        → ip_subtype (a + b)%L;
+    ip_add : ∀ a b, ip_subtype a → ip_subtype b → ip_subtype (a + b)%L;
     ip_opp_or_psub :
       match rngl_opt_opp_or_psub T with
       | Some (inl opp) =>
