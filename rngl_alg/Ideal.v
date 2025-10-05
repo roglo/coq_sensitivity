@@ -4,8 +4,11 @@
 
 Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith.
+Import List.ListNotations.
+
 Require Import RingLike.Core.
 Require Import RingLike.Misc.
+Require Import RingLike.IterAdd.
 
 (* ideal : non empty set (type) with some properties *)
 
@@ -18,6 +21,7 @@ Record ideal {T} {ro : ring_like_op T} := mk_ip
     ip_mul_r : ∀ a b, ip_subtype a → ip_subtype (a * b)%L }.
 
 Arguments ideal T {ro}.
+Arguments ip_subtype {T ro} i a%_L.
 
 Section a.
 
@@ -66,10 +70,10 @@ Definition I_one : ideal T :=
 
 (* addition *)
 
-Definition I_add_subtype a b :=
-  λ x, ∃ y z, x = (y + z)%L ∧ ip_subtype a y ∧ ip_subtype b z.
+Definition I_add_subtype a b z :=
+  ∃ x y, z = (x + y)%L ∧ ip_subtype a x ∧ ip_subtype b y.
 
-Arguments I_add_subtype a b x%_L.
+Arguments I_add_subtype a b z%_L.
 
 Theorem I_add_zero a b : I_add_subtype a b 0%L.
 Proof.
@@ -96,7 +100,7 @@ Qed.
 Theorem I_add_opp a b : ∀ x, I_add_subtype a b x → I_add_subtype a b (- x).
 Proof.
 intros * Hx.
-destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
+destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2); subst.
 exists (- x1)%L, (- x2)%L.
 split; [ | now split; apply ip_opp ].
 rewrite rngl_add_comm.
@@ -106,31 +110,136 @@ rewrite (rngl_sub_opp_r Hop).
 now f_equal.
 Qed.
 
-(* to be completed
+Theorem I_add_mul_l a b :
+  ∀ x y, I_add_subtype a b y → I_add_subtype a b (x * y).
+Proof.
+intros * H.
+destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
+exists (x * x1)%L, (x * x2)%L.
+split; [ | now split; apply ip_mul_l ].
+apply rngl_mul_add_distr_l.
+Qed.
+
+Theorem I_add_mul_r a b :
+  ∀ x y, I_add_subtype a b x → I_add_subtype a b (x * y).
+Proof.
+intros * H.
+destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
+exists (x1 * y)%L, (x2 * y)%L.
+split; [ | now split; apply ip_mul_r ].
+apply rngl_mul_add_distr_r.
+Qed.
+
 Definition I_add (a b : ideal T): ideal T :=
   {| ip_subtype := I_add_subtype a b;
      ip_zero := I_add_zero a b;
      ip_add := I_add_add a b;
      ip_opp := I_add_opp a b;
-     ip_mul_l := true;
-     ip_mul_r := true |}.
-
-...
+     ip_mul_l := I_add_mul_l a b;
+     ip_mul_r := I_add_mul_r a b |}.
 
 (* multiplication *)
 
-Theorem I_mul_zero :
-  ∀ a b, (ip_subtype a 0 && ip_subtype b 0)%bool = true.
+Definition I_mul_subtype a b z :=
+ ∃ n lx ly,
+ length lx = n ∧ length ly = n ∧
+ (∀ x, x ∈ lx → ip_subtype a x) ∧
+ (∀ y, y ∈ ly → ip_subtype b y) ∧
+ z = ∑ (i = 1, n), lx.[i] * ly.[i].
+
+Arguments I_mul_subtype a b z%_L.
+
+Theorem I_mul_zero a b : I_mul_subtype a b 0%L.
 Proof.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+exists 0, [], [].
+split; [ easy | ].
+split; [ easy | ].
+split; [ easy | ].
+split; [ easy | ].
+symmetry.
+now apply rngl_summation_empty.
+Qed.
+
+(*
+Theorem I_mul_add a b :
+  ∀ x y,
+  I_mul_subtype a b x → I_mul_subtype a b y → I_mul_subtype a b (x + y)%L.
+Proof.
+intros * Hx Hy.
+destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
+destruct Hy as (y1 & y2 & Hy & Hy1 & Hy2).
+subst x y.
+progress unfold I_mul_subtype.
+...
+exists (x1 * y1)%L, (x2 * y2)%L.
+split; [ | now split; apply ip_add ].
+do 2 rewrite rngl_add_assoc.
+progress f_equal.
+apply rngl_add_add_swap.
+Qed.
+*)
+
+(*
+Theorem I_mul_opp a b : ∀ x, I_mul_subtype a b x → I_mul_subtype a b (- x).
+Proof.
+intros * Hx.
+destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2); subst.
+exists (- x1)%L, (- x2)%L.
+split; [ | now split; apply ip_opp ].
+rewrite rngl_add_comm.
+rewrite (rngl_add_opp_r Hop).
+rewrite <- (rngl_opp_sub_distr Hop).
+rewrite (rngl_sub_opp_r Hop).
+now f_equal.
+Qed.
+
+Theorem I_mul_mul_l a b :
+  ∀ x y, I_mul_subtype a b y → I_mul_subtype a b (x * y).
+Proof.
+intros * H.
+destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
+exists (x * x1)%L, (x * x2)%L.
+split; [ | now split; apply ip_mul_l ].
+apply rngl_mul_add_distr_l.
+Qed.
+
+Theorem I_mul_mul_r a b :
+  ∀ x y, I_mul_subtype a b x → I_mul_subtype a b (x * y).
+Proof.
+intros * H.
+destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
+exists (x1 * y)%L, (x2 * y)%L.
+split; [ | now split; apply ip_mul_r ].
+apply rngl_mul_add_distr_r.
+Qed.
+*)
+
+(* to be completed
+Definition I_mul (a b : ideal T): ideal T :=
+  {| ip_subtype := I_mul_subtype a b;
+     ip_zero := I_mul_zero a b;
+     ip_add := I_mul_add a b;
+     ip_opp := I_mul_opp a b;
+     ip_mul_l := I_mul_mul_l a b;
+     ip_mul_r := I_mul_mul_r a b |}.
+
 ...
 
+Theorem I_mul_zero a b : ip_subtype a 0 ∧ ip_subtype b 0.
+Proof. split; apply ip_zero. Qed.
+
+Theorem I_mul_zero a b : ip_subtype a 0 ∧ ip_subtype b 0.
+Proof. split; apply ip_zero. Qed.
+
+(* to be completed
 Definition I_mul (a b : ideal T): ideal T :=
-  {| ip_subtype x := (ip_subtype a x && ip_subtype b x)%bool;
+  {| ip_subtype x := ip_subtype a x ∧ ip_subtype b x;
      ip_zero := I_mul_zero a b;
-     ip_add _ _ _ _ := eq_refl;
-     ip_opp_or_psub := I_one_opp_or_psub;
-     ip_mul_l := I_one_mul;
-     ip_mul_r := I_one_mul |}.
+     ip_add := true;
+     ip_opp := true;
+     ip_mul_l := true;
+     ip_mul_r := true |}.
 
 ...
 
