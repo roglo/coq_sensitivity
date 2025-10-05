@@ -13,18 +13,7 @@ Record ideal {T} {ro : ring_like_op T} := mk_ip
   { ip_subtype : T → Prop;
     ip_zero : ip_subtype rngl_zero;
     ip_add : ∀ a b, ip_subtype a → ip_subtype b → ip_subtype (a + b)%L;
-    ip_opp_or_psub :
-      match rngl_opt_opp_or_psub T with
-      | Some (inl opp) =>
-          ∀ a, ip_subtype a → ip_subtype (opp a)%L
-      | Some (inr psub) =>
-          ∀ a b,
-          ip_subtype a
-          → ip_subtype b
-          → ip_subtype (psub a b)
-      | None =>
-          not_applicable
-      end;
+    ip_opp : ∀ a, ip_subtype a → ip_subtype (- a)%L;
     ip_mul_l : ∀ a b, ip_subtype b → ip_subtype (a * b)%L;
     ip_mul_r : ∀ a b, ip_subtype a → ip_subtype (a * b)%L }.
 
@@ -36,91 +25,42 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rr : ring_like_ord T}.
 Context {rp : ring_like_prop T}.
-Context {Hos : rngl_has_opp_or_psub T = true}.
+Context {Hop : rngl_has_opp T = true}.
 Context {Heo : rngl_has_eq_dec_or_order T = true}.
 
 (* 0 and 1 *)
 
-Theorem I_zero_add : ∀ a b : T, a = 0%L → b = 0%L → (a + b = 0)%L.
+Theorem I_zero_add a b : a = 0%L → b = 0%L → (a + b = 0)%L.
+Proof. intros; subst; apply rngl_add_0_l. Qed.
+
+Theorem I_zero_opp a : a = 0%L → (- a = 0)%L.
+Proof. intros; subst; apply (rngl_opp_0 Hop). Qed.
+
+Theorem I_zero_mul_l a b : b = 0%L → (a * b = 0)%L.
 Proof.
-intros; subst.
-apply rngl_add_0_l.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+intros; subst; apply (rngl_mul_0_r Hos).
 Qed.
 
-Theorem I_zero_opp_or_psub :
-  match rngl_opt_opp_or_psub T with
-  | Some (inl opp) => ∀ a : T, a = 0%L → opp a = 0%L
-  | Some (inr psub) => ∀ a b : T, a = 0%L → b = 0%L → psub a b = 0%L
-  | None => not_applicable
-  end.
+Theorem I_zero_mul_r a b : a = 0%L → (a * b = 0)%L.
 Proof.
-remember (rngl_has_opp T) as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  specialize (rngl_opp_0 Hop) as H.
-  progress unfold rngl_opp in H.
-  progress unfold rngl_has_opp in Hop.
-  destruct (rngl_opt_opp_or_psub T) as [op| ]; [ | easy ].
-  destruct op as [opp| ]; [ | easy ].
-  now intros; subst.
-}
-remember (rngl_has_psub T) as su eqn:Hsu.
-symmetry in Hsu.
-destruct su. {
-  specialize rngl_opt_sub_0_l as H.
-  rewrite Hsu in H.
-  specialize (H 0)%L.
-  progress unfold rngl_sub in H.
-  rewrite Hop, Hsu in H.
-  progress unfold rngl_psub in H.
-  progress unfold rngl_has_opp in Hop.
-  destruct (rngl_opt_opp_or_psub T) as [op| ]; [ | easy ].
-  destruct op as [| psub ]; [ easy | ].
-  now intros; subst.
-}
-progress unfold rngl_has_opp in Hop.
-progress unfold rngl_has_psub in Hsu.
-destruct (rngl_opt_opp_or_psub T) as [op| ]; [ | easy ].
-now destruct op.
-Qed.
-
-Theorem I_zero_mul_l : ∀ a b : T, b = 0%L → (a * b = 0)%L.
-Proof.
-intros; subst.
-apply (rngl_mul_0_r Hos).
-Qed.
-
-Theorem I_zero_mul_r : ∀ a b : T, a = 0%L → (a * b = 0)%L.
-Proof.
-intros; subst.
-apply (rngl_mul_0_l Hos).
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+intros; subst; apply (rngl_mul_0_l Hos).
 Qed.
 
 Definition I_zero : ideal T :=
   {| ip_subtype a := a = 0%L;
      ip_zero := eq_refl;
      ip_add := I_zero_add;
-     ip_opp_or_psub := I_zero_opp_or_psub;
+     ip_opp := I_zero_opp;
      ip_mul_l := I_zero_mul_l;
      ip_mul_r := I_zero_mul_r |}.
-
-Theorem I_one_opp_or_psub :
-  match rngl_opt_opp_or_psub T with
-  | Some (inl _) => T → True → True
-  | Some (inr _) => T → T → True → True → True
-  | None => not_applicable
-  end.
-Proof.
-progress unfold rngl_has_opp_or_psub in Hos.
-destruct (rngl_opt_opp_or_psub T) as [os| ]; [ | easy ].
-now destruct os.
-Qed.
 
 Definition I_one : ideal T :=
   {| ip_subtype a := True;
      ip_zero := I;
      ip_add _ _ _ _ := I;
-     ip_opp_or_psub := I_one_opp_or_psub;
+     ip_opp _ _ := I;
      ip_mul_l _ _ _ := I;
      ip_mul_r _ _ _ := I |}.
 
@@ -128,6 +68,8 @@ Definition I_one : ideal T :=
 
 Definition I_add_subtype a b :=
   λ x, ∃ y z, x = (y + z)%L ∧ ip_subtype a y ∧ ip_subtype b z.
+
+Arguments I_add_subtype a b x%_L.
 
 Theorem I_add_zero a b : I_add_subtype a b 0%L.
 Proof.
@@ -151,58 +93,25 @@ progress f_equal.
 apply rngl_add_add_swap.
 Qed.
 
-(* to be completed
-Theorem I_add_opp_or_psub a b :
-  match rngl_opt_opp_or_psub T with
-  | Some (inl opp) =>
-      ∀ x : T, I_add_subtype a b x → I_add_subtype a b (opp x)
-  | Some (inr psub) =>
-      ∀ x y : T,
-      I_add_subtype a b x
-      → I_add_subtype a b y
-      → I_add_subtype a b (psub x y)
-  | None => not_applicable
-  end.
+Theorem I_add_opp a b : ∀ x, I_add_subtype a b x → I_add_subtype a b (- x).
 Proof.
-specialize (rngl_opp_add_distr) as H1.
-specialize (ip_opp_or_psub a) as Ha.
-specialize (ip_opp_or_psub b) as Hb.
-progress unfold rngl_has_opp in H1.
-progress unfold rngl_has_opp_or_psub in Hos.
-progress unfold rngl_sub in H1.
-progress unfold rngl_opp in H1.
-progress unfold rngl_has_opp in H1.
-destruct (rngl_opt_opp_or_psub T) as [os| ]; [ | easy ].
-destruct os as [opp| psub]. {
-  specialize (H1 eq_refl).
-  intros * Hx.
-  destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
-  subst.
-  rewrite H1.
-  exists (opp x1), (opp x2).
-  split; [ easy | ].
-  now split; [ apply Ha | apply Hb ].
-} {
-  intros * Hx Hy.
-  destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
-  destruct Hy as (y1 & y2 & Hy & Hy1 & Hy2).
-  subst.
-  exists (x1 - y1)%L, (x2 - y2)%L.
-(* bon, y a pas à chier, je crois bien qu'il faut qu'il y ait
-   un opposé, et qu'une soustraction primitive ne suffirait pas *)
-Theorem glop :
-  ∀ x1 x2 y1 y2, ((x1 + x2) - (y1 + y2) = (x1 - y1) + (x2 - y2))%L.
-Proof.
-intros.
-rewrite (rngl_sub_add_distr Hos).
-rewrite (rngl_add_sub_assoc).
-...
+intros * Hx.
+destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
+exists (- x1)%L, (- x2)%L.
+split; [ | now split; apply ip_opp ].
+rewrite rngl_add_comm.
+rewrite (rngl_add_opp_r Hop).
+rewrite <- (rngl_opp_sub_distr Hop).
+rewrite (rngl_sub_opp_r Hop).
+now f_equal.
+Qed.
 
+(* to be completed
 Definition I_add (a b : ideal T): ideal T :=
   {| ip_subtype := I_add_subtype a b;
      ip_zero := I_add_zero a b;
      ip_add := I_add_add a b;
-     ip_opp_or_psub := I_add_opp_or_psub a b;
+     ip_opp := I_add_opp a b;
      ip_mul_l := true;
      ip_mul_r := true |}.
 
