@@ -5,9 +5,11 @@
 Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith.
 Import List.ListNotations.
+Import Init.Nat.
 
 Require Import RingLike.Core.
 Require Import RingLike.Misc.
+Require Import RingLike.Utils.
 Require Import RingLike.IterAdd.
 
 (* ideal : non empty set (type) with some properties *)
@@ -161,16 +163,28 @@ symmetry.
 now apply rngl_summation_empty.
 Qed.
 
-(*
+(* to be completed
 Theorem I_mul_add a b :
   ∀ x y,
   I_mul_subtype a b x → I_mul_subtype a b y → I_mul_subtype a b (x + y)%L.
 Proof.
 intros * Hx Hy.
-destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
-destruct Hy as (y1 & y2 & Hy & Hy1 & Hy2).
+destruct Hx as (nx & lx1 & lx2 & Hlx1 & Hlx2 & Hx1 & Hx2 & Hx).
+destruct Hy as (ny & ly1 & ly2 & Hly1 & Hly2 & Hy1 & Hy2 & Hy).
 subst x y.
 progress unfold I_mul_subtype.
+exists (max nx ny).
+remember
+  (List_map2 rngl_mul
+     (lx1 ++ List.repeat 0%L (ny - nx)) (ly1 ++ List.repeat 0%L (nx - ny)))
+    as la eqn:Ha.
+exists la.
+remember
+  (List_map2 rngl_mul
+     (lx2 ++ List.repeat 0%L (ny - nx)) (ly2 ++ List.repeat 0%L (nx - ny)))
+    as lb eqn:Hb.
+exists lb.
+(* non, c'est pas ça... *)
 ...
 exists (x1 * y1)%L, (x2 * y2)%L.
 split; [ | now split; apply ip_add ].
@@ -232,7 +246,6 @@ Proof. split; apply ip_zero. Qed.
 Theorem I_mul_zero a b : ip_subtype a 0 ∧ ip_subtype b 0.
 Proof. split; apply ip_zero. Qed.
 
-(* to be completed
 Definition I_mul (a b : ideal T): ideal T :=
   {| ip_subtype x := ip_subtype a x ∧ ip_subtype b x;
      ip_zero := I_mul_zero a b;
