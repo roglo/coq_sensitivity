@@ -94,11 +94,16 @@ Definition I_psub (a b : ideal P) : ideal P :=
 
 (* less equal *)
 
+(* present definition of rngl_ord_mul_le_compat_nonneg doesn't
+   allow ideals to have order *)
+Definition I_opt_leb : option (ideal P → ideal P → bool) := None.
+(*
 Definition I_opt_leb : option (ideal P → ideal P → bool) :=
   match rngl_opt_leb with
   | Some leb => Some (λ a b : ideal P, leb (i_val a) (i_val b))
   | None => None
   end.
+*)
 
 (* equality in ideals is equivalent to equality in their values,
    because the proof of their properties (i_mem), being an equality
@@ -411,6 +416,7 @@ unfold I_psub, I_add; cbn.
 apply H1.
 Qed.
 
+(*
 Theorem I_ord_le_dec :
   let roi := I_ring_like_op : ring_like_op (ideal P) in
   rngl_is_ordered (ideal P) = true →
@@ -513,6 +519,7 @@ progress unfold rngl_is_ordered; cbn.
 progress unfold I_opt_leb.
 now destruct rngl_opt_leb.
 Qed.
+*)
 
 Theorem rngl_has_opp_or_psub_ideal :
   let roi := I_ring_like_op : ring_like_op (ideal P) in
@@ -524,6 +531,7 @@ destruct (rngl_opt_opp_or_psub T) as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
+(*
 Theorem I_ord_add_le_mono_l :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
@@ -544,6 +552,7 @@ progress unfold rngl_le; cbn.
 progress unfold I_opt_leb.
 now destruct (rngl_opt_leb).
 Qed.
+*)
 
 Theorem I_ord_mul_le_compat_nonneg :
   let roi := I_ring_like_op in
@@ -567,6 +576,7 @@ intros roi Hor; cbn.
 now rewrite Bool.andb_false_r.
 Qed.
 
+(*
 Theorem I_ord_not_le :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
@@ -599,6 +609,7 @@ destruct rngl_opt_leb as [le| ]. {
 }
 now specialize (H2 Hab).
 Qed.
+*)
 
 Theorem I_opt_integral :
   let roi := I_ring_like_op in
@@ -715,8 +726,6 @@ Fixpoint List_map {A B} (f : A → B) l :=
   | (a :: t)%list => (f a :: List_map f t)%list
   end.
 
-(* present definition of rngl_ord_mul_le_compat_nonneg doesn't
-   allow ideals to have order *)
 (*
 Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
   {| rngl_ord_le_dec := I_ord_le_dec Hor;
@@ -739,6 +748,7 @@ symmetry in Hor.
 destruct or; [ | easy ].
 apply (I_ring_like_when_ord Hor).
 Qed.
+*)
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
@@ -764,8 +774,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := I_characteristic_prop;
-     rngl_opt_ord := I_ring_like_ord;
+     rngl_opt_ord := NA; (*I_ring_like_ord;*)
      rngl_opt_archimedean := NA |}.
-*)
 
 End a.
