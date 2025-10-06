@@ -24,6 +24,7 @@ Record ideal {T} {ro : ring_like_op T} := mk_ip
 
 Arguments ideal T {ro}.
 Arguments ip_subtype {T ro} i a%_L.
+Arguments ip_opp {T ro} i a%_L.
 
 Section a.
 
@@ -306,32 +307,10 @@ Definition I_mul (a b : ideal T) : ideal T :=
 
 (* opposite *)
 
-(*
-Theorem I_opp_prop : ∀ a : ideal P, P (- i_val a)%L = true.
-Proof.
-intros.
-specialize ip_opp_or_psub as H1.
-unfold rngl_opp.
-destruct rngl_opt_opp_or_psub as [os| ]; [ | apply ip_zero ].
-destruct os as [opp| psub]; [ | apply ip_zero ].
-apply H1, a.
-Qed.
-*)
-
 (* to be completed
-Definition I_opp_subtype a z :=
-...
-  ∃ n lx ly,
-  length lx = n ∧ length ly = n ∧
-  (∀ x, x ∈ lx → ip_subtype a x) ∧
-  (∀ y, y ∈ ly → ip_subtype b y) ∧
-  z = ∑ (i = 1, n), lx.[i-1] * ly.[i-1].
-
-...
-
 Definition I_opp (a : ideal T) : ideal T :=
-  {| ip_subtype := I_opp_subtype a;
-     ip_zero := true; (*I_opp_zero a;*)
+  {| ip_subtype z := ip_subtype a (-z);
+     ip_zero := ip_opp a 0 (ip_zero a);
      ip_add := true; (*I_opp_add a;*)
      ip_opp := true; (*I_opp_opp a;*)
      ip_mul_l := true; (*I_opp_mul_l a;*)
