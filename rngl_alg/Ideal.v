@@ -143,11 +143,11 @@ Definition I_add (a b : ideal T): ideal T :=
 (* multiplication *)
 
 Definition I_mul_subtype a b z :=
- ∃ n lx ly,
- length lx = n ∧ length ly = n ∧
- (∀ x, x ∈ lx → ip_subtype a x) ∧
- (∀ y, y ∈ ly → ip_subtype b y) ∧
- z = ∑ (i = 1, n), lx.[i] * ly.[i].
+  ∃ n lx ly,
+  length lx = n ∧ length ly = n ∧
+  (∀ x, x ∈ lx → ip_subtype a x) ∧
+  (∀ y, y ∈ ly → ip_subtype b y) ∧
+  z = ∑ (i = 1, n), lx.[i-1] * ly.[i-1].
 
 Arguments I_mul_subtype a b z%_L.
 
@@ -163,7 +163,6 @@ symmetry.
 now apply rngl_summation_empty.
 Qed.
 
-(* to be completed
 Theorem I_mul_add a b :
   ∀ x y,
   I_mul_subtype a b x → I_mul_subtype a b y → I_mul_subtype a b (x + y)%L.
@@ -189,23 +188,59 @@ split. {
   apply List.in_app_or in Hy.
   now destruct Hy; [ apply Hb1 | apply Hb2 ].
 }
-...
-*)
+symmetry.
+rewrite (rngl_summation_split nx); [ | flia ].
+f_equal. {
+  apply rngl_summation_eq_compat.
+  intros i Hi.
+  rewrite List.app_nth1; [ | flia Hla1 Hi ].
+  rewrite List.app_nth1; [ | flia Hlb1 Hi ].
+  easy.
+}
+destruct (Nat.eq_dec ny 0) as [Hnyz| Hnyz]. {
+  move Hnyz at top; subst ny.
+  rewrite rngl_summation_empty; [ | flia ].
+  rewrite rngl_summation_empty; [ | flia ].
+  easy.
+} {
+  rewrite (rngl_summation_shift nx); [ | flia Hnyz ].
+  do 2 rewrite Nat.add_comm, Nat.add_sub.
+  apply rngl_summation_eq_compat.
+  intros i Hi.
+  rewrite List.app_nth2; [ | flia Hla1 Hi ].
+  rewrite List.app_nth2; [ | flia Hlb1 Hi ].
+  rewrite Hla1, Hlb1.
+  f_equal; f_equal; flia.
+}
+Qed.
 
-(*
 Theorem I_mul_opp a b : ∀ x, I_mul_subtype a b x → I_mul_subtype a b (- x).
 Proof.
 intros * Hx.
-destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2); subst.
-exists (- x1)%L, (- x2)%L.
-split; [ | now split; apply ip_opp ].
-rewrite rngl_add_comm.
-rewrite (rngl_add_opp_r Hop).
-rewrite <- (rngl_opp_sub_distr Hop).
-rewrite (rngl_sub_opp_r Hop).
-now f_equal.
+destruct Hx as (n & la & lb & Hla & Hlb & Ha & Hb & Hx).
+subst x.
+progress unfold I_mul_subtype.
+exists n, (List.map rngl_opp la), lb.
+rewrite List.length_map.
+split; [ easy | ].
+split; [ easy | ].
+split. {
+  intros x Hx.
+  apply List.in_map_iff in Hx.
+  destruct Hx as (y & Hyx & Hy).
+  subst x.
+  now apply ip_opp, Ha.
+}
+split; [ easy | ].
+rewrite (rngl_opp_summation Hop).
+apply rngl_summation_eq_compat.
+intros i Hi.
+rewrite <- (rngl_mul_opp_l Hop).
+progress f_equal.
+rewrite (List_map_nth' 0%L); [ easy | flia Hi Hla ].
 Qed.
 
+(*
 Theorem I_mul_mul_l a b :
   ∀ x y, I_mul_subtype a b y → I_mul_subtype a b (x * y).
 Proof.
