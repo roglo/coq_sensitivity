@@ -169,29 +169,27 @@ Theorem I_mul_add a b :
   I_mul_subtype a b x → I_mul_subtype a b y → I_mul_subtype a b (x + y)%L.
 Proof.
 intros * Hx Hy.
-destruct Hx as (nx & lx1 & lx2 & Hlx1 & Hlx2 & Hx1 & Hx2 & Hx).
-destruct Hy as (ny & ly1 & ly2 & Hly1 & Hly2 & Hy1 & Hy2 & Hy).
+destruct Hx as (nx & la1 & lb1 & Hla1 & Hlb1 & Ha1 & Hb1 & Hx).
+destruct Hy as (ny & la2 & lb2 & Hla2 & Hlb2 & Ha2 & Hb2 & Hy).
 subst x y.
 progress unfold I_mul_subtype.
-exists (max nx ny).
-remember
-  (List_map2 rngl_mul
-     (lx1 ++ List.repeat 0%L (ny - nx)) (ly1 ++ List.repeat 0%L (nx - ny)))
-    as la eqn:Ha.
-exists la.
-remember
-  (List_map2 rngl_mul
-     (lx2 ++ List.repeat 0%L (ny - nx)) (ly2 ++ List.repeat 0%L (nx - ny)))
-    as lb eqn:Hb.
-exists lb.
-(* non, c'est pas ça... *)
+exists (nx + ny).
+exists (la1 ++ la2), (lb1 ++ lb2).
+do 2 rewrite List.length_app.
+rewrite Hla1, Hlb1, Hla2, Hlb2.
+split; [ easy | ].
+split; [ easy | ].
+split. {
+  intros x Hx.
+  apply List.in_app_or in Hx.
+  now destruct Hx; [ apply Ha1 | apply Ha2 ].
+}
+split. {
+  intros y Hy.
+  apply List.in_app_or in Hy.
+  now destruct Hy; [ apply Hb1 | apply Hb2 ].
+}
 ...
-exists (x1 * y1)%L, (x2 * y2)%L.
-split; [ | now split; apply ip_add ].
-do 2 rewrite rngl_add_assoc.
-progress f_equal.
-apply rngl_add_add_swap.
-Qed.
 *)
 
 (*
