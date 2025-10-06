@@ -404,11 +404,33 @@ Theorem I_add_comm : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
 progress unfold I_add.
+Print I_add_subtype.
+...
 Theorem glop :
   ∀ a b z, I_add_subtype a b z = I_add_subtype b a z.
 Proof.
 intros.
 progress unfold I_add_subtype.
+Axiom toto :
+  ∀ A (P Q : A → A → Prop),
+  (∀ x y, P x y ↔ Q x y)
+  → (∃ x y, P x y) = (∃ x y, Q x y).
+apply toto.
+intros.
+split; intros (H1 & H2 & H3). {
+  split; [ easy | ].
+...
+f_equal.
+apply and_comm.
+split. {
+ intros H.
+...
+specialize (toto T) as H1.
+set (P := λ x y, z = (x + y)%L ∧ ip_subtype a x ∧ ip_subtype b y).
+set (Q := λ x y, z = (x + y)%L ∧ ip_subtype b x ∧ ip_subtype a y).
+specialize (H1 P Q).
+subst P Q.
+cbn in H1.
 ...
 
 (*
