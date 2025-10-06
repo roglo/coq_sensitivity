@@ -26,14 +26,20 @@ Arguments ideal T {ro}.
 Arguments ip_subtype {T ro} i a%_L.
 Arguments ip_opp {T ro} i a%_L.
 
+Class ideal_ctx T {ro : ring_like_op T} :=
+  { ic_op : rngl_has_opp T = true;
+    ic_eo : rngl_has_eq_dec_or_order T = true }.
+
+Ltac destruct_ic :=
+  set (Hop := ic_op);
+  set (Hos := rngl_has_opp_has_opp_or_psub Hop).
+
 Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
-Context {rr : ring_like_ord T}.
 Context {rp : ring_like_prop T}.
-Context {Hop : rngl_has_opp T = true}.
-Context {Heo : rngl_has_eq_dec_or_order T = true}.
+Context {ic : ideal_ctx T}.
 
 (* 0 and 1 *)
 
@@ -41,17 +47,17 @@ Theorem I_zero_add a b : a = 0%L → b = 0%L → (a + b = 0)%L.
 Proof. intros; subst; apply rngl_add_0_l. Qed.
 
 Theorem I_zero_opp a : a = 0%L → (- a = 0)%L.
-Proof. intros; subst; apply (rngl_opp_0 Hop). Qed.
+Proof. destruct_ic; intros; subst; apply (rngl_opp_0 Hop). Qed.
 
 Theorem I_zero_mul_l a b : b = 0%L → (a * b = 0)%L.
 Proof.
-specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+destruct_ic.
 intros; subst; apply (rngl_mul_0_r Hos).
 Qed.
 
 Theorem I_zero_mul_r a b : a = 0%L → (a * b = 0)%L.
 Proof.
-specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+destruct_ic.
 intros; subst; apply (rngl_mul_0_l Hos).
 Qed.
 
@@ -102,6 +108,7 @@ Qed.
 
 Theorem I_add_opp a b : ∀ x, I_add_subtype a b x → I_add_subtype a b (- x).
 Proof.
+destruct_ic.
 intros * Hx.
 destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2); subst.
 exists (- x1)%L, (- x2)%L.
@@ -154,7 +161,7 @@ Arguments I_mul_subtype a b z%_L.
 
 Theorem I_mul_zero a b : I_mul_subtype a b 0%L.
 Proof.
-specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+destruct_ic.
 exists 0, [], [].
 split; [ easy | ].
 split; [ easy | ].
@@ -217,6 +224,7 @@ Qed.
 
 Theorem I_mul_opp a b : ∀ x, I_mul_subtype a b x → I_mul_subtype a b (- x).
 Proof.
+destruct_ic.
 intros * Hx.
 destruct Hx as (n & la & lb & Hla & Hlb & Ha & Hb & Hx).
 subst x.
@@ -244,7 +252,7 @@ Qed.
 Theorem I_mul_mul_l a b :
   ∀ x y, I_mul_subtype a b y → I_mul_subtype a b (x * y).
 Proof.
-specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+destruct_ic.
 intros * H.
 destruct H as (n & la & lb & Hla & Hlb & Ha & Hb & H).
 subst y.
@@ -272,7 +280,7 @@ Qed.
 Theorem I_mul_mul_r a b :
   ∀ x y, I_mul_subtype a b x → I_mul_subtype a b (x * y).
 Proof.
-specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+destruct_ic.
 intros * H.
 destruct H as (n & la & lb & Hla & Hlb & Ha & Hb & H).
 subst x.
@@ -310,6 +318,7 @@ Definition I_mul (a b : ideal T) : ideal T :=
 Theorem I_opp_add a :
   ∀ x y, ip_subtype a (- x) → ip_subtype a (- y) → ip_subtype a (- (x + y)%L).
 Proof.
+destruct_ic.
 intros * Hx Hy.
 apply ip_opp in Hx, Hy.
 rewrite (rngl_opp_involutive Hop) in Hx, Hy.
@@ -320,6 +329,7 @@ Qed.
 Theorem I_opp_mul_l a :
   ∀ x y, ip_subtype a (- y) → ip_subtype a (- (x * y)%L).
 Proof.
+destruct_ic.
 intros * H.
 apply ip_opp, ip_mul_l.
 rewrite <- (rngl_opp_involutive Hop).
@@ -329,6 +339,7 @@ Qed.
 Theorem I_opp_mul_r a :
   ∀ x y, ip_subtype a (- x) → ip_subtype a (- (x * y)%L).
 Proof.
+destruct_ic.
 intros * H.
 apply ip_opp, ip_mul_r.
 rewrite <- (rngl_opp_involutive Hop).
@@ -345,7 +356,6 @@ Definition I_opp (a : ideal T) : ideal T :=
 
 (* ideal ring like op *)
 
-(* to be completed
 Definition I_ring_like_op : ring_like_op (ideal T) :=
   {| rngl_zero := I_zero;
      rngl_add := I_add;
@@ -354,99 +364,46 @@ Definition I_ring_like_op : ring_like_op (ideal T) :=
      rngl_opt_opp_or_psub :=
        match rngl_opt_opp_or_psub T with
        | Some (inl _) => Some (inl I_opp)
-       | Some (inr _) => Some (inr I_psub)
-       | None => None
+       | _ => None
        end;
      rngl_opt_inv_or_pdiv := None;
-     rngl_opt_is_zero_divisor :=
-       match rngl_opt_is_zero_divisor T with
-       | Some f => Some (λ i, f (i_val i))
-       | None => None
-       end;
-     rngl_opt_eq_dec := I_opt_eq_dec;
-     rngl_opt_leb := I_opt_leb |}.
+     rngl_opt_is_zero_divisor := Some (λ _, True);
+     rngl_opt_eq_dec := None;
+     rngl_opt_leb := None |}.
 
-...
+End a.
 
-(* primitive subtraction *)
+Declare Scope ideal_scope.
+Delimit Scope ideal_scope with I.
+Bind Scope ideal_scope with ideal.
 
+Notation "0" := I_zero : ideal_scope.
+Notation "1" := I_one : ideal_scope.
+Notation "a + b" := (I_add a b) : ideal_scope.
 (*
-Theorem I_psub_prop :
-  ∀ (a b : ideal P), P (rngl_psub (i_val a) (i_val b)) = true.
-Proof.
-intros.
-specialize ip_opp_or_psub as H1.
-unfold rngl_psub.
-destruct rngl_opt_opp_or_psub as [os| ]; [ | apply ip_zero ].
-destruct os as [opp| psub]; [ apply ip_zero | ].
-apply H1; [ apply a | apply b ].
-Qed.
-
-Definition I_psub (a b : ideal P) : ideal P :=
-  mk_I (rngl_psub (i_val a) (i_val b)) (I_psub_prop a b).
+Notation "a - b" := (rngl_sub a b) : ideal_scope.
+Notation "a * b" := (rngl_mul a b) : ideal_scope.
+Notation "- a" := (rngl_opp a) : ideal_scope.
 *)
 
-(* less equal *)
+Section a.
 
-(* present definition of rngl_ord_mul_le_compat_nonneg doesn't
-   allow ideals to have order *)
-...
-Definition I_opt_leb : option (ideal P → ideal P → bool) := None.
-(*
-Definition I_opt_leb : option (ideal P → ideal P → bool) :=
-  match rngl_opt_leb with
-  | Some leb => Some (λ a b : ideal P, leb (i_val a) (i_val b))
-  | None => None
-  end.
-*)
-
-(* equality in ideals is equivalent to equality in their values,
-   because the proof of their properties (i_mem), being an equality
-   between booleans, is unique *)
-
-Theorem eq_ideal_eq : ∀ (a b : ideal P), i_val a = i_val b ↔ a = b.
-Proof.
-intros.
-split; intros Hab; [ | now subst ].
-destruct a as (a, pa).
-destruct b as (b, pb).
-cbn in Hab.
-subst b.
-f_equal.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-Qed.
-
-Theorem neq_ideal_neq : ∀ (a b : ideal P), i_val a ≠ i_val b ↔ a ≠ b.
-Proof.
-intros.
-now split; intros Hab H; apply Hab, eq_ideal_eq.
-Qed.
-
-(* eq_dec *)
-
-Definition I_eq_dec (eq_dec : ∀ a b : T, {a = b} + {a ≠ b}) (a b : ideal P) :=
-  eq_dec (i_val a) (i_val b).
-
-Theorem I_opt_eq_dec : option (∀ a b : ideal P, {a = b} + {a ≠ b}).
-Proof.
-destruct (rngl_opt_eq_dec T) as [rngl_eq_dec| ]; [ | apply None ].
-specialize (I_eq_dec rngl_eq_dec) as H1.
-eapply Some.
-intros.
-specialize (H1 a b).
-destruct H1 as [H1| H1]; [ left | right ]. {
-  now apply eq_ideal_eq.
-} {
-  now apply neq_ideal_neq.
-}
-Qed.
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {ic : ideal_ctx T}.
 
 (* ideal ring like prop *)
 
-Theorem I_add_comm : let roi := I_ring_like_op in
-  ∀ a b : ideal P, (a + b)%L = (b + a)%L.
-Proof. intros; apply eq_ideal_eq, rngl_add_comm. Qed.
+(* to be completed
+Theorem I_add_comm : ∀ a b, (a + b)%I = (b + a)%I.
+Proof.
+intros.
+progress unfold I_add.
+Print ideal.
+...
 
+(*
 Theorem I_add_assoc : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a + (b + c))%L = (a + b + c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_add_assoc. Qed.
@@ -689,7 +646,6 @@ unfold I_psub, I_add; cbn.
 apply H1.
 Qed.
 
-(*
 Theorem I_ord_le_dec :
   let roi := I_ring_like_op : ring_like_op (ideal P) in
   rngl_is_ordered (ideal P) = true →
@@ -792,7 +748,6 @@ progress unfold rngl_is_ordered; cbn.
 progress unfold I_opt_leb.
 now destruct rngl_opt_leb.
 Qed.
-*)
 
 Theorem rngl_has_opp_or_psub_ideal :
   let roi := I_ring_like_op : ring_like_op (ideal P) in
@@ -804,7 +759,6 @@ destruct (rngl_opt_opp_or_psub T) as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
-(*
 Theorem I_ord_add_le_mono_l :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
@@ -825,7 +779,6 @@ progress unfold rngl_le; cbn.
 progress unfold I_opt_leb.
 now destruct (rngl_opt_leb).
 Qed.
-*)
 
 Theorem I_ord_mul_le_compat_nonneg :
   let roi := I_ring_like_op in
@@ -849,7 +802,6 @@ intros roi Hor; cbn.
 now rewrite Bool.andb_false_r.
 Qed.
 
-(*
 Theorem I_ord_not_le :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
@@ -882,7 +834,6 @@ destruct rngl_opt_leb as [le| ]. {
 }
 now specialize (H2 Hab).
 Qed.
-*)
 
 Theorem I_opt_integral :
   let roi := I_ring_like_op in
@@ -999,7 +950,6 @@ Fixpoint List_map {A B} (f : A → B) l :=
   | (a :: t)%list => (f a :: List_map f t)%list
   end.
 
-(*
 Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
   {| rngl_ord_le_dec := I_ord_le_dec Hor;
      rngl_ord_le_refl := I_ord_le_refl Hor;
@@ -1023,30 +973,31 @@ apply (I_ring_like_when_ord Hor).
 Qed.
 *)
 
-Definition I_ring_like_prop : ring_like_prop (ideal P) :=
+Definition I_ring_like_prop : ring_like_prop (ideal T) :=
+  let roi := I_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;
      rngl_add_comm := I_add_comm;
-     rngl_add_assoc := I_add_assoc;
-     rngl_add_0_l := I_add_0_l;
-     rngl_mul_assoc := I_mul_assoc;
-     rngl_opt_mul_1_l := I_opt_mul_1_l;
-     rngl_mul_add_distr_l := I_mul_add_distr_l;
-     rngl_opt_mul_comm := I_opt_mul_comm;
-     rngl_opt_mul_1_r := I_opt_mul_1_r;
-     rngl_opt_mul_add_distr_r := I_opt_mul_add_distr_r;
-     rngl_opt_add_opp_diag_l := I_opt_add_opp_diag_l;
-     rngl_opt_add_sub := I_opt_add_sub;
-     rngl_opt_sub_add_distr := I_opt_sub_add_distr;
-     rngl_opt_sub_0_l := I_opt_sub_0_l;
+     rngl_add_assoc := true; (*I_add_assoc;*)
+     rngl_add_0_l := true; (*I_add_0_l;*)
+     rngl_mul_assoc := true; (*I_mul_assoc;*)
+     rngl_opt_mul_1_l := true; (*I_opt_mul_1_l;*)
+     rngl_mul_add_distr_l := true; (*I_mul_add_distr_l;*)
+     rngl_opt_mul_comm := true; (*I_opt_mul_comm;*)
+     rngl_opt_mul_1_r := true; (*I_opt_mul_1_r;*)
+     rngl_opt_mul_add_distr_r := true; (*I_opt_mul_add_distr_r;*)
+     rngl_opt_add_opp_diag_l := true; (*I_opt_add_opp_diag_l;*)
+     rngl_opt_add_sub := true; (*I_opt_add_sub;*)
+     rngl_opt_sub_add_distr := true; (*I_opt_sub_add_distr;*)
+     rngl_opt_sub_0_l := true; (*I_opt_sub_0_l;*)
      rngl_opt_mul_inv_diag_l := NA;
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
-     rngl_opt_integral := I_opt_integral;
+     rngl_opt_integral := true; (*I_opt_integral;*)
      rngl_opt_alg_closed := NA;
-     rngl_opt_characteristic_prop := I_characteristic_prop;
+     rngl_opt_characteristic_prop := true; (*I_characteristic_prop;*)
      rngl_opt_ord := NA; (*I_ring_like_ord;*)
      rngl_opt_archimedean := NA |}.
 *)
