@@ -319,10 +319,10 @@ Qed.
 
 (* to be completed
 Definition I_opp (a : ideal T) : ideal T :=
-  {| ip_subtype z := ip_subtype a (-z);
+  {| ip_subtype x := ip_subtype a (-x);
      ip_zero := ip_opp a 0 (ip_zero a);
      ip_add := I_opp_add a;
-     ip_opp := true; (*I_opp_opp a;*)
+     ip_opp x := ip_opp a (-x);
      ip_mul_l := true; (*I_opp_mul_l a;*)
      ip_mul_r := true (*I_opp_mul_r a*) |}.
 
