@@ -317,19 +317,35 @@ apply ip_opp.
 now apply ip_add.
 Qed.
 
-(* to be completed
+Theorem I_opp_mul_l a :
+  ∀ x y, ip_subtype a (- y) → ip_subtype a (- (x * y)%L).
+Proof.
+intros * H.
+apply ip_opp, ip_mul_l.
+rewrite <- (rngl_opp_involutive Hop).
+now apply ip_opp.
+Qed.
+
+Theorem I_opp_mul_r a :
+  ∀ x y, ip_subtype a (- x) → ip_subtype a (- (x * y)%L).
+Proof.
+intros * H.
+apply ip_opp, ip_mul_r.
+rewrite <- (rngl_opp_involutive Hop).
+now apply ip_opp.
+Qed.
+
 Definition I_opp (a : ideal T) : ideal T :=
   {| ip_subtype x := ip_subtype a (-x);
      ip_zero := ip_opp a 0 (ip_zero a);
      ip_add := I_opp_add a;
      ip_opp x := ip_opp a (-x);
-     ip_mul_l := true; (*I_opp_mul_l a;*)
-     ip_mul_r := true (*I_opp_mul_r a*) |}.
-
-...
+     ip_mul_l := I_opp_mul_l a;
+     ip_mul_r := I_opp_mul_r a |}.
 
 (* ideal ring like op *)
 
+(* to be completed
 Definition I_ring_like_op : ring_like_op (ideal T) :=
   {| rngl_zero := I_zero;
      rngl_add := I_add;
