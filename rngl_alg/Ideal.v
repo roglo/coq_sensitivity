@@ -396,11 +396,19 @@ Context {ic : ideal_ctx T}.
 (* ideal ring like prop *)
 
 (* to be completed
+From Stdlib Require Import Relations.
+Axiom TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
+  ∃ f : A → A, (∀ x : A, R x (f x)) ∧ (∀ x y, R x y → f x = f y).
+
 Theorem I_add_comm : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
 progress unfold I_add.
-Print ideal.
+Theorem glop :
+  ∀ a b z, I_add_subtype a b z = I_add_subtype b a z.
+Proof.
+intros.
+progress unfold I_add_subtype.
 ...
 
 (*
