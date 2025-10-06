@@ -132,7 +132,7 @@ split; [ | now split; apply ip_mul_r ].
 apply rngl_mul_add_distr_r.
 Qed.
 
-Definition I_add (a b : ideal T): ideal T :=
+Definition I_add (a b : ideal T) : ideal T :=
   {| ip_subtype := I_add_subtype a b;
      ip_zero := I_add_zero a b;
      ip_add := I_add_add a b;
@@ -296,7 +296,7 @@ progress f_equal.
 rewrite (List_map_nth' 0%L); [ easy | flia Hi Hlb ].
 Qed.
 
-Definition I_mul (a b : ideal T): ideal T :=
+Definition I_mul (a b : ideal T) : ideal T :=
   {| ip_subtype := I_mul_subtype a b;
      ip_zero := I_mul_zero a b;
      ip_add := I_mul_add a b;
@@ -304,9 +304,42 @@ Definition I_mul (a b : ideal T): ideal T :=
      ip_mul_l := I_mul_mul_l a b;
      ip_mul_r := I_mul_mul_r a b |}.
 
-(* ideal ring like op *)
+(* opposite *)
+
+(*
+Theorem I_opp_prop : ∀ a : ideal P, P (- i_val a)%L = true.
+Proof.
+intros.
+specialize ip_opp_or_psub as H1.
+unfold rngl_opp.
+destruct rngl_opt_opp_or_psub as [os| ]; [ | apply ip_zero ].
+destruct os as [opp| psub]; [ | apply ip_zero ].
+apply H1, a.
+Qed.
+*)
 
 (* to be completed
+Definition I_opp_subtype a z :=
+...
+  ∃ n lx ly,
+  length lx = n ∧ length ly = n ∧
+  (∀ x, x ∈ lx → ip_subtype a x) ∧
+  (∀ y, y ∈ ly → ip_subtype b y) ∧
+  z = ∑ (i = 1, n), lx.[i-1] * ly.[i-1].
+
+...
+
+Definition I_opp (a : ideal T) : ideal T :=
+  {| ip_subtype := I_opp_subtype a;
+     ip_zero := true; (*I_opp_zero a;*)
+     ip_add := true; (*I_opp_add a;*)
+     ip_opp := true; (*I_opp_opp a;*)
+     ip_mul_l := true; (*I_opp_mul_l a;*)
+     ip_mul_r := true (*I_opp_mul_r a*) |}.
+...
+
+(* ideal ring like op *)
+
 Definition I_ring_like_op : ring_like_op (ideal T) :=
   {| rngl_zero := I_zero;
      rngl_add := I_add;
@@ -328,30 +361,6 @@ Definition I_ring_like_op : ring_like_op (ideal T) :=
      rngl_opt_leb := I_opt_leb |}.
 
 ...
-
-(* multiplication *)
-
-(*
-Definition I_mul (a b : ideal P) : ideal P :=
-  mk_I (i_val a * i_val b) (ip_mul_l (i_val a) (i_val b) (i_mem b)).
-*)
-
-(* opposite *)
-
-(*
-Theorem I_opp_prop : ∀ a : ideal P, P (- i_val a)%L = true.
-Proof.
-intros.
-specialize ip_opp_or_psub as H1.
-unfold rngl_opp.
-destruct rngl_opt_opp_or_psub as [os| ]; [ | apply ip_zero ].
-destruct os as [opp| psub]; [ | apply ip_zero ].
-apply H1, a.
-Qed.
-
-Definition I_opp (a : ideal P) : ideal P :=
-  mk_I (- i_val a) (I_opp_prop a).
-*)
 
 (* primitive subtraction *)
 
