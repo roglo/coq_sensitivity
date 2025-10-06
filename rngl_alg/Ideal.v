@@ -409,7 +409,10 @@ destruct H as (x & y & Hz & Hx & Hy).
 exists y, x.
 now rewrite rngl_add_comm.
 Qed.
-Check glop.
+Axiom pouet : ∀ A B (U V : A → B), (∀ x, U x = V x) → U = V.
+...
+specialize (pouet _ _ (I_add_subtype a b) (I_add_subtype b a)) as H2.
+rewrite H2.
 ...
 } {
 Axiom toto :
