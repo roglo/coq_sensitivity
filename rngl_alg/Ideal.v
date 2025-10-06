@@ -307,14 +307,25 @@ Definition I_mul (a b : ideal T) : ideal T :=
 
 (* opposite *)
 
+Theorem I_opp_add a :
+  ∀ x y, ip_subtype a (- x) → ip_subtype a (- y) → ip_subtype a (- (x + y)%L).
+Proof.
+intros * Hx Hy.
+apply ip_opp in Hx, Hy.
+rewrite (rngl_opp_involutive Hop) in Hx, Hy.
+apply ip_opp.
+now apply ip_add.
+Qed.
+
 (* to be completed
 Definition I_opp (a : ideal T) : ideal T :=
   {| ip_subtype z := ip_subtype a (-z);
      ip_zero := ip_opp a 0 (ip_zero a);
-     ip_add := true; (*I_opp_add a;*)
+     ip_add := I_opp_add a;
      ip_opp := true; (*I_opp_opp a;*)
      ip_mul_l := true; (*I_opp_mul_l a;*)
      ip_mul_r := true (*I_opp_mul_r a*) |}.
+
 ...
 
 (* ideal ring like op *)
