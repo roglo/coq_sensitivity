@@ -963,56 +963,58 @@ Definition I_mul' (a b : ideal' T) : ideal' T :=
 
 (* opposite *)
 
-(* to be completed
-Theorem I_opp_add a :
-  ∀ x y, ip_subtype a (- x) → ip_subtype a (- y) → ip_subtype a (- (x + y)%L).
+Theorem I_opp_add' a :
+  ∀ x y,
+  ip_subtype' a (- x) = true
+  → ip_subtype' a (- y) = true
+  → ip_subtype' a (- (x + y)%L) = true.
 Proof.
-destruct_ic.
+destruct_ic'.
 intros * Hx Hy.
-apply ip_opp in Hx, Hy.
+apply ip_opp' in Hx, Hy.
 rewrite (rngl_opp_involutive Hop) in Hx, Hy.
-apply ip_opp.
-now apply ip_add.
+apply ip_opp'.
+now apply ip_add'.
 Qed.
 
-Theorem I_opp_mul_l a :
-  ∀ x y, ip_subtype a (- y) → ip_subtype a (- (x * y)%L).
+Theorem I_opp_mul_l' a :
+  ∀ x y, ip_subtype' a (- y) = true → ip_subtype' a (- (x * y)%L) = true.
 Proof.
-destruct_ic.
+destruct_ic'.
 intros * H.
-apply ip_opp, ip_mul_l.
-rewrite <- (rngl_opp_involutive Hop).
-now apply ip_opp.
+apply ip_opp', ip_mul_l'.
+rewrite <- (rngl_opp_involutive Hop y).
+now apply ip_opp'.
 Qed.
 
-Theorem I_opp_mul_r a :
-  ∀ x y, ip_subtype a (- x) → ip_subtype a (- (x * y)%L).
+Theorem I_opp_mul_r' a :
+  ∀ x y, ip_subtype' a (- x) = true → ip_subtype' a (- (x * y)%L) = true.
 Proof.
-destruct_ic.
+destruct_ic'.
 intros * H.
-apply ip_opp, ip_mul_r.
-rewrite <- (rngl_opp_involutive Hop).
-now apply ip_opp.
+apply ip_opp', ip_mul_r'.
+rewrite <- (rngl_opp_involutive Hop x).
+now apply ip_opp'.
 Qed.
 
-Definition I_opp (a : ideal T) : ideal T :=
-  {| ip_subtype x := ip_subtype a (-x);
-     ip_zero := ip_opp a 0 (ip_zero a);
-     ip_add := I_opp_add a;
-     ip_opp x := ip_opp a (-x);
-     ip_mul_l := I_opp_mul_l a;
-     ip_mul_r := I_opp_mul_r a |}.
+Definition I_opp' (a : ideal' T) : ideal' T :=
+  {| ip_subtype' x := ip_subtype' a (-x);
+     ip_zero' := ip_opp' a 0 (ip_zero' a);
+     ip_add' := I_opp_add' a;
+     ip_opp' x := ip_opp' a (-x);
+     ip_mul_l' := I_opp_mul_l' a;
+     ip_mul_r' := I_opp_mul_r' a |}.
 
 (* ideal ring like op *)
 
-Definition I_ring_like_op : ring_like_op (ideal T) :=
-  {| rngl_zero := I_zero;
-     rngl_add := I_add;
-     rngl_mul := I_mul;
-     rngl_opt_one := Some I_one;
+Definition I_ring_like_op' : ring_like_op (ideal' T) :=
+  {| rngl_zero := I_zero';
+     rngl_add := I_add';
+     rngl_mul := I_mul';
+     rngl_opt_one := Some I_one';
      rngl_opt_opp_or_psub :=
        match rngl_opt_opp_or_psub T with
-       | Some (inl _) => Some (inl I_opp)
+       | Some (inl _) => Some (inl I_opp')
        | _ => None
        end;
      rngl_opt_inv_or_pdiv := None;
@@ -1026,9 +1028,9 @@ Declare Scope ideal_scope.
 Delimit Scope ideal_scope with I.
 Bind Scope ideal_scope with ideal.
 
-Notation "0" := I_zero : ideal_scope.
-Notation "1" := I_one : ideal_scope.
-Notation "a + b" := (I_add a b) : ideal_scope.
+Notation "0" := I_zero' : ideal_scope.
+Notation "1" := I_one' : ideal_scope.
+Notation "a + b" := (I_add' a b) : ideal_scope.
 (*
 Notation "a - b" := (rngl_sub a b) : ideal_scope.
 Notation "a * b" := (rngl_mul a b) : ideal_scope.
@@ -1040,16 +1042,15 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {ic : ideal_ctx T}.
+Context {ic : ideal_ctx' T}.
 
 (* ideal ring like prop *)
 
-(* to be completed *)
-Theorem I_add_comm : ∀ a b, (a + b)%I = (b + a)%I.
+(* to be completed
+Theorem I_add_comm' : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
-progress unfold I_add.
-Print ideal.
+progress unfold I_add'.
 ...
 
 (*
