@@ -386,6 +386,22 @@ Notation "a + b" := (I_add a b) : ideal_scope.
 Notation "a - b" := (rngl_sub a b) : ideal_scope.
 Notation "a * b" := (rngl_mul a b) : ideal_scope.
 Notation "- a" := (rngl_opp a) : ideal_scope.
+
+Axiom IPO : ∀ {I} (u : I → bool), (∀ i, u i = false) + (∃ i, u i = true).
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {ic : ideal_ctx T}.
+
+Theorem I_add_comm : ∀ a b, (a + b)%I = (b + a)%I.
+Proof.
+intros.
+progress unfold I_add.
+Print ideal.
+...
 *)
 
 (* attempt to implement ideals using bool instead of Prop *)
