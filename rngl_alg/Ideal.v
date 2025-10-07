@@ -10,7 +10,7 @@ Import Init.Nat.
 Require Import RingLike.Core.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
-Require Import RingLike.IterAdd.
+From RingLike Require Import IterAdd IterAnd.
 
 (* ideal: non empty set (type) with some properties *)
 (* drawback: elementary properties, like commutativity of addition of ideals
@@ -655,29 +655,24 @@ Definition I_add' (a b : ideal' T) : ideal' T :=
 
 (* multiplication *)
 
-(* to be completed
 Definition I_mul_subtype' a b z :=
-  ∃ n lx ly,
-  length lx = n ∧ length ly = n ∧
-  (∀ x, x ∈ lx → ip_subtype' a x = true) ∧
-  (∀ y, y ∈ ly → ip_subtype' b y = true) ∧
-  z = ∑ (i = 1, n), lx.[i-1] * ly.[i-1].
+  let u (nll : nat * list T * list T) :=
+    let '(n, lx, ly) := nll in
+    ((length lx =? n) && (length ly =? n) &&
+     ⋀ (x ∈ lx), ip_subtype' a x &&
+     ⋀ (y ∈ ly), ip_subtype' b y &&
+     (z =? ∑ (i = 1, n), lx.[i-1] * ly.[i-1])%L)%bool
+  in
+  bool_of_sum (IPO u).
 
 Arguments I_mul_subtype' a b z%_L.
 
-(*
-Theorem I_mul_zero a b : I_mul_subtype a b 0%L.
+(* to be completed
+Theorem I_mul_zero' a b : I_mul_subtype' a b 0%L = true.
 Proof.
-destruct_ic.
-exists 0, [], [].
-split; [ easy | ].
-split; [ easy | ].
-split; [ easy | ].
-split; [ easy | ].
-symmetry.
-now apply rngl_summation_empty.
-Qed.
+...
 
+(*
 Theorem I_mul_add a b :
   ∀ x y,
   I_mul_subtype a b x → I_mul_subtype a b y → I_mul_subtype a b (x + y)%L.
@@ -813,9 +808,10 @@ rewrite (List_map_nth' 0%L); [ easy | flia Hi Hlb ].
 Qed.
 *)
 
+(* to be completed *)
 Definition I_mul' (a b : ideal' T) : ideal' T :=
   {| ip_subtype' := I_mul_subtype' a b;
-     ip_zero' := true; (*I_mul_zero a b;*)
+     ip_zero' := I_mul_zero' a b;
      ip_add' := I_mul_add a b;
      ip_opp' := I_mul_opp a b;
      ip_mul_l' := I_mul_mul_l a b;
