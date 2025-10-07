@@ -398,11 +398,20 @@ Inductive eset T :=
 
 Arguments E_finite {T} l%_L.
 
+Axiom EM : ∀ P, {P} + {¬P}.
 Axiom LPO : ∀ (u : nat → bool), ( ∀ i, u i = false ) + { i : nat | u i = true }.
 
 Declare Scope eset_scope.
 Delimit Scope eset_scope with E.
 Bind Scope eset_scope with eset.
+
+(*
+Definition eset_mem {T} {ro : ring_like_op T} x (s : eset T) :=
+  match s with
+  | E_finite l => List.existsb (rngl_eqb x) l
+  | E_infinite _ u => bool_of_sumbool (EM (∃ i, rngl_eqb (u i) x = true))
+  end.
+*)
 
 Definition eset_mem {T} {ro : ring_like_op T} x (s : eset T) :=
   match s with
