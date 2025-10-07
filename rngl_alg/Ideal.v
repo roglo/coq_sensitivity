@@ -481,19 +481,24 @@ Definition I_one' : ideal' T :=
      ip_mul_l' _ _ _ := eq_refl;
      ip_mul_r' _ _ _ := eq_refl |}.
 
-(* addition *)
+(* Illimited Principe of Omniscience *)
+Axiom IPO :
+  ∀ {I} (u : I → bool), ( ∀ i, u i = false ) + { i : I | u i = true }.
 
-Axiom IPO : ∀ P (u : P → bool), ( ∀ i, u i = false ) + { i : P | u i = true }.
+Definition bool_of_sum {A B} (s : A + B) :=
+  match s with
+  | inl _ => false
+  | inr _ => true
+  end.
+
+(* addition *)
 
 Definition I_add_subtype' a b z :=
   let u (xy : T * T) :=
     let (x, y) := xy in
     ((z =? (x + y))%L && ip_subtype' a x && ip_subtype' b y)%bool
   in
-  match IPO _ u with
-  | inl _ => false
-  | inr xy => true
-  end.
+  bool_of_sum (IPO u).
 
 Arguments I_add_subtype' a b z%_L.
 
@@ -501,7 +506,7 @@ Theorem I_add_zero' a b : I_add_subtype' a b 0 = true.
 Proof.
 destruct_ic'.
 progress unfold I_add_subtype'.
-destruct (IPO _ _) as [H1| H1]; [ | easy ].
+destruct (IPO _) as [H1| H1]; [ exfalso | easy ].
 specialize (H1 (0, 0))%L.
 cbn in H1.
 rewrite rngl_add_0_r in H1.
