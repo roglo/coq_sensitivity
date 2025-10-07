@@ -388,33 +388,33 @@ Notation "a * b" := (rngl_mul a b) : ideal_scope.
 Notation "- a" := (rngl_opp a) : ideal_scope.
 *)
 
-(* attempt to implement ideals using bool instead of Prop
+(* attempt to implement ideals using bool instead of Prop *)
 
 (* ideal : non empty set (type) with some properties *)
 
-Record ideal {T} {ro : ring_like_op T} := mk_ip
-  { ip_subtype : T → bool;
-    ip_zero : ip_subtype rngl_zero = true;
-    ip_add :
+Record ideal' {T} {ro : ring_like_op T} := mk_ip'
+  { ip_subtype' : T → bool;
+    ip_zero' : ip_subtype' rngl_zero = true;
+    ip_add' :
       ∀ a b,
-      ip_subtype a = true
-      → ip_subtype b = true
-      → ip_subtype (a + b)%L = true;
-    ip_opp : ∀ a, ip_subtype a = true → ip_subtype (- a)%L = true;
-    ip_mul_l : ∀ a b, ip_subtype b = true → ip_subtype (a * b)%L = true;
-    ip_mul_r : ∀ a b, ip_subtype a = true → ip_subtype (a * b)%L = true }.
+      ip_subtype' a = true
+      → ip_subtype' b = true
+      → ip_subtype' (a + b)%L = true;
+    ip_opp' : ∀ a, ip_subtype' a = true → ip_subtype' (- a)%L = true;
+    ip_mul_l' : ∀ a b, ip_subtype' b = true → ip_subtype' (a * b)%L = true;
+    ip_mul_r' : ∀ a b, ip_subtype' a = true → ip_subtype' (a * b)%L = true }.
 
-Arguments ideal T {ro}.
-Arguments ip_subtype {T ro} i a%_L.
-Arguments ip_opp {T ro} i a%_L.
+Arguments ideal' T {ro}.
+Arguments ip_subtype' {T ro} i a%_L.
+Arguments ip_opp' {T ro} i a%_L.
 
-Class ideal_ctx T {ro : ring_like_op T} :=
-  { ic_op : rngl_has_opp T = true;
-    ic_eo : rngl_has_eq_dec_or_order T = true }.
+Class ideal_ctx' T {ro : ring_like_op T} :=
+  { ic_op' : rngl_has_opp T = true;
+    ic_eo' : rngl_has_eq_dec_or_order T = true }.
 
-Ltac destruct_ic :=
-  set (Hop := ic_op);
-  set (Heo := ic_eo);
+Ltac destruct_ic' :=
+  set (Hop := ic_op');
+  set (Heo := ic_eo');
   set (Hos := rngl_has_opp_has_opp_or_psub Hop).
 
 Section a.
@@ -422,92 +422,92 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {ic : ideal_ctx T}.
+Context {ic : ideal_ctx' T}.
 
 (* 0 and 1 *)
 
-Theorem I_zero_add a b :
+Theorem I_zero_add' a b :
   (a =? 0)%L = true
   → (b =? 0)%L = true
   → (a + b =? 0)%L = true.
 Proof.
-destruct_ic.
+destruct_ic'.
 intros Ha Hb.
 apply (rngl_eqb_eq Heo) in Ha, Hb.
 apply (rngl_eqb_eq Heo).
 subst; apply rngl_add_0_l.
 Qed.
 
-Theorem I_zero_opp a : (a =? 0)%L = true → (- a =? 0)%L = true.
+Theorem I_zero_opp' a : (a =? 0)%L = true → (- a =? 0)%L = true.
 Proof.
-destruct_ic.
+destruct_ic'.
 intros Ha.
 apply (rngl_eqb_eq Heo) in Ha.
 apply (rngl_eqb_eq Heo).
 subst; apply (rngl_opp_0 Hop).
 Qed.
 
-Theorem I_zero_mul_l a b : (b =? 0)%L = true → (a * b =? 0)%L = true.
+Theorem I_zero_mul_l' a b : (b =? 0)%L = true → (a * b =? 0)%L = true.
 Proof.
-destruct_ic.
+destruct_ic'.
 intros H.
 apply (rngl_eqb_eq Heo) in H.
 apply (rngl_eqb_eq Heo).
 subst; apply (rngl_mul_0_r Hos).
 Qed.
 
-Theorem I_zero_mul_r a b : (a =? 0)%L = true → (a * b =? 0)%L = true.
+Theorem I_zero_mul_r' a b : (a =? 0)%L = true → (a * b =? 0)%L = true.
 Proof.
-destruct_ic.
+destruct_ic'.
 intros H.
 apply (rngl_eqb_eq Heo) in H.
 apply (rngl_eqb_eq Heo).
 subst; apply (rngl_mul_0_l Hos).
 Qed.
 
-Definition I_zero : ideal T :=
-  {| ip_subtype a := (a =? 0)%L;
-     ip_zero := rngl_eqb_refl ic_eo 0%L;
-     ip_add := I_zero_add;
-     ip_opp := I_zero_opp;
-     ip_mul_l := I_zero_mul_l;
-     ip_mul_r := I_zero_mul_r |}.
+Definition I_zero' : ideal' T :=
+  {| ip_subtype' a := (a =? 0)%L;
+     ip_zero' := rngl_eqb_refl ic_eo' 0%L;
+     ip_add' := I_zero_add';
+     ip_opp' := I_zero_opp';
+     ip_mul_l' := I_zero_mul_l';
+     ip_mul_r' := I_zero_mul_r' |}.
 
-Definition I_one : ideal T :=
-  {| ip_subtype a := true;
-     ip_zero := eq_refl;
-     ip_add _ _ _ _ := eq_refl;
-     ip_opp _ _ := eq_refl;
-     ip_mul_l _ _ _ := eq_refl;
-     ip_mul_r _ _ _ := eq_refl |}.
+Definition I_one' : ideal' T :=
+  {| ip_subtype' a := true;
+     ip_zero' := eq_refl;
+     ip_add' _ _ _ _ := eq_refl;
+     ip_opp' _ _ := eq_refl;
+     ip_mul_l' _ _ _ := eq_refl;
+     ip_mul_r' _ _ _ := eq_refl |}.
 
 (* addition *)
 
 Axiom IPO : ∀ E (u : E → bool), ( ∀ i, u i = false ) + { i : E | u i = true }.
 
-Definition I_add_subtype a b z :=
+Definition I_add_subtype' a b z :=
   let u :=
     λ (xy : T * T),
     let (x, y) := xy in
-    ((z =? (x + y))%L && ip_subtype a x && ip_subtype b y)%bool
+    ((z =? (x + y))%L && ip_subtype' a x && ip_subtype' b y)%bool
   in
   match IPO _ u with
   | inl _ => false
   | inr xy => true
   end.
 
-Arguments I_add_subtype a b z%_L.
+Arguments I_add_subtype' a b z%_L.
 
-Theorem I_add_zero a b : I_add_subtype a b 0 = true.
+Theorem I_add_zero' a b : I_add_subtype' a b 0 = true.
 Proof.
-destruct_ic.
-progress unfold I_add_subtype.
+destruct_ic'.
+progress unfold I_add_subtype'.
 destruct (IPO _ _) as [H1| H1]; [ | easy ].
 specialize (H1 (0, 0))%L.
 cbn in H1.
 rewrite rngl_add_0_r in H1.
 rewrite (rngl_eqb_refl Heo) in H1.
-do 2 rewrite ip_zero in H1.
+do 2 rewrite ip_zero' in H1.
 easy.
 Qed.
 
@@ -562,13 +562,14 @@ apply rngl_mul_add_distr_r.
 Qed.
 *)
 
-Definition I_add (a b : ideal T) : ideal T :=
-  {| ip_subtype := I_add_subtype a b;
-     ip_zero := I_add_zero a b;
-     ip_add := true; (*I_add_add a b;*)
-     ip_opp := true; (*I_add_opp a b;*)
-     ip_mul_l := true; (*I_add_mul_l a b;*)
-     ip_mul_r := true; (*I_add_mul_r a b*) |}.
+(* to be completed
+Definition I_add' (a b : ideal' T) : ideal' T :=
+  {| ip_subtype' := I_add_subtype' a b;
+     ip_zero' := I_add_zero' a b;
+     ip_add' := true; (*I_add_add a b;*)
+     ip_opp' := true; (*I_add_opp a b;*)
+     ip_mul_l' := true; (*I_add_mul_l a b;*)
+     ip_mul_r' := true; (*I_add_mul_r a b*) |}.
 
 (* multiplication *)
 
@@ -1423,6 +1424,8 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_opt_ord := NA; (*I_ring_like_ord;*)
      rngl_opt_archimedean := NA |}.
 *)
+
+End a.
 
 (* attempt to implement ideals on finite or enumerable sets
 
