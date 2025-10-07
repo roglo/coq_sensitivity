@@ -717,14 +717,35 @@ cbn in H3.
 do 2 rewrite List.length_app in H3.
 rewrite H11, H12, H21, H22 in H3.
 rewrite Nat.eqb_refl in H3.
-...
-Search (⋀ (_ ∈ _ ++ _), _).
-Search (∑ (_ ∈ _ ++ _), _).
-rngl_summation_list_app:
-  ∀ {T : Type} {ro : ring_like_op T},
-    ring_like_prop T
-    → ∀ (A : Type) (la lb : list A) (f : A → T),
-        ∑ (i ∈ la ++ lb), f i = (∑ (i ∈ la), f i + ∑ (i ∈ lb), f i)%L
+do 2 rewrite rngl_and_list_app in H3.
+rewrite H13, H14, H23, H24 in H3.
+destruct (Nat.eq_dec n1 0) as [H1z| H1z]. {
+  move H1z at top; subst n1.
+  rewrite (rngl_summation_empty _ 1 0) in H3; [ | easy ].
+  rewrite rngl_add_0_l in H3.
+  rewrite Nat.add_0_l in H3.
+  apply List.length_zero_iff_nil in H12, H11.
+  subst lx1 ly1.
+  do 2 rewrite List.app_nil_l in H3.
+  now rewrite (rngl_eqb_refl Heo) in H3.
+}
+destruct (Nat.eq_dec n2 0) as [H2z| H2z]. {
+  move H2z at top; subst n2.
+  rewrite (rngl_summation_empty _ 1 0) in H3; [ | easy ].
+  rewrite rngl_add_0_r in H3.
+  rewrite Nat.add_0_r in H3.
+  apply List.length_zero_iff_nil in H22, H21.
+  subst lx2 ly2.
+  cbn in H3.
+  do 2 rewrite List.app_nil_r in H3.
+  now rewrite (rngl_eqb_refl Heo) in H3.
+}
+rewrite (rngl_summation_shift 1 1) in H3; [ | flia H1z ].
+rewrite (rngl_summation_shift 1 1) in H3; [ | flia H2z ].
+rewrite (rngl_summation_shift 1 1) in H3; [ | flia H1z ].
+rewrite Nat.sub_diag in H3.
+rewrite Nat.add_sub_swap in H3; [ | flia H1z ].
+rewrite rngl_summation_ub_add_distr in H3.
 ...
 specialize (H3 (x1 + x2, y1 + y2))%L.
 cbn in H3.
