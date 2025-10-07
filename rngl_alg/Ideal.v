@@ -15,7 +15,7 @@ Require Import RingLike.IterAdd.
 (* ideal: non empty set (type) with some properties *)
 (* drawback: elementary properties, like commutativity of addition of ideals
    cannot be proven *)
-(* another version of ideals using finite or enumerable sets follow *)
+(* another version of ideals using bool instead of Prop follows *)
 
 Record ideal {T} {ro : ring_like_op T} := mk_ip
   { ip_subtype : T → Prop;
@@ -388,7 +388,9 @@ Notation "a * b" := (rngl_mul a b) : ideal_scope.
 Notation "- a" := (rngl_opp a) : ideal_scope.
 *)
 
-(* attempt to implement ideals on finite or enumerable sets *)
+(* attempt to implement ideals using bool instead of Prop *)
+
+(* attempt to implement ideals on finite or enumerable sets
 
 (* finite or enumerable sets *)
 
@@ -399,9 +401,6 @@ Inductive eset T :=
 Arguments E_finite {T} l%_L.
 
 Axiom LPO : ∀ (u : nat → bool), ( ∀ i, u i = false ) + { i : nat | u i = true }.
-(*
-Axiom LPO : ∀ E (u : E → bool), ( ∀ i, u i = false ) + { i : E | u i = true }.
-*)
 
 Declare Scope eset_scope.
 Delimit Scope eset_scope with E.
@@ -472,7 +471,6 @@ apply (rngl_eqb_eq Heo).
 apply rngl_add_0_l.
 Qed.
 
-(* to be completed
 Theorem I_zero_opp' a : (a ∈ E_finite [0%L])%E → (- a ∈ E_finite [0%L])%E.
 ...
 
@@ -1133,6 +1131,6 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_opt_characteristic_prop := true; (*I_characteristic_prop;*)
      rngl_opt_ord := NA; (*I_ring_like_ord;*)
      rngl_opt_archimedean := NA |}.
-*)
 
 End a.
+*)
