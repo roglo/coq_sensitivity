@@ -535,36 +535,48 @@ do 2 rewrite ip_zero' in H1.
 easy.
 Qed.
 
-(*
-Theorem I_add_add a b :
+Theorem I_add_add' a b :
   ∀ x y,
-  I_add_subtype a b x → I_add_subtype a b y → I_add_subtype a b (x + y)%L.
+  I_add_subtype' a b x = true
+  → I_add_subtype' a b y = true
+  → I_add_subtype' a b (x + y)%L = true.
 Proof.
+destruct_ic'.
 intros * Hx Hy.
-destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
-destruct Hy as (y1 & y2 & Hy & Hy1 & Hy2).
+progress unfold I_add_subtype' in Hx, Hy.
+progress unfold I_add_subtype'.
+destruct (IPO _) as [H1| H1] in Hx; [ easy | clear Hx ].
+destruct (IPO _) as [H2| H2] in Hy; [ easy | clear Hy ].
+destruct (IPO _) as [H3| H3] in |-*; [ exfalso | easy ].
+destruct H1 as ((x1, y1) & H1).
+destruct H2 as ((x2, y2) & H2).
+move x2 before y1; move y2 before x2.
+apply Bool.andb_true_iff in H1, H2.
+destruct H1 as (H1, H13).
+destruct H2 as (H2, H23).
+apply Bool.andb_true_iff in H1, H2.
+destruct H1 as (H11, H12).
+destruct H2 as (H21, H22).
+apply (rngl_eqb_eq Heo) in H11, H21.
 subst x y.
-exists (x1 + y1)%L, (x2 + y2)%L.
-split; [ | now split; apply ip_add ].
-do 2 rewrite rngl_add_assoc.
-progress f_equal.
-apply rngl_add_add_swap.
+specialize (H3 (x1 + x2, y1 + y2))%L.
+cbn in H3.
+rewrite rngl_add_add_add_swap in H3.
+rewrite (rngl_eqb_refl Heo) in H3.
+rewrite ip_add' in H3; [ | easy | easy ].
+rewrite ip_add' in H3; [ | easy | easy ].
+easy.
 Qed.
 
-Theorem I_add_opp a b : ∀ x, I_add_subtype a b x → I_add_subtype a b (- x).
+(* to be completed
+Theorem I_add_opp' a b :
+  ∀ x, I_add_subtype' a b x = true → I_add_subtype' a b (- x) = true.
 Proof.
-destruct_ic.
+destruct_ic'.
 intros * Hx.
-destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2); subst.
-exists (- x1)%L, (- x2)%L.
-split; [ | now split; apply ip_opp ].
-rewrite rngl_add_comm.
-rewrite (rngl_add_opp_r Hop).
-rewrite <- (rngl_opp_sub_distr Hop).
-rewrite (rngl_sub_opp_r Hop).
-now f_equal.
-Qed.
+...
 
+(*
 Theorem I_add_mul_l a b :
   ∀ x y, I_add_subtype a b y → I_add_subtype a b (x * y).
 Proof.
@@ -586,12 +598,12 @@ apply rngl_mul_add_distr_r.
 Qed.
 *)
 
-(* to be completed
+(* to be completed *)
 Definition I_add' (a b : ideal' T) : ideal' T :=
   {| ip_subtype' := I_add_subtype' a b;
      ip_zero' := I_add_zero' a b;
-     ip_add' := true; (*I_add_add a b;*)
-     ip_opp' := true; (*I_add_opp a b;*)
+     ip_add' := I_add_add' a b;
+     ip_opp' := I_add_opp' a b;
      ip_mul_l' := true; (*I_add_mul_l a b;*)
      ip_mul_r' := true; (*I_add_mul_r a b*) |}.
 
