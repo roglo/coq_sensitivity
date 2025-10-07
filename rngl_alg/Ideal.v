@@ -568,13 +568,32 @@ rewrite ip_add' in H3; [ | easy | easy ].
 easy.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem I_add_opp' a b :
   ∀ x, I_add_subtype' a b x = true → I_add_subtype' a b (- x) = true.
 Proof.
 destruct_ic'.
 intros * Hx.
-...
+progress unfold I_add_subtype' in Hx.
+progress unfold I_add_subtype'.
+destruct (IPO _) as [H1| H1] in Hx; [ easy | clear Hx ].
+destruct (IPO _) as [H2| H2] in |-*; [ exfalso | easy ].
+destruct H1 as ((x1, y1) & H1).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H13).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H11, H12).
+apply (rngl_eqb_eq Heo) in H11.
+subst x.
+specialize (H2 (- x1, - y1))%L.
+cbn in H2.
+rewrite (rngl_add_opp_r Hop) in H2.
+rewrite (rngl_opp_add_distr Hop) in H2.
+rewrite (rngl_eqb_refl Heo) in H2.
+rewrite ip_opp' in H2; [ | easy ].
+rewrite ip_opp' in H2; [ | easy ].
+easy.
+Qed.
 
 (*
 Theorem I_add_mul_l a b :
@@ -598,7 +617,7 @@ apply rngl_mul_add_distr_r.
 Qed.
 *)
 
-(* to be completed *)
+(* to be completed
 Definition I_add' (a b : ideal' T) : ideal' T :=
   {| ip_subtype' := I_add_subtype' a b;
      ip_zero' := I_add_zero' a b;
