@@ -679,7 +679,6 @@ rewrite rngl_summation_empty in H; [ | easy ].
 now rewrite (rngl_eqb_refl Heo) in H.
 Qed.
 
-(* to be completed
 Theorem I_mul_add' a b :
   ∀ x y,
   I_mul_subtype' a b x = true
@@ -746,64 +745,38 @@ rewrite (rngl_summation_shift 1 1) in H3; [ | flia H1z ].
 rewrite Nat.sub_diag in H3.
 rewrite Nat.add_sub_swap in H3; [ | flia H1z ].
 rewrite rngl_summation_ub_add_distr in H3.
-...
-specialize (H3 (x1 + x2, y1 + y2))%L.
-cbn in H3.
-rewrite rngl_add_add_add_swap in H3.
+rewrite <- Nat.sub_succ_l in H3; [ | flia H1z ].
+rewrite Nat_sub_succ_1 in H3.
+rewrite (rngl_summation_shift n1 n1) in H3; [ | flia H2z ].
+rewrite Nat.sub_diag in H3.
+replace (n1 - 1 + n2 - n1) with (n2 - 1) in H3 by flia H1z H2z.
+remember (∑ (i = 0, n1 - 1), _) as x in H3.
+erewrite (rngl_summation_eq_compat _ _ 0 (n1 - 1)) in H3. 2: {
+  intros i Hi.
+  rewrite List.app_nth1; [ | rewrite H11; flia H1z Hi ].
+  rewrite List.app_nth1; [ | rewrite H12; flia H1z Hi ].
+  easy.
+}
+subst x.
+remember (∑ (i = 0, n2 - 1), _) as x in H3.
+erewrite (rngl_summation_eq_compat _ _ 0 (n2 - 1)) in H3. 2: {
+  intros i Hi.
+  rewrite List.app_nth2; [ | rewrite H11; flia H1z Hi ].
+  rewrite List.app_nth2; [ | rewrite H12; flia H1z Hi ].
+  rewrite H11, H12.
+  replace (1 + (n1 + i) - 1 - n1) with (1 + i - 1) by flia.
+  easy.
+}
+subst x.
 rewrite (rngl_eqb_refl Heo) in H3.
-rewrite ip_add' in H3; [ | easy | easy ].
-rewrite ip_add' in H3; [ | easy | easy ].
 easy.
-...
-intros * Hx Hy.
-destruct Hx as (nx & la1 & lb1 & Hla1 & Hlb1 & Ha1 & Hb1 & Hx).
-destruct Hy as (ny & la2 & lb2 & Hla2 & Hlb2 & Ha2 & Hb2 & Hy).
-subst x y.
-progress unfold I_mul_subtype.
-exists (nx + ny).
-exists (la1 ++ la2), (lb1 ++ lb2).
-do 2 rewrite List.length_app.
-rewrite Hla1, Hlb1, Hla2, Hlb2.
-split; [ easy | ].
-split; [ easy | ].
-split. {
-  intros x Hx.
-  apply List.in_app_or in Hx.
-  now destruct Hx; [ apply Ha1 | apply Ha2 ].
-}
-split. {
-  intros y Hy.
-  apply List.in_app_or in Hy.
-  now destruct Hy; [ apply Hb1 | apply Hb2 ].
-}
-symmetry.
-rewrite (rngl_summation_split nx); [ | flia ].
-f_equal. {
-  apply rngl_summation_eq_compat.
-  intros i Hi.
-  rewrite List.app_nth1; [ | flia Hla1 Hi ].
-  rewrite List.app_nth1; [ | flia Hlb1 Hi ].
-  easy.
-}
-destruct (Nat.eq_dec ny 0) as [Hnyz| Hnyz]. {
-  move Hnyz at top; subst ny.
-  rewrite rngl_summation_empty; [ | flia ].
-  rewrite rngl_summation_empty; [ | flia ].
-  easy.
-} {
-  rewrite (rngl_summation_shift nx); [ | flia Hnyz ].
-  do 2 rewrite Nat.add_comm, Nat.add_sub.
-  apply rngl_summation_eq_compat.
-  intros i Hi.
-  rewrite List.app_nth2; [ | flia Hla1 Hi ].
-  rewrite List.app_nth2; [ | flia Hlb1 Hi ].
-  rewrite Hla1, Hlb1.
-  f_equal; f_equal; flia.
-}...
 Qed.
 
-Theorem I_mul_opp a b : ∀ x, I_mul_subtype a b x → I_mul_subtype a b (- x).
+(* to be completed
+Theorem I_mul_opp' a b :
+  ∀ x, I_mul_subtype' a b x = true → I_mul_subtype' a b (- x) = true.
 Proof.
+...
 destruct_ic.
 intros * Hx.
 destruct Hx as (n & la & lb & Hla & Hlb & Ha & Hb & Hx).
@@ -891,7 +864,7 @@ Definition I_mul' (a b : ideal' T) : ideal' T :=
   {| ip_subtype' := I_mul_subtype' a b;
      ip_zero' := I_mul_zero' a b;
      ip_add' := I_mul_add' a b;
-     ip_opp' := I_mul_opp a b;
+     ip_opp' := I_mul_opp' a b;
      ip_mul_l' := I_mul_mul_l a b;
      ip_mul_r' := I_mul_mul_r a b |}.
 
