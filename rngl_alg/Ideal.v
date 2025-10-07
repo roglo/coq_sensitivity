@@ -786,7 +786,6 @@ apply ip_opp' in H.
 now rewrite (rngl_opp_involutive Hop) in H.
 Qed.
 
-(* to be completed
 Theorem I_mul_opp' a b :
   ∀ x, I_mul_subtype' a b x = true → I_mul_subtype' a b (- x) = true.
 Proof.
@@ -808,101 +807,30 @@ destruct H1 as (H11, H12).
 apply Nat.eqb_eq in H11, H12.
 apply (rngl_eqb_eq Heo) in H15.
 subst x.
-specialize (H3 (n, List.map rngl_opp lx, List.map rngl_opp ly)).
+specialize (H3 (n, List.map rngl_opp lx, ly)).
 cbn in H3.
-do 2 rewrite List.length_map in H3.
+rewrite List.length_map in H3.
 rewrite H11, H12 in H3.
 rewrite Nat.eqb_refl in H3.
-do 2 rewrite rngl_and_list_map in H3.
+rewrite rngl_and_list_map in H3.
 erewrite (rngl_and_list_eq_compat _ _ _ lx) in H3. 2: {
   now intros; cbn; rewrite ip_subtype_opp'.
 }
-erewrite (rngl_and_list_eq_compat _ _ _ ly) in H3. 2: {
-  now intros; cbn; rewrite ip_subtype_opp'.
-}
 rewrite H13, H14 in H3.
-...
-rewrite List.map_nth in H3.
-...
-rewrite H13, H14 in H3.
-destruct (Nat.eq_dec n1 0) as [H1z| H1z]. {
-  move H1z at top; subst n1.
-  rewrite (rngl_summation_empty _ 1 0) in H3; [ | easy ].
-  rewrite rngl_add_0_l in H3.
-  rewrite Nat.add_0_l in H3.
-  apply List.length_zero_iff_nil in H12, H11.
-  subst lx1 ly1.
-  do 2 rewrite List.app_nil_l in H3.
-  now rewrite (rngl_eqb_refl Heo) in H3.
-}
-destruct (Nat.eq_dec n2 0) as [H2z| H2z]. {
-  move H2z at top; subst n2.
-  rewrite (rngl_summation_empty _ 1 0) in H3; [ | easy ].
-  rewrite rngl_add_0_r in H3.
-  rewrite Nat.add_0_r in H3.
-  apply List.length_zero_iff_nil in H22, H21.
-  subst lx2 ly2.
-  cbn in H3.
-  do 2 rewrite List.app_nil_r in H3.
-  now rewrite (rngl_eqb_refl Heo) in H3.
-}
-rewrite (rngl_summation_shift 1 1) in H3; [ | flia H1z ].
-rewrite (rngl_summation_shift 1 1) in H3; [ | flia H2z ].
-rewrite (rngl_summation_shift 1 1) in H3; [ | flia H1z ].
-rewrite Nat.sub_diag in H3.
-rewrite Nat.add_sub_swap in H3; [ | flia H1z ].
-rewrite rngl_summation_ub_add_distr in H3.
-rewrite <- Nat.sub_succ_l in H3; [ | flia H1z ].
-rewrite Nat_sub_succ_1 in H3.
-rewrite (rngl_summation_shift n1 n1) in H3; [ | flia H2z ].
-rewrite Nat.sub_diag in H3.
-replace (n1 - 1 + n2 - n1) with (n2 - 1) in H3 by flia H1z H2z.
-remember (∑ (i = 0, n1 - 1), _) as x in H3.
-erewrite (rngl_summation_eq_compat _ _ 0 (n1 - 1)) in H3. 2: {
+rewrite (rngl_opp_summation Hop) in H3.
+remember (∑ (i = _, _), _) as x.
+erewrite rngl_summation_eq_compat in H3. 2: {
   intros i Hi.
-  rewrite List.app_nth1; [ | rewrite H11; flia H1z Hi ].
-  rewrite List.app_nth1; [ | rewrite H12; flia H1z Hi ].
-  easy.
-}
-subst x.
-remember (∑ (i = 0, n2 - 1), _) as x in H3.
-erewrite (rngl_summation_eq_compat _ _ 0 (n2 - 1)) in H3. 2: {
-  intros i Hi.
-  rewrite List.app_nth2; [ | rewrite H11; flia H1z Hi ].
-  rewrite List.app_nth2; [ | rewrite H12; flia H1z Hi ].
-  rewrite H11, H12.
-  replace (1 + (n1 + i) - 1 - n1) with (1 + i - 1) by flia.
+  rewrite (List_map_nth' 0%L 0%L); [ | flia H11 Hi ].
+  rewrite <- (rngl_mul_opp_l Hop).
   easy.
 }
 subst x.
 rewrite (rngl_eqb_refl Heo) in H3.
 easy.
-...
-destruct_ic.
-intros * Hx.
-destruct Hx as (n & la & lb & Hla & Hlb & Ha & Hb & Hx).
-subst x.
-progress unfold I_mul_subtype.
-exists n, (List.map rngl_opp la), lb.
-rewrite List.length_map.
-split; [ easy | ].
-split; [ easy | ].
-split. {
-  intros x Hx.
-  apply List.in_map_iff in Hx.
-  destruct Hx as (y & Hyx & Hy).
-  subst x.
-  now apply ip_opp, Ha.
-}
-split; [ easy | ].
-rewrite (rngl_opp_summation Hop).
-apply rngl_summation_eq_compat.
-intros i Hi.
-rewrite <- (rngl_mul_opp_l Hop).
-progress f_equal.
-rewrite (List_map_nth' 0%L); [ easy | flia Hi Hla ].
 Qed.
 
+(*
 Theorem I_mul_mul_l a b :
   ∀ x y, I_mul_subtype a b y → I_mul_subtype a b (x * y).
 Proof.
@@ -966,7 +894,7 @@ Definition I_mul' (a b : ideal' T) : ideal' T :=
      ip_zero' := I_mul_zero' a b;
      ip_add' := I_mul_add' a b;
      ip_opp' := I_mul_opp' a b;
-     ip_mul_l' := I_mul_mul_l a b;
+     ip_mul_l' := I_mul_mul_l' a b;
      ip_mul_r' := I_mul_mul_r a b |}.
 
 (* opposite *)
