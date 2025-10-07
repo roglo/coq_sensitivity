@@ -831,7 +831,36 @@ rewrite (rngl_eqb_refl Heo) in H3.
 easy.
 Qed.
 
-(* to be completed *)
+Theorem ip_subtype_mul_l' :
+  ∀ lx a x y,
+  ⋀ (z ∈ lx), ip_subtype' a z = true
+  → y ∈ lx
+  → ip_subtype' a (x * y) = ip_subtype' a y.
+Proof.
+intros * H Hy.
+remember (ip_subtype' a y) as u eqn:Hu.
+symmetry in Hu.
+destruct u; [ now apply ip_mul_l' | exfalso ].
+apply Bool.not_true_iff_false in Hu.
+apply Hu; clear Hu.
+now apply (proj2 (all_true_rngl_and_list_true_iff _ _ _) H).
+Qed.
+
+Theorem ip_subtype_mul_r' :
+  ∀ ly a x y,
+  ⋀ (z ∈ ly), ip_subtype' a z = true
+  → x ∈ ly
+  → ip_subtype' a (x * y) = ip_subtype' a x.
+Proof.
+intros * H Hx.
+remember (ip_subtype' a x) as u eqn:Hu.
+symmetry in Hu.
+destruct u; [ now apply ip_mul_r' | exfalso ].
+apply Bool.not_true_iff_false in Hu.
+apply Hu; clear Hu.
+now apply (proj2 (all_true_rngl_and_list_true_iff _ _ _) H).
+Qed.
+
 Theorem I_mul_mul_l' a b :
   ∀ x y, I_mul_subtype' a b y = true → I_mul_subtype' a b (x * y) = true.
 Proof.
@@ -853,23 +882,15 @@ destruct H1 as (H11, H12).
 apply Nat.eqb_eq in H11, H12.
 apply (rngl_eqb_eq Heo) in H15.
 subst y.
-specialize (H3 (n, List.map (rngl_mul x) lx, ly)).
+specialize (H3 (n, List.map (λ z, (x * z)%L) lx, ly)).
 cbn in H3.
 rewrite List.length_map in H3.
 rewrite H11, H12 in H3.
 rewrite Nat.eqb_refl in H3.
 rewrite rngl_and_list_map in H3.
-remember (⋀ (y ∈ lx), _) as u in H3; subst u.
 erewrite (rngl_and_list_eq_compat _ _ _ lx) in H3. 2: {
-  intros y Hy; cbn.
-  replace (ip_subtype' a (x * y)) with (ip_subtype' a y). 2: {
-    remember (ip_subtype' a y) as u eqn:Hu.
-    symmetry in Hu; symmetry.
-    destruct u; [ now apply ip_mul_l' | exfalso ].
-    apply Bool.not_true_iff_false in Hu.
-    apply Hu; clear Hu.
-    now apply (proj2 (all_true_rngl_and_list_true_iff _ _ _) H13).
-  }
+  intros z Hz; cbn.
+  rewrite (ip_subtype_mul_l' lx); [ | easy | easy ].
   easy.
 }
 rewrite H13, H14 in H3.
@@ -886,37 +907,52 @@ rewrite (rngl_eqb_refl Heo) in H3.
 easy.
 Qed.
 
-(*
-Theorem I_mul_mul_r a b :
-  ∀ x y, I_mul_subtype a b x → I_mul_subtype a b (x * y).
+Theorem I_mul_mul_r' a b :
+  ∀ x y, I_mul_subtype' a b x = true → I_mul_subtype' a b (x * y) = true.
 Proof.
-destruct_ic.
+destruct_ic'.
 intros * H.
-destruct H as (n & la & lb & Hla & Hlb & Ha & Hb & H).
+progress unfold I_mul_subtype' in H.
+progress unfold I_mul_subtype'.
+destruct (IPO _) as [H1| H1] in H; [ easy | clear H ].
+destruct (IPO _) as [H3| H3] in |-*; [ exfalso | easy ].
+destruct H1 as (((n, lx), ly) & H1).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H15).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H14).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H13).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H11, H12).
+apply Nat.eqb_eq in H11, H12.
+apply (rngl_eqb_eq Heo) in H15.
 subst x.
-progress unfold I_mul_subtype.
-exists n, la, (List.map (λ z, rngl_mul z y) lb).
-rewrite List.length_map.
-split; [ easy | ].
-split; [ easy | ].
-split; [ easy | ].
-split. {
-  intros z Hz.
-  apply List.in_map_iff in Hz.
-  destruct Hz as (x & Hxy & Hx).
-  subst z.
-  now apply ip_mul_r, Hb.
+specialize (H3 (n, lx, List.map (λ z, (z * y)%L) ly)).
+cbn in H3.
+rewrite List.length_map in H3.
+rewrite H11, H12 in H3.
+rewrite Nat.eqb_refl in H3.
+rewrite rngl_and_list_map in H3.
+erewrite (rngl_and_list_eq_compat _ _ _ ly) in H3. 2: {
+  intros z Hz; cbn.
+  rewrite (ip_subtype_mul_r' ly); [ | easy | easy ].
+  easy.
 }
-rewrite (rngl_mul_summation_distr_r Hos).
-apply rngl_summation_eq_compat.
-intros i Hi.
-rewrite <- rngl_mul_assoc.
-progress f_equal.
-rewrite (List_map_nth' 0%L); [ easy | flia Hi Hlb ].
+rewrite H13, H14 in H3.
+rewrite (rngl_mul_summation_distr_r Hos) in H3.
+remember (∑ (i = _, _), _) as u.
+erewrite rngl_summation_eq_compat in H3. 2: {
+  intros i Hi.
+  rewrite (List_map_nth' 0%L 0%L); [ | flia H12 Hi ].
+  rewrite <- rngl_mul_assoc.
+  easy.
+}
+subst u.
+rewrite (rngl_eqb_refl Heo) in H3.
+easy.
 Qed.
-*)
 
-(* to be completed
 Definition I_mul' (a b : ideal' T) : ideal' T :=
   {| ip_subtype' := I_mul_subtype' a b;
      ip_zero' := I_mul_zero' a b;
@@ -927,6 +963,7 @@ Definition I_mul' (a b : ideal' T) : ideal' T :=
 
 (* opposite *)
 
+(* to be completed
 Theorem I_opp_add a :
   ∀ x y, ip_subtype a (- x) → ip_subtype a (- y) → ip_subtype a (- (x + y)%L).
 Proof.
