@@ -772,11 +772,11 @@ rewrite (rngl_eqb_refl Heo) in H3.
 easy.
 Qed.
 
-Theorem ip_subtype_opp' : ∀ a i, ip_subtype' a (- i) = ip_subtype' a i.
+Theorem ip_subtype_opp' : ∀ a x, ip_subtype' a (- x) = ip_subtype' a x.
 Proof.
 destruct_ic'.
 intros.
-remember (ip_subtype' a i) as b eqn:Hb.
+remember (ip_subtype' a x) as b eqn:Hb.
 symmetry in Hb.
 destruct b; [ now apply ip_opp' | ].
 apply Bool.not_true_iff_false in Hb.
@@ -816,6 +816,7 @@ rewrite rngl_and_list_map in H3.
 erewrite (rngl_and_list_eq_compat _ _ _ lx) in H3. 2: {
   now intros; cbn; rewrite ip_subtype_opp'.
 }
+remember (⋀ (x ∈ lx), _) as x in H3; subst x.
 rewrite H13, H14 in H3.
 rewrite (rngl_opp_summation Hop) in H3.
 remember (∑ (i = _, _), _) as x.
@@ -831,9 +832,85 @@ easy.
 Qed.
 
 (*
-Theorem I_mul_mul_l a b :
-  ∀ x y, I_mul_subtype a b y → I_mul_subtype a b (x * y).
+Theorem ip_subtype_mul_l' : ∀ a x y, ip_subtype' a (x * y) = ip_subtype' a y.
 Proof.
+destruct_ic'.
+intros.
+remember (ip_subtype' a y) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ now apply ip_mul_l' | ].
+apply Bool.not_true_iff_false in Hb.
+apply Bool.not_true_iff_false.
+intros H; apply Hb; clear Hb.
+apply ip_mul_l' with (a := x) in H.
+now rewrite (rngl_opp_involutive Hop) in H.
+Qed.
+...
+*)
+
+(* to be completed
+Theorem I_mul_mul_l' a b :
+  ∀ x y, I_mul_subtype' a b y = true → I_mul_subtype' a b (x * y) = true.
+Proof.
+destruct_ic'.
+intros * H.
+progress unfold I_mul_subtype' in H.
+progress unfold I_mul_subtype'.
+destruct (IPO _) as [H1| H1] in H; [ easy | clear H ].
+destruct (IPO _) as [H3| H3] in |-*; [ exfalso | easy ].
+destruct H1 as (((n, lx), ly) & H1).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H15).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H14).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H13).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H11, H12).
+apply Nat.eqb_eq in H11, H12.
+apply (rngl_eqb_eq Heo) in H15.
+subst y.
+specialize (H3 (n, List.map (rngl_mul x) lx, ly)).
+cbn in H3.
+rewrite List.length_map in H3.
+rewrite H11, H12 in H3.
+rewrite Nat.eqb_refl in H3.
+rewrite rngl_and_list_map in H3.
+remember (⋀ (y ∈ lx), _) as u in H3; subst u.
+erewrite (rngl_and_list_eq_compat _ _ _ lx) in H3. 2: {
+  intros y Hy; cbn.
+(* tiens... c'est bizarre... *)
+...
+Search (ip_subtype' _ (_ * _)).
+...
+ip_mul_r':
+  ∀ {T : Type} {ro : ring_like_op T} (i : ideal' T) (a b : T),
+    ip_subtype' i a = true → ip_subtype' i (a * b) = true
+H3:
+  (true && true && ⋀ (i ∈ lx), ip_subtype' a (x * i) && ⋀ (y ∈ ly), ip_subtype' b y &&
+   (x * (∑ (i = 1, n), lx.[i - 1] * ly.[i - 1]) =?
+    ∑ (i = 1, n), (ListDef.map (rngl_mul x) lx).[i - 1] * ly.[i - 1])%L)%bool =
+  false
+
+rewrite ip_subtype_mul_l'.
+Print ideal'.
+...
+rewrite ip_subtype_mul_l.
+  now intros; cbn; rewrite ip_subtype_opp'.
+}
+rewrite H13, H14 in H3.
+rewrite (rngl_opp_summation Hop) in H3.
+remember (∑ (i = _, _), _) as x.
+erewrite rngl_summation_eq_compat in H3. 2: {
+  intros i Hi.
+  rewrite (List_map_nth' 0%L 0%L); [ | flia H11 Hi ].
+  rewrite <- (rngl_mul_opp_l Hop).
+  easy.
+}
+subst x.
+rewrite (rngl_eqb_refl Heo) in H3.
+easy.
+...
 destruct_ic.
 intros * H.
 destruct H as (n & la & lb & Hla & Hlb & Ha & Hb & H).
