@@ -831,24 +831,7 @@ rewrite (rngl_eqb_refl Heo) in H3.
 easy.
 Qed.
 
-(*
-Theorem ip_subtype_mul_l' : ∀ a x y, ip_subtype' a (x * y) = ip_subtype' a y.
-Proof.
-destruct_ic'.
-intros.
-remember (ip_subtype' a y) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ now apply ip_mul_l' | ].
-apply Bool.not_true_iff_false in Hb.
-apply Bool.not_true_iff_false.
-intros H; apply Hb; clear Hb.
-apply ip_mul_l' with (a := x) in H.
-now rewrite (rngl_opp_involutive Hop) in H.
-Qed.
-...
-*)
-
-(* to be completed
+(* to be completed *)
 Theorem I_mul_mul_l' a b :
   ∀ x y, I_mul_subtype' a b y = true → I_mul_subtype' a b (x * y) = true.
 Proof.
@@ -879,63 +862,31 @@ rewrite rngl_and_list_map in H3.
 remember (⋀ (y ∈ lx), _) as u in H3; subst u.
 erewrite (rngl_and_list_eq_compat _ _ _ lx) in H3. 2: {
   intros y Hy; cbn.
-(* tiens... c'est bizarre... *)
-...
-Search (ip_subtype' _ (_ * _)).
-...
-ip_mul_r':
-  ∀ {T : Type} {ro : ring_like_op T} (i : ideal' T) (a b : T),
-    ip_subtype' i a = true → ip_subtype' i (a * b) = true
-H3:
-  (true && true && ⋀ (i ∈ lx), ip_subtype' a (x * i) && ⋀ (y ∈ ly), ip_subtype' b y &&
-   (x * (∑ (i = 1, n), lx.[i - 1] * ly.[i - 1]) =?
-    ∑ (i = 1, n), (ListDef.map (rngl_mul x) lx).[i - 1] * ly.[i - 1])%L)%bool =
-  false
-
-rewrite ip_subtype_mul_l'.
-Print ideal'.
-...
-rewrite ip_subtype_mul_l.
-  now intros; cbn; rewrite ip_subtype_opp'.
+  replace (ip_subtype' a (x * y)) with (ip_subtype' a y). 2: {
+    remember (ip_subtype' a y) as u eqn:Hu.
+    symmetry in Hu; symmetry.
+    destruct u; [ now apply ip_mul_l' | exfalso ].
+    apply Bool.not_true_iff_false in Hu.
+    apply Hu; clear Hu.
+    now apply (proj2 (all_true_rngl_and_list_true_iff _ _ _) H13).
+  }
+  easy.
 }
 rewrite H13, H14 in H3.
-rewrite (rngl_opp_summation Hop) in H3.
-remember (∑ (i = _, _), _) as x.
+rewrite (rngl_mul_summation_distr_l Hos) in H3.
+remember (∑ (i = _, _), _) as u.
 erewrite rngl_summation_eq_compat in H3. 2: {
   intros i Hi.
   rewrite (List_map_nth' 0%L 0%L); [ | flia H11 Hi ].
-  rewrite <- (rngl_mul_opp_l Hop).
+  rewrite <- rngl_mul_assoc.
   easy.
 }
-subst x.
+subst u.
 rewrite (rngl_eqb_refl Heo) in H3.
 easy.
-...
-destruct_ic.
-intros * H.
-destruct H as (n & la & lb & Hla & Hlb & Ha & Hb & H).
-subst y.
-progress unfold I_mul_subtype.
-exists n, (List.map (rngl_mul x) la), lb.
-rewrite List.length_map.
-split; [ easy | ].
-split; [ easy | ].
-split. {
-  intros z Hz.
-  apply List.in_map_iff in Hz.
-  destruct Hz as (y & Hxy & Hz).
-  subst z.
-  now apply ip_mul_l, Ha.
-}
-split; [ easy | ].
-rewrite (rngl_mul_summation_distr_l Hos).
-apply rngl_summation_eq_compat.
-intros i Hi.
-rewrite rngl_mul_assoc.
-progress f_equal.
-rewrite (List_map_nth' 0%L); [ easy | flia Hi Hla ].
 Qed.
 
+(*
 Theorem I_mul_mul_r a b :
   ∀ x y, I_mul_subtype a b x → I_mul_subtype a b (x * y).
 Proof.
@@ -972,7 +923,7 @@ Definition I_mul' (a b : ideal' T) : ideal' T :=
      ip_add' := I_mul_add' a b;
      ip_opp' := I_mul_opp' a b;
      ip_mul_l' := I_mul_mul_l' a b;
-     ip_mul_r' := I_mul_mul_r a b |}.
+     ip_mul_r' := I_mul_mul_r' a b |}.
 
 (* opposite *)
 
