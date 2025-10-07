@@ -483,11 +483,10 @@ Definition I_one' : ideal' T :=
 
 (* addition *)
 
-Axiom IPO : ∀ E (u : E → bool), ( ∀ i, u i = false ) + { i : E | u i = true }.
+Axiom IPO : ∀ P (u : P → bool), ( ∀ i, u i = false ) + { i : P | u i = true }.
 
 Definition I_add_subtype' a b z :=
-  let u :=
-    λ (xy : T * T),
+  let u (xy : T * T) :=
     let (x, y) := xy in
     ((z =? (x + y))%L && ip_subtype' a x && ip_subtype' b y)%bool
   in
