@@ -12,7 +12,10 @@ Require Import RingLike.Misc.
 Require Import RingLike.Utils.
 Require Import RingLike.IterAdd.
 
-(* ideal : non empty set (type) with some properties *)
+(* ideal: non empty set (type) with some properties *)
+(* drawback: elementary properties, like commutativity of addition of ideals
+   cannot be proven *)
+(* another version of ideals using finite or enumerable sets follow *)
 
 Record ideal {T} {ro : ring_like_op T} := mk_ip
   { ip_subtype : T → Prop;
@@ -27,8 +30,7 @@ Arguments ip_subtype {T ro} i a%_L.
 Arguments ip_opp {T ro} i a%_L.
 
 Class ideal_ctx T {ro : ring_like_op T} :=
-  { ic_op : rngl_has_opp T = true;
-    ic_eo : rngl_has_eq_dec_or_order T = true }.
+  { ic_op : rngl_has_opp T = true }.
 
 Ltac destruct_ic :=
   set (Hop := ic_op);
@@ -373,6 +375,7 @@ Definition I_ring_like_op : ring_like_op (ideal T) :=
 
 End a.
 
+(*
 Declare Scope ideal_scope.
 Delimit Scope ideal_scope with I.
 Bind Scope ideal_scope with ideal.
@@ -380,11 +383,107 @@ Bind Scope ideal_scope with ideal.
 Notation "0" := I_zero : ideal_scope.
 Notation "1" := I_one : ideal_scope.
 Notation "a + b" := (I_add a b) : ideal_scope.
-(*
 Notation "a - b" := (rngl_sub a b) : ideal_scope.
 Notation "a * b" := (rngl_mul a b) : ideal_scope.
 Notation "- a" := (rngl_opp a) : ideal_scope.
 *)
+
+(* attempt to implement ideals on finite or enumerable sets *)
+
+(* finite or enumerable sets *)
+
+Inductive eset T :=
+  | E_finite : list T → eset T
+  | E_infinite : (nat → T) → eset T.
+
+Arguments E_finite {T} l%_L.
+
+Axiom LPO : ∀ (u : nat → bool), ( ∀ i, u i = false ) + { i : nat | u i = true }.
+
+Declare Scope eset_scope.
+Delimit Scope eset_scope with E.
+Bind Scope eset_scope with eset.
+
+Definition eset_mem {T} {ro : ring_like_op T} x (s : eset T) :=
+  match s with
+  | E_finite l => List.existsb (rngl_eqb x) l
+  | E_infinite _ u =>
+      match LPO (λ i, rngl_eqb (u i) x) with
+      | inl _ => false
+      | inr _ => true
+      end
+  end.
+
+Arguments eset_mem {T ro} x%_L s%_E.
+
+Notation "x '∈' l" := (eset_mem x l = true) : eset_scope.
+
+(* attempt to implement such ideals *)
+
+Record ideal' {T} {ro : ring_like_op T} := mk_id
+  { id_set : eset T;
+    id_zero : (0%L ∈ id_set)%E;
+    id_add : ∀ a b, (a ∈ id_set → b ∈ id_set → a + b ∈ id_set)%E;
+    id_opp : ∀ a, (a ∈ id_set → -a ∈ id_set)%E;
+    id_mul_l : ∀ a b, (b ∈ id_set → a * b ∈ id_set)%E;
+    id_mul_r : ∀ a b, (a ∈ id_set → a * b ∈ id_set)%E }.
+
+Arguments ideal' T {ro}.
+
+Class ideal_ctx' T {ro : ring_like_op T} :=
+  { ic_op' : rngl_has_opp T = true;
+    ic_eo' : rngl_has_eq_dec_or_order T = true }.
+
+Ltac destruct_ic' :=
+  set (Hop := ic_op');
+  set (Heo := ic_eo');
+  set (Hos := rngl_has_opp_has_opp_or_psub Hop).
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {ic : ideal_ctx' T}.
+
+Theorem I_zero_zero' : (0 ∈ E_finite [0%L])%E.
+Proof.
+destruct_ic'.
+apply Bool.orb_true_iff; left.
+apply (rngl_eqb_refl Heo).
+Qed.
+
+Theorem I_zero_add' a b :
+  (a ∈ E_finite [0%L])%E
+  → (b ∈ E_finite [0%L])%E
+  → (a + b ∈ E_finite [0%L])%E.
+Proof.
+destruct_ic'.
+intros Ha Hb.
+apply Bool.orb_true_iff in Ha, Hb.
+apply Bool.orb_true_iff; left.
+destruct Ha as [Ha| ]; [ | easy ].
+destruct Hb as [Hb| ]; [ | easy ].
+apply (rngl_eqb_eq Heo) in Ha, Hb; subst.
+apply (rngl_eqb_eq Heo).
+apply rngl_add_0_l.
+Qed.
+
+(* to be completed
+Theorem I_zero_opp' a : (a ∈ E_finite [0%L])%E → (- a ∈ E_finite [0%L])%E.
+...
+
+Definition I_zero' : ideal' T :=
+  {| id_set := E_finite [0]%L;
+     id_zero := I_zero_zero';
+     id_add := I_zero_add';
+     id_opp := I_zero_opp';
+     id_mul_l := true;
+     id_mul_r := true |}.
+
+...
+
+(* old stuff *)
 
 Section a.
 
@@ -395,7 +494,6 @@ Context {ic : ideal_ctx T}.
 
 (* ideal ring like prop *)
 
-(* to be completed
 Theorem I_add_comm : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
@@ -437,7 +535,6 @@ subst P Q.
 cbn in H1.
 ...
 
-(*
 Theorem I_add_assoc : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a + (b + c))%L = (a + b + c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_add_assoc. Qed.
@@ -1005,7 +1102,6 @@ symmetry in Hor.
 destruct or; [ | easy ].
 apply (I_ring_like_when_ord Hor).
 Qed.
-*)
 
 Definition I_ring_like_prop : ring_like_prop (ideal T) :=
   let roi := I_ring_like_op in
