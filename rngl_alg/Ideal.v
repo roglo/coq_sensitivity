@@ -411,10 +411,8 @@ Print ideal.
 Record ideal' {T} {ro : ring_like_op T} := mk_ip'
   { ip_subtype' : T → bool;
     ip_zero' : ip_subtype' rngl_zero = true;
-    ip_add' :
-      ∀ a b,
-      ip_subtype' a = true
-      → ip_subtype' b = true
+    ip_add' a b :
+      (ip_subtype' a && ip_subtype' b)%bool = true
       → ip_subtype' (a + b)%L = true;
     ip_opp' : ∀ a, ip_subtype' a = true → ip_subtype' (- a)%L = true;
     ip_mul_l' : ∀ a b, ip_subtype' b = true → ip_subtype' (a * b)%L = true;
@@ -443,12 +441,13 @@ Context {ic : ideal_ctx' T}.
 (* 0 and 1 *)
 
 Theorem I_zero_add' a b :
-  (a =? 0)%L = true
-  → (b =? 0)%L = true
+  ((a =? 0)%L && (b =? 0)%L)%bool = true
   → (a + b =? 0)%L = true.
 Proof.
 destruct_ic'.
-intros Ha Hb.
+intros H.
+apply Bool.andb_true_iff in H.
+destruct H as (Ha, Hb).
 apply (rngl_eqb_eq Heo) in Ha, Hb.
 apply (rngl_eqb_eq Heo).
 subst; apply rngl_add_0_l.
@@ -492,7 +491,7 @@ Definition I_zero' : ideal' T :=
 Definition I_one' : ideal' T :=
   {| ip_subtype' a := true;
      ip_zero' := eq_refl;
-     ip_add' _ _ _ _ := eq_refl;
+     ip_add' _ _ _ := eq_refl;
      ip_opp' _ _ := eq_refl;
      ip_mul_l' _ _ _ := eq_refl;
      ip_mul_r' _ _ _ := eq_refl |}.
@@ -538,12 +537,13 @@ Qed.
 
 Theorem I_add_add' a b :
   ∀ x y,
-  I_add_subtype' a b x = true
-  → I_add_subtype' a b y = true
+  (I_add_subtype' a b x && I_add_subtype' a b y)%bool = true
   → I_add_subtype' a b (x + y)%L = true.
 Proof.
 destruct_ic'.
-intros * Hx Hy.
+intros * H.
+apply Bool.andb_true_iff in H.
+destruct H as (Hx, Hy).
 progress unfold I_add_subtype' in Hx, Hy.
 progress unfold I_add_subtype'.
 destruct (IPO _) as [H1| H1] in Hx; [ easy | clear Hx ].
@@ -564,8 +564,8 @@ specialize (H3 (x1 + x2, y1 + y2))%L.
 cbn in H3.
 rewrite rngl_add_add_add_swap in H3.
 rewrite (rngl_eqb_refl Heo) in H3.
-rewrite ip_add' in H3; [ | easy | easy ].
-rewrite ip_add' in H3; [ | easy | easy ].
+rewrite ip_add' in H3; [ | now apply Bool.andb_true_iff ].
+rewrite ip_add' in H3; [ | now apply Bool.andb_true_iff ].
 easy.
 Qed.
 
@@ -681,12 +681,13 @@ Qed.
 
 Theorem I_mul_add' a b :
   ∀ x y,
-  I_mul_subtype' a b x = true
-  → I_mul_subtype' a b y = true
+  (I_mul_subtype' a b x && I_mul_subtype' a b y)%bool = true
   → I_mul_subtype' a b (x + y)%L = true.
 Proof.
 destruct_ic'.
-intros * Hx Hy.
+intros * H.
+apply Bool.andb_true_iff in H.
+destruct H as (Hx, Hy).
 progress unfold I_mul_subtype' in Hx, Hy.
 progress unfold I_mul_subtype'.
 destruct (IPO _) as [H1| H1] in Hx; [ easy | clear Hx ].
@@ -965,16 +966,18 @@ Definition I_mul' (a b : ideal' T) : ideal' T :=
 
 Theorem I_opp_add' a :
   ∀ x y,
-  ip_subtype' a (- x) = true
-  → ip_subtype' a (- y) = true
+  (ip_subtype' a (- x) && ip_subtype' a (- y))%bool = true
   → ip_subtype' a (- (x + y)%L) = true.
 Proof.
 destruct_ic'.
-intros * Hx Hy.
+intros * H.
+apply Bool.andb_true_iff in H.
+destruct H as (Hx, Hy).
 apply ip_opp' in Hx, Hy.
 rewrite (rngl_opp_involutive Hop) in Hx, Hy.
 apply ip_opp'.
-now apply ip_add'.
+apply ip_add'.
+now apply Bool.andb_true_iff.
 Qed.
 
 Theorem I_opp_mul_l' a :
@@ -1044,9 +1047,35 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ic : ideal_ctx' T}.
 
+(* to be completed
+Theorem eq_ideal_eq : ∀ a b, 
+  ip_subtype' a = ip_subtype' b
+  → a = b.
+Proof.
+intros * Hab.
+destruct a.
+destruct b.
+cbn in *.
+subst.
+f_equal.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+move ip_add'1 before ip_add'0.
+...
+apply Eqdep_dec.UIP_dec.
+...
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+...
+
+move ip_zero'1 before ip_zero'0.
+move ip_subtyp_1 before ip_sub
+...
+
 (* ideal ring like prop *)
 
-(* to be completed
+(* to be completed *)
 Theorem I_add_comm' : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
