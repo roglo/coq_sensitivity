@@ -482,8 +482,12 @@ Definition I_one' : ideal' T :=
      ip_mul_r' _ _ _ := eq_refl |}.
 
 (* Illimited Principe of Omniscience *)
+(*
 Axiom IPO :
-  ∀ {I} (u : I → bool), ( ∀ i, u i = false ) + { i : I | u i = true }.
+  ∀ {I} (u : I → bool), (∀ i, u i = false) + { i : I | u i = true }.
+*)
+Axiom IPO : ∀ {I} (u : I → bool), (∀ i, u i = false) + (∃ i, u i = true).
+(**)
 
 Definition bool_of_sum {A B} (s : A + B) :=
   match s with
