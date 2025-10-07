@@ -667,9 +667,44 @@ Definition I_mul_subtype' a b z :=
 
 Arguments I_mul_subtype' a b z%_L.
 
+(*
+Notation "'⋀' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, (c && g)%bool) true)
+  (at level 36, i at level 0, b at level 60, e at level 60,
+   right associativity,
+   format "'[hv  ' ⋀  ( i  =  b ,  e ) ,  '/' '[' g ']' ']'").
+
+Notation "'⋀' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, (c && g)%bool) true)
+  (at level 36, i at level 0, l at level 60,
+   right associativity,
+   format "'[hv  ' ⋀  ( i  ∈  l ) ,  '/' '[' g ']' ']'").
+
+Print Grammar constr.
+*)
+
 (* to be completed
 Theorem I_mul_zero' a b : I_mul_subtype' a b 0%L = true.
 Proof.
+progress unfold I_mul_subtype'.
+destruct (IPO _) as [H| H]; [ exfalso | easy ].
+specialize (H (0, [], [])).
+cbn in H.
+...
+destruct H as (n & lx & ly & H).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H13).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H11, H12).
+apply (rngl_eqb_eq Heo) in H11.
+subst.
+specialize (H2 (x1 * y, y1 * y))%L.
+cbn in H2.
+rewrite rngl_mul_add_distr_r in H2.
+rewrite (rngl_eqb_refl Heo) in H2.
+rewrite ip_mul_r' in H2; [ | easy ].
+rewrite ip_mul_r' in H2; [ | easy ].
+easy.
 ...
 
 (*
