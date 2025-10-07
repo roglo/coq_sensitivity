@@ -501,8 +501,9 @@ Definition I_one' : ideal' T :=
 (*
 Axiom IPO :
   ∀ {I} (u : I → bool), (∀ i, u i = false) + { i : I | u i = true }.
-*)
 Axiom IPO : ∀ {I} (u : I → bool), (∀ i, u i = false) + (∃ i, u i = true).
+*)
+Axiom IPO : ∀ {I} (u : I → bool), { ∀ i, u i = false } + { ∃ i, u i = true }.
 (**)
 
 Definition bool_of_sum {A B} (s : A + B) :=
@@ -518,7 +519,7 @@ Definition I_add_subtype' a b z :=
     let (x, y) := xy in
     ((z =? (x + y))%L && ip_subtype' a x && ip_subtype' b y)%bool
   in
-  bool_of_sum (IPO u).
+  negb (bool_of_sumbool (IPO u)).
 
 Arguments I_add_subtype' a b z%_L.
 
@@ -568,7 +569,6 @@ rewrite ip_add' in H3; [ | easy | easy ].
 easy.
 Qed.
 
-(* to be completed *)
 Theorem I_add_opp' a b :
   ∀ x, I_add_subtype' a b x = true → I_add_subtype' a b (- x) = true.
 Proof.
@@ -663,55 +663,64 @@ Definition I_mul_subtype' a b z :=
      ⋀ (y ∈ ly), ip_subtype' b y &&
      (z =? ∑ (i = 1, n), lx.[i-1] * ly.[i-1])%L)%bool
   in
-  bool_of_sum (IPO u).
+  negb (bool_of_sumbool (IPO u)).
 
 Arguments I_mul_subtype' a b z%_L.
 
-(*
-Notation "'⋀' ( i = b , e ) , g" :=
-  (iter_seq b e (λ c i, (c && g)%bool) true)
-  (at level 36, i at level 0, b at level 60, e at level 60,
-   right associativity,
-   format "'[hv  ' ⋀  ( i  =  b ,  e ) ,  '/' '[' g ']' ']'").
-
-Notation "'⋀' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, (c && g)%bool) true)
-  (at level 36, i at level 0, l at level 60,
-   right associativity,
-   format "'[hv  ' ⋀  ( i  ∈  l ) ,  '/' '[' g ']' ']'").
-
-Print Grammar constr.
-*)
-
-(* to be completed
 Theorem I_mul_zero' a b : I_mul_subtype' a b 0%L = true.
 Proof.
+destruct_ic'.
 progress unfold I_mul_subtype'.
 destruct (IPO _) as [H| H]; [ exfalso | easy ].
-specialize (H (0, [], [])).
-cbn in H.
-...
-destruct H as (n & lx & ly & H).
-apply Bool.andb_true_iff in H1.
+specialize (H (0, [], [])); cbn in H.
+rewrite rngl_and_list_empty in H; [ | easy ].
+rewrite rngl_and_list_empty in H; [ | easy ].
+rewrite rngl_summation_empty in H; [ | easy ].
+now rewrite (rngl_eqb_refl Heo) in H.
+Qed.
+
+(* to be completed
+Theorem I_mul_add' a b :
+  ∀ x y,
+  I_mul_subtype' a b x = true
+  → I_mul_subtype' a b y = true
+  → I_mul_subtype' a b (x + y)%L = true.
+Proof.
+destruct_ic'.
+intros * Hx Hy.
+progress unfold I_mul_subtype' in Hx, Hy.
+progress unfold I_mul_subtype'.
+destruct (IPO _) as [H1| H1] in Hx; [ easy | clear Hx ].
+destruct (IPO _) as [H2| H2] in Hy; [ easy | clear Hy ].
+destruct (IPO _) as [H3| H3] in |-*; [ exfalso | easy ].
+destruct H1 as (((n1, lx1), ly1) & H1).
+destruct H2 as (((n2, lx2), ly2) & H2).
+move n2 before n1.
+move lx2 before ly1; move ly2 before lx2.
+apply Bool.andb_true_iff in H1, H2.
+destruct H1 as (H1, H15).
+destruct H2 as (H2, H25).
+apply Bool.andb_true_iff in H1, H2.
+destruct H1 as (H1, H14).
+destruct H2 as (H2, H24).
+apply Bool.andb_true_iff in H1, H2.
 destruct H1 as (H1, H13).
-apply Bool.andb_true_iff in H1.
+destruct H2 as (H2, H23).
+apply Bool.andb_true_iff in H1, H2.
 destruct H1 as (H11, H12).
-apply (rngl_eqb_eq Heo) in H11.
-subst.
-specialize (H2 (x1 * y, y1 * y))%L.
-cbn in H2.
-rewrite rngl_mul_add_distr_r in H2.
-rewrite (rngl_eqb_refl Heo) in H2.
-rewrite ip_mul_r' in H2; [ | easy ].
-rewrite ip_mul_r' in H2; [ | easy ].
+destruct H2 as (H21, H22).
+apply Nat.eqb_eq in H11, H12, H21, H22.
+apply (rngl_eqb_eq Heo) in H15, H25.
+subst x y.
+...
+specialize (H3 (x1 + x2, y1 + y2))%L.
+cbn in H3.
+rewrite rngl_add_add_add_swap in H3.
+rewrite (rngl_eqb_refl Heo) in H3.
+rewrite ip_add' in H3; [ | easy | easy ].
+rewrite ip_add' in H3; [ | easy | easy ].
 easy.
 ...
-
-(*
-Theorem I_mul_add a b :
-  ∀ x y,
-  I_mul_subtype a b x → I_mul_subtype a b y → I_mul_subtype a b (x + y)%L.
-Proof.
 intros * Hx Hy.
 destruct Hx as (nx & la1 & lb1 & Hla1 & Hlb1 & Ha1 & Hb1 & Hx).
 destruct Hy as (ny & la2 & lb2 & Hla2 & Hlb2 & Ha2 & Hb2 & Hy).
@@ -756,7 +765,7 @@ destruct (Nat.eq_dec ny 0) as [Hnyz| Hnyz]. {
   rewrite List.app_nth2; [ | flia Hlb1 Hi ].
   rewrite Hla1, Hlb1.
   f_equal; f_equal; flia.
-}
+}...
 Qed.
 
 Theorem I_mul_opp a b : ∀ x, I_mul_subtype a b x → I_mul_subtype a b (- x).
@@ -843,11 +852,11 @@ rewrite (List_map_nth' 0%L); [ easy | flia Hi Hlb ].
 Qed.
 *)
 
-(* to be completed *)
+(* to be completed
 Definition I_mul' (a b : ideal' T) : ideal' T :=
   {| ip_subtype' := I_mul_subtype' a b;
      ip_zero' := I_mul_zero' a b;
-     ip_add' := I_mul_add a b;
+     ip_add' := I_mul_add' a b;
      ip_opp' := I_mul_opp a b;
      ip_mul_l' := I_mul_mul_l a b;
      ip_mul_r' := I_mul_mul_r a b |}.
