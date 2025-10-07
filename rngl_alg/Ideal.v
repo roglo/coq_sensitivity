@@ -712,6 +712,19 @@ destruct H2 as (H21, H22).
 apply Nat.eqb_eq in H11, H12, H21, H22.
 apply (rngl_eqb_eq Heo) in H15, H25.
 subst x y.
+specialize (H3 (n1 + n2, lx1 ++ lx2, ly1 ++ ly2)).
+cbn in H3.
+do 2 rewrite List.length_app in H3.
+rewrite H11, H12, H21, H22 in H3.
+rewrite Nat.eqb_refl in H3.
+...
+Search (⋀ (_ ∈ _ ++ _), _).
+Search (∑ (_ ∈ _ ++ _), _).
+rngl_summation_list_app:
+  ∀ {T : Type} {ro : ring_like_op T},
+    ring_like_prop T
+    → ∀ (A : Type) (la lb : list A) (f : A → T),
+        ∑ (i ∈ la ++ lb), f i = (∑ (i ∈ la), f i + ∑ (i ∈ lb), f i)%L
 ...
 specialize (H3 (x1 + x2, y1 + y2))%L.
 cbn in H3.
