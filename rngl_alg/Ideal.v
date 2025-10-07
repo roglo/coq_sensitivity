@@ -595,40 +595,68 @@ rewrite ip_opp' in H2; [ | easy ].
 easy.
 Qed.
 
-(*
-Theorem I_add_mul_l a b :
-  ∀ x y, I_add_subtype a b y → I_add_subtype a b (x * y).
+Theorem I_add_mul_l' a b :
+  ∀ x y, I_add_subtype' a b y = true → I_add_subtype' a b (x * y) = true.
 Proof.
+destruct_ic'.
 intros * H.
-destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
-exists (x * x1)%L, (x * x2)%L.
-split; [ | now split; apply ip_mul_l ].
-apply rngl_mul_add_distr_l.
+progress unfold I_add_subtype' in H.
+progress unfold I_add_subtype'.
+destruct (IPO _) as [H1| H1] in H; [ easy | clear H ].
+destruct (IPO _) as [H2| H2] in |-*; [ exfalso | easy ].
+destruct H1 as ((x1, y1) & H1).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H13).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H11, H12).
+apply (rngl_eqb_eq Heo) in H11.
+subst.
+specialize (H2 (x * x1, x * y1))%L.
+cbn in H2.
+rewrite rngl_mul_add_distr_l in H2.
+rewrite (rngl_eqb_refl Heo) in H2.
+rewrite ip_mul_l' in H2; [ | easy ].
+rewrite ip_mul_l' in H2; [ | easy ].
+easy.
 Qed.
 
-Theorem I_add_mul_r a b :
-  ∀ x y, I_add_subtype a b x → I_add_subtype a b (x * y).
+Theorem I_add_mul_r' a b :
+  ∀ x y, I_add_subtype' a b x = true → I_add_subtype' a b (x * y) = true.
 Proof.
+destruct_ic'.
 intros * H.
-destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
-exists (x1 * y)%L, (x2 * y)%L.
-split; [ | now split; apply ip_mul_r ].
-apply rngl_mul_add_distr_r.
+progress unfold I_add_subtype' in H.
+progress unfold I_add_subtype'.
+destruct (IPO _) as [H1| H1] in H; [ easy | clear H ].
+destruct (IPO _) as [H2| H2] in |-*; [ exfalso | easy ].
+destruct H1 as ((x1, y1) & H1).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H13).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H11, H12).
+apply (rngl_eqb_eq Heo) in H11.
+subst.
+specialize (H2 (x1 * y, y1 * y))%L.
+cbn in H2.
+rewrite rngl_mul_add_distr_r in H2.
+rewrite (rngl_eqb_refl Heo) in H2.
+rewrite ip_mul_r' in H2; [ | easy ].
+rewrite ip_mul_r' in H2; [ | easy ].
+easy.
 Qed.
-*)
 
-(* to be completed
 Definition I_add' (a b : ideal' T) : ideal' T :=
   {| ip_subtype' := I_add_subtype' a b;
      ip_zero' := I_add_zero' a b;
      ip_add' := I_add_add' a b;
      ip_opp' := I_add_opp' a b;
-     ip_mul_l' := true; (*I_add_mul_l a b;*)
-     ip_mul_r' := true; (*I_add_mul_r a b*) |}.
+     ip_mul_l' := I_add_mul_l' a b;
+     ip_mul_r' := I_add_mul_r' a b |}.
 
 (* multiplication *)
 
-Definition I_mul_subtype a b z :=
+(* to be completed
+Definition I_mul_subtype' a b z :=
   ∃ n lx ly,
   length lx = n ∧ length ly = n ∧
   (∀ x, x ∈ lx → ip_subtype a x) ∧
