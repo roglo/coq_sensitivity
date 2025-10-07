@@ -659,12 +659,13 @@ Definition I_add' (a b : ideal' T) : ideal' T :=
 Definition I_mul_subtype' a b z :=
   ∃ n lx ly,
   length lx = n ∧ length ly = n ∧
-  (∀ x, x ∈ lx → ip_subtype a x) ∧
-  (∀ y, y ∈ ly → ip_subtype b y) ∧
+  (∀ x, x ∈ lx → ip_subtype' a x = true) ∧
+  (∀ y, y ∈ ly → ip_subtype' b y = true) ∧
   z = ∑ (i = 1, n), lx.[i-1] * ly.[i-1].
 
-Arguments I_mul_subtype a b z%_L.
+Arguments I_mul_subtype' a b z%_L.
 
+(*
 Theorem I_mul_zero a b : I_mul_subtype a b 0%L.
 Proof.
 destruct_ic.
@@ -810,14 +811,15 @@ rewrite <- rngl_mul_assoc.
 progress f_equal.
 rewrite (List_map_nth' 0%L); [ easy | flia Hi Hlb ].
 Qed.
+*)
 
-Definition I_mul (a b : ideal T) : ideal T :=
-  {| ip_subtype := I_mul_subtype a b;
-     ip_zero := I_mul_zero a b;
-     ip_add := I_mul_add a b;
-     ip_opp := I_mul_opp a b;
-     ip_mul_l := I_mul_mul_l a b;
-     ip_mul_r := I_mul_mul_r a b |}.
+Definition I_mul' (a b : ideal' T) : ideal' T :=
+  {| ip_subtype' := I_mul_subtype' a b;
+     ip_zero' := true; (*I_mul_zero a b;*)
+     ip_add' := I_mul_add a b;
+     ip_opp' := I_mul_opp a b;
+     ip_mul_l' := I_mul_mul_l a b;
+     ip_mul_r' := I_mul_mul_r a b |}.
 
 (* opposite *)
 
