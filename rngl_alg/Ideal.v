@@ -1157,9 +1157,15 @@ destruct H2 as [H2| H2]. {
   }
   clear H2.
   rename H into H2.
+  specialize (H3 i).
+  cbn in H1, H2, H3.
+...
   specialize (H2 (0, 0))%L.
   specialize (H3 (0, 0))%L.
   cbn in H2, H3.
+cbn in H1.
+destruct i as (a, b).
+
   rewrite H2 in H3.
 ...
   congruence.
