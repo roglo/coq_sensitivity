@@ -1118,17 +1118,7 @@ set
      let (a, b) := ab in
      (negb (ip_subtype'1 a) || negb (ip_subtype'1 b) || ip_subtype'1 (a + b)%L)%bool).
 specialize (H1 u).
-destruct H1 as [H1| H1]. 2: {
-  destruct H1 as (i, H1).
-  subst u.
-  cbn in H1.
-  destruct i as (a, b).
-(* bin oui, aucun intérêt *)
-(* bon, faut que j'ajoute l'extensionalité.
-   J'aime pas l'extensionalité.
-   Surtout que j'ai déjà un axiome.
-   Je vais quand même pas en mettre deux ! *)
-... ...
+destruct H1 as [H1| H1]. {
   subst u.
   cbn in H1.
   assert
@@ -1142,6 +1132,22 @@ destruct H1 as [H1| H1]. 2: {
   }
   clear H1.
   rename H into H1.
+  specialize (H1 (0, 0))%L.
+  specialize (H2 (0, 0))%L.
+  cbn in H1, H2.
+  congruence.
+}
+destruct H1 as (i, H1).
+subst u.
+cbn in H1.
+destruct i as (a, b).
+cbn in H.
+(* bin oui, aucun intérêt *)
+(* bon, faut que j'ajoute l'extensionalité.
+   J'aime pas l'extensionalité.
+   Surtout que j'ai déjà un axiome.
+   Je vais quand même pas en mettre deux ! *)
+... ...
 ...
 set (u (ab : T * T) := H ab).
 ...
