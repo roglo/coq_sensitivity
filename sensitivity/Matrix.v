@@ -106,7 +106,7 @@ split; intros Hm. {
   remember (mat_list_list M) as ll eqn:Hll.
   clear Hll.
   induction ll as [| la]; [ easy | cbn ].
-  rewrite and_list_cons in Hc.
+  rewrite rngl_and_list_cons in Hc.
   apply Bool.andb_true_iff in Hc.
   destruct Hc as (Hla, Hc).
   apply Nat.eqb_eq in Hla.
@@ -129,7 +129,7 @@ split; intros Hm. {
   remember (mat_list_list M) as ll eqn:Hll.
   clear Hll.
   induction ll as [| la]; [ easy | ].
-  rewrite and_list_cons.
+  rewrite rngl_and_list_cons.
   apply Bool.andb_true_iff.
   split; [ now apply Nat.eqb_eq, Hc; left | ].
   apply IHll.
