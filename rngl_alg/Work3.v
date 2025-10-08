@@ -131,8 +131,7 @@ intros Hop Hiv Hor * Hz.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hi1.
-...
-specialize (rngl_integral_or_inv_or_pdiv_eq_dec_order Hiv Hor) as Hio.
+specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 apply (rngl_div_nonneg Hop Hiv Hor). {
   apply rl_sqrt_nonneg.
   apply (rngl_add_squ_nonneg Hos Hor).
@@ -681,17 +680,10 @@ Qed.
 *)
 
 Theorem rngl_0_gc_0 : 0%L = 0%C.
-Proof. now intros; apply eq_gc_eq. Qed.
+Proof. easy. Qed.
 
 Theorem rngl_1_gc_1 : 1%L = 1%C.
-Proof.
-intros.
-apply eq_gc_eq; cbn.
-progress unfold rngl_one.
-cbn.
-progress unfold gc_opt_one.
-now destruct (rngl_opt_one T).
-Qed.
+Proof. easy. Qed.
 
 Theorem gc_eq_mul_0_l :
   rngl_mul_is_comm T = true →
@@ -703,7 +695,7 @@ Proof.
 intros Hic Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
-specialize (rngl_integral_or_pdiv_eq_dec_order Hiv Hor) as Hio.
+specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 intros * Hab Hbz.
 apply eq_gc_eq in Hab.
 cbn in Hab.
@@ -768,7 +760,6 @@ apply Haz; clear Haz.
 induction n. {
   cbn in Hanz.
   apply eq_gc_eq in Hanz.
-  rewrite gre_1, gim_1 in Hanz.
   destruct Hanz as (H, _).
   now apply rngl_1_neq_0_iff in H.
 }
@@ -790,10 +781,7 @@ Theorem gc_modl_pow :
   ∀ z n, (‖ z ^ n ‖ = ‖ z ‖ ^ n)%L.
 Proof.
 intros Hic Hop Hiq Hor *.
-induction n; cbn. {
-  rewrite rngl_1_gc_1.
-  apply (gc_modl_1 Hop Hiq Hor).
-}
+induction n; cbn; [ apply (gc_modl_1 Hop Hiq Hor) | ].
 rewrite (gc_modl_mul Hic Hop Hiq Hor).
 rewrite rngl_pow_gc_pow.
 now rewrite IHn.
@@ -929,17 +917,6 @@ Qed.
 Print rngl_opt_integral.
 Check is_charac_0_field.
 *)
-
-Theorem rngl_has_1_gc_has_1 :
-  rngl_has_1 T = true → rngl_has_1 (GComplex T) = true.
-Proof.
-intros Hon.
-progress unfold rngl_has_1.
-cbn.
-progress unfold rngl_has_1 in Hon.
-progress unfold gc_opt_one.
-now destruct (rngl_opt_one T).
-Qed.
 
 Theorem rngl_has_opp_or_psub_gc_has_opp_or_psub :
   rngl_has_opp_or_psub T = true → rngl_has_opp_or_psub (GComplex T) = true.
