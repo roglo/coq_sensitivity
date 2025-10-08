@@ -18,7 +18,6 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hon : rngl_has_1 T = true).
 
 (* version of signature (parity) of a list of nat *)
 
@@ -52,6 +51,7 @@ Definition test_ring_like_op :=
     end
   in
   {| rngl_zero := Zero;
+     rngl_one := One;
      rngl_add _ _ := Zero;
      rngl_mul a b :=
        match a with
@@ -59,7 +59,6 @@ Definition test_ring_like_op :=
        | Minus_one => test_opp b
        | One => b
        end;
-     rngl_opt_one := Some One;
      rngl_opt_opp_or_psub := Some (inl test_opp);
      rngl_opt_inv_or_pdiv := None;
      rngl_opt_is_zero_divisor := Some (λ _, True);
@@ -76,7 +75,7 @@ intros Hop *.
 unfold minus_one_pow.
 remember (i mod 2) as k eqn:Hk; symmetry in Hk.
 destruct k. {
-  now rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+  now rewrite (rngl_mul_1_r), (rngl_mul_1_l).
 }
 rewrite (rngl_mul_opp_l Hop).
 rewrite (rngl_mul_opp_r Hop).
@@ -156,7 +155,7 @@ Theorem minus_one_pow_mul_same :
 Proof.
 intros Hop *.
 unfold minus_one_pow.
-destruct (i mod 2); [ apply (rngl_mul_1_l Hon) | ].
+destruct (i mod 2); [ apply (rngl_mul_1_l) | ].
 now apply rngl_squ_opp_1.
 Qed.
 
@@ -347,13 +346,13 @@ specialize (ε_aux_in Hop a la) as H1.
 destruct IHla as [H2| [H2| [H2| ]]]; [ | | | easy ]; rewrite <- H2. {
   destruct H1 as [H1| [H1| [H1| ]]]; [ | | | easy ]; rewrite <- H1. {
     right; right; left.
-    symmetry; apply (rngl_squ_opp_1 Hon Hop).
+    symmetry; apply (rngl_squ_opp_1 Hop).
   } {
     right; left.
     symmetry; apply (rngl_mul_0_l Hos).
   } {
     left.
-    symmetry; apply (rngl_mul_1_l Hon).
+    symmetry; apply (rngl_mul_1_l).
   }
 } {
   right; left.
@@ -374,8 +373,8 @@ move Hos before Hop.
 specialize (ε_aux_in Hop i la) as H1.
 destruct H1 as [H1| H1]. {
   rewrite <- H1.
-  rewrite (rngl_mul_opp_l Hop), (rngl_mul_1_l Hon).
-  rewrite (rngl_mul_opp_r Hop), (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_opp_l Hop), (rngl_mul_1_l).
+  rewrite (rngl_mul_opp_r Hop), (rngl_mul_1_r).
   easy.
 }
 destruct H1 as [H1| H1]. {
@@ -702,7 +701,7 @@ specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 revert a.
-induction la as [| b]; intros; [ symmetry; apply (rngl_mul_1_l Hon) | cbn ].
+induction la as [| b]; intros; [ symmetry; apply (rngl_mul_1_l) | cbn ].
 remember (a ?= b) as c eqn:Hc; symmetry in Hc.
 destruct c. {
   apply Nat.compare_eq_iff in Hc; subst b.
@@ -858,7 +857,7 @@ revert lb Hbp la Hla.
 induction n; intros; cbn. {
   destruct Hbp as (Hb, Hbl).
   apply List.length_zero_iff_nil in Hla, Hbl; subst la lb.
-  symmetry; apply (rngl_mul_1_l Hon).
+  symmetry; apply (rngl_mul_1_l).
 }
 (* removing the highest value, "n" in "lb", permutation of {0..n} *)
 specialize (permut_without_highest Hbp) as H1.
@@ -949,7 +948,7 @@ rewrite Hbbl in H5.
 apply (f_equal (rngl_mul (minus_one_pow n))) in H5.
 rewrite rngl_mul_assoc in H5.
 rewrite (minus_one_pow_mul_same Hop) in H5.
-rewrite (rngl_mul_1_l Hon) in H5.
+rewrite (rngl_mul_1_l) in H5.
 rewrite <- H5; cbn; clear H5.
 (* ... and the right factor of the lhs, being
    "ε((la without List.last)°(lb1++lb2)", can be replaced using
@@ -969,7 +968,7 @@ rewrite <- List.app_removelast_last in H5; [ | now intros H; subst la ].
 apply (f_equal (rngl_mul (minus_one_pow n))) in H5.
 rewrite rngl_mul_assoc in H5.
 rewrite (minus_one_pow_mul_same Hop) in H5.
-rewrite (rngl_mul_1_l Hon) in H5.
+rewrite (rngl_mul_1_l) in H5.
 rewrite <- H5; cbn.
 (* both sides now contain "(-1)^" and "ε(la without List.last)" that we can
    eliminate *)
@@ -1097,7 +1096,7 @@ intros * Hpq.
 revert q Hpq.
 induction p as [| i]; intros. {
   cbn; symmetry; f_equal.
-  apply (rngl_mul_1_l Hon).
+  apply (rngl_mul_1_l).
 }
 cbn.
 rewrite IHp. 2: {
@@ -1117,7 +1116,7 @@ Proof.
 intros Hop * Hpq.
 revert i q Hpq.
 induction p as [| j]; intros; cbn. {
-  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_1_r).
   assert (H : ∀ k, k ∈ q → k < i). {
     intros.
     apply Hpq; [ now left | easy ].
@@ -1162,7 +1161,7 @@ intros Hop * Hpq.
 revert q Hpq.
 induction p as [| i]; intros. {
   cbn; symmetry; f_equal.
-  now do 2 rewrite (rngl_mul_1_l Hon).
+  now do 2 rewrite (rngl_mul_1_l).
 }
 cbn.
 rewrite IHp. 2: {
@@ -1171,7 +1170,7 @@ rewrite IHp. 2: {
 }
 do 3 rewrite rngl_mul_assoc.
 f_equal; f_equal.
-rewrite (minus_one_pow_add Hon Hop).
+rewrite (minus_one_pow_add Hop).
 do 2 rewrite <- (minus_one_pow_mul_comm Hop).
 rewrite <- rngl_mul_assoc; f_equal.
 now apply ε_aux_app2.
@@ -1189,7 +1188,7 @@ rewrite ε_app. 2: {
   destruct Hj as [Hj| ]; [ now subst j | easy ].
 }
 cbn.
-do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_1_r).
 apply IHlen.
 Qed.
 
@@ -1268,7 +1267,7 @@ rewrite ε_app. 2: {
   destruct Hj as [Hj| Hj]; [ now subst j | ].
   apply List.in_seq in Hj; flia Hi Hpq Hj.
 }
-rewrite ε_seq, (rngl_mul_1_l Hon).
+rewrite ε_seq, (rngl_mul_1_l).
 rewrite List_cons_is_app.
 rewrite (List_cons_is_app p).
 do 2 rewrite List.app_assoc.
@@ -1289,7 +1288,7 @@ rewrite ε_app. 2: {
   destruct Hi; [ subst i | easy ].
   now transitivity q.
 }
-rewrite ε_seq, (rngl_mul_1_r Hon).
+rewrite ε_seq, (rngl_mul_1_r).
 clear n Hq.
 rewrite (ε_app2 Hop). 2: {
   intros i j Hi Hj.
@@ -1303,8 +1302,8 @@ rewrite (ε_app2 Hop). 2: {
 rewrite List.length_app, List.length_seq.
 cbn - [ ε ].
 rewrite Nat.mul_1_r.
-replace (ε [p]) with 1%L by now cbn; rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_1_r Hon).
+replace (ε [p]) with 1%L by now cbn; rewrite (rngl_mul_1_l).
+rewrite (rngl_mul_1_r).
 rewrite (minus_one_pow_succ Hop).
 rewrite (rngl_mul_opp_l Hop); f_equal.
 rewrite List_cons_is_app.
@@ -1314,10 +1313,10 @@ rewrite (ε_app2 Hop). 2: {
   apply List.in_seq in Hj.
   now rewrite Nat.add_comm, Nat.sub_add in Hj.
 }
-rewrite ε_seq, (rngl_mul_1_r Hon).
+rewrite ε_seq, (rngl_mul_1_r).
 rewrite List.length_seq; cbn.
 rewrite Nat.add_0_r.
-do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_1_r).
 now apply minus_one_pow_mul_same.
 Qed.
 
@@ -2157,7 +2156,7 @@ Theorem ε_aux_app_all_gt_l :
 Proof.
 intros Hop * Hla.
 revert lb.
-induction la as [| a]; intros; cbn; [ symmetry; apply (rngl_mul_1_l Hon) | ].
+induction la as [| a]; intros; cbn; [ symmetry; apply (rngl_mul_1_l) | ].
 specialize (Hla a (or_introl eq_refl)) as H1.
 apply Nat.compare_gt_iff in H1.
 rewrite H1.
@@ -2256,7 +2255,7 @@ rewrite (ε_aux_app_all_gt_l Hop). 2: {
   intros j Hj.
   now apply List.in_seq in Hj.
 }
-rewrite List.length_seq, <- (rngl_mul_1_r Hon); f_equal.
+rewrite List.length_seq, <- (rngl_mul_1_r); f_equal.
 erewrite List.map_ext_in. 2: {
   intros j Hj.
   apply List.in_seq in Hj; destruct Hj as (Hij, Hjn).
@@ -2359,7 +2358,7 @@ apply List.NoDup_cons_iff in Hσ.
 destruct Hσ as (Ha, Hnd).
 specialize (IHla Hnd).
 destruct IHla as [Hla| Hla]; rewrite Hla. {
-  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_1_r).
   clear Hla.
   induction la as [| b]; intros; [ now left | cbn ].
   apply List.not_in_cons in Ha.
@@ -2373,7 +2372,7 @@ destruct IHla as [Hla| Hla]; rewrite Hla. {
   left; apply (rngl_opp_involutive Hop).
 } {
   clear Hla.
-  rewrite (rngl_mul_opp_r Hop), (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_opp_r Hop), (rngl_mul_1_r).
   induction la as [| b]; intros; [ now right | cbn ].
   apply List.not_in_cons in Ha.
   destruct Ha as (Hab, Ha).
@@ -2398,11 +2397,11 @@ exfalso.
 apply (ε_when_dup Hop) in H1.
 rewrite H1 in Hσ.
 destruct Hσ as [Hσ| Hσ]; symmetry in Hσ. {
-  revert Hσ; apply (rngl_1_neq_0_iff Hon), H10.
+  revert Hσ; apply (rngl_1_neq_0_iff), H10.
 } {
   rewrite <- (rngl_opp_0 Hop) in Hσ.
   apply (rngl_opp_inj Hop) in Hσ.
-  revert Hσ; apply (rngl_1_neq_0_iff Hon), H10.
+  revert Hσ; apply (rngl_1_neq_0_iff), H10.
 }
 Qed.
 
@@ -2414,10 +2413,10 @@ intros Hop * Hσ.
 specialize (NoDup_ε_1_opp_1) as H1.
 specialize (H1 Hop σ Hσ).
 destruct H1 as [H1| H1]; rewrite H1. {
-  apply (rngl_mul_1_l Hon).
+  apply (rngl_mul_1_l).
 } {
   rewrite rngl_mul_opp_opp; [ | easy ].
-  apply (rngl_mul_1_l Hon).
+  apply (rngl_mul_1_l).
 }
 Qed.
 

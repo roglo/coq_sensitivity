@@ -90,7 +90,6 @@ Definition Rayleigh_quotient (M : matrix T) (v : vector T) :=
   (≺ v, M • v ≻ / ≺ v, v ≻)%L.
 
 Definition in_ordered_field :=
-  rngl_has_1 T = true ∧
   rngl_mul_is_comm T = true ∧
   rngl_has_opp T = true ∧
   rngl_has_eq_dec T = true ∧
@@ -99,13 +98,12 @@ Definition in_ordered_field :=
   rngl_is_ordered T = true.
 
 Theorem eq_vect_squ_0 :
-  rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
   rngl_is_ordered T = true →
   ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.
-intros Hon Hop Hiq Hor * Hvvz.
+intros Hop Hiq Hor * Hvvz.
 specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -148,8 +146,7 @@ destruct i. {
   apply rngl_integral in Haz; [ now destruct Haz | easy | ].
   apply Bool.orb_true_iff; right.
   apply Bool.andb_true_iff.
-  split.
-  apply (rngl_has_1_has_inv_or_pdiv_has_inv_and_1_or_pdiv Hon Hiq).
+  split; [ easy | ].
   apply (rngl_has_eq_dec_or_is_ordered_r Hor).
 }
 cbn.
@@ -214,7 +211,7 @@ Theorem RQ_mul_scal_prop :
   → Rayleigh_quotient M (c × V) = Rayleigh_quotient M V.
 Proof.
 intros Hof * Hsm Hsr Hcz.
-destruct Hof as (Hon & Hic & Hop & Heq & Hiv & Hch & Hor).
+destruct Hof as (Hic & Hop & Heq & Hiv & Hch & Hor).
 specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
@@ -237,24 +234,23 @@ rewrite vect_scal_mul_dot_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
 rewrite Hiv.
-rewrite (rngl_inv_mul_distr Hon Hos Hiv); cycle 1. {
+rewrite (rngl_inv_mul_distr Hos Hiv); cycle 1. {
   intros H.
-  now apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
+  now apply (rngl_eq_mul_0_l Hos Hiq) in H.
 } {
   intros H.
-  apply (eq_vect_squ_0 Hon Hop Hiq Hor) in H.
+  apply (eq_vect_squ_0 Hop Hiq Hor) in H.
   now rewrite Hsr in H.
 }
 rewrite rngl_mul_assoc.
 rewrite rngl_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
-rewrite (rngl_mul_inv_diag_l Hon Hiv); [ now rewrite rngl_mul_1_l | ].
+rewrite (rngl_mul_inv_diag_l Hiv); [ now rewrite rngl_mul_1_l | ].
 intros H; apply Hcz.
-now apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
+now apply (rngl_eq_mul_0_l Hos Hiq) in H.
 Qed.
 
 Theorem Rayleigh_quotient_of_eigenvector :
-  rngl_has_1 T = true →
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   (rngl_is_integral_domain T || rngl_has_eq_dec T)%bool = true →
@@ -265,19 +261,17 @@ Theorem Rayleigh_quotient_of_eigenvector :
   → (M • V = μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
-intros Hon Hic Hop Hii Hiv Hor * Hvz Hmv.
+intros Hic Hop Hii Hiv Hor * Hvz Hmv.
 specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
-specialize (proj2 rngl_has_inv_and_1_or_pdiv_iff) as Hi1.
-specialize (Hi1 (or_introl (conj Hiv Hon))).
 unfold Rayleigh_quotient.
 rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
-apply (rngl_mul_div Hi1).
+apply (rngl_mul_div Hiq).
 intros H.
-now apply (eq_vect_squ_0 Hon Hop Hiq Hor) in H.
+now apply (eq_vect_squ_0 Hop Hiq Hor) in H.
 Qed.
 
 Definition is_orthogonal_matrix (M : matrix T) :=
@@ -470,7 +464,6 @@ Qed.
      eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
-  rngl_has_1 T = true →
   rngl_mul_is_comm T = true →
   rngl_has_opp_or_psub T = true →
   rngl_has_eq_dec T = true →
@@ -482,10 +475,10 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → A = mat_with_vect n eV
   → (A⁺ * A = mI n)%M.
 Proof.
-intros Hon Hic Hos Hed Hin * Hsy Hr Hvv Hm.
+intros Hic Hos Hed Hin * Hsy Hr Hvv Hm.
 specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
-specialize (proj2 rngl_has_inv_and_1_or_pdiv_iff) as Hi1.
-specialize (Hi1 (or_introl (conj Hin Hon))).
+specialize (proj2 rngl_has_inv_or_pdiv_iff) as Hi1.
+specialize (Hi1 (or_introl Hin)).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n A | ].
 rewrite Hm.
 apply matrix_eq; cycle 1. {
@@ -980,11 +973,11 @@ assert (Hdu : det U ≠ 0%L). {
     now apply squ_mat_ncols.
   }
   generalize Hif; intros H.
-  destruct H as (Hon, Hic, Hop, Hin, Hde, Hch).
-  rewrite (determinant_transpose Hon Hic Hop) in Huu; [ | | easy ]. 2: {
+  destruct H as (Hic, Hop, Hin, Hde, Hch).
+  rewrite (determinant_transpose Hic Hop) in Huu; [ | | easy ]. 2: {
     now rewrite Hch.
   }
-  rewrite (det_mI Hon) in Huu; [ | easy ].
+  rewrite (det_mI) in Huu; [ | easy ].
   intros H; rewrite H in Huu.
   rewrite rngl_mul_0_r in Huu; [ | easy ].
   symmetry in Huu; revert Huu.
@@ -1005,7 +998,7 @@ rewrite mat_mul_inv_diag_r in H1; [ | easy | | apply Hdu ]. {
     apply mat_with_vect_is_square.
   }
   symmetry.
-  apply mat_mul_1_r; [ now destruct Hif | now destruct Hif | | ]. {
+  apply mat_mul_1_r; [ now destruct Hif | | ]. {
     unfold is_symm_mat in Hsy.
     now apply squ_mat_is_corr.
   }

@@ -81,12 +81,11 @@ apply Nat.add_comm.
 Qed.
 
 Theorem lap_x_power_add :
-  rngl_has_1 T = true →
   rngl_has_opp_or_psub T = true →
   rngl_has_eq_dec T = true →
   ∀ a b, lap_x_power (a + b) = (lap_x_power a * lap_x_power b)%lap.
 Proof.
-intros Hon Hos Hed *.
+intros Hos Hed *.
 unfold lap_x_power.
 rewrite List.repeat_app.
 rewrite <- List.app_assoc.
@@ -99,7 +98,7 @@ clear Hla b.
 revert la Ha.
 induction a; intros; cbn - [ lap_mul ]. {
   rewrite (lap_mul_const_l Hos).
-  erewrite List.map_ext_in; [ | intros; apply (rngl_mul_1_l Hon) ].
+  erewrite List.map_ext_in; [ | intros; apply (rngl_mul_1_l) ].
   now rewrite List.map_id.
 }
 rewrite IHa; [ | easy ].
@@ -112,24 +111,23 @@ assert (Ha : la ≠ []). {
 }
 clear a Hla IHa.
 move Hb after Ha.
-rewrite <- (lap_mul_x_l Hos Hon). 2: {
+rewrite <- (lap_mul_x_l Hos). 2: {
   intros Hab.
   apply eq_lap_mul_0 in Hab.
   now destruct Hab.
 }
 symmetry.
-rewrite <- (lap_mul_x_l Hos Hon); [ | easy ].
+rewrite <- (lap_mul_x_l Hos); [ | easy ].
 symmetry.
 apply (lap_mul_assoc Hed Hos).
 Qed.
 
 Theorem lap_x_power_has_polyn_prop :
-  rngl_has_1 T = true →
   rngl_characteristic T ≠ 1 →
   rngl_has_eq_dec T = true →
   ∀ n, has_polyn_prop (lap_x_power n) = true.
 Proof.
-intros Hon Hch Hed *.
+intros Hch Hed *.
 apply Bool.orb_true_iff.
 right.
 destruct n; cbn. {
@@ -146,25 +144,23 @@ now apply rngl_1_neq_0_iff.
 Qed.
 
 Theorem lap_norm_x_power :
-  rngl_has_1 T = true →
   rngl_characteristic T ≠ 1 →
   rngl_has_eq_dec T = true →
   ∀ n, lap_norm (lap_x_power n) = lap_x_power n.
 Proof.
-intros Hon Hch Hed *.
+intros Hch Hed *.
 apply (has_polyn_prop_lap_norm Hed).
-apply (lap_x_power_has_polyn_prop Hon Hch Hed).
+apply (lap_x_power_has_polyn_prop Hch Hed).
 Qed.
 
 Theorem polyn_x_power_add :
-  rngl_has_1 T = true →
   rngl_has_opp_or_psub T = true →
   rngl_has_eq_dec T = true →
   ∀ a b, polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
 Proof.
-intros Hon Hos Hed *.
+intros Hos Hed *.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
-  specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
+  specialize (rngl_characteristic_1 Hos Hch) as H1.
   apply eq_polyn_eq.
   apply (eq_list_eq 0%L). 2: {
     intros i Hi.
@@ -181,12 +177,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
 }
 apply eq_polyn_eq; cbn.
 f_equal.
-rewrite (lap_x_power_add Hon Hos Hed).
-now do 2 rewrite (lap_norm_x_power Hon Hch Hed).
+rewrite (lap_x_power_add Hos Hed).
+now do 2 rewrite (lap_norm_x_power Hch Hed).
 Qed.
 
 Theorem lap_norm_mul_x_power_r :
-  rngl_has_1 T = true →
   rngl_has_opp_or_psub T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
@@ -194,12 +189,12 @@ Theorem lap_norm_mul_x_power_r :
   ∀ la n,
   lap_norm (la * lap_x_power n) = (lap_norm la * lap_x_power n)%lap.
 Proof.
-intros Hon Hos Hiv Hch Hed *.
+intros Hos Hiv Hch Hed *.
 rewrite <- (lap_mul_norm_idemp_l Hos Hed).
-rewrite (lap_norm_mul Hos Hed Hon Hiv); [ easy | | ]. {
+rewrite (lap_norm_mul Hos Hed Hiv); [ easy | | ]. {
   apply polyn_norm_prop.
 }
-apply (lap_x_power_has_polyn_prop Hon Hch Hed).
+apply (lap_x_power_has_polyn_prop Hch Hed).
 Qed.
 
 Theorem polyn_of_const_add :
@@ -242,7 +237,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]. {
 Qed.
 
 Theorem polyn_of_const_mul :
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_pdiv T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_or_pdiv T)%bool = true →
   ∀ (Hos : rngl_has_opp_or_psub T = true),
   ∀ (Hed : rngl_has_eq_dec T = true),
   ∀ (rop := polyn_ring_like_op Hos Hed),
@@ -281,19 +276,18 @@ congruence.
 Qed.
 
 Arguments charac_0_field T {ro rp}.
-Arguments polyn_characteristic_prop T {ro rp} Hon Hos Hed.
+Arguments polyn_characteristic_prop T {ro rp} Hos Hed.
 Arguments polyn_ring_like_op T {ro rp} Hos Hed.
-Arguments polyn_ring_like_prop T {ro rp} Hon Hos Hed.
+Arguments polyn_ring_like_prop T {ro rp} Hos Hed.
 
 Theorem polyn_of_const_rngl_summation :
-  rngl_has_1 T = true →
   ∀ (Hos : rngl_has_opp_or_psub T = true),
   ∀ (Hed : rngl_has_eq_dec T = true),
   ∀ (rop := polyn_ring_like_op T Hos Hed),
   ∀ b e f,
   polyn_of_const (∑ (i = b, e), f i) = ∑ (i = b, e), polyn_of_const (f i).
 Proof.
-intros Hon *.
+intros *.
 unfold iter_seq.
 remember (S e - b) as n eqn:Hn.
 clear e Hn.
@@ -306,7 +300,7 @@ induction n; intros. {
 }
 rewrite List.seq_S.
 rewrite rngl_summation_list_app.
-set (rpp := polyn_ring_like_prop T Hon Hos Hed).
+set (rpp := polyn_ring_like_prop T Hos Hed).
 rewrite rngl_summation_list_app.
 rewrite (polyn_of_const_add Hos Hed).
 rewrite IHn.
@@ -407,21 +401,20 @@ Definition rngl_has_opp_has_opp_or_psub (Hop : rngl_has_opp = true) :=
 *)
 
 Theorem polyn_of_const_minus_one_pow :
-  rngl_has_1 T = true →
   ∀ (Hop : rngl_has_opp T = true),
   ∀ (Hed : rngl_has_eq_dec T = true),
   ∀ (rop := polyn_ring_like_op T (rngl_has_opp_has_opp_or_psub Hop) Hed),
   ∀ n, polyn_of_const (minus_one_pow n) = minus_one_pow n.
 Proof.
-intros Hon *.
+intros *.
 assert (Honp : rngl_has_1 (polyn T) = true) by easy.
 set (Hos := rngl_has_opp_has_opp_or_psub Hop) in rop.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
-  specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
+  specialize (rngl_characteristic_1 Hos Hch) as H1.
   apply eq_polyn_eq; cbn.
   rewrite (H1 (minus_one_pow n)).
   rewrite (rngl_eqb_refl Hed); cbn.
-  set (rpp := polyn_ring_like_prop T Hon Hos Hed).
+  set (rpp := polyn_ring_like_prop T Hos Hed).
   specialize (polyn_characteristic_prop (polyn T)) as H2.
   assert (Hosp : rngl_has_opp_or_psub (polyn T) = true). {
     now specialize (polyn_has_opp_or_psub Hop Hed) as H3.
@@ -517,7 +510,6 @@ now rewrite Hos' in Hsu.
 Qed.
 
 Theorem det_polyn_of_const :
-  rngl_has_1 T = true →
   (rngl_is_integral_domain T || rngl_has_inv_or_pdiv T)%bool = true →
   rngl_characteristic T ≠ 1 →
   ∀ (Hop : rngl_has_opp T = true),
@@ -527,7 +519,7 @@ Theorem det_polyn_of_const :
   det {| mat_list_list := List.map (λ l, List.map polyn_of_const l) ll |} =
   polyn_of_const (det {| mat_list_list := ll |}).
 Proof.
-intros Hon Hii Hch *; cbn.
+intros Hii Hch *; cbn.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 replace rop with (polyn_ring_like_op T Hos Hed). 2: {
   subst rop.
@@ -553,18 +545,18 @@ remember (List.length ll) as len eqn:Hlen; symmetry in Hlen.
 revert ll Hlen.
 induction len; intros; [ easy | ].
 cbn - [ rngl_zero rngl_add ].
-rewrite (polyn_of_const_rngl_summation Hon Hos Hed).
+rewrite (polyn_of_const_rngl_summation Hos Hed).
 apply rngl_summation_eq_compat.
 intros i Hi.
 assert
   (Hi1 :
     (rngl_is_integral_domain T ||
-       rngl_has_inv_and_1_or_pdiv T)%bool = true). {
+       rngl_has_inv_or_pdiv T)%bool = true). {
   apply Bool.orb_true_iff in Hii.
   apply Bool.orb_true_iff.
   destruct Hii as [Hii | Hii]; [ now left | right ].
   apply rngl_has_inv_or_pdiv_iff in Hii.
-  apply rngl_has_inv_and_1_or_pdiv_iff.
+  apply rngl_has_inv_or_pdiv_iff.
   now destruct Hii; [ left | right ].
 }
 rewrite (polyn_of_const_mul Hi1 Hos Hed).
@@ -574,7 +566,7 @@ rewrite <- List_hd_nth_0; cbn.
 do 2 rewrite <- (polyn_mul_assoc Hos Hed).
 f_equal. {
   symmetry.
-  apply (polyn_of_const_minus_one_pow Hon Hop Hed).
+  apply (polyn_of_const_minus_one_pow Hop Hed).
 }
 f_equal. {
   destruct (lt_dec (i - 1) (List.length (List.hd [] ll))) as [Hil| Hil]. {
@@ -651,7 +643,7 @@ assert (Hos : rngl_has_opp_or_psub T = true). {
 assert (Hon : rngl_has_1 T = true) by apply (cf_has_1 Hif).
 assert (Hed : rngl_has_eq_dec T = true) by apply (cf_has_eq_dec Hif).
 set (rop := polyn_ring_like_op T Hos Hed).
-set (rpp := polyn_ring_like_prop T Hon Hos Hed).
+set (rpp := polyn_ring_like_prop T Hos Hed).
 specialize (Hcr rop rpp).
 cbn - [ det ] in Hcr.
 generalize Hif; intros H.
@@ -915,7 +907,7 @@ assert (H : (sm • u)%V = v). {
       rewrite <- Hn'.
       replace (n - S (n - j)) with (j - 1) by flia Hj.
       rewrite (polyn_mul_comm Hic).
-      rewrite (polyn_x_power_add Hon Hos Hed).
+      rewrite (polyn_x_power_add Hos Hed).
       replace polyn_mul with rngl_mul by easy.
       rewrite <- rngl_mul_assoc.
       easy.
@@ -982,7 +974,7 @@ assert (H : (sm • u)%V = v). {
     cbn - [ rngl_zero rngl_add lap_norm ].
     clear H2p.
 (**)
-    clear - rp Hon Hos Hed.
+    clear - rp Hos Hed.
     induction P as [| a la ]; [ easy | ].
     cbn - [ rngl_zero rngl_add lap_norm List.nth ].
     rewrite rngl_summation_shift with (s := 1); [ | cbn; flia ].
@@ -1005,7 +997,7 @@ assert (H : (sm • u)%V = v). {
       intros i Hi.
       rewrite <- Nat.add_sub_assoc; [ | easy ].
       rewrite List_nth_succ_cons.
-      rewrite (lap_x_power_add Hon Hos Hed).
+      rewrite (lap_x_power_add Hos Hed).
       unfold lap_x_power at 1.
       cbn - [ rngl_zero rngl_add lap_norm List.nth lap_mul ].
       rewrite <- (lap_mul_assoc Hed Hos).
@@ -1014,7 +1006,7 @@ assert (H : (sm • u)%V = v). {
     remember (λ j, _) as x in |-*; subst x.
     cbn - [ rngl_zero rngl_add lap_norm List.nth lap_mul ].
     rewrite (lap_mul_const_l Hos).
-    erewrite List.map_ext_in; [ | now intros; rewrite (rngl_mul_1_l Hon) ].
+    erewrite List.map_ext_in; [ | now intros; rewrite (rngl_mul_1_l) ].
     rewrite List.map_id.
     (* cannot apply rngl_mul_summation_list_distr because it requires
        rngl_has_opp_or_psub, which is false on laps *)
@@ -1067,7 +1059,7 @@ assert (H : (sm • u)%V = v). {
     rewrite (lap_add_norm_idemp_l Hed).
     (**)
     f_equal.
-    apply (lap_cons Hon Hos).
+    apply (lap_cons Hos).
   }
   f_equal; [ now apply (H P Q) | now rewrite Nat.add_comm; apply (H Q P) ].
 }
@@ -1119,7 +1111,7 @@ assert
   unfold polyn_norm in Hcr.
   apply (f_equal (λ p, lap p)) in Hcr.
   cbn - [ det ] in Hcr.
-  rewrite (lap_norm_mul_x_power_r Hon Hos Hin) in Hcr; [ | | easy ]. 2: {
+  rewrite (lap_norm_mul_x_power_r Hos Hin) in Hcr; [ | | easy ]. 2: {
     now rewrite Hch.
   }
   easy.
@@ -1129,7 +1121,7 @@ assert (Hdm : det sm = polyn_of_const (det (mk_mat ll))). {
   rewrite Hsm.
   specialize det_polyn_of_const as H1.
   rewrite Hiq, Bool.orb_comm in H1.
-  specialize (H1 Hon eq_refl).
+  specialize (H1 eq_refl).
   rewrite Hch in H1.
   specialize (H1 (Nat.neq_0_succ _) Hop Hed).
   cbn - [ det ] in H1.

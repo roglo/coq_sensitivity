@@ -21,7 +21,6 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hon : rngl_has_1 T = true).
 Context (Hos : rngl_has_opp_or_psub T = true).
 Context (Hed : rngl_has_eq_dec T = true).
 
@@ -119,14 +118,14 @@ Proof.
 intros.
 destruct la as [| a2]; [ now cbn; rewrite rngl_add_0_r | cbn ].
 unfold iter_seq, iter_list; cbn.
-rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_1_l).
 do 2 rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
 do 3 rewrite rngl_add_0_l.
 rewrite List.app_nil_r.
 f_equal; f_equal.
 rewrite (lap_convol_mul_l_succ_l Hos).
 rewrite List_map2_rngl_add_0_l.
-now symmetry; apply (lap_convol_mul_1_l Hos Hon).
+now symmetry; apply (lap_convol_mul_1_l Hos).
 Qed.
 
 End a.

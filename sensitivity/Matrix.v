@@ -661,7 +661,6 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hon : @rngl_has_1 T ro = true).
 Context (Hop : @rngl_has_opp T ro = true).
 
 Declare Scope M_scope.
@@ -1029,7 +1028,7 @@ rewrite all_0_rngl_summation_0. 2: {
 rewrite rngl_add_0_l.
 apply List.in_seq in Hi.
 rewrite mat_el_mI_diag; [ | flia Hi ].
-rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_1_l).
 remember (∑ (k = _, _), _) as x; cbn; subst x.
 do 2 rewrite Nat.sub_0_r.
 rewrite <- Hla.
@@ -1098,7 +1097,7 @@ rewrite all_0_rngl_summation_0. 2: {
 rewrite rngl_add_0_l.
 apply List.in_seq in Hj.
 rewrite mat_el_mI_diag; [ | flia Hj ].
-rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_mul_1_r).
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite mat_el_mI_ndiag; [ | flia Hk | flia | flia Hk ].
@@ -1307,7 +1306,7 @@ destruct l' as [| a']. {
 }
 cbn.
 rewrite δ_diag.
-rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_1_l).
 erewrite List_map2_ext_in. 2: {
   intros (j, a) Hj; cbn.
   apply List.in_combine_l, List.in_seq in Hj.
@@ -2557,7 +2556,7 @@ f_equal; cbn.
 induction ll as [| la]; [ easy | cbn ].
 rewrite IHll; f_equal.
 induction la as [| a]; [ easy | cbn ].
-now rewrite (rngl_mul_1_l Hon), IHla.
+now rewrite (rngl_mul_1_l), IHla.
 Qed.
 
 (* ring of square matrices *)
