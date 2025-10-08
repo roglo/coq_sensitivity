@@ -1841,9 +1841,9 @@ Require Import RingLike.Core.
 
 Definition QG_ring_like_op : ring_like_op QG :=
   {| rngl_zero := 0%QG;
+     rngl_one := 1%QG;
      rngl_add := QG_add;
      rngl_mul := QG_mul;
-     rngl_opt_one := Some 1%QG;
      rngl_opt_opp_or_psub := Some (inl QG_opp);
      rngl_opt_inv_or_pdiv := Some (inl QG_inv);
      rngl_opt_is_zero_divisor := Some (λ _, True);
@@ -1882,7 +1882,7 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_add_assoc := QG_add_assoc;
      rngl_add_0_l := QG_add_0_l;
      rngl_mul_assoc := QG_mul_assoc;
-     rngl_opt_mul_1_l := QG_mul_1_l;
+     rngl_mul_1_l := QG_mul_1_l;
      rngl_mul_add_distr_l := QG_mul_add_distr_l;
      rngl_opt_mul_comm := QG_mul_comm;
      rngl_opt_mul_1_r := NA;

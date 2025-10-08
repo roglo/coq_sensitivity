@@ -148,7 +148,7 @@ destruct_pphc.
 cbn.
 rewrite (rngl_squ_0 Hos).
 rewrite (rngl_sub_0_r Hos).
-rewrite (rngl_squ_1 Hon).
+rewrite rngl_squ_1.
 apply (rngl_eqb_refl Hed).
 Qed.
 
@@ -191,7 +191,7 @@ destruct p2 as [p2| ]; [ easy | ].
 clear H1 H2.
 rewrite (rngl_add_comm (y1 * x2)).
 (* code borrowed from HyperbolicTrigo.v *)
-do 2 rewrite (rngl_squ_add Hic Hon).
+do 2 rewrite (rngl_squ_add Hic).
 rewrite rngl_add_add_swap.
 do 2 rewrite (rngl_sub_add_distr Hos).
 rewrite (rngl_sub_sub_swap Hop (_ + _ + _))%L.
@@ -206,7 +206,7 @@ rewrite <- (rngl_sub_sub_distr Hop).
 do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
 apply (rngl_eqb_eq Hed) in Hp2.
 rewrite Hp2.
-now do 2 rewrite (rngl_mul_1_r Hon).
+now do 2 rewrite rngl_mul_1_r.
 Qed.
 
 Definition pph_angle_add θ1 θ2 :=
@@ -236,7 +236,7 @@ Theorem pph_angle_div_2_prop :
 Proof.
 destruct_pphc.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
   intros.
   progress unfold pp_cosh2_sinh2_prop.
   cbn.
@@ -250,27 +250,27 @@ cbn.
 assert (Hε : (ε² = 1)%L). {
   progress unfold ε.
   destruct (0 ≤? pp_sinh θ)%L.
-  apply (rngl_mul_1_l Hon).
-  apply (rngl_squ_opp_1 Hon Hop).
+  apply rngl_mul_1_l.
+  apply (rngl_squ_opp_1 Hop).
 }
 rewrite (rngl_squ_mul Hic).
 rewrite Hε.
-rewrite (rngl_mul_1_l Hon).
+rewrite rngl_mul_1_l.
 (*
 split. 2: {
   apply rngl_leb_le.
   apply rl_sqrt_nonneg.
-  apply (rngl_le_div_r Hon Hop Hiv Hor).
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_le_div_r Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hor).
   rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
   apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
-  apply (rngl_opp_1_le_1 Hon Hop Hor).
+  apply (rngl_opp_1_le_1 Hop Hor).
 }
 *)
 apply (rngl_eqb_eq Hed).
-rewrite (rngl_squ_sqrt Hon). 2: {
+rewrite rngl_squ_sqrt. 2: {
 (* ouais mais pp_cosh peut être négatif, maintenant *)
 (* et puis, de toutes façons, je ne vois pas déjà, dans ma tête,
    comment la géométrie projective pourrait ajouter la branche gauche
@@ -286,19 +286,19 @@ rewrite (rngl_squ_sqrt Hon). 2: {
    commence mal *)
 Abort. (*
 ...
-  apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_le_div_r Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hos Hc1 Hor).
   }
   rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_comm.
   apply (rngl_le_opp_l Hop Hor).
 ...
   apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
-  apply (rngl_opp_1_le_1 Hon Hop Hor).
+  apply (rngl_opp_1_le_1 Hop Hor).
 }
-rewrite (rngl_squ_sqrt Hon). 2: {
-  apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_div_r Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hos Hc1 Hor).
   }
   rewrite (rngl_mul_0_l Hos).
   apply (rngl_le_0_sub Hop Hor).
@@ -309,8 +309,8 @@ rewrite (rngl_sub_sub_distr Hop).
 rewrite (rngl_add_sub_swap Hop).
 rewrite (rngl_sub_diag Hos).
 rewrite rngl_add_0_l.
-apply (rngl_div_diag Hon Hiq).
-apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+apply (rngl_div_diag Hiq).
+apply (rngl_2_neq_0 Hos Hc1 Hor).
 ...
 *)
 

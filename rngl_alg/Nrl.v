@@ -230,11 +230,9 @@ Definition Zn_inv' n a :=
   | _ => Zn_of_nat n 0
   end.
 
-Definition Zn_has_1 (n : nat) := true.
-
 Theorem Zn_opt_mul_inv_diag_l :
   ∀ {not_applicable : Prop} (NA : not_applicable) n,
-  if (Zn_has_inv n && Zn_has_1 n)%bool then
+  if Zn_has_inv n then
     ∀ a : Zn n,
     a ≠ Zn_of_nat n 0
     → Zn_mul n (Zn_inv' n a) a = Zn_of_nat n 1
@@ -242,7 +240,6 @@ Theorem Zn_opt_mul_inv_diag_l :
 Proof.
 intros.
 progress unfold Zn_has_inv.
-progress unfold Zn_has_1.
 progress unfold Zn_inv'.
 progress unfold Zn_opt_inv_or_pdiv.
 remember (is_prime n) as p eqn:Hp.
@@ -288,7 +285,7 @@ Qed.
 
 Theorem Zn_opt_mul_inv_diag_r :
   ∀ {not_applicable : Prop} (NA : not_applicable) n {P},
-  if (Zn_has_inv n && true && false)%bool then P
+  if (Zn_has_inv n && false)%bool then P
   else not_applicable.
 Proof.
 now intros; rewrite Bool.andb_false_r.
@@ -310,9 +307,9 @@ Require Import RingLike.Core.
 
 Instance Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_zero := Zn_of_nat n 0;
+     rngl_one := Zn_of_nat n 1;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
-     rngl_opt_one := Some (Zn_of_nat n 1);
      rngl_opt_opp_or_psub := Some (inl (Zn_opp n));
      rngl_opt_inv_or_pdiv := Zn_opt_inv_or_pdiv n;
      rngl_opt_is_zero_divisor := Some (λ _, True);
@@ -392,7 +389,7 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) :
      rngl_add_assoc := Zn_add_assoc n;
      rngl_add_0_l := Zn_add_0_l n;
      rngl_mul_assoc := Zn_mul_assoc n;
-     rngl_opt_mul_1_l := Zn_mul_1_l n;
+     rngl_mul_1_l := Zn_mul_1_l n;
      rngl_mul_add_distr_l := Zn_mul_add_distr_l n;
      rngl_opt_mul_comm := Zn_mul_comm n;
      rngl_opt_mul_1_r := NA;

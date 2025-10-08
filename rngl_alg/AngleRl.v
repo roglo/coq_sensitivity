@@ -19,13 +19,13 @@ Definition angle_phony_mul (θ1 θ2 : angle T) := 0%A.
 
 Instance angle_ring_like_op : ring_like_op (angle T) :=
   {| rngl_zero := 0%A;
+     rngl_one := 0%A;
      rngl_add := angle_add;
      rngl_mul := angle_phony_mul;
-     rngl_opt_one := None;
      rngl_opt_opp_or_psub := Some (inl angle_opp);
      rngl_opt_inv_or_pdiv := None;
      rngl_opt_is_zero_divisor := Some (λ _, True);
-     rngl_opt_eq_dec := Some (angle_eq_dec);
+     rngl_opt_eq_dec := Some angle_eq_dec;
      rngl_opt_leb := None (* no order: fails on add_le_compat *) |}.
 
 (*
@@ -45,6 +45,16 @@ Proof. apply angle_add_0_l. Qed.
 Theorem rngl_angle_mul_assoc :
   ∀ a b c : angle T, (a * (b * c))%L = (a * b * c)%L.
 Proof. easy. Qed.
+
+(*
+Theorem rngl_angle_mul_1_l : ∀ a : angle T, (1 * a)%L = a.
+Proof.
+intros.
+cbn.
+progress unfold angle_phony_mul.
+doen'nt work
+...
+*)
 
 Theorem rngl_angle_mul_add_distr_l :
   ∀ a b c : angle T, (a * (b + c))%L = (a * b + a * c)%L.
@@ -71,7 +81,8 @@ intros * Hab.
 now right; right; left.
 Qed.
 
-Instance angle_ring_like_prop :
+(* rngl_mul_1_l doen't work
+Instance angle_rning_like_prop :
   ring_like_prop (angle T) :=
   {| rngl_mul_is_comm := true;
      rngl_is_archimedean := true;
@@ -81,7 +92,7 @@ Instance angle_ring_like_prop :
      rngl_add_assoc := rngl_angle_add_assoc;
      rngl_add_0_l := rngl_angle_add_0_l;
      rngl_mul_assoc := rngl_angle_mul_assoc;
-     rngl_opt_mul_1_l := NA;
+     rngl_mul_1_l := true; (*rngl_angle_mul_1_l;*)
      rngl_mul_add_distr_l := rngl_angle_mul_add_distr_l;
      rngl_opt_mul_comm := rngl_angle_opt_mul_comm;
      rngl_opt_mul_1_r := NA;
@@ -98,5 +109,6 @@ Instance angle_ring_like_prop :
      rngl_opt_characteristic_prop := NA;
      rngl_opt_ord := NA;
      rngl_opt_archimedean := NA |}.
+*)
 
 End a.

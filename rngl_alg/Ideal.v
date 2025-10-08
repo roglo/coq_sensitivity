@@ -12,7 +12,7 @@ Require Import RingLike.Misc.
 Require Import RingLike.Utils.
 From RingLike Require Import IterAdd IterAnd.
 
-(* ideal: non empty set (type) with some properties *)
+(* ideal: non empty set type with some properties *)
 (* drawback: elementary properties, like commutativity of addition of ideals
    cannot be proven *)
 (* another version of ideals using bool instead of Prop follows *)
@@ -360,9 +360,9 @@ Definition I_opp (a : ideal T) : ideal T :=
 
 Definition I_ring_like_op : ring_like_op (ideal T) :=
   {| rngl_zero := I_zero;
+     rngl_one := I_one;
      rngl_add := I_add;
      rngl_mul := I_mul;
-     rngl_opt_one := Some I_one;
      rngl_opt_opp_or_psub :=
        match rngl_opt_opp_or_psub T with
        | Some (inl _) => Some (inl I_opp)
@@ -406,7 +406,7 @@ Print ideal.
 
 (* attempt to implement ideals using bool instead of Prop *)
 
-(* ideal : non empty set (type) with some properties *)
+(* ideal : non empty set type with some properties *)
 
 Record ideal' {T} {ro : ring_like_op T} := mk_ip'
   { ip_subtype' : T → bool;
@@ -1056,9 +1056,9 @@ Definition I_opp' (a : ideal' T) : ideal' T :=
 
 Definition I_ring_like_op' : ring_like_op (ideal' T) :=
   {| rngl_zero := I_zero';
+     rngl_one := I_one';
      rngl_add := I_add';
      rngl_mul := I_mul';
-     rngl_opt_one := Some I_one';
      rngl_opt_opp_or_psub :=
        match rngl_opt_opp_or_psub T with
        | Some (inl _) => Some (inl I_opp')
@@ -1203,7 +1203,7 @@ assert (Hon : rngl_has_1 T = true). {
 }
 intros.
 apply eq_ideal_eq; cbn.
-specialize (rngl_mul_1_l Hon (i_val a)) as H1.
+specialize (rngl_mul_1_l (i_val a)) as H1.
 progress unfold rngl_one in H1.
 progress unfold roi.
 progress unfold I_ring_like_op.
@@ -1254,7 +1254,7 @@ assert (Hon : rngl_has_1 T = true). {
 }
 intros.
 apply eq_ideal_eq; cbn.
-specialize (rngl_mul_1_r Hon (i_val a)) as H1.
+specialize (rngl_mul_1_r (i_val a)) as H1.
 progress unfold rngl_one in H1.
 progress unfold roi.
 progress unfold I_ring_like_op.
@@ -1547,7 +1547,7 @@ specialize (H2 (i_val a) (i_val b) (i_val c)).
 progress unfold rngl_le in H2.
 progress unfold rngl_le; cbn.
 progress unfold I_opt_leb.
-now destruct (rngl_opt_leb).
+now destruct rngl_opt_leb.
 Qed.
 
 Theorem I_ord_mul_le_compat_nonneg :
@@ -1671,7 +1671,7 @@ assert (Hon : rngl_has_1 T = true). {
   now destruct (rngl_opt_one T).
 }
 specialize rngl_opt_characteristic_prop as H1.
-rewrite Hon in H1.
+rewrite in H1.
 rewrite if_bool_if_dec in H1 |-*.
 progress unfold roi.
 progress unfold I_ring_like_op.
@@ -1949,7 +1949,7 @@ assert (Hon : rngl_has_1 T = true). {
 }
 intros.
 apply eq_ideal_eq; cbn.
-specialize (rngl_mul_1_l Hon (i_val a)) as H1.
+specialize (rngl_mul_1_l (i_val a)) as H1.
 progress unfold rngl_one in H1.
 progress unfold roi.
 progress unfold I_ring_like_op.
@@ -2000,7 +2000,7 @@ assert (Hon : rngl_has_1 T = true). {
 }
 intros.
 apply eq_ideal_eq; cbn.
-specialize (rngl_mul_1_r Hon (i_val a)) as H1.
+specialize (rngl_mul_1_r (i_val a)) as H1.
 progress unfold rngl_one in H1.
 progress unfold roi.
 progress unfold I_ring_like_op.
@@ -2293,7 +2293,7 @@ specialize (H2 (i_val a) (i_val b) (i_val c)).
 progress unfold rngl_le in H2.
 progress unfold rngl_le; cbn.
 progress unfold I_opt_leb.
-now destruct (rngl_opt_leb).
+now destruct rngl_opt_leb.
 Qed.
 
 Theorem I_ord_mul_le_compat_nonneg :
@@ -2417,7 +2417,7 @@ assert (Hon : rngl_has_1 T = true). {
   now destruct (rngl_opt_one T).
 }
 specialize rngl_opt_characteristic_prop as H1.
-rewrite Hon in H1.
+rewrite in H1.
 rewrite if_bool_if_dec in H1 |-*.
 progress unfold roi.
 progress unfold I_ring_like_op.

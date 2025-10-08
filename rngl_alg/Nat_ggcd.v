@@ -5,7 +5,7 @@ Require Import RingLike.Misc Misc.
 
 Set Nested Proofs Allowed.
 
-Tactic Notation "flia" hyp_list(Hs) := clear - Hs; lia.
+Tactic Notation "flia" hyp_list (Hs) := clear - Hs; lia.
 
 Fixpoint ggcdn it a b :=
   match it with

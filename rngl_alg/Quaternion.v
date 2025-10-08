@@ -157,7 +157,7 @@ Open Scope Z_scope.
 
 (* trinions: i²=-1 j²=-1 ij=0 *)
 (* i and j are zero divisors *)
-(* not associative: (ii)j=-j, but i(ij)=0 *)
+(* not associative: iij=-j, but iij=0 *)
 Compute (
   let ro := Z_ring_like_op in
   let i := mk_nion 0 (mk_vect [1;0]) in
@@ -240,7 +240,7 @@ Time Compute (
   (e3*e4)%H).
 
 (*
-Finished transaction in 23.527 secs (22.043u,1.48s) (successful)
+Finished transaction in 23.527 secs (22.043u,1.48s) successful
 *)
 
 (* e1*e1=-1 e1*e2=e5 e1*e3=-e2 e1*e4=e6 *)
@@ -276,8 +276,8 @@ Theorem vect_cross_mul_anticomm :
 Proof.
 intros Hop Hic * Huv.
 progress unfold "*"%V; f_equal.
-destruct u as (la).
-destruct v as (lb); cbn - [ "/" ].
+destruct u as la.
+destruct v as lb; cbn - [ "/" ].
 cbn in Huv.
 rewrite List.map_length.
 rewrite <- Huv.
@@ -423,9 +423,9 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 rewrite rngl_summation_seq_summation; [ | easy ].
 rewrite rngl_summation_seq_summation; [ | easy ].
 cbn - [ "/" "-" nth ].
-destruct u as (la).
-destruct v as (lb).
-destruct w as (lc).
+destruct u as la.
+destruct v as lb.
+destruct w as lc.
 cbn in Hu, Hv, Hw.
 rename Hu into Ha; rename Hv into Hb; rename Hw into Hc.
 cbn - [ "/" "-" nth ].

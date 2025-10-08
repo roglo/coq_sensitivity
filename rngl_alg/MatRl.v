@@ -16,8 +16,7 @@ Import matrix_Notations.
 (* to be moved to RingLike_mul.v perhaps *)
 Definition is_charac_0_field T {ro : ring_like_op T} {rp : ring_like_prop T}
   :=
-  (rngl_has_1 T &&
-   rngl_mul_is_comm T &&
+  (rngl_mul_is_comm T &&
    rngl_has_opp T &&
    rngl_has_inv T &&
    rngl_has_eq_dec T &&
@@ -31,7 +30,7 @@ intros.
 progress unfold is_charac_0_field.
 split. {
   intros cf.
-  rewrite (cf_has_1 cf), (cf_mul_is_comm cf), (cf_has_opp cf).
+  rewrite (cf_mul_is_comm cf), (cf_has_opp cf).
   rewrite (cf_has_inv cf), (cf_has_eq_dec cf), (cf_characteristic cf).
   easy.
 } {
@@ -44,9 +43,7 @@ split. {
   apply Bool.andb_true_iff in Hcf.
   destruct Hcf as (Hcf, Hiv).
   apply Bool.andb_true_iff in Hcf.
-  destruct Hcf as (Hcf, Hop).
-  apply Bool.andb_true_iff in Hcf.
-  destruct Hcf as (Hon, Hic).
+  destruct Hcf as (Hic, Hop).
   now split.
 }
 Qed.
@@ -64,7 +61,6 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hon : @rngl_has_1 T ro = true).
 Context (Hop : @rngl_has_opp T ro = true).
 
 Theorem mZ_is_square_matrix : ∀ n,
@@ -177,9 +173,9 @@ Definition mat_is_zero_divisor n (M : square_matrix n T) :=
 Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
     ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
+     rngl_one := smI n;
      rngl_add := square_matrix_add;
      rngl_mul := square_matrix_mul;
-     rngl_opt_one := Some (smI n);
      rngl_opt_opp_or_psub := Some (inl square_matrix_opp);
      rngl_opt_inv_or_pdiv := None;
 (**)
@@ -312,7 +308,7 @@ split. {
   progress unfold rngl_mul_nat in H1.
   progress unfold mul_nat in H1; cbn in H1.
   rewrite H1 in Hlla; [ clear H1 | easy ].
-  now apply (rngl_characteristic_0 Hon Hch i).
+  now apply (rngl_characteristic_0 Hch i).
 } {
   intros l Hl.
   subst rom.
@@ -420,7 +416,7 @@ Theorem squ_mat_mul_1_l :
 Proof.
 intros.
 apply square_matrix_eq; cbn.
-apply (mat_mul_1_l Hon); [ easy | | symmetry; apply smat_nrows ].
+apply mat_mul_1_l; [ easy | | symmetry; apply smat_nrows ].
 apply square_matrix_is_correct.
 Qed.
 
@@ -503,7 +499,7 @@ Theorem squ_mat_mul_1_r :
 Proof.
 intros.
 apply square_matrix_eq; cbn.
-apply (mat_mul_1_r Hon); [ easy | | symmetry; apply smat_ncols ].
+apply mat_mul_1_r; [ easy | | symmetry; apply smat_ncols ].
 apply square_matrix_is_correct.
 Qed.
 
@@ -688,7 +684,7 @@ rewrite (mat_mul_assoc Hop) in Hab; cycle 1. {
   now apply Nat.eqb_eq in Hnz'.
 }
 rewrite Ha in Hab.
-rewrite (mat_mul_1_l Hon Hop) in Hab; [ easy | | ]. {
+rewrite (mat_mul_1_l Hop) in Hab; [ easy | | ]. {
   apply square_matrix_is_correct.
 } {
   symmetry.
@@ -722,7 +718,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 apply Nat.neq_0_lt_0 in Hnz.
 specialize @rngl_opt_characteristic_prop as H1.
 specialize (H1 T ro rp).
-rewrite Hon in H1.
 rewrite if_eqb_eq_dec in H1 |-*.
 destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
   intros i Hi.
@@ -851,7 +846,7 @@ Instance mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
      rngl_add_assoc := squ_mat_add_assoc eq_dec;
      rngl_add_0_l := squ_mat_add_0_l eq_dec;
      rngl_mul_assoc := squ_mat_mul_assoc eq_dec;
-     rngl_opt_mul_1_l := squ_mat_mul_1_l eq_dec;
+     rngl_mul_1_l := squ_mat_mul_1_l eq_dec;
      rngl_mul_add_distr_l := squ_mat_mul_add_distr_l eq_dec;
      rngl_opt_mul_comm := NA;
      rngl_opt_mul_1_r := squ_mat_mul_1_r eq_dec;

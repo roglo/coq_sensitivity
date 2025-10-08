@@ -1458,11 +1458,14 @@ Proof.
 intros.
 remember (Nat.gcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as a eqn:Ha.
 rewrite (PQred_mul_mul_one_l (PQred x) y (mknn (a - 1))).
-destruct x as ((xn), (xd)).
+destruct x as (xn, xd).
 simpl in Ha.
 progress unfold "*"%PQ; simpl.
 progress unfold PQmul_num1, PQmul_den1; simpl.
 progress unfold PQred; simpl.
+destruct xn as (xn).
+destruct xd as (xd).
+cbn - [ ggcd ] in Ha |-*.
 specialize (ggcd_split (xn + 1) (xd + 1) a Ha) as H.
 rewrite H; simpl.
 destruct a.
@@ -1558,10 +1561,11 @@ Theorem gcd_1_PQred : ∀ x,
   → x = PQred x.
 Proof.
 intros x Hx.
-destruct x as ((xn), (xd)).
+destruct x as (xn, xd).
 rewrite <- ggcd_gcd in Hx.
 progress unfold PQred.
 remember ggcd as f; cbn in Hx; cbn; subst f.
+...
 remember (ggcd (xn + 1) (xd + 1)) as g eqn:Hg.
 destruct g as (g, (aa, bb)); cbn in Hx; subst g.
 specialize (ggcd_correct_divisors (xn + 1) (xd + 1)) as H.
@@ -1578,7 +1582,7 @@ intros * Hx Hxy.
 progress unfold "=="%PQ, nd in Hxy.
 specialize (PQred_gcd x) as Hg.
 rewrite <- Hx in Hg.
-destruct x as ((xn), (xd)), y as ((yn), (yd)).
+destruct x as (xn, xd), y as (yn, yd).
 cbn in Hxy, Hg.
 assert (Hd : Nat.divide (xn + 1) ((xd + 1) * (yn + 1))). {
   rewrite Nat.mul_comm, <- Hxy.
@@ -1609,10 +1613,10 @@ intros Hxy.
 specialize (PQeq_red_l x y Hx Hxy) as H1.
 symmetry in Hxy.
 specialize (PQeq_red_l y x Hy Hxy) as H2.
-destruct H1 as ((c), Hc).
-destruct H2 as ((d), Hd).
+destruct H1 as (c, Hc).
+destruct H2 as (d, Hd).
 move d before c.
-destruct x as ((xn), (xd)), y as ((yn), (yd)).
+destruct x as (xn, xd), y as (yn, yd).
 progress unfold "*"%PQ in Hc, Hd.
 cbn in Hc, Hd.
 injection Hc; clear Hc; intros H1 H2.
@@ -1647,7 +1651,7 @@ Qed.
 
 Theorem PQred_diag : ∀ x, PQred (x ╱ x) = 1%PQ.
 Proof.
-intros (x).
+intros x.
 progress unfold PQred.
 cbn - [ ggcd ].
 rewrite ggcd_diag; [ easy | flia ].

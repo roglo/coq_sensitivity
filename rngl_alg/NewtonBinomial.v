@@ -18,18 +18,17 @@ Context {rp : ring_like_prop T}.
 
 Theorem newton_binomial :
   rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
   rngl_has_opp_or_psub T = true →
   ∀ n a b,
   ((a + b) ^ n)%L =
     (∑ (k = 0, n), rngl_of_nat (binomial n k) * a ^ (n - k) * b ^ k)%L.
 Proof.
-intros Hic Hon Hos.
+intros Hic Hos.
 intros.
 induction n. {
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_add_0_r.
-  now do 2 rewrite (rngl_mul_1_l Hon).
+  now do 2 rewrite rngl_mul_1_l.
 }
 rewrite rngl_pow_succ_r.
 rewrite IHn.
@@ -40,14 +39,14 @@ erewrite rngl_summation_eq_compat. 2: {
   do 4 rewrite rngl_mul_assoc.
   rewrite (rngl_mul_comm Hic (a * _))%L.
   rewrite rngl_mul_assoc.
-  replace a with (a ^ 1)%L at 2 by apply (rngl_mul_1_r Hon).
-  rewrite <- (rngl_pow_add_r Hon).
+  replace a with (a ^ 1)%L at 2 by apply rngl_mul_1_r.
+  rewrite <- rngl_pow_add_r.
   rewrite (rngl_mul_comm Hic (a ^ _)%L).
   rewrite rngl_add_comm.
   rewrite (rngl_mul_comm Hic _ (b ^ _))%L at 1.
   do 2 rewrite rngl_mul_assoc.
-  replace b with (b ^ 1)%L at 2 by apply (rngl_mul_1_r Hon).
-  rewrite <- (rngl_pow_add_r Hon).
+  replace b with (b ^ 1)%L at 2 by apply rngl_mul_1_r.
+  rewrite <- rngl_pow_add_r.
   rewrite <- rngl_mul_assoc.
   rewrite (rngl_mul_comm Hic).
   do 2 rewrite <- rngl_mul_assoc.
@@ -58,11 +57,11 @@ remember (∑ (i = _, _), _) as x; subst x.
 symmetry.
 rewrite rngl_summation_split_first; [ | easy ].
 progress unfold binomial at 1.
-rewrite Nat.sub_0_r, rngl_pow_0_r, (rngl_mul_1_r Hon).
+rewrite Nat.sub_0_r, rngl_pow_0_r, rngl_mul_1_r.
 rewrite (rngl_summation_shift 1); [ | flia ].
 rewrite Nat.sub_diag, Nat_sub_succ_1.
 remember (rngl_of_nat 1) as x; cbn in Heqx; subst x.
-rewrite rngl_add_0_r, (rngl_mul_1_l Hon).
+rewrite rngl_add_0_r, rngl_mul_1_l.
 erewrite rngl_summation_eq_compat. 2: {
   intros * Hin.
   rewrite (Nat.add_1_l i).
@@ -110,8 +109,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   do 2 rewrite rngl_add_0_l.
   do 2 rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_0_l, rngl_add_0_r.
-  rewrite (rngl_mul_1_l Hon).
-  do 2 rewrite (rngl_mul_1_r Hon).
+  rewrite rngl_mul_1_l.
+  do 2 rewrite rngl_mul_1_r.
   easy.
 }
 rewrite (rngl_summation_shift 1); [ | flia Hnz ].
@@ -134,7 +133,7 @@ cbn.
 destruct n; [ easy | cbn ].
 rewrite Nat.add_1_r.
 rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
-rewrite rngl_add_0_r, (rngl_mul_1_l Hon).
+rewrite rngl_add_0_r, rngl_mul_1_l.
 now rewrite rngl_mul_1_r.
 Qed.
 
