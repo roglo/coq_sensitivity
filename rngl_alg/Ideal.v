@@ -1103,6 +1103,47 @@ cbn in *.
 subst.
 f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+move ip_add'1 before ip_add'0.
+assert
+  (H : ∀ (ab : T * T), let '(a, b) := ab in
+     (negb (ip_subtype'1 a) || negb (ip_subtype'1 b) ||
+        ip_subtype'1 (a + b)%L)%bool = true). {
+  intros.
+  destruct ab as (a, b).
+  apply ip_add'0.
+}
+specialize (@IPO (T * T)) as H1.
+set
+  (u (ab : T * T) :=
+     let (a, b) := ab in
+     (negb (ip_subtype'1 a) || negb (ip_subtype'1 b) || ip_subtype'1 (a + b)%L)%bool).
+specialize (H1 u).
+destruct H1 as [H1| H1]. 2: {
+  destruct H1 as (i, H1).
+  subst u.
+  cbn in H1.
+  destruct i as (a, b).
+(* bin oui, aucun intérêt *)
+(* bon, faut que j'ajoute l'extensionalité.
+   J'aime pas l'extensionalité.
+   Surtout que j'ai déjà un axiome.
+   Je vais quand même pas en mettre deux ! *)
+... ...
+  subst u.
+  cbn in H1.
+  assert
+    (H2 : ∀ (ab : T * T), let '(a, b) := ab in
+      (negb (ip_subtype'1 a) || negb (ip_subtype'1 b) ||
+      ip_subtype'1 (a + b)%L)%bool = false). {
+    intros ab.
+    destruct ab as (a, b).
+    specialize (H1 (a, b)).
+    easy.
+  }
+  clear H1.
+  rename H into H1.
+...
+set (u (ab : T * T) := H ab).
 ...
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 ...
