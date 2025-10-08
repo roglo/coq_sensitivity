@@ -1138,15 +1138,31 @@ destruct H1 as [H1| H1]. {
   congruence.
 }
 destruct H1 as (i, H1).
-subst u.
-cbn in H1.
-destruct i as (a, b).
-cbn in H.
-(* bin oui, aucun intérêt *)
-(* bon, faut que j'ajoute l'extensionalité.
-   J'aime pas l'extensionalité.
-   Surtout que j'ai déjà un axiome.
-   Je vais quand même pas en mettre deux ! *)
+specialize (@IPO (T * T)) as H2.
+set (v ab := negb (u ab)).
+specialize (H2 v).
+destruct H2 as [H2| H2]. {
+  subst v.
+  cbn in H2.
+  subst u.
+  assert
+    (H3 : ∀ (ab : T * T),
+      (let '(a, b) := ab in
+       (negb (ip_subtype'1 a) || negb (ip_subtype'1 b) ||
+       ip_subtype'1 (a + b)%L)%bool) = true). {
+    intros ab.
+    destruct ab as (a, b).
+    specialize (H2 (a, b)).
+    easy.
+  }
+  clear H2.
+  rename H into H2.
+  specialize (H2 (0, 0))%L.
+  specialize (H3 (0, 0))%L.
+  cbn in H2, H3.
+  rewrite H2 in H3.
+...
+  congruence.
 ... ...
 ...
 set (u (ab : T * T) := H ab).
