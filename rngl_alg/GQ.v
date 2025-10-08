@@ -159,10 +159,10 @@ simpl in Hxy.
 unfold GQ_of_PQ.
 apply GQeq_eq; simpl.
 unfold PQred; simpl.
-destruct xn as xn.
-destruct xd as xd.
-destruct yn as yn.
-destruct yd as yd.
+destruct xn as (xn).
+destruct xd as (xd).
+destruct yn as (yn).
+destruct yd as (yd).
 cbn in Hxy.
 cbn - [ ggcd ].
 remember (Nat.gcd (xn + 1) (xd + 1)) as gx eqn:Hgx.
@@ -201,8 +201,8 @@ Proof.
 intros * Hxy Hyx.
 apply Nat.le_antisymm in Hxy; [ | easy ].
 unfold nd in Hxy.
-destruct x as ((xn, xd), Hxp).
-destruct y as ((yn, yd), Hyp).
+destruct x as (((xn), (xd)), Hxp).
+destruct y as (((yn), (yd)), Hyp).
 move yd before xd; move yn before xd.
 simpl in Hxp, Hyp, Hxy.
 apply GQeq_eq; simpl.
@@ -713,8 +713,8 @@ destruct x as (x, Hx).
 destruct y as (y, Hy).
 move y before x.
 simpl in H; simpl.
-destruct x as (xn, xd).
-destruct y as (yn, yd).
+destruct x as ((xn), (xd)).
+destruct y as ((yn), (yd)).
 simpl in *.
 unfold "=="%PQ, nd in H.
 simpl in H.
@@ -732,7 +732,7 @@ Qed.
 
 Theorem GQ_of_PQ_eq : ∀ x y, GQ_of_PQ x = GQ_of_PQ y → (x == y)%PQ.
 Proof.
-intros (xn, xd) (yn, yd) H.
+intros ((xn), (xd)) ((yn), (yd)) H.
 unfold GQ_of_PQ in H; simpl in H.
 injection H; clear H; intros H.
 unfold PQred in H; simpl in H.
@@ -1194,7 +1194,7 @@ unfold GQnum, GQden.
 unfold GQ_of_PQ; cbn.
 remember (PQ_of_GQ x) as px eqn:Hpx; symmetry in Hpx.
 unfold PQred.
-destruct px as (nx, dx).
+destruct px as ((nx), (dx)).
 remember ggcd as f; cbn; subst f.
 remember (ggcd (nx + 1) (dx + 1)) as g eqn:Hg.
 symmetry in Hg.

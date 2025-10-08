@@ -8,7 +8,7 @@ Import GQ_Notations.
 Set Nested Proofs Allowed.
 
 (* "fast" lia, to improve compilation speed *)
-Tactic Notation "flia" hyp_listHs := clear - Hs; lia.
+Tactic Notation "flia" hyp_list (Hs) := clear - Hs; lia.
 (* "pauto" = "auto" failing if not working *)
 Tactic Notation "pauto" := progress auto.
 
