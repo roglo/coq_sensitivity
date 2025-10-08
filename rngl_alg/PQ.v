@@ -1565,7 +1565,8 @@ destruct x as (xn, xd).
 rewrite <- ggcd_gcd in Hx.
 progress unfold PQred.
 remember ggcd as f; cbn in Hx; cbn; subst f.
-...
+destruct xn as (xn).
+destruct xd as (xd); cbn - [ ggcd ] in Hx |-*.
 remember (ggcd (xn + 1) (xd + 1)) as g eqn:Hg.
 destruct g as (g, (aa, bb)); cbn in Hx; subst g.
 specialize (ggcd_correct_divisors (xn + 1) (xd + 1)) as H.
@@ -1584,6 +1585,10 @@ specialize (PQred_gcd x) as Hg.
 rewrite <- Hx in Hg.
 destruct x as (xn, xd), y as (yn, yd).
 cbn in Hxy, Hg.
+destruct xn as (xn).
+destruct xd as (xd).
+destruct yn as (yn).
+destruct yd as (yd); cbn in Hx, Hxy, Hg |-*.
 assert (Hd : Nat.divide (xn + 1) ((xd + 1) * (yn + 1))). {
   rewrite Nat.mul_comm, <- Hxy.
   exists (yd + 1).
@@ -1621,6 +1626,16 @@ progress unfold "*"%PQ in Hc, Hd.
 cbn in Hc, Hd.
 injection Hc; clear Hc; intros H1 H2.
 injection Hd; clear Hd; intros H3 H4.
+destruct xn as (xn).
+destruct xd as (xd).
+destruct yn as (yn).
+destruct yd as (yd).
+destruct c as (c).
+destruct d as (d); cbn in *.
+injection H1; clear H1; intros H1.
+injection H2; clear H2; intros H2.
+injection H3; clear H3; intros H3.
+injection H4; clear H4; intros H4.
 destruct d.
 -cbn in H3, H4.
  rewrite Nat.add_0_r, Nat.add_sub in H3, H4.
