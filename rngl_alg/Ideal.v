@@ -375,6 +375,12 @@ Definition I_ring_like_op : ring_like_op (ideal T) :=
 
 End a.
 
+(* Illimited Principe of Omniscience *)
+Axiom IPO : ∀ {I} (u : I → bool), { ∀ i, u i = false } + { ∃ i, u i = true }.
+
+(* Extensionnality Forall *)
+Axiom EF : ∀ A B (f g : A → B) (x y : ∀ a, f a = g a), x = y.
+
 (*
 Declare Scope ideal_scope.
 Delimit Scope ideal_scope with I.
@@ -387,8 +393,6 @@ Notation "a - b" := (rngl_sub a b) : ideal_scope.
 Notation "a * b" := (rngl_mul a b) : ideal_scope.
 Notation "- a" := (rngl_opp a) : ideal_scope.
 
-Axiom IPO : ∀ {I} (u : I → bool), (∀ i, u i = false) + (∃ i, u i = true).
-
 Section a.
 
 Context {T : Type}.
@@ -396,13 +400,33 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ic : ideal_ctx T}.
 
+Theorem eq_ideal_eq : ∀ a b,
+  ip_subtype a = ip_subtype b
+  → a = b.
+Proof.
+intros * Hab.
+destruct a.
+destruct b.
+cbn in *.
+subst.
+move ip_mul_r1 before ip_mul_r0.
+move ip_mul_l1 before ip_mul_l0.
+move ip_opp1 before ip_opp0.
+move ip_add1 before ip_add0.
+f_equal.
+... marche pas...
+...
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+...
+
 Theorem I_add_comm : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
 progress unfold I_add.
-Print ideal.
 ...
 *)
+
+Notation "a ⇒ b" := (negb a || b)%bool (at level 99, right associativity).
 
 (* attempt to implement ideals using bool instead of Prop *)
 
@@ -411,9 +435,11 @@ Print ideal.
 Record ideal' {T} {ro : ring_like_op T} := mk_ip'
   { ip_subtype' : T → bool;
     ip_zero' : ip_subtype' rngl_zero = true;
-    ip_add' a b :
-      (negb (ip_subtype' a) ||
-         (negb (ip_subtype' b) || ip_subtype' (a + b)%L))%bool = true;
+    ip_add' :
+      ∀ ab,
+      let a := fst ab in
+      let b := snd ab in
+      (ip_subtype' a ⇒ ip_subtype' b ⇒ ip_subtype' (a + b)%L) = true;
     ip_opp' : ∀ a, ip_subtype' (- a)%L = ip_subtype' a;
     ip_mul_l' : ∀ a b, ip_subtype' b = true → ip_subtype' (a * b)%L = true;
     ip_mul_r' : ∀ a b, ip_subtype' a = true → ip_subtype' (a * b)%L = true }.
@@ -431,8 +457,6 @@ Ltac destruct_ic' :=
   set (Heo := ic_eo');
   set (Hos := rngl_has_opp_has_opp_or_psub Hop).
 
-Notation "a ⇒ b" := ((negb a || b)%bool) (at level 99, right associativity).
-
 Section a.
 
 Context {T : Type}.
@@ -442,10 +466,14 @@ Context {ic : ideal_ctx' T}.
 
 (* 0 and 1 *)
 
-Theorem I_zero_add' a b :
+Theorem I_zero_add' ab :
+  let a := fst ab in
+  let b := snd ab in
   ((a ≠? 0)%L || ((b ≠? 0)%L || (a + b =? 0)%L))%bool = true.
 Proof.
 destruct_ic'.
+destruct ab as (a, b).
+cbn.
 rewrite Bool.orb_assoc.
 apply Bool.orb_true_iff.
 remember (a + b =? 0)%L as u eqn:Hu.
@@ -512,19 +540,10 @@ Definition I_zero' : ideal' T :=
 Definition I_one' : ideal' T :=
   {| ip_subtype' a := true;
      ip_zero' := eq_refl;
-     ip_add' _ _ := eq_refl;
+     ip_add' _ := eq_refl;
      ip_opp' _ := eq_refl;
      ip_mul_l' _ _ _ := eq_refl;
      ip_mul_r' _ _ _ := eq_refl |}.
-
-(* Illimited Principe of Omniscience *)
-(*
-Axiom IPO :
-  ∀ {I} (u : I → bool), (∀ i, u i = false) + { i : I | u i = true }.
-Axiom IPO : ∀ {I} (u : I → bool), (∀ i, u i = false) + (∃ i, u i = true).
-*)
-Axiom IPO : ∀ {I} (u : I → bool), { ∀ i, u i = false } + { ∃ i, u i = true }.
-(**)
 
 Definition bool_of_sum {A B} (s : A + B) :=
   match s with
@@ -557,13 +576,14 @@ easy.
 Qed.
 
 Theorem I_add_add' a b :
-  ∀ x y,
-  (negb (I_add_subtype' a b x) ||
-     (negb (I_add_subtype' a b y) ||
-      I_add_subtype' a b (x + y)))%bool = true.
+  ∀ xy,
+  let x := fst xy in
+  let y := snd xy in
+  (I_add_subtype' a b x ⇒ I_add_subtype' a b y ⇒ I_add_subtype' a b (x + y))
+  = true.
 Proof.
 destruct_ic'.
-intros.
+intros (x, y); cbn.
 rewrite Bool.orb_assoc.
 apply Bool.orb_true_iff.
 remember (I_add_subtype' a b (x + y)) as u eqn:Hu.
@@ -601,12 +621,14 @@ apply Bool.andb_false_iff in H3.
 destruct H3 as [H3| H3]. {
   apply Bool.not_true_iff_false in H3.
   apply H3; clear H3.
-  specialize (ip_add' a x1 x2) as H1.
+  specialize (ip_add' a (x1, x2)) as H1.
+  cbn in H1.
   now rewrite H12, H22 in H1.
 } {
   apply Bool.not_true_iff_false in H3.
   apply H3; clear H3.
-  specialize (ip_add' b y1 y2) as H1.
+  specialize (ip_add' b (y1, y2)) as H1.
+  cbn in H1.
   now rewrite H13, H23 in H1.
 }
 Qed.
@@ -735,13 +757,15 @@ now rewrite (rngl_eqb_refl Heo) in H.
 Qed.
 
 Theorem I_mul_add' a b :
-  ∀ x y,
+  ∀ xy,
+  let x := fst xy in
+  let y := snd xy in
   (negb (I_mul_subtype' a b x) ||
      (negb (I_mul_subtype' a b y) ||
         I_mul_subtype' a b (x + y)))%bool = true.
 Proof.
 destruct_ic'.
-intros.
+intros (x, y); cbn.
 rewrite Bool.orb_assoc.
 apply Bool.orb_true_iff.
 remember (I_mul_subtype' a b (x + y)) as u eqn:Hu.
@@ -1038,13 +1062,15 @@ apply ip_zero'.
 Qed.
 
 Theorem I_opp_add' a :
-  ∀ x y,
+  ∀ xy,
+  let x := fst xy in
+  let y := snd xy in
   (negb (ip_subtype' a (- x)) ||
      (negb (ip_subtype' a (- y)) ||
       ip_subtype' a (- (x + y)%L)))%bool = true.
 Proof.
 destruct_ic'.
-intros.
+intros (x, y); cbn.
 rewrite Bool.orb_assoc.
 apply Bool.orb_true_iff.
 remember (ip_subtype' a (- (x + y)))%L as u eqn:Hu.
@@ -1058,7 +1084,8 @@ apply Hu; clear Hu.
 destruct H as (Hx, Hy).
 apply Bool.negb_false_iff in Hx, Hy.
 rewrite ip_opp' in Hx, Hy |-*.
-specialize (ip_add' a x y) as H1.
+specialize (ip_add' a (x, y)) as H1.
+cbn in H1.
 now rewrite Hx, Hy in H1.
 Qed.
 
@@ -1127,16 +1154,8 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ic : ideal_ctx' T}.
 
-Axiom rngl_extensionality : ∀ (f g : T → Prop), (∀ a, f a = g a) → f = g.
-Definition isSet (A : Type) := ∀ (a b : A) (p q : a = b), p = q.
-Definition isProp (A : Type) := ∀ (x y : A), x = y.
-
-Axiom glap : ∀ (P Q : T → bool) (x y : ∀ a : T, P a = Q a), x = y.
-Axiom glop : ∀ (P : T → T → bool) (x y : ∀ a b : T, P a b = true), x = y.
-(* voir si on peut démontrer glop à partir de glap, avec ∀ (a, b) pour ∀ a b *)
-
 (* to be completed
-Theorem eq_ideal_eq : ∀ a b, 
+Theorem eq_ideal_eq' : ∀ a b,
   ip_subtype' a = ip_subtype' b
   → a = b.
 Proof.
@@ -1151,95 +1170,8 @@ move ip_opp'1 before ip_opp'0.
 move ip_add'1 before ip_add'0.
 f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-apply glop.
-apply glap.
-... hint: faire ip_mul_l' comme ip_add' avec un ⇒ classique
-apply glop.
-...
-assert
-  (H : ∀ (ab : T * T), let '(a, b) := ab in
-     (negb (ip_subtype'1 a) ||
-        (negb (ip_subtype'1 b) ||
-         ip_subtype'1 (a + b)%L))%bool = true). {
-  intros.
-  destruct ab as (a, b).
-  apply ip_add'0.
-}
-specialize (@IPO (T * T)) as H1.
-set
-  (u (ab : T * T) :=
-     let (a, b) := ab in
-     (negb (ip_subtype'1 a) ||
-        (negb (ip_subtype'1 b) || ip_subtype'1 (a + b)%L))%bool).
-specialize (H1 u).
-destruct H1 as [H1| H1]. {
-  subst u.
-  cbn in H1.
-  assert
-    (H2 : ∀ (ab : T * T), let '(a, b) := ab in
-      (negb (ip_subtype'1 a) ||
-         (negb (ip_subtype'1 b) ||
-            ip_subtype'1 (a + b)%L))%bool = false). {
-    intros ab.
-    destruct ab as (a, b).
-    specialize (H1 (a, b)).
-    easy.
-  }
-  clear H1.
-  rename H into H1.
-  specialize (H1 (0, 0))%L.
-  specialize (H2 (0, 0))%L.
-  cbn in H1, H2.
-  congruence.
-}
-destruct H1 as (i, H1).
-...
-specialize (@IPO (T * T)) as H2.
-set (v ab := negb (u ab)).
-specialize (H2 v).
-destruct H2 as [H2| H2]. {
-  subst v.
-  cbn in H2.
-  subst u.
-  assert
-    (H3 : ∀ (ab : T * T),
-      (let '(a, b) := ab in
-       (negb (ip_subtype'1 a) || negb (ip_subtype'1 b) ||
-       ip_subtype'1 (a + b)%L)%bool) = true). {
-    intros ab.
-    destruct ab as (a, b).
-    specialize (H2 (a, b)).
-    easy.
-  }
-  clear H2.
-  rename H into H2.
-  specialize (H3 i).
-  cbn in H1, H2, H3.
-...
-  specialize (H2 (0, 0))%L.
-  specialize (H3 (0, 0))%L.
-  cbn in H2, H3.
-cbn in H1.
-destruct i as (a, b).
-
-  rewrite H2 in H3.
-...
-  congruence.
-... ...
-...
-set (u (ab : T * T) := H ab).
-...
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-...
-...
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-...
-
-move ip_zero'1 before ip_zero'0.
-move ip_subtyp_1 before ip_sub
+apply EF.
+apply EF.
 ...
 *)
 
@@ -1274,6 +1206,8 @@ Qed.
 Theorem I_add_comm' : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
+... ...
+apply eq_ideal_eq'.
 progress unfold I_add'.
 ... ...
 assert (I_add_subtype' a b = I_add_subtype' b a). {
