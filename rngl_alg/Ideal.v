@@ -375,14 +375,12 @@ Definition I_ring_like_op : ring_like_op (ideal T) :=
 
 End a.
 
+(* for propositional and functional extensionalities *)
+From Stdlib Require Import PropExtensionality.
+From Stdlib Require Import FunctionalExtensionality.
+
 (* Illimited Principe of Omniscience *)
 Axiom IPO : ∀ {I} (u : I → bool), { ∀ i, u i = false } + { ∃ i, u i = true }.
-
-(* Extensionnality Predicate *)
-Axiom EP : ∀ A B (f g : A → B) (P Q : ∀ a, f a = g a), P = Q.
-
-(* Extensionnality Function *)
-Axiom EF : ∀ A B (f g : A → B), (∀ a, f a = g a) → f = g.
 
 (*
 Declare Scope ideal_scope.
@@ -1223,10 +1221,10 @@ move ip_opp'1 before ip_opp'0.
 move ip_add'1 before ip_add'0.
 f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-apply EP.
-apply EP.
-apply EP.
-apply EP.
+apply proof_irrelevance.
+apply proof_irrelevance.
+apply proof_irrelevance.
+apply proof_irrelevance.
 Qed.
 
 (* ideal ring like prop *)
@@ -1260,10 +1258,30 @@ Theorem I_add_comm' : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
 apply eq_ideal_eq'.
-apply EF.
+apply functional_extensionality_dep.
 intros z.
 apply I_add_subtype_comm'.
 Qed.
+
+(*
+Print Assumptions eq_ideal_eq'.
+Print Assumptions I_add_comm'.
+*)
+
+(*
+Check eq_ideal_eq'.
+Axioms:
+propositional_extensionality : ∀ P Q : Prop, P ↔ Q → P = Q
+*)
+
+(*
+Check I_add_comm'.
+Axioms:
+propositional_extensionality : ∀ P Q : Prop, P ↔ Q → P = Q
+functional_extensionality_dep :
+  ∀ (A : Type) (B : A → Type) (f g : ∀ x : A, B x), (∀ x : A, f x = g x) → f = g
+IPO : ∀ (I : Type) (u : I → bool), {∀ i : I, u i = false} + {∃ i : I, u i = true}
+*)
 
 (* to be completed
 (*
