@@ -437,9 +437,9 @@ Record ideal' {T} {ro : ring_like_op T} := mk_ip'
     ip_zero' : ip_subtype' rngl_zero = true;
     ip_add' :
       ∀ ab,
-      let a := fst ab in
-      let b := snd ab in
-      (ip_subtype' a ⇒ ip_subtype' b ⇒ ip_subtype' (a + b)%L) = true;
+      (ip_subtype' (fst ab) ⇒
+       ip_subtype' (snd ab) ⇒
+       ip_subtype' (fst ab + snd ab)%L) = true;
     ip_opp' : ∀ a, ip_subtype' (- a)%L = ip_subtype' a;
     ip_mul_l' : ∀ a b, ip_subtype' b = true → ip_subtype' (a * b)%L = true;
     ip_mul_r' : ∀ a b, ip_subtype' a = true → ip_subtype' (a * b)%L = true }.
