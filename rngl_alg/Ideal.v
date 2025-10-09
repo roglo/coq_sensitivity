@@ -382,7 +382,7 @@ From Stdlib Require Import FunctionalExtensionality.
 (* Illimited Principe of Omniscience *)
 Axiom IPO : ∀ {I} (u : I → bool), { ∀ i, u i = false } + { ∃ i, u i = true }.
 
-(*
+(**)
 Declare Scope ideal_scope.
 Delimit Scope ideal_scope with I.
 Bind Scope ideal_scope with ideal.
@@ -410,22 +410,67 @@ destruct a.
 destruct b.
 cbn in *.
 subst.
-move ip_mul_r1 before ip_mul_r0.
-move ip_mul_l1 before ip_mul_l0.
-move ip_opp1 before ip_opp0.
-move ip_add1 before ip_add0.
 f_equal.
-... marche pas...
-...
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-...
+apply proof_irrelevance.
+apply proof_irrelevance.
+apply proof_irrelevance.
+apply proof_irrelevance.
+apply proof_irrelevance.
+Qed.
 
+(*
+Theorem I_add_subtype_comm a b z :
+  I_add_subtype a b z = I_add_subtype b a z.
+Proof.
+progress unfold I_add_subtype.
+f_equal.
+apply functional_extensionality_dep.
+intros x.
+f_equal.
+apply functional_extensionality_dep.
+intros y.
+...
+specialize (@IPO' T) as H1.
+specialize (H1 (ip_subtype a)).
+destruct H1 as [H1| H1]. {
+f_equal.
+
+Print ideal.
+...
+destruct (IPO' _) as [f| f]. {
+  destruct (IPO _) as [g| g] in |-*; [ easy | exfalso ].
+  destruct g as ((x, y), g).
+  specialize (f (y, x)).
+  cbn in f.
+  rewrite rngl_add_comm in g.
+  rewrite <- Bool.andb_assoc in f, g.
+  rewrite (Bool.andb_comm (ip_subtype' b x)) in g.
+  congruence.
+} {
+  destruct (IPO _) as [g| g] in |-*; [ exfalso | easy ].
+  destruct f as ((x, y), f).
+  specialize (g (y, x)).
+  cbn in g.
+  rewrite rngl_add_comm in g.
+  rewrite <- Bool.andb_assoc in f, g.
+  rewrite (Bool.andb_comm (ip_subtype' b y)) in g.
+  congruence.
+}
+Qed.
+*)
+
+(*
 Theorem I_add_comm : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
-progress unfold I_add.
+apply eq_ideal_eq.
+progress unfold I_add; cbn.
+apply functional_extensionality_dep.
+intros z.
 ...
 *)
+
+End a.
 
 Notation "a ⇒ b" := (negb a || b)%bool (at level 48, right associativity).
 
@@ -1186,13 +1231,13 @@ Definition I_ring_like_op' : ring_like_op (ideal' T) :=
 
 End a.
 
-Declare Scope ideal_scope.
-Delimit Scope ideal_scope with I.
-Bind Scope ideal_scope with ideal.
+Declare Scope ideal_scope'.
+Delimit Scope ideal_scope' with I'.
+Bind Scope ideal_scope' with ideal'.
 
-Notation "0" := I_zero' : ideal_scope.
-Notation "1" := I_one' : ideal_scope.
-Notation "a + b" := (I_add' a b) : ideal_scope.
+Notation "0" := I_zero' : ideal_scope'.
+Notation "1" := I_one' : ideal_scope'.
+Notation "a + b" := (I_add' a b) : ideal_scope'.
 (*
 Notation "a - b" := (rngl_sub a b) : ideal_scope.
 Notation "a * b" := (rngl_mul a b) : ideal_scope.
@@ -1254,7 +1299,7 @@ destruct (IPO _) as [f| f]. {
 }
 Qed.
 
-Theorem I_add_comm' : ∀ a b, (a + b)%I = (b + a)%I.
+Theorem I_add_comm' : ∀ a b, (a + b)%I' = (b + a)%I'.
 Proof.
 intros.
 apply eq_ideal_eq'.
