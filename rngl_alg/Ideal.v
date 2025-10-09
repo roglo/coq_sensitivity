@@ -1127,7 +1127,9 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ic : ideal_ctx' T}.
 
-(* bof, ça a pas l'air de le faire...
+Axiom rngl_extensionality : ∀ A (f g : T → A), (∀ a, f a = g a) → f = g.
+
+(* to be completed
 Theorem eq_ideal_eq : ∀ a b, 
   ip_subtype' a = ip_subtype' b
   → a = b.
@@ -1143,6 +1145,10 @@ move ip_opp'1 before ip_opp'0.
 move ip_add'1 before ip_add'0.
 f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+2: {
+Check ip_opp'0.
+  apply rngl_extensionality.
+...
 assert
   (H : ∀ (ab : T * T), let '(a, b) := ab in
      (negb (ip_subtype'1 a) ||
@@ -1262,6 +1268,11 @@ Theorem I_add_comm' : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
 progress unfold I_add'.
+... ...
+assert (I_add_subtype' a b = I_add_subtype' b a). {
+  apply extensionality_bool.
+  apply I_add_subtype_comm'.
+}
 ...
 
 (*
