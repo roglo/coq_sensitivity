@@ -1132,6 +1132,8 @@ Definition isSet (A : Type) := ∀ (a b : A) (p q : a = b), p = q.
 Definition isProp (A : Type) := ∀ (x y : A), x = y.
 
 Axiom glap : ∀ (P Q : T → bool) (x y : ∀ a : T, P a = Q a), x = y.
+Axiom glop : ∀ (P : T → T → bool) (x y : ∀ a b : T, P a b = true), x = y.
+(* voir si on peut démontrer glop à partir de glap, avec ∀ (a, b) pour ∀ a b *)
 
 (* to be completed
 Theorem eq_ideal_eq : ∀ a b, 
@@ -1149,11 +1151,10 @@ move ip_opp'1 before ip_opp'0.
 move ip_add'1 before ip_add'0.
 f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-2: {
-  apply glap.
-}
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply glop.
 apply glap.
+... hint: faire ip_mul_l' comme ip_add' avec un ⇒ classique
+apply glop.
 ...
 assert
   (H : ∀ (ab : T * T), let '(a, b) := ab in
