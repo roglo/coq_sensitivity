@@ -381,6 +381,9 @@ Axiom IPO : ∀ {I} (u : I → bool), { ∀ i, u i = false } + { ∃ i, u i = tr
 (* Extensionnality Forall *)
 Axiom EF : ∀ A B (f g : A → B) (x y : ∀ a, f a = g a), x = y.
 
+(* Extensionnality *)
+Axiom extensionnality : ∀ A B (f g : A → B), (∀ a, f a = g a) → f = g.
+
 (*
 Declare Scope ideal_scope.
 Delimit Scope ideal_scope with I.
@@ -1253,21 +1256,16 @@ destruct (IPO _) as [f| f]. {
 }
 Qed.
 
-(* to be completed
 Theorem I_add_comm' : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
 apply eq_ideal_eq'.
-progress unfold I_add'; cbn.
-... ... extensionnality needed
+apply extensionnality.
+intros z.
 apply I_add_subtype_comm'.
-... ...
-assert (I_add_subtype' a b = I_add_subtype' b a). {
-  apply extensionality_bool.
-  apply I_add_subtype_comm'.
-}
-...
+Qed.
 
+(* to be completed
 (*
 Theorem I_add_assoc : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a + (b + c))%L = (a + b + c)%L.
@@ -1838,17 +1836,17 @@ apply (I_ring_like_when_ord Hor).
 Qed.
 *)
 
-Definition I_ring_like_prop : ring_like_prop (ideal T) :=
+Definition I_ring_like_prop' : ring_like_prop (ideal' T) :=
   let roi := I_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;
-     rngl_add_comm := I_add_comm;
+     rngl_add_comm := I_add_comm';
      rngl_add_assoc := true; (*I_add_assoc;*)
      rngl_add_0_l := true; (*I_add_0_l;*)
      rngl_mul_assoc := true; (*I_mul_assoc;*)
-     rngl_opt_mul_1_l := true; (*I_opt_mul_1_l;*)
+     rngl_mul_1_l := true; (*I_opt_mul_1_l;*)
      rngl_mul_add_distr_l := true; (*I_mul_add_distr_l;*)
      rngl_opt_mul_comm := true; (*I_opt_mul_comm;*)
      rngl_opt_mul_1_r := true; (*I_opt_mul_1_r;*)
