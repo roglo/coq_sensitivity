@@ -378,11 +378,11 @@ End a.
 (* Illimited Principe of Omniscience *)
 Axiom IPO : ∀ {I} (u : I → bool), { ∀ i, u i = false } + { ∃ i, u i = true }.
 
-(* Extensionnality Forall *)
-Axiom EF : ∀ A B (f g : A → B) (x y : ∀ a, f a = g a), x = y.
+(* Extensionnality Predicate *)
+Axiom EP : ∀ A B (f g : A → B) (P Q : ∀ a, f a = g a), P = Q.
 
-(* Extensionnality *)
-Axiom extensionnality : ∀ A B (f g : A → B), (∀ a, f a = g a) → f = g.
+(* Extensionnality Function *)
+Axiom EF : ∀ A B (f g : A → B), (∀ a, f a = g a) → f = g.
 
 (*
 Declare Scope ideal_scope.
@@ -1223,10 +1223,10 @@ move ip_opp'1 before ip_opp'0.
 move ip_add'1 before ip_add'0.
 f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-apply EF.
-apply EF.
-apply EF.
-apply EF.
+apply EP.
+apply EP.
+apply EP.
+apply EP.
 Qed.
 
 (* ideal ring like prop *)
@@ -1260,7 +1260,7 @@ Theorem I_add_comm' : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
 apply eq_ideal_eq'.
-apply extensionnality.
+apply EF.
 intros z.
 apply I_add_subtype_comm'.
 Qed.
