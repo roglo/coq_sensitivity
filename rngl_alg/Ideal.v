@@ -1277,7 +1277,8 @@ propositional_extensionality : ∀ P Q : Prop, P ↔ Q → P = Q
 (*
 Check I_add_comm'.
 Axioms:
-propositional_extensionality : ∀ P Q : Prop, P ↔ Q → P = Q
+propositional_extensionality :
+  ∀ P Q : Prop, P ↔ Q → P = Q
 functional_extensionality_dep :
   ∀ (A : Type) (B : A → Type) (f g : ∀ x : A, B x), (∀ x : A, f x = g x) → f = g
 IPO : ∀ (I : Type) (u : I → bool), {∀ i : I, u i = false} + {∃ i : I, u i = true}
@@ -1855,7 +1856,7 @@ Qed.
 *)
 
 Definition I_ring_like_prop' : ring_like_prop (ideal' T) :=
-  let roi := I_ring_like_op in
+  let roi := I_ring_like_op' in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
