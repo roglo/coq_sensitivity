@@ -1127,7 +1127,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ic : ideal_ctx' T}.
 
-(* to be completed
+(* bof, ça a pas l'air de le faire...
 Theorem eq_ideal_eq : ∀ a b, 
   ip_subtype' a = ip_subtype' b
   → a = b.
@@ -1228,10 +1228,36 @@ apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 move ip_zero'1 before ip_zero'0.
 move ip_subtyp_1 before ip_sub
 ...
+*)
 
 (* ideal ring like prop *)
 
-(* to be completed *)
+Theorem I_add_subtype_comm' a b z :
+  I_add_subtype' a b z = I_add_subtype' b a z.
+Proof.
+progress unfold I_add_subtype'.
+destruct (IPO _) as [f| f]. {
+  destruct (IPO _) as [g| g] in |-*; [ easy | exfalso ].
+  destruct g as ((x, y), g).
+  specialize (f (y, x)).
+  cbn in f.
+  rewrite rngl_add_comm in g.
+  rewrite <- Bool.andb_assoc in f, g.
+  rewrite (Bool.andb_comm (ip_subtype' b x)) in g.
+  congruence.
+} {
+  destruct (IPO _) as [g| g] in |-*; [ exfalso | easy ].
+  destruct f as ((x, y), f).
+  specialize (g (y, x)).
+  cbn in g.
+  rewrite rngl_add_comm in g.
+  rewrite <- Bool.andb_assoc in f, g.
+  rewrite (Bool.andb_comm (ip_subtype' b y)) in g.
+  congruence.
+}
+Qed.
+
+(* to be completed
 Theorem I_add_comm' : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
