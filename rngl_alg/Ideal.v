@@ -36,6 +36,18 @@ Ltac destruct_ic :=
   set (Hop := ic_op);
   set (Hos := rngl_has_opp_has_opp_or_psub Hop).
 
+(* for propositional and functional extensionalities *)
+From Stdlib Require Import PropExtensionality.
+From Stdlib Require Import FunctionalExtensionality.
+(* provides the axioms:
+- propositional_extensionality :
+     ∀ P Q : Prop, P ↔ Q → P = Q.
+- functional_extensionality_dep :
+     ∀ (A : Type) (B : A → Type) (f g : ∀ x : A, B x),
+     (∀ x : A, f x = g x)
+     → f = g
+*)
+
 Section a.
 
 Context {T : Type}.
@@ -374,18 +386,6 @@ Definition I_ring_like_op : ring_like_op (ideal T) :=
      rngl_opt_leb := None |}.
 
 End a.
-
-(* for propositional and functional extensionalities *)
-From Stdlib Require Import PropExtensionality.
-From Stdlib Require Import FunctionalExtensionality.
-(* provides the axioms:
-- propositional_extensionality :
-     ∀ P Q : Prop, P ↔ Q → P = Q.
-- functional_extensionality_dep :
-     ∀ (A : Type) (B : A → Type) (f g : ∀ x : A, B x),
-     (∀ x : A, f x = g x)
-     → f = g
-*)
 
 Declare Scope ideal_scope.
 Delimit Scope ideal_scope with I.
