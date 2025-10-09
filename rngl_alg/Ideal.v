@@ -426,7 +426,7 @@ progress unfold I_add.
 ...
 *)
 
-Notation "a ⇒ b" := (negb a || b)%bool (at level 99, right associativity).
+Notation "a ⇒ b" := (negb a || b)%bool (at level 48, right associativity).
 
 (* attempt to implement ideals using bool instead of Prop *)
 
@@ -437,14 +437,11 @@ Record ideal' {T} {ro : ring_like_op T} := mk_ip'
     ip_zero' : ip_subtype' rngl_zero = true;
     ip_add' :
       ∀ ab,
-      (ip_subtype' (fst ab) ⇒
-       ip_subtype' (snd ab) ⇒
+      (ip_subtype' (fst ab) ⇒ ip_subtype' (snd ab) ⇒
        ip_subtype' (fst ab + snd ab)%L) = true;
     ip_opp' : ∀ a, ip_subtype' (- a)%L = ip_subtype' a;
     ip_mul_l' :
-      ∀ ab,
-      ip_subtype' (snd ab) = true →
-      ip_subtype' (fst ab * snd ab)%L = true;
+      ∀ ab, (ip_subtype' (snd ab) ⇒ ip_subtype' (fst ab * snd ab)%L) = true;
     ip_mul_r' : ∀ a b, ip_subtype' a = true → ip_subtype' (a * b)%L = true }.
 
 Arguments ideal' T {ro}.
@@ -517,13 +514,18 @@ Qed.
 Theorem I_zero_mul_l' ab :
   let a := fst ab in
   let b := snd ab in
-  (b =? 0)%L = true → (a * b =? 0)%L = true.
+  ((b =? 0)%L ⇒ (a * b =? 0)%L) = true.
 Proof.
 destruct_ic'.
 intros; cbn.
-apply (rngl_eqb_eq Heo) in H.
+apply Bool.orb_true_iff.
+remember (b ≠? 0)%L as u eqn:Hu.
+symmetry in Hu.
+destruct u; [ now left | right ].
+apply Bool.negb_false_iff in Hu.
+apply (rngl_eqb_eq Heo) in Hu.
 apply (rngl_eqb_eq Heo).
-rewrite H; apply (rngl_mul_0_r Hos).
+rewrite Hu; apply (rngl_mul_0_r Hos).
 Qed.
 
 Theorem I_zero_mul_r' a b : (a =? 0)%L = true → (a * b =? 0)%L = true.
@@ -548,7 +550,7 @@ Definition I_one' : ideal' T :=
      ip_zero' := eq_refl;
      ip_add' _ := eq_refl;
      ip_opp' _ := eq_refl;
-     ip_mul_l' _ _ := eq_refl;
+     ip_mul_l' _ := eq_refl;
      ip_mul_r' _ _ _ := eq_refl |}.
 
 Definition bool_of_sum {A B} (s : A + B) :=
@@ -684,14 +686,14 @@ Theorem I_add_mul_l' ab :
   ∀ xy,
   let x := fst xy in
   let y := snd xy in
-  I_add_subtype' a b y = true → I_add_subtype' a b (x * y) = true.
+  (I_add_subtype' a b y ⇒ I_add_subtype' a b (x * y)) = true.
 Proof.
 destruct_ic'.
 intros a b; cbn.
-intros (x, y) H; cbn in H |-*.
-progress unfold I_add_subtype' in H.
+intros (x, y); cbn.
+apply Bool.orb_true_iff.
 progress unfold I_add_subtype'.
-destruct (IPO _) as [H1| H1] in H; [ easy | clear H ].
+destruct (IPO _) as [H1| H1]; [ now left | right ].
 destruct (IPO _) as [H2| H2] in |-*; [ exfalso | easy ].
 destruct H1 as ((x1, y1) & H1).
 apply Bool.andb_true_iff in H1.
@@ -704,10 +706,12 @@ specialize (H2 (x * x1, x * y1))%L.
 cbn in H2.
 rewrite rngl_mul_add_distr_l in H2.
 rewrite (rngl_eqb_refl Heo) in H2.
-specialize (ip_mul_l' _ (x, x1) H12) as H.
-cbn in H; rewrite H in H2; clear H.
-specialize (ip_mul_l' _ (x, y1) H13) as H.
-cbn in H; rewrite H in H2; clear H.
+specialize (ip_mul_l' a (x, x1)) as H; cbn in H.
+rewrite H12 in H; cbn in H.
+rewrite H in H2; clear H.
+specialize (ip_mul_l' b (x, y1)) as H; cbn in H.
+rewrite H13 in H; cbn in H.
+rewrite H in H2; clear H.
 easy.
 Qed.
 
@@ -946,7 +950,11 @@ Proof.
 intros * Hl Hy.
 remember (ip_subtype' a y) as u eqn:Hu.
 symmetry in Hu.
-destruct u; [ now apply (ip_mul_l' _ (x, y) Hu) | exfalso ].
+destruct u. {
+  specialize (ip_mul_l' a (x, y)) as H2; cbn in H2.
+  now rewrite Hu in H2.
+}
+exfalso.
 apply Bool.not_true_iff_false in Hu.
 apply Hu; clear Hu.
 now apply (proj2 (all_true_rngl_and_list_true_iff _ _ _) Hl).
@@ -973,15 +981,15 @@ Theorem I_mul_mul_l' ab :
   ∀ xy,
   let x := fst xy in
   let y := snd xy in
-  I_mul_subtype' a b y = true → I_mul_subtype' a b (x * y) = true.
+  (I_mul_subtype' a b y ⇒ I_mul_subtype' a b (x * y)) = true.
 Proof.
 destruct_ic'.
 intros a b; cbn.
-intros (x, y) Hab; cbn in Hab |-*.
-progress unfold I_mul_subtype' in Hab.
+intros (x, y); cbn.
+apply Bool.orb_true_iff.
 progress unfold I_mul_subtype'.
-destruct (IPO _) as [H1| H1] in Hab; [ easy | clear Hab ].
-destruct (IPO _) as [H3| H3] in |-*; [ exfalso | easy ].
+destruct (IPO _) as [H1| H1]; [ now left | right ].
+destruct (IPO _) as [H3| H3]; [ exfalso | easy ].
 destruct H1 as (((n, lx), ly) & H1).
 apply Bool.andb_true_iff in H1.
 destruct H1 as (H1, H15).
@@ -1113,12 +1121,12 @@ Theorem I_opp_mul_l' a :
   ∀ xy,
   let x := fst xy in
   let y := snd xy in
-  ip_subtype' a (- y) = true → ip_subtype' a (- (x * y)%L) = true.
+  ip_subtype' a (- y) ⇒ ip_subtype' a (- (x * y)%L) = true.
 Proof.
 destruct_ic'.
-intros * H.
-rewrite ip_opp' in H |-*.
-apply (ip_mul_l' a (x, y) H).
+intros.
+specialize (ip_mul_l' a (x, y)) as H1; cbn in H1.
+now do 2 rewrite ip_opp'.
 Qed.
 
 Theorem I_opp_mul_r' a :
@@ -1193,6 +1201,7 @@ move ip_opp'1 before ip_opp'0.
 move ip_add'1 before ip_add'0.
 f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply EF.
 apply EF.
 apply EF.
 ...
