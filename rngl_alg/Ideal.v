@@ -378,11 +378,15 @@ End a.
 (* for propositional and functional extensionalities *)
 From Stdlib Require Import PropExtensionality.
 From Stdlib Require Import FunctionalExtensionality.
+(* provides the axioms:
+- propositional_extensionality :
+     ∀ P Q : Prop, P ↔ Q → P = Q.
+- functional_extensionality_dep :
+     ∀ (A : Type) (B : A → Type) (f g : ∀ x : A, B x),
+     (∀ x : A, f x = g x)
+     → f = g
+*)
 
-(* Illimited Principe of Omniscience *)
-Axiom IPO : ∀ {I} (u : I → bool), { ∀ i, u i = false } + { ∃ i, u i = true }.
-
-(**)
 Declare Scope ideal_scope.
 Delimit Scope ideal_scope with I.
 Bind Scope ideal_scope with ideal.
@@ -418,48 +422,20 @@ apply proof_irrelevance.
 apply proof_irrelevance.
 Qed.
 
-(*
 Theorem I_add_subtype_comm a b z :
   I_add_subtype a b z = I_add_subtype b a z.
 Proof.
 progress unfold I_add_subtype.
-f_equal.
-apply functional_extensionality_dep.
-intros x.
-f_equal.
-apply functional_extensionality_dep.
-intros y.
-...
-specialize (@IPO' T) as H1.
-specialize (H1 (ip_subtype a)).
-destruct H1 as [H1| H1]. {
-f_equal.
-
-Print ideal.
-...
-destruct (IPO' _) as [f| f]. {
-  destruct (IPO _) as [g| g] in |-*; [ easy | exfalso ].
-  destruct g as ((x, y), g).
-  specialize (f (y, x)).
-  cbn in f.
-  rewrite rngl_add_comm in g.
-  rewrite <- Bool.andb_assoc in f, g.
-  rewrite (Bool.andb_comm (ip_subtype' b x)) in g.
-  congruence.
+apply propositional_extensionality.
+split; intros (x & y & H1 & H2 & H3). {
+  exists y, x.
+  now rewrite rngl_add_comm.
 } {
-  destruct (IPO _) as [g| g] in |-*; [ exfalso | easy ].
-  destruct f as ((x, y), f).
-  specialize (g (y, x)).
-  cbn in g.
-  rewrite rngl_add_comm in g.
-  rewrite <- Bool.andb_assoc in f, g.
-  rewrite (Bool.andb_comm (ip_subtype' b y)) in g.
-  congruence.
+  exists y, x.
+  now rewrite rngl_add_comm.
 }
 Qed.
-*)
 
-(*
 Theorem I_add_comm : ∀ a b, (a + b)%I = (b + a)%I.
 Proof.
 intros.
@@ -467,14 +443,26 @@ apply eq_ideal_eq.
 progress unfold I_add; cbn.
 apply functional_extensionality_dep.
 intros z.
-...
+apply I_add_subtype_comm.
+Qed.
+
+(*
+Print Assumptions eq_ideal_eq.
+Print Assumptions I_add_comm.
 *)
 
 End a.
 
-Notation "a ⇒ b" := (negb a || b)%bool (at level 48, right associativity).
 
 (* attempt to implement ideals using bool instead of Prop *)
+
+(* a notation for classical implication A ⇒ B is ¬A or B *)
+
+Notation "a ⇒ b" := (negb a || b)%bool (at level 48, right associativity).
+
+(* Illimited Principe of Omniscience *)
+
+Axiom IPO : ∀ {I} (u : I → bool), { ∀ i, u i = false } + { ∃ i, u i = true }.
 
 (* ideal : non empty set type with some properties *)
 
