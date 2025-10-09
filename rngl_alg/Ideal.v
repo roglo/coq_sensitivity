@@ -453,6 +453,7 @@ Print Assumptions I_add_comm.
 
 End a.
 
+(* FOLLOWING VERSION WITH BOOL TO BE REMOVED... *)
 
 (* attempt to implement ideals using bool instead of Prop *)
 
