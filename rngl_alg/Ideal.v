@@ -453,32 +453,38 @@ Print Assumptions eq_ideal_eq.
 Print Assumptions I_add_comm.
 *)
 
+Theorem I_add_subtype_assoc_l a b c x z :
+  ip_subtype a x
+  → ip_subtype (b + c)%I z
+  → I_add_subtype (a + b) c (x + z)%L.
+Proof.
+intros H1 H2.
+cbn in H2.
+progress unfold I_add_subtype; cbn.
+progress unfold I_add_subtype in H2.
+progress unfold I_add_subtype.
+destruct H2 as (y & t & H & H2 & H3); subst z.
+rename t into z.
+move y before x; move z before y.
+exists (x + y)%L, z.
+split; [ apply rngl_add_assoc | ].
+split; [ | easy ].
+now exists x, y.
+Qed.
+
 Theorem I_add_subtype_assoc a b c x :
   I_add_subtype a (b + c) x = I_add_subtype (a + b) c x.
 Proof.
 destruct_ic.
-progress unfold I_add_subtype; cbn.
 apply propositional_extensionality.
 split; intros (y & z & H & H1 & H2); subst x. {
-  rename y into x.
-  progress unfold I_add_subtype in H2.
-  progress unfold I_add_subtype.
-  destruct H2 as (y & t & H & H2 & H3); subst z.
-  rename t into z.
-  move y before x; move z before y.
-  exists (x + y)%L, z.
-  split; [ apply rngl_add_assoc | ].
-  split; [ | easy ].
-  now exists x, y.
+  now apply I_add_subtype_assoc_l.
 } {
-  progress unfold I_add_subtype in H1.
-  progress unfold I_add_subtype.
-  destruct H1 as (x & t & H & H1 & H3); subst y.
-  rename t into y.
-  exists x, (y + z)%L.
-  split; [ symmetry; apply rngl_add_assoc | ].
-  split; [ easy | ].
-  now exists y, z.
+  rewrite I_add_subtype_comm.
+  rewrite I_add_comm.
+  rewrite rngl_add_comm.
+  apply I_add_subtype_assoc_l; [ easy | ].
+  now rewrite I_add_comm.
 }
 Qed.
 
@@ -519,9 +525,11 @@ Theorem I_mul_subtype_assoc a b c x :
   I_mul_subtype a (b * c) x = I_mul_subtype (a * b) c x.
 Proof.
 destruct_ic.
-progress unfold I_mul_subtype; cbn.
 apply propositional_extensionality.
-split; intros (n & lx & ly & Hx & Hy & H1 & H2 & H); subst x. {
+split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
+  cbn in H2.
+  assert (H : ∀ yz, yz ∈ lyz → I_mul_subtype b c yz) by easy.
+  clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
   progress unfold I_mul_subtype.
 ...
