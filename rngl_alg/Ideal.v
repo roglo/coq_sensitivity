@@ -520,16 +520,10 @@ apply functional_extensionality_dep.
 apply I_add_subtype_0_l.
 Qed.
 
-(* to be completed
-Theorem glop {A B} (da : A) (dn : B) P la :
+Theorem forall_exists_exists_forall {A B} (da : A) (dn : B) P la :
   (∀ a, a ∈ la → ∃ n, P a n)
   → ∃ nl,
-    List.Forall
-      (λ i,
-         let a := List.nth i la da in
-         let n := List.nth i nl dn in
-         P a n)
-      (List.seq 0 (length nl)).
+    ∀ i, i ∈ List.seq 0 (length nl) → P (List.nth i la da) (List.nth i nl dn).
 Proof.
 intros * Ha.
 induction la as [| a]; [ now exists [] | ].
@@ -538,20 +532,21 @@ assert (H : ∀ a, a ∈ la → ∃ n, P a n). {
   apply Ha.
   now right.
 }
-specialize (IHla H).
+specialize (IHla H); clear H.
 destruct IHla as (nl, H1).
-...
-exists nl.
-apply List.Forall_forall.
-intros n Hn.
-specialize (proj1 (List.Forall_forall _ _) H1 n Hn) as H2.
-cbn in H2.
-destruct n. {
-  cbn.
-  specialize (Ha a (List.in_eq _ _)).
-  destruct Ha as (n, Ha).
-...
+destruct (Ha a (List.in_eq _ _)) as (na, Hna).
+exists (na :: nl).
+intros i Hi.
+destruct i; [ easy | cbn ].
+apply H1.
+apply List.in_seq in Hi.
+apply List.in_seq.
+destruct Hi as (_, Hi); cbn in Hi.
+split; [ easy | ].
+now apply Nat.succ_lt_mono in Hi.
+Qed.
 
+(* to be completed *)
 Theorem I_mul_subtype_assoc a b c x :
   I_mul_subtype a (b * c) x = I_mul_subtype (a * b) c x.
 Proof.
@@ -562,21 +557,15 @@ split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
   assert (H : ∀ yz, yz ∈ lyz → I_mul_subtype b c yz) by easy.
   clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
-... ...
-apply (glop 0%L 0) in H2.
-destruct H2 as (nl, H2).
-specialize (proj1 (List.Forall_forall _ _) H2) as H.
-clear H2; rename H into H2.
-cbn in H2.
-apply (glop 0 []) in H2.
-destruct H2 as (nll1, H2).
-specialize (proj1 (List.Forall_forall _ _) H2) as H.
-clear H2; rename H into H2.
-cbn in H2.
-apply (glop 0 []) in H2.
-destruct H2 as (nll2, H2).
-specialize (proj1 (List.Forall_forall _ _) H2) as H.
-clear H2; rename H into H2.
+  apply (forall_exists_exists_forall 0%L 0) in H2.
+  destruct H2 as (nl, H2).
+  cbn in H2.
+  apply (forall_exists_exists_forall 0 []) in H2.
+  destruct H2 as (nll1, H2).
+  apply (forall_exists_exists_forall 0 []) in H2.
+  destruct H2 as (nll2, H2).
+...
+
 cbn in H2.
 Search (List.nth _ (List.seq _ _)).
 ...
