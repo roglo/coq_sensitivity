@@ -531,8 +531,8 @@ split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
   assert (H : ∀ yz, yz ∈ lyz → I_mul_subtype b c yz) by easy.
   clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
-Theorem glop A (da : A) P la :
-  (∀ a la, a ∈ la → ∃ n, P n a)
+Theorem glop {A} (da : A) P la :
+  (∀ a, a ∈ la → ∃ n, P n a)
   → ∃ nl,
     List.Forall
       (λ i,
@@ -540,6 +540,16 @@ Theorem glop A (da : A) P la :
          let a := List.nth n la da in
          P n a)
       (List.seq 0 (length nl)).
+Admitted.
+apply (glop 0%L) in H2.
+destruct H2 as (nl, H2).
+specialize (proj1 (List.Forall_forall _ _) H2) as H.
+clear H2; rename H into H2.
+cbn in H2.
+specialize @glop as H.
+(* ouais, non, c'est pas bon *)
+...
+Search ListDef.Forall.
 ...
 Check glop.
 specialize glop as H3.
