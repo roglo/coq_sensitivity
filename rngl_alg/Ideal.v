@@ -490,16 +490,31 @@ intros z; cbn.
 apply I_add_subtype_assoc.
 Qed.
 
+Theorem I_add_subtype_0_l a x : I_add_subtype 0 a x = ip_subtype a x.
+Proof.
+destruct_ic.
+progress unfold I_add_subtype; cbn.
+apply propositional_extensionality.
+split. {
+  intros (y & z & H & H1 & H2); subst x y.
+  now rewrite rngl_add_0_l.
+} {
+  intros H1.
+  exists 0%L, x.
+  now rewrite rngl_add_0_l.
+}
+Qed.
+
+Theorem I_add_0_l a : (0 + a)%I = a.
+Proof.
+intros.
+apply eq_ideal_eq; cbn.
+apply functional_extensionality_dep.
+apply I_add_subtype_0_l.
+Qed.
+
 (* to be completed
 (*
-Theorem I_add_assoc : let roi := I_ring_like_op in
-  ∀ a b c : ideal P, (a + (b + c))%L = (a + b + c)%L.
-Proof. intros; apply eq_ideal_eq, rngl_add_assoc. Qed.
-
-Theorem I_add_0_l : let roi := I_ring_like_op in
-  ∀ a : ideal P, (0 + a)%L = a.
-Proof. intros; apply eq_ideal_eq, rngl_add_0_l. Qed.
-
 Theorem I_mul_assoc : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a * (b * c))%L = (a * b * c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
@@ -1069,7 +1084,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_characteristic := rngl_characteristic T;
      rngl_add_comm := I_add_comm;
      rngl_add_assoc := I_add_assoc;
-     rngl_add_0_l := true; (*I_add_0_l;*)
+     rngl_add_0_l := I_add_0_l;
      rngl_mul_assoc := true; (*I_mul_assoc;*)
      rngl_mul_1_l := true; (*I_opt_mul_1_l;*)
      rngl_mul_add_distr_l := true; (*I_mul_add_distr_l;*)
