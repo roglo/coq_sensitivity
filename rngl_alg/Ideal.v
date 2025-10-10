@@ -532,13 +532,12 @@ split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
   clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
 Theorem glop {A} (da : A) P la :
-  (∀ a, a ∈ la → ∃ n, P n a)
+  (∀ a, a ∈ la → P a)
   → ∃ nl,
     List.Forall
       (λ i,
-         let n := List.nth i nl 0 in
-         let a := List.nth n la da in
-         P n a)
+         let a := List.nth i la da in
+         P a)
       (List.seq 0 (length nl)).
 Admitted.
 apply (glop 0%L) in H2.
