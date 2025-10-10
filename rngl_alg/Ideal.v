@@ -522,10 +522,24 @@ destruct_ic.
 progress unfold I_mul_subtype; cbn.
 apply propositional_extensionality.
 split; intros (n & lx & ly & Hx & Hy & H1 & H2 & H); subst x. {
+  progress unfold I_mul_subtype in H2.
+  progress unfold I_mul_subtype.
 ...
-  rename y into x.
-  progress unfold I_add_subtype in H2.
-  progress unfold I_add_subtype.
+exists n, lx, ly.
+split; [ easy | ].
+split; [ easy | ].
+split. {
+  intros z Hz.
+  exists n, lx, ly.
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split. {
+    intros y Hy'.
+    specialize (H2 y Hy').
+    destruct H2 as (n' & lx' & ly' & Hx' & Hy'' & H2 & H3 & H).
+    subst y.
+...
   destruct H2 as (y & t & H & H2 & H3); subst z.
   rename t into z.
   move y before x; move z before y.
