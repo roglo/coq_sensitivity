@@ -531,6 +531,26 @@ split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
   assert (H : ∀ yz, yz ∈ lyz → I_mul_subtype b c yz) by easy.
   clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
+Theorem glop A (da : A) P la :
+  (∀ a la, a ∈ la → ∃ n, P n a)
+  → ∃ nl,
+    List.Forall
+      (λ i,
+         let n := List.nth i nl 0 in
+         let a := List.nth n la da in
+         P n a)
+      (List.seq 0 (length nl)).
+...
+Check glop.
+specialize glop as H3.
+specialize (H3 T 0%L).
+(* chais pas *)
+...
+  assert
+    (∃ ln llx lly,
+     List.map
+       (λ i,
+        let lx := List.nth i llx
   progress unfold I_mul_subtype.
 ...
 exists n, lx, ly.
