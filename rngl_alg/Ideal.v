@@ -521,6 +521,37 @@ apply I_add_subtype_0_l.
 Qed.
 
 (* to be completed
+Theorem glop {A B} (da : A) (dn : B) P la :
+  (∀ a, a ∈ la → ∃ n, P a n)
+  → ∃ nl,
+    List.Forall
+      (λ i,
+         let a := List.nth i la da in
+         let n := List.nth i nl dn in
+         P a n)
+      (List.seq 0 (length nl)).
+Proof.
+intros * Ha.
+induction la as [| a]; [ now exists [] | ].
+assert (H : ∀ a, a ∈ la → ∃ n, P a n). {
+  intros b Hb.
+  apply Ha.
+  now right.
+}
+specialize (IHla H).
+destruct IHla as (nl, H1).
+...
+exists nl.
+apply List.Forall_forall.
+intros n Hn.
+specialize (proj1 (List.Forall_forall _ _) H1 n Hn) as H2.
+cbn in H2.
+destruct n. {
+  cbn.
+  specialize (Ha a (List.in_eq _ _)).
+  destruct Ha as (n, Ha).
+...
+
 Theorem I_mul_subtype_assoc a b c x :
   I_mul_subtype a (b * c) x = I_mul_subtype (a * b) c x.
 Proof.
@@ -531,22 +562,25 @@ split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
   assert (H : ∀ yz, yz ∈ lyz → I_mul_subtype b c yz) by easy.
   clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
-Theorem glop {A} (da : A) P la :
-  (∀ a, a ∈ la → P a)
-  → ∃ nl,
-    List.Forall
-      (λ i,
-         let a := List.nth i la da in
-         P a)
-      (List.seq 0 (length nl)).
-Admitted.
-apply (glop 0%L) in H2.
+... ...
+apply (glop 0%L 0) in H2.
 destruct H2 as (nl, H2).
 specialize (proj1 (List.Forall_forall _ _) H2) as H.
 clear H2; rename H into H2.
 cbn in H2.
-specialize @glop as H.
-(* ouais, non, c'est pas bon *)
+apply (glop 0 []) in H2.
+destruct H2 as (nll1, H2).
+specialize (proj1 (List.Forall_forall _ _) H2) as H.
+clear H2; rename H into H2.
+cbn in H2.
+apply (glop 0 []) in H2.
+destruct H2 as (nll2, H2).
+specialize (proj1 (List.Forall_forall _ _) H2) as H.
+clear H2; rename H into H2.
+cbn in H2.
+Search (List.nth _ (List.seq _ _)).
+...
+rewrite List.seq_nth in H2.
 ...
 Search ListDef.Forall.
 ...
