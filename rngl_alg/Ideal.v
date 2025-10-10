@@ -396,7 +396,9 @@ Notation "1" := I_one : ideal_scope.
 Notation "a + b" := (I_add a b) : ideal_scope.
 (*
 Notation "a - b" := (rngl_sub a b) : ideal_scope.
-Notation "a * b" := (rngl_mul a b) : ideal_scope.
+*)
+Notation "a * b" := (I_mul a b) : ideal_scope.
+(*
 Notation "- a" := (rngl_opp a) : ideal_scope.
 *)
 
@@ -451,29 +453,28 @@ Print Assumptions eq_ideal_eq.
 Print Assumptions I_add_comm.
 *)
 
-Theorem I_add_subtype_assoc a b c z :
-  I_add_subtype a (b + c) z = I_add_subtype (a + b) c z.
+Theorem I_add_subtype_assoc a b c x :
+  I_add_subtype a (b + c) x = I_add_subtype (a + b) c x.
 Proof.
 destruct_ic.
 progress unfold I_add_subtype; cbn.
 apply propositional_extensionality.
-split; intros (x & y & H & H1 & H2); subst z. {
-  cbn in H2.
+split; intros (y & z & H & H1 & H2); subst x. {
+  rename y into x.
   progress unfold I_add_subtype in H2.
   progress unfold I_add_subtype.
-  destruct H2 as (z & t & H & H2 & H3); subst y.
-  rename z into y; rename t into z.
+  destruct H2 as (y & t & H & H2 & H3); subst z.
+  rename t into z.
   move y before x; move z before y.
   exists (x + y)%L, z.
   split; [ apply rngl_add_assoc | ].
   split; [ | easy ].
   now exists x, y.
 } {
-  cbn in H1.
   progress unfold I_add_subtype in H1.
   progress unfold I_add_subtype.
-  destruct H1 as (z & t & H & H1 & H3); subst x.
-  rename z into x; rename y into z; rename t into y.
+  destruct H1 as (x & t & H & H1 & H3); subst y.
+  rename t into y.
   exists x, (y + z)%L.
   split; [ symmetry; apply rngl_add_assoc | ].
   split; [ easy | ].
@@ -486,7 +487,7 @@ Proof.
 intros.
 apply eq_ideal_eq.
 apply functional_extensionality_dep.
-intros z; cbn.
+intros x; cbn.
 apply I_add_subtype_assoc.
 Qed.
 
@@ -514,11 +515,44 @@ apply I_add_subtype_0_l.
 Qed.
 
 (* to be completed
-(*
-Theorem I_mul_assoc : let roi := I_ring_like_op in
-  ∀ a b c : ideal P, (a * (b * c))%L = (a * b * c)%L.
-Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
+Theorem I_mul_subtype_assoc a b c x :
+  I_mul_subtype a (b * c) x = I_mul_subtype (a * b) c x.
+Proof.
+destruct_ic.
+progress unfold I_mul_subtype; cbn.
+apply propositional_extensionality.
+split; intros (n & lx & ly & Hx & Hy & H1 & H2 & H); subst x. {
+...
+  rename y into x.
+  progress unfold I_add_subtype in H2.
+  progress unfold I_add_subtype.
+  destruct H2 as (y & t & H & H2 & H3); subst z.
+  rename t into z.
+  move y before x; move z before y.
+  exists (x + y)%L, z.
+  split; [ apply rngl_add_assoc | ].
+  split; [ | easy ].
+  now exists x, y.
+} {
+  progress unfold I_add_subtype in H1.
+  progress unfold I_add_subtype.
+  destruct H1 as (x & t & H & H1 & H3); subst y.
+  rename t into y.
+  exists x, (y + z)%L.
+  split; [ symmetry; apply rngl_add_assoc | ].
+  split; [ easy | ].
+  now exists y, z.
+}
+...
 
+Theorem I_mul_assoc a b c : (a * (b * c))%I = ((a * b) * c)%I.
+Proof.
+apply eq_ideal_eq; cbn.
+apply functional_extensionality_dep.
+apply I_add_subtype_0_l.
+...
+
+(*
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem I_opt_mul_1_l : let roi := I_ring_like_op in
@@ -1085,7 +1119,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_add_comm := I_add_comm;
      rngl_add_assoc := I_add_assoc;
      rngl_add_0_l := I_add_0_l;
-     rngl_mul_assoc := true; (*I_mul_assoc;*)
+     rngl_mul_assoc := I_mul_assoc;
      rngl_mul_1_l := true; (*I_opt_mul_1_l;*)
      rngl_mul_add_distr_l := true; (*I_mul_add_distr_l;*)
      rngl_opt_mul_comm := true; (*I_opt_mul_comm;*)
