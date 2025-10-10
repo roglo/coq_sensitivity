@@ -455,9 +455,9 @@ Theorem I_add_subtype_assoc a b c z :
   I_add_subtype a (b + c) z = I_add_subtype (a + b) c z.
 Proof.
 destruct_ic.
-progress unfold I_add_subtype.
+progress unfold I_add_subtype; cbn.
 apply propositional_extensionality.
-split; intros (x & y & H & H1 & H2); subst z; cbn. {
+split; intros (x & y & H & H1 & H2); subst z. {
   cbn in H2.
   progress unfold I_add_subtype in H2.
   progress unfold I_add_subtype.
