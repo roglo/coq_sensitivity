@@ -522,7 +522,7 @@ Qed.
 
 Theorem forall_exists_exists_forall {A B} (da : A) (dn : B) P la :
   (∀ a, a ∈ la → ∃ n, P a n)
-  → ∃ nl,
+  → ∃ nl, length nl = length la ∧
     ∀ i, i ∈ List.seq 0 (length nl) → P (List.nth i la da) (List.nth i nl dn).
 Proof.
 intros * Ha.
@@ -533,12 +533,13 @@ assert (H : ∀ a, a ∈ la → ∃ n, P a n). {
   now right.
 }
 specialize (IHla H); clear H.
-destruct IHla as (nl, H1).
+destruct IHla as (nl & H1 & H2).
 destruct (Ha a (List.in_eq _ _)) as (na, Hna).
 exists (na :: nl).
+split; [ now cbn; f_equal | ].
 intros i Hi.
 destruct i; [ easy | cbn ].
-apply H1.
+apply H2.
 apply List.in_seq in Hi.
 apply List.in_seq.
 destruct Hi as (_, Hi); cbn in Hi.
@@ -546,7 +547,7 @@ split; [ easy | ].
 now apply Nat.succ_lt_mono in Hi.
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem I_mul_subtype_assoc a b c x :
   I_mul_subtype a (b * c) x = I_mul_subtype (a * b) c x.
 Proof.
@@ -558,12 +559,34 @@ split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
   clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
   apply (forall_exists_exists_forall 0%L 0) in H2.
-  destruct H2 as (nl, H2).
-  cbn in H2.
-  apply (forall_exists_exists_forall 0 []) in H2.
-  destruct H2 as (nll1, H2).
-  apply (forall_exists_exists_forall 0 []) in H2.
-  destruct H2 as (nll2, H2).
+  destruct H2 as (nl & H2 & H3).
+  cbn in H3.
+  apply (forall_exists_exists_forall 0 []) in H3.
+  destruct H3 as (nll1 & H3 & H4).
+  rewrite List.length_seq in H3.
+  apply (forall_exists_exists_forall 0 []) in H4.
+  destruct H4 as (nll2 & H4 & H5).
+  rewrite List.length_seq in H4.
+  move nll2 before nll1.
+  rewrite H2 in H3.
+  rewrite H3 in H4.
+  apply List.Forall_forall in H5.
+  eapply List.Forall_impl in H5. 2: {
+    specialize (proj1 (List.Forall_forall _ _) H5) as H6.
+    cbn in H6.
+    clear H5.
+    intros d H7.
+    destruct H7 as (H7 & H8 & H9 & H10 & H11).
+    destruct (le_dec (length nll1) d) as [Hd| Hd]. {
+      rewrite List.nth_overflow in H7. 2: {
+...
+    rewrite List.seq_nth in H7. 2: {
+    cbn in H7.
+    apply (H6 d).
+...
+  }
+  specialize (proj1 (List.Forall_forall _ _) H5) as H6.
+  clear H5; cbn in H6.
 ...
 
 cbn in H2.
