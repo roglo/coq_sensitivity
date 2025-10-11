@@ -597,6 +597,27 @@ clear H6.
         now rewrite List.length_seq.
       }
       cbn in H11.
+      remember (length lx) as n eqn:Hn.
+      rewrite Hyz in H2, H3, H4.
+      rewrite H3 in H9.
+      rewrite (@List.nth_overflow _ _ d) in H9. 2: {
+        now rewrite List.length_seq.
+      }
+      rewrite (@List.nth_overflow _ _ d) in H8. 2: {
+        now rewrite List.length_seq.
+      }
+      symmetry in H8; cbn in H8.
+      rewrite List.seq_nth in H8; [ | flia Hnz ].
+      cbn in H8.
+      rewrite H8 in H11.
+      rewrite (@List.nth_overflow _ _ d) in H7. 2: {
+        now rewrite List.length_seq.
+      }
+      rewrite List.seq_nth in H7; [ | flia Hnz ].
+      cbn in H7.
+      rewrite H8 in H7.
+      rewrite rngl_summation_empty in H11; [ | easy ].
+(* ah : H7 est censé être une contradiction *)
 ...
       rewrite List.nth_overflow in H8. 2: {
         rewrite List.seq_nth. 2: {
