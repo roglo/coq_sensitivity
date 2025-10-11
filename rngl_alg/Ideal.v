@@ -584,9 +584,19 @@ split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
     intros d H7.
     destruct H7 as (H7 & H8 & H9 & H10 & H11).
     destruct (le_dec n d) as [Hnd| Hnd]. {
+clear H6.
       exfalso; subst; cbn in *.
+      rewrite H3, H2, Hyz in H7, H8, H11.
       rewrite List.nth_overflow in H8; [ | congruence ].
-      symmetry in H8; cbn in H8.
+      rewrite List.seq_nth in H11. 2: {
+        rewrite List.nth_overflow.
+        now apply Nat.neq_0_lt_0.
+        now rewrite List.length_seq.
+      }
+      rewrite (@List.nth_overflow _ _ d) in H11. 2: {
+        now rewrite List.length_seq.
+      }
+      cbn in H11.
 ...
       rewrite List.nth_overflow in H8. 2: {
         rewrite List.seq_nth. 2: {
