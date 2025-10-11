@@ -555,6 +555,12 @@ destruct_ic.
 apply propositional_extensionality.
 split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
   cbn in H2.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    move Hnz at top; subst n.
+    rewrite rngl_summation_empty; [ | easy ].
+    progress unfold I_mul_subtype.
+    now exists 0, [], [].
+  }
   assert (H : ∀ yz, yz ∈ lyz → I_mul_subtype b c yz) by easy.
   clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
@@ -577,11 +583,27 @@ split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
     clear H5.
     intros d H7.
     destruct H7 as (H7 & H8 & H9 & H10 & H11).
-    destruct (le_dec (length nll1) d) as [Hd| Hd]. {
-      rewrite List.nth_overflow in H7. 2: {
+    destruct (le_dec n d) as [Hnd| Hnd]. {
+      exfalso; subst; cbn in *.
+      rewrite List.nth_overflow in H8; [ | congruence ].
+      symmetry in H8; cbn in H8.
 ...
-    rewrite List.seq_nth in H7. 2: {
-    cbn in H7.
+      rewrite List.nth_overflow in H8. 2: {
+        rewrite List.seq_nth. 2: {
+          rewrite List.nth_overflow.
+          rewrite H2, Hyz.
+          now apply Nat.neq_0_lt_0.
+          now rewrite List.length_seq.
+        }
+...
+        rewrite List.seq_nth. 2: {
+          rewrite List.nth_overflow; [ | now rewrite List.length_seq ].
+          apply Nat.neq_0_lt_0.
+          congruence.
+        }
+...
+        rewrite List.seq_nth in H7. 2: {
+          cbn in H7.
     apply (H6 d).
 ...
   }
