@@ -566,16 +566,17 @@ Theorem I_mul_subtype_assoc a b c x :
 Proof.
 destruct_ic.
 apply propositional_extensionality.
-split; intros (n & lx & lyz & Hnz & Hx & Hyz & H1 & H2 & H); subst x. {
+split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
+  generalize Hbc; intros H2.
   cbn in H2.
-  assert (H : ∀ yz, yz ∈ lyz → I_mul_subtype b c yz) by easy.
+  assert (H : ∀ yz, yz ∈ lbc → I_mul_subtype b c yz) by easy.
   clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
   apply (forall_exists_exists_forall 0%L 0) in H2.
   destruct H2 as (nl & H2 & H3).
-  move nl before lyz.
-  move H2 before Hyz.
-  rewrite Hyz in H2.
+  move nl before lbc.
+  move H2 before Hlbc.
+  rewrite Hlbc in H2.
   apply (forall_exists_exists_forall 0 []) in H3.
   destruct H3 as (nll1 & H3 & H4).
   rewrite List.length_seq, H2 in H3.
@@ -608,10 +609,9 @@ split; intros (n & lx & lyz & Hnz & Hx & Hyz & H1 & H2 & H); subst x. {
   clear H5; cbn in H6.
   remember (∀ i, _) as P eqn:H in H6; subst P. (* renaming *)
   progress unfold I_mul_subtype.
+  eenough (H : ∃ m lab lc, _) by apply H. (* renaming *)
 (**)
-  (* ah oui, associativité...
-     le lx0, c'est pour (a * b)
-     let ly, c'est pour c *)
+  (* ah oui, associativité... *)
 ...
   exists n, lx, lyz.
   split; [ easy | ].
