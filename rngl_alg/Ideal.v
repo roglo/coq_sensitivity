@@ -25,9 +25,13 @@ Record ideal {T} {ro : ring_like_op T} := mk_ip
     ip_mul_l : ∀ a b, ip_subtype b → ip_subtype (a * b)%L;
     ip_mul_r : ∀ a b, ip_subtype a → ip_subtype (a * b)%L }.
 
+Declare Scope ideal_scope.
+Delimit Scope ideal_scope with I.
+Bind Scope ideal_scope with ideal.
+
 Arguments ideal T {ro}.
-Arguments ip_subtype {T ro} i a%_L.
-Arguments ip_opp {T ro} i a%_L.
+Arguments ip_subtype {T ro} i%_I a%_L.
+Arguments ip_opp {T ro} i%_I a%_L.
 
 Class ideal_ctx T {ro : ring_like_op T} :=
   { ic_op : rngl_has_opp T = true }.
@@ -400,10 +404,6 @@ Definition I_ring_like_op : ring_like_op (ideal T) :=
 
 End a.
 
-Declare Scope ideal_scope.
-Delimit Scope ideal_scope with I.
-Bind Scope ideal_scope with ideal.
-
 Notation "0" := I_zero : ideal_scope.
 Notation "1" := I_one : ideal_scope.
 Notation "a + b" := (I_add a b) : ideal_scope.
@@ -586,29 +586,49 @@ split; intros (n & lx & lyz & Hnz & Hx & Hyz & H1 & H2 & H); subst x. {
   rewrite List.length_seq, H3 in H4.
   move nll2 before nll1.
   move H4 before H3.
-(**)
-...
+  rewrite H2, H3, H4 in H5.
   apply List.Forall_forall in H5.
   eapply List.Forall_impl in H5. 2: {
     intros d H7.
-    destruct H7 as (H7 & H8 & H9 & H10 & H11 & H12).
-    move d before n.
-    rewrite <- H9 in H7.
-    rewrite (@List.nth_overflow _ _ d) in H7.
-...
-      now exfalso; apply H7.
-    admit.
-  }
     destruct (le_dec n d) as [Hnd| Hnd]. {
+      destruct H7 as (H7 & H8 & H9 & H10 & H11 & H12).
+      move d before n.
+      rewrite <- H9 in H7.
       exfalso.
       rewrite (@List.nth_overflow _ _ d) in H7; [ easy | congruence ].
     }
     apply Nat.nle_gt in Hnd.
-    apply (H6 d).
-...
+    clear H5.
+    rewrite List.seq_nth in H7; [ | now rewrite List.seq_nth ].
+    rewrite List.seq_nth in H7; [ | easy ].
+    cbn in H7.
+    apply H7.
   }
   specialize (proj1 (List.Forall_forall _ _) H5) as H6.
   clear H5; cbn in H6.
+  remember (∀ i, _) as P eqn:H in H6; subst P. (* renaming *)
+  progress unfold I_mul_subtype.
+(**)
+  (* ah oui, associativité...
+     le lx0, c'est pour (a * b)
+     let ly, c'est pour c *)
+...
+  exists n, lx, lyz.
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split. {
+    intros x Hxl; cbn.
+    progress unfold I_mul_subtype.
+    exists n, lx, (List.repeat 1%L n).
+    rewrite List.repeat_length.
+    split; [ easy | ].
+    split; [ easy | ].
+    split; [ easy | ].
+    split; [ easy | ].
+(* bin non, parce que 1 n'appartient par forcément à y *)
+...
+    cbn.
 ...
 
 cbn in H2.
