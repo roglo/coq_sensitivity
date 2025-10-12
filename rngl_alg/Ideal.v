@@ -166,6 +166,7 @@ Definition I_add (a b : ideal T) : ideal T :=
 
 Definition I_mul_subtype a b z :=
   ∃ n lx ly,
+  n ≠ 0 ∧
   length lx = n ∧ length ly = n ∧
   (∀ x, x ∈ lx → ip_subtype a x) ∧
   (∀ y, y ∈ ly → ip_subtype b y) ∧
@@ -176,13 +177,21 @@ Arguments I_mul_subtype a b z%_L.
 Theorem I_mul_zero a b : I_mul_subtype a b 0%L.
 Proof.
 destruct_ic.
-exists 0, [], [].
+exists 1, [0%L], [0%L].
 split; [ easy | ].
 split; [ easy | ].
 split; [ easy | ].
-split; [ easy | ].
+split. {
+  cbn; intros x Hx; destruct Hx as [Hx| ]; [ | easy ].
+  subst x; apply ip_zero.
+}
+split. {
+  cbn; intros x Hx; destruct Hx as [Hx| ]; [ | easy ].
+  subst x; apply ip_zero.
+}
 symmetry.
-now apply rngl_summation_empty.
+rewrite rngl_summation_only_one; cbn.
+apply (rngl_mul_0_l Hos).
 Qed.
 
 Theorem I_mul_add a b :
@@ -190,14 +199,15 @@ Theorem I_mul_add a b :
   I_mul_subtype a b x → I_mul_subtype a b y → I_mul_subtype a b (x + y)%L.
 Proof.
 intros * Hx Hy.
-destruct Hx as (nx & la1 & lb1 & Hla1 & Hlb1 & Ha1 & Hb1 & Hx).
-destruct Hy as (ny & la2 & lb2 & Hla2 & Hlb2 & Ha2 & Hb2 & Hy).
+destruct Hx as (nx & la1 & lb1 & Hnx & Hla1 & Hlb1 & Ha1 & Hb1 & Hx).
+destruct Hy as (ny & la2 & lb2 & Hny & Hla2 & Hlb2 & Ha2 & Hb2 & Hy).
 subst x y.
 progress unfold I_mul_subtype.
 exists (nx + ny).
 exists (la1 ++ la2), (lb1 ++ lb2).
 do 2 rewrite List.length_app.
 rewrite Hla1, Hlb1, Hla2, Hlb2.
+split; [ flia Hnx Hny | ].
 split; [ easy | ].
 split; [ easy | ].
 split. {
@@ -240,11 +250,12 @@ Theorem I_mul_opp a b : ∀ x, I_mul_subtype a b x → I_mul_subtype a b (- x).
 Proof.
 destruct_ic.
 intros * Hx.
-destruct Hx as (n & la & lb & Hla & Hlb & Ha & Hb & Hx).
+destruct Hx as (n & la & lb & Hn & Hla & Hlb & Ha & Hb & Hx).
 subst x.
 progress unfold I_mul_subtype.
 exists n, (List.map rngl_opp la), lb.
 rewrite List.length_map.
+split; [ easy | ].
 split; [ easy | ].
 split; [ easy | ].
 split. {
@@ -268,11 +279,12 @@ Theorem I_mul_mul_l a b :
 Proof.
 destruct_ic.
 intros * H.
-destruct H as (n & la & lb & Hla & Hlb & Ha & Hb & H).
+destruct H as (n & la & lb & Hn & Hla & Hlb & Ha & Hb & H).
 subst y.
 progress unfold I_mul_subtype.
 exists n, (List.map (rngl_mul x) la), lb.
 rewrite List.length_map.
+split; [ easy | ].
 split; [ easy | ].
 split; [ easy | ].
 split. {
@@ -296,11 +308,12 @@ Theorem I_mul_mul_r a b :
 Proof.
 destruct_ic.
 intros * H.
-destruct H as (n & la & lb & Hla & Hlb & Ha & Hb & H).
+destruct H as (n & la & lb & Hn & Hla & Hlb & Ha & Hb & H).
 subst x.
 progress unfold I_mul_subtype.
 exists n, la, (List.map (λ z, rngl_mul z y) lb).
 rewrite List.length_map.
+split; [ easy | ].
 split; [ easy | ].
 split; [ easy | ].
 split; [ easy | ].
@@ -553,88 +566,44 @@ Theorem I_mul_subtype_assoc a b c x :
 Proof.
 destruct_ic.
 apply propositional_extensionality.
-split; intros (n & lx & lyz & Hx & Hyz & H1 & H2 & H); subst x. {
+split; intros (n & lx & lyz & Hnz & Hx & Hyz & H1 & H2 & H); subst x. {
   cbn in H2.
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-    move Hnz at top; subst n.
-    rewrite rngl_summation_empty; [ | easy ].
-    progress unfold I_mul_subtype.
-    now exists 0, [], [].
-  }
   assert (H : ∀ yz, yz ∈ lyz → I_mul_subtype b c yz) by easy.
   clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
   apply (forall_exists_exists_forall 0%L 0) in H2.
   destruct H2 as (nl & H2 & H3).
-  cbn in H3.
+  move nl before lyz.
+  move H2 before Hyz.
+  rewrite Hyz in H2.
   apply (forall_exists_exists_forall 0 []) in H3.
   destruct H3 as (nll1 & H3 & H4).
-  rewrite List.length_seq in H3.
+  rewrite List.length_seq, H2 in H3.
+  move nll1 before nl.
+  move H3 before H2.
   apply (forall_exists_exists_forall 0 []) in H4.
   destruct H4 as (nll2 & H4 & H5).
-  rewrite List.length_seq in H4.
+  rewrite List.length_seq, H3 in H4.
   move nll2 before nll1.
-  rewrite H2 in H3.
-  rewrite H3 in H4.
+  move H4 before H3.
+(**)
+...
   apply List.Forall_forall in H5.
   eapply List.Forall_impl in H5. 2: {
-    specialize (proj1 (List.Forall_forall _ _) H5) as H6.
-    cbn in H6.
-    clear H5.
     intros d H7.
-    destruct H7 as (H7 & H8 & H9 & H10 & H11).
+    destruct H7 as (H7 & H8 & H9 & H10 & H11 & H12).
+    move d before n.
+    rewrite <- H9 in H7.
+    rewrite (@List.nth_overflow _ _ d) in H7.
+...
+      now exfalso; apply H7.
+    admit.
+  }
     destruct (le_dec n d) as [Hnd| Hnd]. {
-clear H6.
-      exfalso; subst; cbn in *.
-      rewrite H3, H2, Hyz in H7, H8, H11.
-      rewrite List.nth_overflow in H8; [ | congruence ].
-      rewrite List.seq_nth in H11. 2: {
-        rewrite List.nth_overflow.
-        now apply Nat.neq_0_lt_0.
-        now rewrite List.length_seq.
-      }
-      rewrite (@List.nth_overflow _ _ d) in H11. 2: {
-        now rewrite List.length_seq.
-      }
-      cbn in H11.
-      remember (length lx) as n eqn:Hn.
-      rewrite Hyz in H2, H3, H4.
-      rewrite H3 in H9.
-      rewrite (@List.nth_overflow _ _ d) in H9. 2: {
-        now rewrite List.length_seq.
-      }
-      rewrite (@List.nth_overflow _ _ d) in H8. 2: {
-        now rewrite List.length_seq.
-      }
-      symmetry in H8; cbn in H8.
-      rewrite List.seq_nth in H8; [ | flia Hnz ].
-      cbn in H8.
-      rewrite H8 in H11.
-      rewrite (@List.nth_overflow _ _ d) in H7. 2: {
-        now rewrite List.length_seq.
-      }
-      rewrite List.seq_nth in H7; [ | flia Hnz ].
-      cbn in H7.
-      rewrite H8 in H7.
-      rewrite rngl_summation_empty in H11; [ | easy ].
-(* ah : H7 est censé être une contradiction *)
-...
-      rewrite List.nth_overflow in H8. 2: {
-        rewrite List.seq_nth. 2: {
-          rewrite List.nth_overflow.
-          rewrite H2, Hyz.
-          now apply Nat.neq_0_lt_0.
-          now rewrite List.length_seq.
-        }
-...
-        rewrite List.seq_nth. 2: {
-          rewrite List.nth_overflow; [ | now rewrite List.length_seq ].
-          apply Nat.neq_0_lt_0.
-          congruence.
-        }
-...
-        rewrite List.seq_nth in H7. 2: {
-          cbn in H7.
+      exfalso.
+      rewrite (@List.nth_overflow _ _ d) in H7; [ easy | congruence ].
+    }
+    apply Nat.nle_gt in Hnd.
     apply (H6 d).
 ...
   }
