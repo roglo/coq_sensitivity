@@ -10,7 +10,8 @@ Import Init.Nat.
 Require Import RingLike.Core.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
-From RingLike Require Import IterAdd IterAnd.
+From RingLike Require Import IterAdd IterAnd IterMax.
+From RingLike Require Import Nat_algebra.
 
 (* ideal: non empty set type with some properties *)
 (* drawback: elementary properties, like commutativity of addition of ideals
@@ -610,8 +611,8 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   remember (∀ i, _) as P eqn:H in H6; subst P. (* renaming *)
   progress unfold I_mul_subtype.
   eenough (H : ∃ m lab lc, _) by apply H. (* renaming *)
-(**)
-  (* ah oui, associativité... *)
+  (* au feeling : *)
+  exists (max n (Max (i = 1, n), nl.[i-1])).
 ...
   exists n, lx, lyz.
   split; [ easy | ].
