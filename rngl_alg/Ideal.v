@@ -612,7 +612,8 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   progress unfold I_mul_subtype.
   eenough (H : ∃ m lab lc, _) by apply H. (* renaming *)
   (* au feeling : *)
-  exists (max n (Max (i = 1, n), nl.[i-1])).
+  remember (max n (Max (i = 1, n), nl.[i-1])) as m eqn:Hm.
+  exists m.
 ...
   exists n, lx, lyz.
   split; [ easy | ].
