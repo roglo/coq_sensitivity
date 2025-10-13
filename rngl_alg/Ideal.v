@@ -695,9 +695,20 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   }
   split. {
     subst lab.
-    rewrite List.length_map.
+(**)
     rewrite Hpairs.
+    rewrite List.length_map.
     rewrite List.length_concat.
+    progress unfold List.list_sum.
+    rewrite <- (List.rev_involutive (List.map (length (A:=T*T)) _)).
+    rewrite List.fold_left_rev_right.
+    do 2 rewrite <- List.map_rev.
+...
+    rewrite Hm.
+    progress unfold iter_seq.
+    progress unfold iter_list.
+    rewrite Nat_sub_succ_1.
+...
     clear Hla Hlbc H2 H3 H4 H6 Hpairs Hnz.
     revert m Hm.
     induction n; intros; [ easy | ].
@@ -707,6 +718,7 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     rewrite List.length_map.
     rewrite List.length_seq.
     rewrite List.list_sum_app.
+Print List.list_sum.
 ...
     symmetry in Hm; move Hm at bottom.
     progress unfold iter_seq in Hm.
