@@ -41,7 +41,7 @@ Ltac destruct_ic :=
   set (Hop := ic_op);
   set (Hos := rngl_has_opp_has_opp_or_psub Hop).
 
-(* to be added somewhere else, probably IterAdd.v *)
+(* to be moved somewhere else, probably IterAdd.v *)
 
 Definition rngl_is_additive_integral T {ro : ring_like_op T} :=
   (∀ a b : T, (a + b = 0 → a = 0 ∧ b = 0)%L).
@@ -81,6 +81,12 @@ flia Hab.
 flia Hab.
 apply List.in_seq.
 flia Hab.
+Qed.
+
+Theorem nat_is_additive_integral : rngl_is_additive_integral nat.
+Proof.
+intros a b Hab.
+now apply Nat.eq_add_0.
 Qed.
 
 (* end to be added *)
@@ -677,12 +683,8 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     move Hm at bottom.
     move H6 at bottom.
     move Hnz at bottom.
-    assert (H : rngl_is_additive_integral nat). {
-      intros x y Hxy.
-      now apply Nat.eq_add_0.
-    }
-    specialize (eq_rngl_summation_zero H _ _ _ Hm) as H1; clear H.
-    cbn in H1.
+    specialize (eq_rngl_summation_zero nat_is_additive_integral) as H1.
+    specialize (H1 _ _ _ Hm); cbn in H1.
 ...
     symmetry in Hm; move Hm at bottom.
     progress unfold iter_seq in Hm.
