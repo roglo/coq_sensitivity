@@ -684,7 +684,29 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     move H6 at bottom.
     move Hnz at bottom.
     specialize (eq_rngl_summation_zero nat_is_additive_integral) as H1.
-    specialize (H1 _ _ _ Hm); cbn in H1.
+    specialize (H1 _ _ _ Hm); cbn in H1; clear Hm.
+    specialize (H6 0).
+    assert (H : 0 ∈ List.seq 0 n) by now destruct n; [ | left ].
+    specialize (H6 H); clear H.
+    destruct H6 as (H6, _).
+    specialize (H1 1).
+    assert (H : 1 ≤ 1 ≤ n) by flia Hnz.
+    now specialize (H1 H); clear H.
+  }
+  split. {
+    subst lab.
+    rewrite List.length_map.
+    rewrite Hpairs.
+    rewrite List.length_concat.
+    clear Hla Hlbc H2 H3 H4 H6 Hpairs Hnz.
+    revert m Hm.
+    induction n; intros; [ easy | ].
+    rewrite List.seq_S.
+    rewrite List.map_last.
+    rewrite List.map_last.
+    rewrite List.length_map.
+    rewrite List.length_seq.
+    rewrite List.list_sum_app.
 ...
     symmetry in Hm; move Hm at bottom.
     progress unfold iter_seq in Hm.
