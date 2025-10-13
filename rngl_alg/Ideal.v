@@ -611,9 +611,22 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   remember (∀ i, _) as P eqn:H in H6; subst P. (* renaming *)
   progress unfold I_mul_subtype.
   eenough (H : ∃ m lab lc, _) by apply H. (* renaming *)
-  (* au feeling : *)
-  remember (max n (Max (i = 1, n), nl.[i-1])) as m eqn:Hm.
+  (* conseils de ChatGPT: *)
+  remember (∑ (i = 1, n), nl.[i-1]) as m eqn:Hm.
   exists m.
+  remember
+    (List.concat
+       (List.map
+         (λ i : nat,
+            List.map
+              (λ j : nat,
+                 ((la.[i-1] * (ListDef.nth i nll1 []).[j-1])%L,
+                  (la.[i-1] * (ListDef.nth i nll2 []).[j-1])%L))
+              (List.seq 1 nl.[i]))
+         (List.seq 1 n))) as pairs eqn:Hpairs.
+  remember (List.map fst pairs) as lab eqn:Hlab.
+  remember (List.map snd pairs) as lc eqn:Hlc.
+  exists lab, lc.
 ...
   exists n, lx, lyz.
   split; [ easy | ].
