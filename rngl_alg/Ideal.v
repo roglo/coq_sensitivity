@@ -630,6 +630,14 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   split. {
     intros H; move H at top; subst m.
     symmetry in Hm.
+    move Hm at bottom.
+    move H6 at bottom.
+    move Hnz at bottom.
+...
+    symmetry in Hm; move Hm at bottom.
+    progress unfold iter_seq in Hm.
+    progress unfold iter_list in Hm.
+    rewrite Nat_sub_succ_1 in Hm.
 ...
   exists n, lx, lyz.
   split; [ easy | ].
