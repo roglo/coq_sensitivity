@@ -41,6 +41,50 @@ Ltac destruct_ic :=
   set (Hop := ic_op);
   set (Hos := rngl_has_opp_has_opp_or_psub Hop).
 
+(* to be added somewhere else, probably IterAdd.v *)
+
+Definition rngl_is_additive_integral T {ro : ring_like_op T} :=
+  (∀ a b : T, (a + b = 0 → a = 0 ∧ b = 0)%L).
+
+Theorem eq_rngl_summation_list_zero
+  {T} {ro : ring_like_op T} {rp : ring_like_prop T} {A} :
+  rngl_is_additive_integral T
+  → ∀ (l : list A) f,
+  ∑ (i ∈ l), f i = 0%L
+  → ∀ i, i ∈ l → f i = 0%L.
+Proof.
+intros Hai * Hs * Hl.
+progress unfold iter_list in Hs.
+revert i Hl.
+induction l as [| a l]; intros; [ easy | ].
+cbn in Hs.
+rewrite rngl_add_0_l in Hs.
+rewrite fold_left_rngl_add_fun_from_0 in Hs.
+apply Hai in Hs.
+destruct Hl as [Hl| Hl]; [ now subst a | ].
+now apply IHl.
+Qed.
+
+Theorem eq_rngl_summation_zero
+  {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_is_additive_integral T →
+  ∀ a b f, ∑ (i = a, b), f i = 0%L
+  → ∀ i, a ≤ i ≤ b → f i = 0%L.
+Proof.
+intros Hai * Hs * Hab.
+apply (eq_rngl_summation_list_zero Hai (List.seq a (S b - a))).
+rewrite rngl_summation_seq_summation.
+rewrite Nat.add_sub_assoc.
+rewrite Nat.add_comm, Nat.add_sub.
+now rewrite Nat_sub_succ_1.
+flia Hab.
+flia Hab.
+apply List.in_seq.
+flia Hab.
+Qed.
+
+(* end to be added *)
+
 (* for propositional and functional extensionalities *)
 From Stdlib Require Import PropExtensionality.
 From Stdlib Require Import FunctionalExtensionality.
@@ -633,49 +677,12 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     move Hm at bottom.
     move H6 at bottom.
     move Hnz at bottom.
-Definition rngl_is_additive_integral T {ro : ring_like_op T} :=
-  (∀ a b : T, (a + b = 0 → a = 0 ∧ b = 0)%L).
-
-Theorem eq_rngl_summation_list_zero {A} :
-  rngl_is_additive_integral T
-  → ∀ (l : list A) f,
-  ∑ (i ∈ l), f i = 0%L
-  → ∀ i, i ∈ l → f i = 0%L.
-Proof.
-intros Hai * Hs * Hl.
-progress unfold iter_list in Hs.
-revert i Hl.
-induction l as [| a l]; intros; [ easy | ].
-cbn in Hs.
-rewrite rngl_add_0_l in Hs.
-rewrite fold_left_rngl_add_fun_from_0 in Hs.
-apply Hai in Hs.
-destruct Hl as [Hl| Hl]; [ now subst a | ].
-now apply IHl.
-Qed.
-
-Theorem eq_rngl_summation_zero :
-  rngl_is_additive_integral T →
-  ∀ a b f, ∑ (i = a, b), f i = 0%L
-  → ∀ i, a ≤ i ≤ b → f i = 0%L.
-Proof.
-intros Hai * Hs * Hab.
-apply (eq_rngl_summation_list_zero Hai (List.seq a (S b - a))).
-rewrite rngl_summation_seq_summation.
-rewrite Nat.add_sub_assoc.
-rewrite Nat.add_comm, Nat.add_sub.
-now rewrite Nat_sub_succ_1.
-flia Hab.
-flia Hab.
-apply List.in_seq.
-flia Hab.
-Qed.
-
-specialize @eq_rngl_summation_zero as H1.
-(* ah bin non, c'est que pour un T (en l'occurrence nat, ici)
-   que ça marche *)
-...
-apply eq_rngl_summation_zero in Hm.
+    assert (H : rngl_is_additive_integral nat). {
+      intros x y Hxy.
+      now apply Nat.eq_add_0.
+    }
+    specialize (eq_rngl_summation_zero H _ _ _ Hm) as H1; clear H.
+    cbn in H1.
 ...
     symmetry in Hm; move Hm at bottom.
     progress unfold iter_seq in Hm.
