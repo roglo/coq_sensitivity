@@ -627,6 +627,9 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   remember (List.map fst pairs) as lab eqn:Hlab.
   remember (List.map snd pairs) as lc eqn:Hlc.
   exists lab, lc.
+  split. {
+    intros H; move H at top; subst m.
+    symmetry in Hm.
 ...
   exists n, lx, lyz.
   split; [ easy | ].
