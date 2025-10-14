@@ -674,10 +674,43 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
                   (la.[i-1] * (ListDef.nth i nll2 []).[j-1])%L))
               (List.seq 1 nl.[i-1]))
          (List.seq 1 n))) as pairs eqn:Hpairs.
-  remember (List.map fst pairs) as lab eqn:Hlab.
-  remember (List.map snd pairs) as lc eqn:Hlc.
+  remember (List.map fst pairs) as lab eqn:Hdab.
+  remember (List.map snd pairs) as lc eqn:Hdc.
   exists lab, lc.
-  split. {
+  assert (Hlab : length lab = m). {
+    subst lab.
+    clear lc Hdc; subst pairs.
+    rewrite List.length_map.
+    rewrite <- List.flat_map_concat_map.
+    rewrite List_flat_length_map.
+    replace add with (@rngl_add nat _) by easy.
+    replace 0 with (@rngl_zero nat _) at 2 by easy.
+    rewrite rngl_summation_seq_summation; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    subst m.
+    apply rngl_summation_eq_compat.
+    intros i Hi.
+    rewrite List.length_map.
+    apply List.length_seq.
+  }
+  assert (Hlc : length lc = m). {
+    subst lc.
+    clear lab Hdab Hlab; subst pairs.
+    rewrite List.length_map.
+    rewrite <- List.flat_map_concat_map.
+    rewrite List_flat_length_map.
+    replace add with (@rngl_add nat _) by easy.
+    replace 0 with (@rngl_zero nat _) at 2 by easy.
+    rewrite rngl_summation_seq_summation; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    subst m.
+    apply rngl_summation_eq_compat.
+    intros i Hi.
+    rewrite List.length_map.
+    apply List.length_seq.
+  }
+  move lc before lab.
+  assert (Hmz : m ≠ 0). {
     intros H; move H at top; subst m.
     symmetry in Hm.
     move Hm at bottom.
@@ -693,39 +726,18 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     assert (H : 1 ≤ 1 ≤ n) by flia Hnz.
     now specialize (H1 H); clear H.
   }
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
   split. {
-    subst lab.
-    clear lc Hlc; subst pairs.
-    rewrite List.length_map.
-    rewrite <- List.flat_map_concat_map.
-    rewrite List_flat_length_map.
-    replace add with (@rngl_add nat _) by easy.
-    replace 0 with (@rngl_zero nat _) at 2 by easy.
-    rewrite rngl_summation_seq_summation; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    subst m.
-    apply rngl_summation_eq_compat.
-    intros i Hi.
-    rewrite List.length_map.
-    apply List.length_seq.
-  }
-  split. {
-    subst lc.
-    clear lab Hlab; subst pairs.
-    rewrite List.length_map.
-    rewrite <- List.flat_map_concat_map.
-    rewrite List_flat_length_map.
-    replace add with (@rngl_add nat _) by easy.
-    replace 0 with (@rngl_zero nat _) at 2 by easy.
-    rewrite rngl_summation_seq_summation; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    subst m.
-    apply rngl_summation_eq_compat.
-    intros i Hi.
-    rewrite List.length_map.
-    apply List.length_seq.
-  }
-  split. {
+    intros ab Hab; cbn.
+    progress unfold I_mul_subtype.
+    exists m, lab, lc.
+    split; [ easy | ].
+    split; [ easy | ].
+    split; [ easy | ].
+    split. {
+      intros ab' Hab'.
 ...
   exists n, lx, lyz.
   split; [ easy | ].
