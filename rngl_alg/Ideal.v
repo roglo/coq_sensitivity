@@ -672,7 +672,7 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
               (λ j : nat,
                  ((la.[i-1] * (ListDef.nth i nll1 []).[j-1])%L,
                   (la.[i-1] * (ListDef.nth i nll2 []).[j-1])%L))
-              (List.seq 1 nl.[i]))
+              (List.seq 1 nl.[i-1]))
          (List.seq 1 n))) as pairs eqn:Hpairs.
   remember (List.map fst pairs) as lab eqn:Hlab.
   remember (List.map snd pairs) as lc eqn:Hlc.
@@ -695,35 +695,37 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   }
   split. {
     subst lab.
-(**)
-    rewrite Hpairs.
+    clear lc Hlc; subst pairs.
     rewrite List.length_map.
-    rewrite List.length_concat.
-    progress unfold List.list_sum.
-    rewrite <- (List.rev_involutive (List.map (length (A:=T*T)) _)).
-    rewrite List.fold_left_rev_right.
-    do 2 rewrite <- List.map_rev.
-...
-    rewrite Hm.
-    progress unfold iter_seq.
-    progress unfold iter_list.
-    rewrite Nat_sub_succ_1.
-...
-    clear Hla Hlbc H2 H3 H4 H6 Hpairs Hnz.
-    revert m Hm.
-    induction n; intros; [ easy | ].
-    rewrite List.seq_S.
-    rewrite List.map_last.
-    rewrite List.map_last.
+    rewrite <- List.flat_map_concat_map.
+    rewrite List_flat_length_map.
+    replace add with (@rngl_add nat _) by easy.
+    replace 0 with (@rngl_zero nat _) at 2 by easy.
+    rewrite rngl_summation_seq_summation; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    subst m.
+    apply rngl_summation_eq_compat.
+    intros i Hi.
     rewrite List.length_map.
-    rewrite List.length_seq.
-    rewrite List.list_sum_app.
-Print List.list_sum.
-...
-    symmetry in Hm; move Hm at bottom.
-    progress unfold iter_seq in Hm.
-    progress unfold iter_list in Hm.
-    rewrite Nat_sub_succ_1 in Hm.
+    apply List.length_seq.
+  }
+  split. {
+    subst lc.
+    clear lab Hlab; subst pairs.
+    rewrite List.length_map.
+    rewrite <- List.flat_map_concat_map.
+    rewrite List_flat_length_map.
+    replace add with (@rngl_add nat _) by easy.
+    replace 0 with (@rngl_zero nat _) at 2 by easy.
+    rewrite rngl_summation_seq_summation; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    subst m.
+    apply rngl_summation_eq_compat.
+    intros i Hi.
+    rewrite List.length_map.
+    apply List.length_seq.
+  }
+  split. {
 ...
   exists n, lx, lyz.
   split; [ easy | ].
