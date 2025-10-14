@@ -742,26 +742,29 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     apply List.in_concat in Hab.
     destruct Hab as (ab', (Hab, H1)).
     apply List.in_map_iff in Hab.
-    destruct Hab as (u, (Hab, Hu)).
+    destruct Hab as (i, (Hab, Hi)).
     subst ab'.
     apply List.in_map_iff in H1.
-    destruct H1 as (i, (Hv, Hi)).
+    destruct H1 as (j, (Hv, Hj)).
+    move j before i.
     injection Hv; clear Hv; intros Hv Hw.
     clear c'' Hv.
     cbn.
-    remember (List.nth u nll1 []) as lb eqn:Hdlb.
-    assert (Hlb : length lb = n). {
-      rewrite Hdlb.
-... ...
-    exists n, la, lb.
-    split; [ easy | ].
-    split; [ easy | ].
-... ...
-...
-    cbn.
+    remember (List.nth i nll1 []) as lb eqn:Hdlb.
     progress unfold I_mul_subtype.
-(**)
-    exists n, la.
+    apply List.in_seq in Hi.
+    apply List.in_seq in Hj.
+    exists (max i j).
+    exists (List.repeat 0%L (i-1) ++ la.[i-1] :: List.repeat 0%L (j - i)).
+    exists (List.repeat 0%L (j-1) ++ lb.[j-1] :: List.repeat 0%L (i - j)).
+    assert (Hij : max i j ≠ 0) by flia Hi Hj.
+    split; [ easy | ].
+    split. {
+      rewrite List.length_app.
+      rewrite List.length_cons.
+      do 2 rewrite List.repeat_length.
+      flia Hi Hj.
+    }
 ...
     exists m, lab, lc.
     split; [ easy | ].
