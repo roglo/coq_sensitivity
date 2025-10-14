@@ -730,14 +730,46 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   split; [ easy | ].
   split; [ easy | ].
   split. {
-    intros ab Hab; cbn.
+    intros ab Hab.
+(**)
+    rewrite Hdab in Hab.
+    apply List.in_map_iff in Hab.
+    destruct Hab as (abc', Hab).
+    destruct abc' as (ab', c'').
+    cbn in Hab.
+    destruct Hab as (H, Hab); subst ab'.
+    rewrite Hpairs in Hab.
+    apply List.in_concat in Hab.
+    destruct Hab as (ab', (Hab, H1)).
+    apply List.in_map_iff in Hab.
+    destruct Hab as (u, (Hab, Hu)).
+    subst ab'.
+    apply List.in_map_iff in H1.
+    destruct H1 as (i, (Hv, Hi)).
+    injection Hv; clear Hv; intros Hv Hw.
+    clear c'' Hv.
+    cbn.
+    remember (List.nth u nll1 []) as lb eqn:Hdlb.
+    assert (Hlb : length lb = n). {
+      rewrite Hdlb.
+... ...
+    exists n, la, lb.
+    split; [ easy | ].
+    split; [ easy | ].
+... ...
+...
+    cbn.
     progress unfold I_mul_subtype.
+(**)
+    exists n, la.
+...
     exists m, lab, lc.
     split; [ easy | ].
     split; [ easy | ].
     split; [ easy | ].
     split. {
       intros ab' Hab'.
+Print ideal.
 ...
   exists n, lx, lyz.
   split; [ easy | ].
