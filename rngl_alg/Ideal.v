@@ -754,6 +754,10 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     progress unfold I_mul_subtype.
     apply List.in_seq in Hi.
     apply List.in_seq in Hj.
+(**)
+    exists (max n nl.[i-1]).
+(* ? *)
+...
     exists (max i j).
     exists (List.repeat 0%L (i-1) ++ la.[i-1] :: List.repeat 0%L (j - i)).
     exists (List.repeat 0%L (j-1) ++ lb.[j-1] :: List.repeat 0%L (i - j)).
@@ -765,6 +769,34 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
       do 2 rewrite List.repeat_length.
       flia Hi Hj.
     }
+    rewrite List.length_app.
+    rewrite List.length_cons.
+    do 2 rewrite List.repeat_length.
+    rewrite <- Nat.sub_succ_l.
+    split. {
+      destruct (Nat.max_dec i j) as [Hdij| Hdij]. {
+        rewrite Nat.add_sub_assoc; [ | flia Hdij ].
+        rewrite <- Nat.add_sub_swap; [ | flia Hj ].
+        rewrite <- Nat.add_sub_assoc; [ | flia Hi ].
+        rewrite Nat_sub_succ_1.
+        now rewrite Nat.add_comm, Nat.add_sub.
+      }
+      rewrite Hdij.
+      apply Nat.max_r_iff in Hdij.
+      destruct (Nat.eq_dec i j) as [Heij| Heij]. {
+        rewrite Heij.
+        rewrite Nat.sub_succ_l; [ | easy ].
+        rewrite Nat.sub_diag.
+        apply Nat.sub_add.
+        flia Hj.
+      }
+      replace (S i - j) with 0 by flia Hdij Heij.
+(* chiasse *)
+...
+    replace (j - 1 + S (i - j)) with i by flia Hi Hj.
+
+    rewrite <- Nat.add_sub_swap; [ | flia Hj ].
+    rewrite Nat.add
 ...
     exists m, lab, lc.
     split; [ easy | ].
