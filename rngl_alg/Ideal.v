@@ -10,7 +10,7 @@ Import Init.Nat.
 Require Import RingLike.Core.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
-From RingLike Require Import IterAdd IterAnd IterMax.
+From RingLike Require Import IterAdd.
 From RingLike Require Import Nat_algebra.
 
 (* ideal: non empty set type with some properties *)
@@ -837,8 +837,33 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   rewrite Hdab, Hdc, Hpairs.
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
-    rewrite (List_map_nth' (0, 0)%L 0%L); [ | ].
-    rewrite (List_map_nth' (0, 0)%L 0%L); [ | ].
+    rewrite (List_map_nth' (0, 0)%L 0%L). 2: {
+      rewrite List.length_concat.
+      progress unfold List.list_sum.
+      rewrite <- (List.rev_involutive (List.map (length (A:=T*T)) _)).
+      rewrite List.fold_left_rev_right.
+      do 2 rewrite <- List.map_rev.
+      replace add with (@rngl_add nat _) by easy.
+      replace 0 with (@rngl_zero nat _) at 3 by easy.
+      rewrite List.map_map.
+      erewrite List_fold_left_ext_in. 2: {
+        intros; apply rngl_add_comm.
+      }
+      erewrite List.map_ext_in. 2: {
+        intros.
+        rewrite List.length_map.
+        rewrite List.length_seq.
+        reflexivity.
+      }
+      rewrite fold_iter_list.
+      rewrite rngl_summation_list_map.
+      rewrite rngl_summation_list_rev.
+      rewrite rngl_summation_seq_summation; [ | easy ].
+      rewrite Nat.add_comm, Nat.add_sub.
+      remember (∑ (j = _, _), _) as x; subst x. (* renaming *)
+      rewrite <- Hm.
+      flia Hi.
+    }
 ...
 } {
   progress unfold I_add_subtype in H1.
