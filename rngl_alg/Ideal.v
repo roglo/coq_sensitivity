@@ -670,8 +670,8 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
          (λ i : nat,
             List.map
               (λ j : nat,
-                 ((la.[i-1] * (ListDef.nth i nll1 []).[j-1])%L,
-                  (la.[i-1] * (ListDef.nth i nll2 []).[j-1])%L))
+                 ((la.[i-1] * (ListDef.nth (i-1) nll1 []).[j-1])%L,
+                  (la.[i-1] * (ListDef.nth (i-1) nll2 []).[j-1])%L))
               (List.seq 1 nl.[i-1]))
          (List.seq 1 n))) as pairs eqn:Hpairs.
   remember (List.map fst pairs) as lab eqn:Hdab.
@@ -750,14 +750,12 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     injection Hv; clear Hv; intros Hv Hw.
     clear c'' Hv.
     cbn.
-    remember (List.nth i nll1 []) as lb eqn:Hdlb.
+    remember (List.nth (i - 1) nll1 []) as lb eqn:Hdlb.
     progress unfold I_mul_subtype.
     apply List.in_seq in Hi.
     apply List.in_seq in Hj.
 (**)
-    exists 1.
-    exists [la.[i-1]].
-    exists [lb.[j-1]].
+    exists 1, [la.[i-1]], [lb.[j-1]].
     split; [ easy | ].
     split; [ easy | ].
     split; [ easy | ].
@@ -772,14 +770,18 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
       intros y Hy.
       destruct Hy as [Hy| ]; [ subst y | easy ].
       rewrite Hdlb.
-      apply List.in_seq in Hi.
-      specialize (H6 i).
-      assert (H : i ∈ ListDef.seq 0 n). {
-(* ah zut *)
-   ...
-      apply Ha.
+      specialize (H6 (i - 1)).
+      assert (H : i - 1 ∈ ListDef.seq 0 n). {
+        apply List.in_seq.
+        flia Hi.
+      }
+      specialize (H6 H); clear H.
+      destruct H6 as (H6 & H7 & H8 & H9 & H10 & H11).
+      apply H9.
       apply List.nth_In.
-      flia Hla Hi.
+      rewrite H7.
+      replace 0 with (@rngl_zero nat _) at 3 by easy.
+      flia Hj.
     }
 ...
     remember (max n nl.[i-1]) as p eqn:Hp.
