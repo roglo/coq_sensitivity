@@ -755,8 +755,37 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     apply List.in_seq in Hi.
     apply List.in_seq in Hj.
 (**)
-    exists (max n nl.[i-1]).
-(* ? *)
+    exists 1.
+    exists [la.[i-1]].
+    exists [lb.[j-1]].
+    split; [ easy | ].
+    split; [ easy | ].
+    split; [ easy | ].
+    split. {
+      intros x Hx.
+      destruct Hx as [Hx| ]; [ subst x | easy ].
+      apply Ha.
+      apply List.nth_In.
+      flia Hla Hi.
+    }
+    split. {
+      intros y Hy.
+      destruct Hy as [Hy| ]; [ subst y | easy ].
+      rewrite Hdlb.
+      apply List.in_seq in Hi.
+      specialize (H6 i).
+      assert (H : i ∈ ListDef.seq 0 n). {
+(* ah zut *)
+   ...
+      apply Ha.
+      apply List.nth_In.
+      flia Hla Hi.
+    }
+...
+    remember (max n nl.[i-1]) as p eqn:Hp.
+    exists p.
+    exists (List.repeat 0%L (i-1) ++ la.[i-1] :: List.repeat 0%L (p - i)).
+    exists (List.repeat 0%L (j-1) ++ lb.[j-1] :: List.repeat 0%L (p - j)).
 ...
     exists (max i j).
     exists (List.repeat 0%L (i-1) ++ la.[i-1] :: List.repeat 0%L (j - i)).
