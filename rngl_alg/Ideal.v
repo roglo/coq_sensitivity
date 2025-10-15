@@ -819,6 +819,26 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     replace 0 with (@rngl_zero nat _) at 3 by easy.
     flia Hj.
   }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    apply (f_equal (rngl_mul _)).
+    specialize (Hbc (i-1)).
+    assert (H : i - 1 ∈ ListDef.seq 0 n). {
+      apply List.in_seq.
+      flia Hi.
+    }
+    specialize (Hbc H); clear H.
+    destruct Hbc as (_ & _ & _ & _ & _ & Hbc).
+    rewrite Hbc.
+    remember (∑ (j = _, _), _) as x in |-*; subst x. (* renaming *)
+    reflexivity.
+  }
+  symmetry.
+  rewrite Hdab, Hdc, Hpairs.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    rewrite (List_map_nth' (0, 0)%L 0%L); [ | ].
+    rewrite (List_map_nth' (0, 0)%L 0%L); [ | ].
 ...
 } {
   progress unfold I_add_subtype in H1.
