@@ -624,21 +624,21 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   clear H2; rename H into H2.
   progress unfold I_mul_subtype in H2.
   apply (forall_exists_exists_forall 0%L 0) in H2.
-  destruct H2 as (nl & H2 & H3).
+  destruct H2 as (nl & Hnl & H3).
   move nl before lbc.
-  move H2 before Hlbc.
-  rewrite Hlbc in H2.
+  move Hnl before Hlbc.
+  rewrite Hlbc in Hnl.
   apply (forall_exists_exists_forall 0 []) in H3.
-  destruct H3 as (nll1 & H3 & H4).
-  rewrite List.length_seq, H2 in H3.
+  destruct H3 as (nll1 & Hll1 & H4).
+  rewrite List.length_seq, Hnl in Hll1.
   move nll1 before nl.
-  move H3 before H2.
+  move Hll1 before Hnl.
   apply (forall_exists_exists_forall 0 []) in H4.
-  destruct H4 as (nll2 & H4 & H5).
-  rewrite List.length_seq, H3 in H4.
+  destruct H4 as (nll2 & Hll2 & H5).
+  rewrite List.length_seq, Hll1 in Hll2.
   move nll2 before nll1.
-  move H4 before H3.
-  rewrite H2, H3, H4 in H5.
+  move Hll2 before Hll1.
+  rewrite Hnl, Hll1, Hll2 in H5.
   apply List.Forall_forall in H5.
   eapply List.Forall_impl in H5. 2: {
     intros d H7.
@@ -656,9 +656,9 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     cbn in H7.
     apply H7.
   }
-  specialize (proj1 (List.Forall_forall _ _) H5) as H6.
-  clear H5; cbn in H6.
-  remember (∀ i, _) as P eqn:H in H6; subst P. (* renaming *)
+  specialize (proj1 (List.Forall_forall _ _) H5) as H1.
+  clear H5; cbn in H1.
+  remember (∀ i, _) as P eqn:H in H1; subst P. (* renaming *)
   progress unfold I_mul_subtype.
   eenough (H : ∃ m lab lc, _) by apply H. (* renaming *)
   (* conseils de ChatGPT: *)
@@ -714,24 +714,23 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     intros H; move H at top; subst m.
     symmetry in Hm.
     move Hm at bottom.
-    move H6 at bottom.
+    move H1 at bottom.
     move Hnz at bottom.
-    specialize (eq_rngl_summation_zero nat_is_additive_integral) as H1.
-    specialize (H1 _ _ _ Hm); cbn in H1; clear Hm.
-    specialize (H6 0).
+    specialize (eq_rngl_summation_zero nat_is_additive_integral) as H2.
+    specialize (H2 _ _ _ Hm); cbn in H1; clear Hm.
+    specialize (H1 0).
     assert (H : 0 ∈ List.seq 0 n) by now destruct n; [ | left ].
-    specialize (H6 H); clear H.
-    destruct H6 as (H6, _).
-    specialize (H1 1).
+    specialize (H1 H); clear H.
+    destruct H1 as (H1, _).
+    specialize (H2 1).
     assert (H : 1 ≤ 1 ≤ n) by flia Hnz.
-    now specialize (H1 H); clear H.
+    now specialize (H2 H); clear H.
   }
   split; [ easy | ].
   split; [ easy | ].
   split; [ easy | ].
   split. {
     intros ab Hab.
-(**)
     rewrite Hdab in Hab.
     apply List.in_map_iff in Hab.
     destruct Hab as (abc', Hab).
@@ -740,12 +739,12 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     destruct Hab as (H, Hab); subst ab'.
     rewrite Hpairs in Hab.
     apply List.in_concat in Hab.
-    destruct Hab as (ab', (Hab, H1)).
+    destruct Hab as (ab', (Hab, H2)).
     apply List.in_map_iff in Hab.
     destruct Hab as (i, (Hab, Hi)).
     subst ab'.
-    apply List.in_map_iff in H1.
-    destruct H1 as (j, (Hv, Hj)).
+    apply List.in_map_iff in H2.
+    destruct H2 as (j, (Hv, Hj)).
     move j before i.
     injection Hv; clear Hv; intros Hv Hw.
     clear c'' Hv.
@@ -754,7 +753,6 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     progress unfold I_mul_subtype.
     apply List.in_seq in Hi.
     apply List.in_seq in Hj.
-(**)
     exists 1, [la.[i-1]], [lb.[j-1]].
     split; [ easy | ].
     split; [ easy | ].
@@ -770,16 +768,16 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
       intros y Hy.
       destruct Hy as [Hy| ]; [ subst y | easy ].
       rewrite Hdlb.
-      specialize (H6 (i - 1)).
+      specialize (H1 (i - 1)).
       assert (H : i - 1 ∈ ListDef.seq 0 n). {
         apply List.in_seq.
         flia Hi.
       }
-      specialize (H6 H); clear H.
-      destruct H6 as (H6 & H7 & H8 & H9 & H10 & H11).
-      apply H9.
+      specialize (H1 H); clear H.
+      destruct H1 as (H1 & H2 & H3 & H4 & H5 & H6).
+      apply H4.
       apply List.nth_In.
-      rewrite H7.
+      rewrite H2.
       replace 0 with (@rngl_zero nat _) at 3 by easy.
       flia Hj.
     }
