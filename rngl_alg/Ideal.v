@@ -618,29 +618,28 @@ Proof.
 destruct_ic.
 apply propositional_extensionality.
 split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
-  generalize Hbc; intros H2.
-  cbn in H2.
+  cbn in Hbc.
   assert (H : ∀ yz, yz ∈ lbc → I_mul_subtype b c yz) by easy.
-  clear H2; rename H into H2.
-  progress unfold I_mul_subtype in H2.
-  apply (forall_exists_exists_forall 0%L 0) in H2.
-  destruct H2 as (nl & Hnl & H3).
+  clear Hbc; rename H into Hbc.
+  progress unfold I_mul_subtype in Hbc.
+  apply (forall_exists_exists_forall 0%L 0) in Hbc.
+  destruct Hbc as (nl & Hnl & Hbc).
   move nl before lbc.
   move Hnl before Hlbc.
   rewrite Hlbc in Hnl.
-  apply (forall_exists_exists_forall 0 []) in H3.
-  destruct H3 as (llb & Hllb & H4).
+  apply (forall_exists_exists_forall 0 []) in Hbc.
+  destruct Hbc as (llb & Hllb & Hbc).
   rewrite List.length_seq, Hnl in Hllb.
   move llb before nl.
   move Hllb before Hnl.
-  apply (forall_exists_exists_forall 0 []) in H4.
-  destruct H4 as (nll2 & Hll2 & H5).
+  apply (forall_exists_exists_forall 0 []) in Hbc.
+  destruct Hbc as (nll2 & Hll2 & Hbc).
   rewrite List.length_seq, Hllb in Hll2.
   move nll2 before llb.
   move Hll2 before Hllb.
-  rewrite Hnl, Hllb, Hll2 in H5.
-  apply List.Forall_forall in H5.
-  eapply List.Forall_impl in H5. 2: {
+  rewrite Hnl, Hllb, Hll2 in Hbc.
+  apply List.Forall_forall in Hbc.
+  eapply List.Forall_impl in Hbc. 2: {
     intros d H7.
     destruct (le_dec n d) as [Hnd| Hnd]. {
       destruct H7 as (H7 & H8 & H9 & H10 & H11 & H12).
@@ -650,15 +649,16 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
       rewrite (@List.nth_overflow _ _ d) in H7; [ easy | congruence ].
     }
     apply Nat.nle_gt in Hnd.
-    clear H5.
+    clear Hbc.
     rewrite List.seq_nth in H7; [ | now rewrite List.seq_nth ].
     rewrite List.seq_nth in H7; [ | easy ].
     cbn in H7.
     apply H7.
   }
-  specialize (proj1 (List.Forall_forall _ _) H5) as H1.
-  clear H5; cbn in H1.
-  remember (∀ i, _) as P eqn:H in H1; subst P. (* renaming *)
+  specialize (proj1 (List.Forall_forall _ _) Hbc) as H1.
+  clear Hbc.
+  rename H1 into Hbc; cbn in Hbc.
+  remember (∀ i, _) as P eqn:H in Hbc; subst P. (* renaming *)
   progress unfold I_mul_subtype.
   eenough (H : ∃ m lab lc, _) by apply H. (* renaming *)
   (* conseils de ChatGPT: *)
@@ -714,14 +714,14 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     intros H; move H at top; subst m.
     symmetry in Hm.
     move Hm at bottom.
-    move H1 at bottom.
+    move Hbc at bottom.
     move Hnz at bottom.
     specialize (eq_rngl_summation_zero nat_is_additive_integral) as H2.
-    specialize (H2 _ _ _ Hm); cbn in H1; clear Hm.
-    specialize (H1 0).
+    specialize (H2 _ _ _ Hm); cbn in Hbc; clear Hm.
+    specialize (Hbc 0).
     assert (H : 0 ∈ List.seq 0 n) by now destruct n; [ | left ].
-    specialize (H1 H); clear H.
-    destruct H1 as (H1, _).
+    specialize (Hbc H); clear H.
+    destruct Hbc as (Hnlz, _).
     specialize (H2 1).
     assert (H : 1 ≤ 1 ≤ n) by flia Hnz.
     now specialize (H2 H); clear H.
@@ -767,16 +767,17 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
       intros y Hy.
       destruct Hy as [Hy| ]; [ subst y | easy ].
       rewrite Hdlb.
-      specialize (H1 (i - 1)).
+      specialize (Hbc (i - 1)).
+      rewrite <- Hdlb in Hbc.
       assert (H : i - 1 ∈ ListDef.seq 0 n). {
         apply List.in_seq.
         flia Hi.
       }
-      specialize (H1 H); clear H.
-      destruct H1 as (H1 & H2 & H3 & H4 & H5 & H6).
-      apply H4.
+      specialize (Hbc H); clear H.
+      destruct Hbc as (_ & Hlb & _ & Hb & _).
+      apply Hb; rewrite <- Hdlb.
       apply List.nth_In.
-      rewrite H2.
+      rewrite Hlb.
       replace 0 with (@rngl_zero nat _) at 3 by easy.
       flia Hj.
     }
@@ -784,6 +785,8 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     rewrite Nat.sub_diag; cbn.
     easy.
   }
+  split. {
+    intros z Hz.
 ...
     remember (max n nl.[i-1]) as p eqn:Hp.
     exists p.
