@@ -633,11 +633,11 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   move llb before nl.
   move Hllb before Hnl.
   apply (forall_exists_exists_forall 0 []) in Hbc.
-  destruct Hbc as (nll2 & Hll2 & Hbc).
-  rewrite List.length_seq, Hllb in Hll2.
-  move nll2 before llb.
-  move Hll2 before Hllb.
-  rewrite Hnl, Hllb, Hll2 in Hbc.
+  destruct Hbc as (llc & Hllc & Hbc).
+  rewrite List.length_seq, Hllb in Hllc.
+  move llc before llb.
+  move Hllc before Hllb.
+  rewrite Hnl, Hllb, Hllc in Hbc.
   apply List.Forall_forall in Hbc.
   eapply List.Forall_impl in Hbc. 2: {
     intros d H7.
@@ -671,7 +671,7 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
             List.map
               (λ j : nat,
                  ((la.[i-1] * (ListDef.nth (i-1) llb []).[j-1])%L,
-                  (la.[i-1] * (ListDef.nth (i-1) nll2 []).[j-1])%L))
+                  (la.[i-1] * (ListDef.nth (i-1) llc []).[j-1])%L))
               (List.seq 1 nl.[i-1]))
          (List.seq 1 n))) as pairs eqn:Hpairs.
   remember (List.map fst pairs) as lab eqn:Hdab.
@@ -733,12 +733,12 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     intros xy Hxy.
     rewrite Hdab in Hxy.
     apply List.in_map_iff in Hxy.
-    destruct Hxy as ((xy', z), Hxy).
-    cbn in Hxy.
-    destruct Hxy as (H, Hxy); subst xy'.
-    rewrite Hpairs in Hxy.
-    apply List.in_concat in Hxy.
-    destruct Hxy as (lxyz, (Hlxyz, Hxyz)).
+    destruct Hxy as ((xy', z), Hxyz).
+    cbn in Hxyz.
+    destruct Hxyz as (H, Hxyz); subst xy'.
+    rewrite Hpairs in Hxyz.
+    apply List.in_concat in Hxyz.
+    destruct Hxyz as (lxyz, (Hlxyz, Hxyz)).
     apply List.in_map_iff in Hlxyz.
     destruct Hlxyz as (i, (Hlxyz, Hi)).
     subst lxyz.
@@ -787,119 +787,39 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   }
   split. {
     intros z Hz.
-...
-    remember (max n nl.[i-1]) as p eqn:Hp.
-    exists p.
-    exists (List.repeat 0%L (i-1) ++ la.[i-1] :: List.repeat 0%L (p - i)).
-    exists (List.repeat 0%L (j-1) ++ lb.[j-1] :: List.repeat 0%L (p - j)).
-...
-    exists (max i j).
-    exists (List.repeat 0%L (i-1) ++ la.[i-1] :: List.repeat 0%L (j - i)).
-    exists (List.repeat 0%L (j-1) ++ lb.[j-1] :: List.repeat 0%L (i - j)).
-    assert (Hij : max i j ≠ 0) by flia Hi Hj.
-    split; [ easy | ].
-    split. {
-      rewrite List.length_app.
-      rewrite List.length_cons.
-      do 2 rewrite List.repeat_length.
-      flia Hi Hj.
+    rewrite Hdc in Hz.
+    apply List.in_map_iff in Hz.
+    destruct Hz as ((xy, z'), Hz).
+    cbn in Hz.
+    destruct Hz as (H, Hxyz); subst z'.
+    rewrite Hpairs in Hxyz.
+    apply List.in_concat in Hxyz.
+    destruct Hxyz as (lxyz, (Hlxyz, Hxyz)).
+    apply List.in_map_iff in Hlxyz.
+    destruct Hlxyz as (i, (Hlxyz, Hi)).
+    subst lxyz.
+    apply List.in_map_iff in Hxyz.
+    destruct Hxyz as (j, (Hxyz, Hj)).
+    move j before i.
+    injection Hxyz; clear Hxyz; intros Hz Hxy.
+    clear xy Hxy; subst z.
+    apply ip_mul_l.
+    apply List.in_seq in Hi.
+    apply List.in_seq in Hj.
+    specialize (Hbc (i - 1)).
+    assert (H : i - 1 ∈ ListDef.seq 0 n). {
+      apply List.in_seq.
+      flia Hi.
     }
-    rewrite List.length_app.
-    rewrite List.length_cons.
-    do 2 rewrite List.repeat_length.
-    rewrite <- Nat.sub_succ_l.
-    split. {
-      destruct (Nat.max_dec i j) as [Hdij| Hdij]. {
-        rewrite Nat.add_sub_assoc; [ | flia Hdij ].
-        rewrite <- Nat.add_sub_swap; [ | flia Hj ].
-        rewrite <- Nat.add_sub_assoc; [ | flia Hi ].
-        rewrite Nat_sub_succ_1.
-        now rewrite Nat.add_comm, Nat.add_sub.
-      }
-      rewrite Hdij.
-      apply Nat.max_r_iff in Hdij.
-      destruct (Nat.eq_dec i j) as [Heij| Heij]. {
-        rewrite Heij.
-        rewrite Nat.sub_succ_l; [ | easy ].
-        rewrite Nat.sub_diag.
-        apply Nat.sub_add.
-        flia Hj.
-      }
-      replace (S i - j) with 0 by flia Hdij Heij.
-(* chiasse *)
+    specialize (Hbc H); clear H.
+    destruct Hbc as (_ & _ & Hlc' & _ & Hc & _).
+    apply Hc.
+    apply List.nth_In.
+    rewrite Hlc'.
+    replace 0 with (@rngl_zero nat _) at 3 by easy.
+    flia Hj.
+  }
 ...
-    replace (j - 1 + S (i - j)) with i by flia Hi Hj.
-
-    rewrite <- Nat.add_sub_swap; [ | flia Hj ].
-    rewrite Nat.add
-...
-    exists m, lab, lc.
-    split; [ easy | ].
-    split; [ easy | ].
-    split; [ easy | ].
-    split. {
-      intros ab' Hab'.
-Print ideal.
-...
-  exists n, lx, lyz.
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split. {
-    intros x Hxl; cbn.
-    progress unfold I_mul_subtype.
-    exists n, lx, (List.repeat 1%L n).
-    rewrite List.repeat_length.
-    split; [ easy | ].
-    split; [ easy | ].
-    split; [ easy | ].
-    split; [ easy | ].
-(* bin non, parce que 1 n'appartient par forcément à y *)
-...
-    cbn.
-...
-
-cbn in H2.
-Search (List.nth _ (List.seq _ _)).
-...
-rewrite List.seq_nth in H2.
-...
-Search ListDef.Forall.
-...
-Check glop.
-specialize glop as H3.
-specialize (H3 T 0%L).
-(* chais pas *)
-...
-  assert
-    (∃ ln llx lly,
-     List.map
-       (λ i,
-        let lx := List.nth i llx
-  progress unfold I_mul_subtype.
-...
-exists n, lx, ly.
-split; [ easy | ].
-split; [ easy | ].
-split. {
-  intros z Hz.
-  exists n, lx, ly.
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split. {
-    intros y Hy'.
-    specialize (H2 y Hy').
-    destruct H2 as (n' & lx' & ly' & Hx' & Hy'' & H2 & H3 & H).
-    subst y.
-...
-  destruct H2 as (y & t & H & H2 & H3); subst z.
-  rename t into z.
-  move y before x; move z before y.
-  exists (x + y)%L, z.
-  split; [ apply rngl_add_assoc | ].
-  split; [ | easy ].
-  now exists x, y.
 } {
   progress unfold I_add_subtype in H1.
   progress unfold I_add_subtype.
