@@ -3,7 +3,7 @@
 
 Set Implicit Arguments.
 
-From RingLike Require Import Utf8.
+Require Import RingLike.Utf8.
 Require Import RingLike.Core.
 Require Import Rational.
 Import Q.Notations.

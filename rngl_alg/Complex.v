@@ -1,9 +1,9 @@
 Set Nested Proofs Allowed.
 
-From Stdlib Require Import ZArith.
+Require Import Stdlib.ZArith.ZArith.
 Require Import Init.Nat.
 Import List.ListNotations.
-From RingLike Require Import Utf8.
+Require Import RingLike.Utf8.
 Require Import RingLike.Core.
 Require Import RingLike.IterAdd.
 Require Import RingLike.RealLike.

@@ -4,11 +4,11 @@
 (* borrowed 2021-01-17 from my development "coq_euler_prod_form" *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Arith.
-From Stdlib Require FinFun.
+Require Import Stdlib.Arith.Arith.
+Require Stdlib.Vectors.FinFun.
 Import List.ListNotations.
 
-From RingLike Require Import Utf8.
+Require Import RingLike.Utf8.
 Require Import Misc.
 
 Fixpoint find_dup f (la : list nat) :=

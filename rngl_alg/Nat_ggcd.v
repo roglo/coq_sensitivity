@@ -1,8 +1,8 @@
 (* gcd a b with computation of a/gcd a b and b/gcd a b on the fly *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Arith Psatz.
-From RingLike Require Import Utf8.
+Require Import Stdlib.Arith.Arith Stdlib.micromega.Psatz.
+Require Import RingLike.Utf8.
 Require Import RingLike.Misc.
 
 Require Import Misc.

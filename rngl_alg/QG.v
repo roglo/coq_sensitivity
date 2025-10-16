@@ -6,9 +6,9 @@
 
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
-From Stdlib Require Import QArith.
-From Stdlib Require Import ZArith.
-From RingLike Require Import Utf8.
+Require Import Stdlib.QArith.QArith.
+Require Import Stdlib.ZArith.ZArith.
+Require Import RingLike.Utf8.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 Notation "x ≤ y" := (Qle x y) : Q_scope.
@@ -356,7 +356,7 @@ rewrite Z.mul_comm, Hadbc.
 apply Z.mul_comm.
 Qed.
 
-From Stdlib Require Import Psatz.
+Require Import Stdlib.micromega.Psatz.
 
 (* I don't understand why the proof of that is so complicated *)
 Theorem qeq_eq : ∀ q1 q2,

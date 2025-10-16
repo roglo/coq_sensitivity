@@ -1,7 +1,7 @@
 (* preparation of GPY (Goldston–Pintz–Yıldırım sieve) *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Arith.
+Require Import Stdlib.Arith.Arith.
 Import ListDef.
 Import List.ListNotations.
 
@@ -307,7 +307,7 @@ which is a contradiction.
 *)
 ...
 (*
-From Stdlib Require Import QArith.
+Require Import Stdlib.QArith.QArith.
 Open Scope nat_scope.
 Compute (
   map (λ n,
@@ -315,7 +315,7 @@ Compute (
   ) (seq 0 40)
 ).
 *)
-From Stdlib Require Import QArith.
+Require Import Stdlib.QArith.QArith.
 Open Scope nat_scope.
 Import List.ListNotations.
 Compute (
@@ -338,7 +338,7 @@ Proof.
 intros * Hε.
 ...
 (*
-From Stdlib Require Import QArith.
+Require Import Stdlib.QArith.QArith.
 Open Scope nat_scope.
 Import List.ListNotations.
 Compute (
@@ -380,7 +380,7 @@ Proof.
 intros * H2n.
 ...
 (*
-From Stdlib Require Import QArith.
+Require Import Stdlib.QArith.QArith.
 Open Scope nat_scope.
 Import List.ListNotations.
 Compute (
@@ -395,7 +395,7 @@ Compute (
 ).
 *)
 (*
-From Stdlib Require Import QArith.
+Require Import Stdlib.QArith.QArith.
 Open Scope nat_scope.
 Import List.ListNotations.
 Compute (

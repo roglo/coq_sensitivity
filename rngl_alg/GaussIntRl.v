@@ -1,6 +1,6 @@
 Set Nested Proofs Allowed.
-From Stdlib Require Import ZArith.
-From RingLike Require Import Utf8.
+Require Import Stdlib.ZArith.ZArith.
+Require Import RingLike.Utf8.
 
 Open Scope Z_scope.
 

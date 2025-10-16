@@ -1,12 +1,11 @@
 (* Theorems of general usage, which could be (or not) in Coq library *)
 
-From Stdlib Require Import Arith Psatz.
-
+Require Import Stdlib.Arith.Arith Stdlib.micromega.Psatz.
 Import List.ListNotations Init.Nat.
-Open Scope list.
+Require Import RingLike.Utf8.
+Require Export RingLike.Misc RingLike.Utils.
 
-From RingLike Require Import Utf8.
-From RingLike Require Export Misc Utils.
+Open Scope list.
 
 Notation "n !" := (fact n) (at level 1, format "n !").
 

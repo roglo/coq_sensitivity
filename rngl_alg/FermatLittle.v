@@ -1,8 +1,8 @@
 (* Fermat's little theorem *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Arith SetoidList.
-From RingLike Require Import Utf8.
+Require Import Stdlib.Arith.Arith Stdlib.Sorting.SetoidList.
+Require Import RingLike.Utf8.
 Require Import RingLike.PermutationFun.
 Require Import RingLike.Misc.
 Import ListNotations.

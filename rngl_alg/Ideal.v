@@ -3,15 +3,15 @@
 (* ideals on a RingLike *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Arith.
+Require Import Stdlib.Arith.Arith.
 Import List.ListNotations.
 Import Init.Nat.
-From RingLike Require Import Utf8.
+Require Import RingLike.Utf8.
 Require Import RingLike.Core.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
-From RingLike Require Import IterAdd.
-From RingLike Require Import Nat_algebra.
+Require Import RingLike.IterAdd.
+Require Import RingLike.Nat_algebra.
 
 (* ideal: non empty set type with some properties *)
 (* drawback: elementary properties, like commutativity of addition of ideals
@@ -92,8 +92,8 @@ Qed.
 (* end to be added *)
 
 (* for propositional and functional extensionalities *)
-From Stdlib Require Import PropExtensionality.
-From Stdlib Require Import FunctionalExtensionality.
+Require Import Stdlib.Logic.PropExtensionality.
+Require Import Stdlib.Logic.FunctionalExtensionality.
 (* provides the axioms:
 - propositional_extensionality :
      ∀ P Q : Prop, P ↔ Q → P = Q.

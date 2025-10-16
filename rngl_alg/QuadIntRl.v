@@ -14,9 +14,9 @@
 
 Set Implicit Arguments.
 
-From Stdlib Require Import ZArith.
+Require Import Stdlib.ZArith.ZArith.
 Import List.ListNotations.
-From RingLike Require Import Utf8.
+Require Import RingLike.Utf8.
 Require Import RingLike.Core.
 Require Import RingLike.Misc.
 Open Scope Z_scope.

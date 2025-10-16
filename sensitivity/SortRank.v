@@ -4,10 +4,10 @@
 
 Set Nested Proofs Allowed.
 
-From Stdlib Require Import Arith.
+Require Import Stdlib.Arith.Arith.
 Import List.ListNotations.
 Import Init.Nat.
-From RingLike Require Import Utf8.
+Require Import RingLike.Utf8.
 
 Require Import Misc SortingFun.
 

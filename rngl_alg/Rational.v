@@ -1,9 +1,10 @@
 (* Rationals based on nat and where num and den are always common primes *)
 (* allowing us to use Leibnitz' equality. *)
 
-From Stdlib Require Import Arith Psatz Init.Nat.
+Require Import Stdlib.Arith.Arith Stdlib.micromega.Psatz.
+Require Import Stdlib.Init.Nat.
 Require Import RingLike.Misc.
-From RingLike Require Import Utf8.
+Require Import RingLike.Utf8.
 
 Require Import Misc GQ.
 Import GQ_Notations.
