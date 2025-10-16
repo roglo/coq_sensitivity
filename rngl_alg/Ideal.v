@@ -833,6 +833,39 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     remember (∑ (j = _, _), _) as x in |-*; subst x. (* renaming *)
     reflexivity.
   }
+  cbn.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    rewrite (rngl_mul_summation_distr_l Hos).
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite rngl_mul_assoc.
+      reflexivity.
+    }
+    remember (∑ (j = _, _), _) as x in |-*; subst x. (* renaming *)
+    reflexivity.
+  }
+  cbn.
+(*
+Transformer la somme double en somme sur la concaténation (flatten).
+Après application pour tous les ii, tu obtiens une somme double
+  ∑i=1n∑j=1nl[i−1]  Ti,j∑i=1n​∑j=1nl[i−1]​Ti,j​, avec
+  Ti,j:=(la[i−1]⋅llbi[j−1])⋅llci[j−1]Ti,j​:=(la[i−1]⋅llbi​[j−1])⋅llci​[j−1].
+
+Utilise le lemme général sum_over_i_sum_over_j =
+sum_over_flattened_list (souvent appelé sum_flat_map ou
+sum_concat_map) :
+
+cela dit que la somme double est égale à la somme sur la liste obtenue
+en concaténant, pour chaque i, la liste map (fun j => T_{i,j}) (seq 1
+nl[i-1]).  Mais cette liste exacte est celle que tu as définie dans
+pairs (voir Hpairs).
+*)
+...
+  ∑ (i ∈ la), ∑ (j ∈ lb), f i j = ∑ (i ...
+  ∑ (i = a, b), ∑ (j = c, d), f i j = ∑ (i = 0, (b - a) * (d - c)),
+Search (∑ (_ = _, _), ∑ (_ = _, _), _).
+...
   symmetry.
   rewrite Hdab, Hdc, Hpairs.
   erewrite rngl_summation_eq_compat. 2: {
