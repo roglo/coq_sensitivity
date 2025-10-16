@@ -861,12 +861,11 @@ en concaténant, pour chaque i, la liste map (fun j => T_{i,j}) (seq 1
 nl[i-1]).  Mais cette liste exacte est celle que tu as définie dans
 pairs (voir Hpairs).
 *)
-Theorem rngl_summation_summation_list_concat {A B} la lb (f : A → B → T) :
-  ∑ (i ∈ la), ∑ (j ∈ lb i), f i j =
-  ∑ (i ∈ List.concat (List.map (λ i, List.map (λ j, f i j) (lb i)) la)), i.
-Proof.
-... ...
-Theorem rngl_summation_summation_concat a b c d f :
+  progress unfold iter_seq.
+  rewrite rngl_summation_summation_list_flat_map'.
+  rewrite <- rngl_summation_summation_list_flat_map.
+(* ah, chais pas *)
+...
   ∑ (i = a, b), ∑ (j = c i, d i), f i j =
   ∑ (i ∈
      List.concat
@@ -875,6 +874,11 @@ Theorem rngl_summation_summation_concat a b c d f :
           (List.seq a (S b - a)))),
      i.
 Proof.
+progress unfold iter_seq.
+Check rngl_summation_summation_list_flat_map.
+...
+rewrite rngl_summation_summation_list_flat_map.
+rewrite <- List.flat_map_concat_map.
 apply rngl_summation_summation_list_concat.
 Qed.
 ... ...
