@@ -3,7 +3,7 @@
   in order to try to add the left part curve of
   the hyperbole among hyperbolic angles *)
 
-Require Import Utf8 Arith.
+Require Import Arith.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.

@@ -1,7 +1,6 @@
 (* experiment *)
 
 Set Nested Proofs Allowed.
-Require Import Utf8.
 
 Require Import RingLike.Core.
 Require Import RingLike.Misc.

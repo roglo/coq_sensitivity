@@ -1,8 +1,11 @@
 (* Positive rationals where num and den are always common primes *)
 (* allowing us to use Leibnitz' equality. *)
 
-From Stdlib Require Import Utf8 Arith Morphisms Init.Nat.
-Require Import RingLike.Misc PQ Nat_ggcd.
+From Stdlib Require Import Arith Morphisms Init.Nat.
+From RingLike Require Import Utf8.
+Require Import RingLike.Misc.
+
+Require Import PQ Nat_ggcd.
 Import PQ_Notations.
 
 Set Nested Proofs Allowed.

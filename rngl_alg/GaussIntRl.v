@@ -1,5 +1,7 @@
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 ZArith.
+From Stdlib Require Import ZArith.
+From RingLike Require Import Utf8.
+
 Open Scope Z_scope.
 
 Record gauss_int := mk_gi { gi_re : Z; gi_im : Z }.

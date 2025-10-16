@@ -14,12 +14,14 @@
 
 Set Implicit Arguments.
 
-From Stdlib Require Import Utf8 ZArith.
+From Stdlib Require Import ZArith.
 Import List.ListNotations.
-
+From RingLike Require Import Utf8.
 Require Import RingLike.Core.
-Require Import RingLike.Misc Misc.
+Require Import RingLike.Misc.
 Open Scope Z_scope.
+
+Require Import Misc.
 
 Record quad_int (d : Z) := mk_qi { qi_re : Z; qi_im : Z }.
 

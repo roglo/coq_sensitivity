@@ -1,9 +1,11 @@
 (* gcd a b with computation of a/gcd a b and b/gcd a b on the fly *)
 
-From Stdlib Require Import Utf8 Arith Psatz.
-Require Import RingLike.Misc Misc.
-
 Set Nested Proofs Allowed.
+From Stdlib Require Import Arith Psatz.
+From RingLike Require Import Utf8.
+Require Import RingLike.Misc.
+
+Require Import Misc.
 
 Tactic Notation "flia" hyp_list (Hs) := clear - Hs; lia.
 

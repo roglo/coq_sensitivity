@@ -3,11 +3,13 @@
  *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 Arith.
+From Stdlib Require Import Arith.
+From RingLike Require Import Utf8.
 Require Import RingLike.Core.
 Require Import RingLike.IterAdd.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
+
 Require Import Misc.
 
 Section a.

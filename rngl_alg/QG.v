@@ -6,9 +6,9 @@
 
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
-From Stdlib Require Import Utf8.
 From Stdlib Require Import QArith.
 From Stdlib Require Import ZArith.
+From RingLike Require Import Utf8.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 Notation "x ≤ y" := (Qle x y) : Q_scope.

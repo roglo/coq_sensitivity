@@ -3,7 +3,7 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 Arith.
+Require Import Arith.
 Import List.ListNotations Init.Nat.
 
 Require Import RingLike.RingLike.

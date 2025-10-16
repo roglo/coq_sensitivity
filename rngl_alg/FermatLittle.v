@@ -1,11 +1,13 @@
 (* Fermat's little theorem *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 Arith SetoidList.
-
+From Stdlib Require Import Arith SetoidList.
+From RingLike Require Import Utf8.
 Require Import RingLike.PermutationFun.
-Require Import RingLike.Misc Misc.
+Require Import RingLike.Misc.
 Import ListNotations.
+
+Require Import Misc.
 
 Fixpoint prime_test cnt n d :=
   match cnt with

@@ -1,10 +1,10 @@
 (* Coq reals as Cauchy sequences *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8.
 From Stdlib Require Import Reals.Cauchy.ConstructiveCauchyReals.
 From Stdlib Require Import Reals.Cauchy.ConstructiveCauchyRealsMult.
 From Stdlib Require Import QArith.
+From RingLike Require Import Utf8.
 Require Import RingLike.Core.
 
 Axiom CReal_appart_or_eq : ∀ x y, (x # y)%CReal + (x = y).
@@ -261,7 +261,7 @@ Definition CComplex_ring_like_prop : ring_like_op CComplex :=
 (* Classical Reals defined by axioms *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 Reals.
+From Stdlib Require Import Reals.
 Require Import RingLike.Core.
 
 Instance reals_ring_like_op : ring_like_op R :=

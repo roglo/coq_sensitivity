@@ -4,8 +4,11 @@
      if n is not prime, it has neither inverse nor division, it is a ring *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 Arith.
-Require Import RingLike.Misc Misc FermatLittle.
+From Stdlib Require Import Arith.
+From RingLike Require Import Utf8.
+Require Import RingLike.Misc.
+
+Require Import Misc FermatLittle.
 
 (*
 have been moved to NatRingLike.v in directory ../sensitivity

@@ -2,9 +2,9 @@
 
 Set Nested Proofs Allowed.
 
-From Stdlib Require Import Utf8 Arith Bool.
+From Stdlib Require Import Arith Bool.
 Import List.ListNotations.
-
+From RingLike Require Import Utf8.
 Require Import RingLike.Core.
 Require Import RingLike.IterAdd.
 Require Import Sensitivity.Misc.

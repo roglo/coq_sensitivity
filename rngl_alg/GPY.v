@@ -1,7 +1,7 @@
 (* preparation of GPY (Goldston–Pintz–Yıldırım sieve) *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 Arith.
+From Stdlib Require Import Arith.
 Import ListDef.
 Import List.ListNotations.
 

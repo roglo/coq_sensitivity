@@ -1,7 +1,10 @@
 (* Implementation of positive (non zero) rationals using only nat *)
 
-From Stdlib Require Import Utf8 Arith Morphisms.
-Require Import RingLike.Misc Misc.
+From Stdlib Require Import Arith Morphisms.
+From RingLike Require Import Utf8.
+Require Import RingLike.Misc.
+
+Require Import Misc.
 
 Set Nested Proofs Allowed.
 

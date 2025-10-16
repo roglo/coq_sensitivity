@@ -12,13 +12,14 @@
 
 Set Nested Proofs Allowed.
 
-From Stdlib Require Import Utf8 Arith.
+From Stdlib Require Import Arith.
 From Stdlib Require Import Sorted.
 Import Init.Nat List List.ListNotations.
-
+From RingLike Require Import Utf8.
 Require Import RingLike.Core.
 Require Import RingLike.IterAdd.
 Require Import RingLike.IterMul.
+
 Require Import Misc MyVector.
 Require Import Matrix Signature Determinant Comatrix.
 Require Import CauchyBinet.
