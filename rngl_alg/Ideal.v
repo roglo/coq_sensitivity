@@ -862,8 +862,22 @@ nl[i-1]).  Mais cette liste exacte est celle que tu as définie dans
 pairs (voir Hpairs).
 *)
   progress unfold iter_seq.
+  do 2 rewrite Nat_sub_succ_1.
   rewrite rngl_summation_summation_list_flat_map'.
+...
   rewrite <- rngl_summation_summation_list_flat_map.
+Search (∑ (_ ∈ List.map _ _), _).
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros i Hi.
+    rewrite rngl_summation_list_map.
+    rewrite Nat_sub_succ_1.
+    reflexivity.
+  }
+  cbn.
+  ============================
+  ∑ (i ∈ ListDef.seq 1 n),
+    ∑ (i0 ∈ ListDef.seq 1 (ListDef.nth (i - 1) nl 0)),
+      la.[i - 1] * (ListDef.nth (i - 1) llb []).[i0 - 1] * (ListDef.nth (i - 1) llc []).[i0 - 1] =
 (* ah, chais pas *)
 ...
   ∑ (i = a, b), ∑ (j = c i, d i), f i j =
