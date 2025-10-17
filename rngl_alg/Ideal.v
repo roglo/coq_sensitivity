@@ -898,22 +898,6 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     }
     reflexivity.
   }
-Theorem List_flat_map_ext' [A B : Type] (f g : A → list B) :
-  ∀ l : list A,
-  (∀ a : A, a ∈ l → f a = g a)
-  → List.flat_map f l = List.flat_map g l.
-Proof.
-intros * Hl.
-induction l as [| a]; [ easy | ].
-cbn.
-rewrite Hl; [ | now left ].
-progress f_equal.
-apply IHl.
-intros b Hb.
-now apply Hl; right.
-Qed.
-(* à déplacer dans un de mes Misc.v ou Utils.v, chais pas où *)
-... ...
   erewrite List_flat_map_ext' in Hdc. 2: {
     intros i Hi.
     move Hbc at bottom.
@@ -929,6 +913,38 @@ Qed.
     rewrite <- List_map_nth_seq.
     reflexivity.
   }
+  rewrite List.flat_map_concat_map in Hdab, Hdc |-*.
+  rewrite <- List.seq_shift in Hdab, Hdc.
+  rewrite List.map_map in Hdab, Hdc.
+  erewrite List.map_ext_in in Hdab. 2: {
+    intros i Hi.
+    rewrite Nat_sub_succ_1.
+    reflexivity.
+  }
+  erewrite List.map_ext_in in Hdc. 2: {
+    intros i Hi.
+    rewrite Nat_sub_succ_1.
+    reflexivity.
+  }
+  rewrite <- Hllc in Hdab, Hdc.
+  rewrite <- List_map_nth_seq in Hdc.
+  subst lc.
+...
+Check @List_map_nth_seq.
+Check List.concat_map.
+...
+  rewrite <- rngl_summation_summation_list_flat_map' in Hdab.
+  rewrite <- rngl_summation_summation_list_flat_map'.
+  erewrite List_flat_map_ext'. 2: {
+    intros i Hi.
+...
+  rewrite List.flat_map_concat_map in Hdab, Hdc |-*.
+...
+  rewrite <- List.concat_map in Hdab. , Hdc |-*.
+Search (List.flat_map _ _ = List.flat_map _ _).
+  Check List.flat_map_concat_map.
+Search List.concat.
+Check List.concat_map.
 ...
     destruct Hbc as (_ & _ & _ & HHHHHHHHHHH & _ & _).
 ...
