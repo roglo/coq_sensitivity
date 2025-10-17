@@ -898,6 +898,20 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     }
     reflexivity.
   }
+  erewrite List_flat_map_ext' in Hdab. 2: {
+    intros i Hi.
+    move Hbc at bottom.
+    specialize (Hbc (i - 1)).
+    assert (H : i - 1 ∈ ListDef.seq 0 n). {
+      apply List.in_seq in Hi.
+      apply List.in_seq.
+      flia Hi.
+    }
+    specialize (Hbc H); clear H.
+    destruct Hbc as (_ & H1 & _ & _ & _).
+    rewrite <- H1.
+    reflexivity.
+  }
   erewrite List_flat_map_ext' in Hdc. 2: {
     intros i Hi.
     move Hbc at bottom.
@@ -928,7 +942,10 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   }
   rewrite <- Hllc in Hdab, Hdc.
   rewrite <- List_map_nth_seq in Hdc.
+...
   subst lc.
+Search (List.map _ (List.seq _ _)).
+Search (List.map (λ _, List.map _ _) _).
 ...
 Check @List_map_nth_seq.
 Check List.concat_map.
