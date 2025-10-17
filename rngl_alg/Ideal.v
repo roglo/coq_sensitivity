@@ -890,6 +890,49 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   erewrite List.flat_map_ext in Hdc. 2: {
     intros i.
     rewrite List.map_map; cbn.
+    rewrite List_map_seq.
+    erewrite List.map_ext_in. 2: {
+      intros j Hj.
+      rewrite Nat.add_comm, Nat.add_sub.
+      reflexivity.
+    }
+    reflexivity.
+  }
+Search (List.flat_map _ _ = List.flat_map _ _).
+(* peut-être une version avec ∀ a : A, f a ∈ l → f a = g a) ou une
+   connerie comme ça ? *)
+...
+  erewrite List.flat_map_ext in Hdc. 2: {
+    intros i.
+    destruct (lt_dec (i - 1) n) as [Hin| Hin]. {
+      move Hbc at bottom.
+      specialize (Hbc (i - 1)).
+      assert (H : i - 1 ∈ ListDef.seq 0 n) by now apply List.in_seq.
+      specialize (Hbc H); clear H.
+      destruct Hbc as (_ & _ & H1 & _ & _ & _).
+      rewrite <- H1.
+      rewrite <- List_map_nth_seq.
+      reflexivity.
+    }
+    cbn.
+    exfalso.
+    apply Nat.nlt_ge in Hin.
+    (* coincé *)
+...
+  }
+...
+    destruct Hbc as (_ & _ & _ & HHHHHHHHHHH & _ & _).
+...
+Search (List.map _ (List.seq _ _)).
+List_map_nth_seq:
+  ∀ {A : Type} (d : A) (la : list A),
+    la =
+    ListDef.map (λ i : nat, ListDef.nth i la d) (ListDef.seq 0 (length la))
+...
+    reflexivity.
+  }
+Search (List.map _ (List.seq _ _)).
+...
     remember (List.map (λ j, _) _) as x in |-*; subst x. (* renaming *)
     reflexivity.
   }
