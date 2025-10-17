@@ -846,24 +846,39 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     reflexivity.
   }
   cbn.
-(*
-Transformer la somme double en somme sur la concaténation (flatten).
-Après application pour tous les ii, tu obtiens une somme double
-  ∑i=1n∑j=1nl[i−1]  Ti,j∑i=1n​∑j=1nl[i−1]​Ti,j​, avec
-  Ti,j:=(la[i−1]⋅llbi[j−1])⋅llci[j−1]Ti,j​:=(la[i−1]⋅llbi​[j−1])⋅llci​[j−1].
+  (*
+  Transformer la somme double en somme sur la concaténation (flatten).
+  Après application pour tous les ii, tu obtiens une somme double
+    ∑i=1n∑j=1nl[i−1]  Ti,j∑i=1n​∑j=1nl[i−1]​Ti,j​, avec
+    Ti,j:=(la[i−1]⋅llbi[j−1])⋅llci[j−1]Ti,j​:=(la[i−1]⋅llbi​[j−1])⋅llci​[j−1].
 
-Utilise le lemme général sum_over_i_sum_over_j =
-sum_over_flattened_list (souvent appelé sum_flat_map ou
-sum_concat_map) :
+  Utilise le lemme général sum_over_i_sum_over_j =
+  sum_over_flattened_list (souvent appelé sum_flat_map ou
+  sum_concat_map) :
 
-cela dit que la somme double est égale à la somme sur la liste obtenue
-en concaténant, pour chaque i, la liste map (fun j => T_{i,j}) (seq 1
-nl[i-1]).  Mais cette liste exacte est celle que tu as définie dans
-pairs (voir Hpairs).
-*)
+  cela dit que la somme double est égale à la somme sur la liste obtenue
+  en concaténant, pour chaque i, la liste map (fun j => T_{i,j}) (seq 1
+  nl[i-1]).  Mais cette liste exacte est celle que tu as définie dans
+  pairs (voir Hpairs).
+  *)
   progress unfold iter_seq.
   do 2 rewrite Nat_sub_succ_1.
   rewrite rngl_summation_summation_list_flat_map'.
+  erewrite List.flat_map_ext. 2: {
+    intros i.
+    rewrite Nat_sub_succ_1.
+    reflexivity.
+  }
+  (* ouais, je crois que c'est ça *)
+  (*
+  Remplacer la liste construite par pairs (utiliser Hpairs).
+  Grâce à Hpairs tu peux remplacer la liste concaténée par pairs.
+  Après sum_flat_map et Hpairs, la somme devient la somme sur pairs
+  de fst(pair)*snd(pair) (avec les notations appropriées).
+  *)
+  rewrite List.flat_map_concat_map.
+...
+  rewrite <- Hpairs.
 ...
   rewrite <- rngl_summation_summation_list_flat_map.
 Search (∑ (_ ∈ List.map _ _), _).
