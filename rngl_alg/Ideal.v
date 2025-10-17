@@ -671,7 +671,7 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
             List.map
               (λ j : nat,
                  ((la.[i-1] * (ListDef.nth (i-1) llb []).[j-1])%L,
-                  (la.[i-1] * (ListDef.nth (i-1) llc []).[j-1])%L))
+                  (ListDef.nth (i-1) llc []).[j-1])%L)
               (List.seq 1 nl.[i-1]))
          (List.seq 1 n))) as pairs eqn:Hpairs.
   remember (List.map fst pairs) as lab eqn:Hdab.
@@ -803,7 +803,6 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     move j before i.
     injection Hxyz; clear Hxyz; intros Hz Hxy.
     clear xy Hxy; subst z.
-    apply ip_mul_l.
     apply List.in_seq in Hi.
     apply List.in_seq in Hj.
     specialize (Hbc (i - 1)).
