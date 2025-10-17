@@ -876,7 +876,26 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   Après sum_flat_map et Hpairs, la somme devient la somme sur pairs
   de fst(pair)*snd(pair) (avec les notations appropriées).
   *)
-  rewrite List.flat_map_concat_map.
+  rewrite Hpairs in Hdab, Hdc.
+  rewrite List.concat_map in Hdab, Hdc.
+  rewrite List.map_map in Hdab, Hdc.
+  rewrite <- List.flat_map_concat_map in Hdab, Hdc.
+  remember (List.flat_map (λ i, _)) as x in Hdab; subst x. (* renaming *)
+  remember (List.flat_map (λ i, _)) as x in Hdc; subst x. (* renaming *)
+  erewrite List.flat_map_ext in Hdab. 2: {
+    intros i.
+    rewrite List.map_map; cbn.
+    remember (List.map (λ j, _) _) as x in |-*; subst x. (* renaming *)
+    reflexivity.
+  }
+  erewrite List.flat_map_ext in Hdc. 2: {
+    intros i.
+    rewrite List.map_map; cbn.
+    remember (List.map (λ j, _) _) as x in |-*; subst x. (* renaming *)
+    reflexivity.
+  }
+...
+  rewrite <- List.flat_map_concat_map in Hpairs.
 ...
   rewrite <- Hpairs.
 ...
