@@ -898,27 +898,36 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     }
     reflexivity.
   }
-Search (List.flat_map _ _ = List.flat_map _ _).
-(* peut-être une version avec ∀ a : A, f a ∈ l → f a = g a) ou une
-   connerie comme ça ? *)
-...
-  erewrite List.flat_map_ext in Hdc. 2: {
-    intros i.
-    destruct (lt_dec (i - 1) n) as [Hin| Hin]. {
-      move Hbc at bottom.
-      specialize (Hbc (i - 1)).
-      assert (H : i - 1 ∈ ListDef.seq 0 n) by now apply List.in_seq.
-      specialize (Hbc H); clear H.
-      destruct Hbc as (_ & _ & H1 & _ & _ & _).
-      rewrite <- H1.
-      rewrite <- List_map_nth_seq.
-      reflexivity.
+Theorem List_flat_map_ext' [A B : Type] (f g : A → list B) :
+  ∀ l : list A,
+  (∀ a : A, a ∈ l → f a = g a)
+  → List.flat_map f l = List.flat_map g l.
+Proof.
+intros * Hl.
+induction l as [| a]; [ easy | ].
+cbn.
+rewrite Hl; [ | now left ].
+progress f_equal.
+apply IHl.
+intros b Hb.
+now apply Hl; right.
+Qed.
+(* à déplacer dans un de mes Misc.v ou Utils.v, chais pas où *)
+... ...
+  erewrite List_flat_map_ext' in Hdc. 2: {
+    intros i Hi.
+    move Hbc at bottom.
+    specialize (Hbc (i - 1)).
+    assert (H : i - 1 ∈ ListDef.seq 0 n). {
+      apply List.in_seq in Hi.
+      apply List.in_seq.
+      flia Hi.
     }
-    cbn.
-    exfalso.
-    apply Nat.nlt_ge in Hin.
-    (* coincé *)
-...
+    specialize (Hbc H); clear H.
+    destruct Hbc as (_ & _ & H1 & _ & _ & _).
+    rewrite <- H1.
+    rewrite <- List_map_nth_seq.
+    reflexivity.
   }
 ...
     destruct Hbc as (_ & _ & _ & HHHHHHHHHHH & _ & _).
