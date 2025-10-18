@@ -35,10 +35,10 @@ Arguments ip_subtype {T ro} i%_I a%_L.
 Arguments ip_opp {T ro} i%_I a%_L.
 
 Class ideal_ctx T {ro : ring_like_op T} :=
-  { ic_op : rngl_has_opp T = true }.
+  { ix_op : rngl_has_opp T = true }.
 
-Ltac destruct_ic :=
-  set (Hop := ic_op);
+Ltac destruct_ix :=
+  set (Hop := ix_op);
   set (Hos := rngl_has_opp_has_opp_or_psub Hop).
 
 (* to be moved somewhere else, probably IterAdd.v *)
@@ -116,17 +116,17 @@ Theorem I_zero_add a b : a = 0%L → b = 0%L → (a + b = 0)%L.
 Proof. intros; subst; apply rngl_add_0_l. Qed.
 
 Theorem I_zero_opp a : a = 0%L → (- a = 0)%L.
-Proof. destruct_ic; intros; subst; apply (rngl_opp_0 Hop). Qed.
+Proof. destruct_ix; intros; subst; apply (rngl_opp_0 Hop). Qed.
 
 Theorem I_zero_mul_l a b : b = 0%L → (a * b = 0)%L.
 Proof.
-destruct_ic.
+destruct_ix.
 intros; subst; apply (rngl_mul_0_r Hos).
 Qed.
 
 Theorem I_zero_mul_r a b : a = 0%L → (a * b = 0)%L.
 Proof.
-destruct_ic.
+destruct_ix.
 intros; subst; apply (rngl_mul_0_l Hos).
 Qed.
 
@@ -177,7 +177,7 @@ Qed.
 
 Theorem I_add_opp a b : ∀ x, I_add_subtype a b x → I_add_subtype a b (- x).
 Proof.
-destruct_ic.
+destruct_ix.
 intros * Hx.
 destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2); subst.
 exists (- x1)%L, (- x2)%L.
@@ -231,7 +231,7 @@ Arguments I_mul_subtype a b z%_L.
 
 Theorem I_mul_zero a b : I_mul_subtype a b 0%L.
 Proof.
-destruct_ic.
+destruct_ix.
 exists 1, [0%L], [0%L].
 split; [ easy | ].
 split; [ easy | ].
@@ -303,7 +303,7 @@ Qed.
 
 Theorem I_mul_opp a b : ∀ x, I_mul_subtype a b x → I_mul_subtype a b (- x).
 Proof.
-destruct_ic.
+destruct_ix.
 intros * Hx.
 destruct Hx as (n & la & lb & Hn & Hla & Hlb & Ha & Hb & Hx).
 subst x.
@@ -332,7 +332,7 @@ Qed.
 Theorem I_mul_mul_l a b :
   ∀ x y, I_mul_subtype a b y → I_mul_subtype a b (x * y).
 Proof.
-destruct_ic.
+destruct_ix.
 intros * H.
 destruct H as (n & la & lb & Hn & Hla & Hlb & Ha & Hb & H).
 subst y.
@@ -361,7 +361,7 @@ Qed.
 Theorem I_mul_mul_r a b :
   ∀ x y, I_mul_subtype a b x → I_mul_subtype a b (x * y).
 Proof.
-destruct_ic.
+destruct_ix.
 intros * H.
 destruct H as (n & la & lb & Hn & Hla & Hlb & Ha & Hb & H).
 subst x.
@@ -400,7 +400,7 @@ Definition I_mul (a b : ideal T) : ideal T :=
 Theorem I_opp_add a :
   ∀ x y, ip_subtype a (- x) → ip_subtype a (- y) → ip_subtype a (- (x + y)%L).
 Proof.
-destruct_ic.
+destruct_ix.
 intros * Hx Hy.
 apply ip_opp in Hx, Hy.
 rewrite (rngl_opp_involutive Hop) in Hx, Hy.
@@ -411,7 +411,7 @@ Qed.
 Theorem I_opp_mul_l a :
   ∀ x y, ip_subtype a (- y) → ip_subtype a (- (x * y)%L).
 Proof.
-destruct_ic.
+destruct_ix.
 intros * H.
 apply ip_opp, ip_mul_l.
 rewrite <- (rngl_opp_involutive Hop).
@@ -421,7 +421,7 @@ Qed.
 Theorem I_opp_mul_r a :
   ∀ x y, ip_subtype a (- x) → ip_subtype a (- (x * y)%L).
 Proof.
-destruct_ic.
+destruct_ix.
 intros * H.
 apply ip_opp, ip_mul_r.
 rewrite <- (rngl_opp_involutive Hop).
@@ -471,7 +471,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {ic : ideal_ctx T}.
+Context {ix : ideal_ctx T}.
 
 Theorem eq_ideal_eq : ∀ a b,
   ip_subtype a = ip_subtype b
@@ -539,7 +539,7 @@ Qed.
 Theorem I_add_subtype_assoc a b c x :
   I_add_subtype a (b + c) x = I_add_subtype (a + b) c x.
 Proof.
-destruct_ic.
+destruct_ix.
 apply propositional_extensionality.
 split; intros (y & z & H & H1 & H2); subst x. {
   now apply I_add_subtype_assoc_l.
@@ -563,7 +563,7 @@ Qed.
 
 Theorem I_add_subtype_0_l a x : I_add_subtype 0 a x = ip_subtype a x.
 Proof.
-destruct_ic.
+destruct_ix.
 progress unfold I_add_subtype; cbn.
 apply propositional_extensionality.
 split. {
@@ -584,18 +584,59 @@ apply functional_extensionality_dep.
 apply I_add_subtype_0_l.
 Qed.
 
-(* to be completed
-Theorem I_mul_subtype_comm a b x : I_mul_subtype a b x = I_mul_subtype b a x.
+Theorem I_mul_subtype_comm :
+  rngl_mul_is_comm T = true →
+  ∀ a b x, I_mul_subtype a b x = I_mul_subtype b a x.
 Proof.
-....
+intros Hic *.
+progress unfold I_mul_subtype.
+apply propositional_extensionality.
+split; intros (n & lx & ly & H1 & H2 & H3 & H4 & H5 & H6). {
+  exists n, ly, lx.
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  subst x.
+  apply rngl_summation_eq_compat.
+  intros i Hi.
+  apply (rngl_mul_comm Hic).
+} {
+  exists n, ly, lx.
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  subst x.
+  apply rngl_summation_eq_compat.
+  intros i Hi.
+  apply (rngl_mul_comm Hic).
+}
+Qed.
 
-Theorem I_mul_comm a b : (a * b)%I = (b * a)%I.
+Theorem I_opt_mul_comm :
+  if rngl_mul_is_comm T then ∀ a b : ideal T, (a * b)%I = (b * a)%I
+  else not_applicable.
 Proof.
+remember (rngl_mul_is_comm T) as ic eqn:Hic.
+symmetry in Hic.
+destruct ic; [ | easy ].
+intros.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
-...
-apply I_mul_subtype_comm.
-...
+intros.
+apply (I_mul_subtype_comm Hic).
+Qed.
+
+(* to be completed
+Theorem I_opt_mul_1_l : ∀ a : ideal T, (1 * a)%I = a.
+Admitted.
+
+Theorem I_mul_add_distr_l :
+  ∀ a b c : ideal T, (a * (b + c))%I = (a * b + a * c)%I.
+Admitted.
 *)
 
 Theorem forall_exists_exists_forall {A B} (da : A) (dn : B) P la :
@@ -629,7 +670,7 @@ Qed.
 Theorem I_mul_subtype_assoc a b c x :
   I_mul_subtype a (b * c) x = I_mul_subtype (a * b) c x.
 Proof.
-destruct_ic.
+destruct_ix.
 apply propositional_extensionality.
 split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   cbn in Hbc.
@@ -1079,13 +1120,15 @@ Search (∑ (_ = _, _), ∑ (_ = _, _), _).
   now exists y, z.
 }
 ...
+*)
 
 Theorem I_mul_assoc a b c : (a * (b * c))%I = ((a * b) * c)%I.
 Proof.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
-apply I_add_subtype_0_l.
+Admitted. (*
 ...
+*)
 
 (*
 Arguments rngl_opt_one T {ring_like_op}.
@@ -1200,7 +1243,6 @@ intros; apply eq_ideal_eq, (rngl_add_opp_diag_l Hop).
 Qed.
 
 Theorem rngl_has_psub_I_has_psub :
-  let roi := I_ring_like_op in
   rngl_has_psub T = rngl_has_psub (ideal P).
 Proof.
 progress unfold rngl_has_psub; cbn.
@@ -1643,7 +1685,6 @@ symmetry in Hor.
 destruct or; [ | easy ].
 apply (I_ring_like_when_ord Hor).
 Qed.
-*)
 
 Definition I_ring_like_prop : ring_like_prop (ideal T) :=
   let roi := I_ring_like_op in
@@ -1655,9 +1696,9 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_add_assoc := I_add_assoc;
      rngl_add_0_l := I_add_0_l;
      rngl_mul_assoc := I_mul_assoc;
-     rngl_mul_1_l := true; (*I_opt_mul_1_l;*)
-     rngl_mul_add_distr_l := true; (*I_mul_add_distr_l;*)
-     rngl_opt_mul_comm := true; (*I_opt_mul_comm;*)
+     rngl_mul_1_l := I_opt_mul_1_l;
+     rngl_mul_add_distr_l := I_mul_add_distr_l;
+     rngl_opt_mul_comm := I_opt_mul_comm;
      rngl_opt_mul_1_r := true; (*I_opt_mul_1_r;*)
      rngl_opt_mul_add_distr_r := true; (*I_opt_mul_add_distr_r;*)
      rngl_opt_add_opp_diag_l := true; (*I_opt_add_opp_diag_l;*)
