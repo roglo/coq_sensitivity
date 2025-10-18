@@ -630,11 +630,17 @@ intros.
 apply (I_mul_subtype_comm Hic).
 Qed.
 
+(* ah ouais, mais c'est chiant, il faut que 1 appartienne à l'idéal,
+   of course. Et j'ai pas prévu qu'un ring-like n'ait pas le 1. Je
+   l'avais, avant, cette option, mais je l'ai supprimée, comme un con.
+   Il faut dire que ça ne sert que pour les idéaux, justement. *)
 (* to be completed
-Theorem I_mul_subtype_1_l a x : I_mul_subtype 1 a x = ip_subtype a x.
+Theorem I_mul_subtype_1_l a :
+  ip_subtype a 1 →
+  ∀ x, I_mul_subtype 1 a x = ip_subtype a x.
 Proof.
 destruct_ix.
-intros.
+intros * Ha1 *.
 progress unfold I_mul_subtype.
 apply propositional_extensionality.
 split. {
@@ -669,18 +675,54 @@ split. {
   rewrite rngl_summation_only_one.
   rewrite Nat.sub_diag.
   do 2 rewrite List_nth_0_cons.
-  apply ip_add.
-...
+  apply ip_add; [ now apply ip_mul_l, H5; left | ].
+  rewrite rngl_summation_succ_succ.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    replace (S i - 1) with (S (i - 1)) by flia Hi.
+    cbn.
+    reflexivity.
+  }
+  cbn in H2, H3 |-*.
+  apply Nat.succ_inj in H2, H3.
+  apply IHn; [ easy | easy | ].
+  intros z Hz.
+  now apply H5; right.
+} {
+  intros Hax.
+  exists 1, [x], [1%L].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split. {
+    intros y Hy.
+    destruct Hy as [Hy| Hy]; [ | easy ].
+    subst y.
+    apply Ha1.
+  }
+  rewrite rngl_summation_only_one.
+  rewrite Nat.sub_diag.
+  cbn; symmetry.
+  apply rngl_mul_1_r.
+}
+Qed.
 
-Theorem I_mul_1_l : ∀ a : ideal T, (1 * a)%I = a.
+(* même remarque que pour I_mul_subtype_1_l *)
+Theorem I_mul_1_l :
+  ∀ a : ideal T,
+  ip_subtype a 1 →
+  (1 * a)%I = a.
 Proof.
-intros.
+intros * Ha1.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
 intros.
-apply I_mul_subtype_1_l.
-...
+now apply I_mul_subtype_1_l.
+Qed.
+*)
 
+(* to be completed
 Theorem I_mul_add_distr_l :
   ∀ a b c : ideal T, (a * (b + c))%I = (a * b + a * c)%I.
 ...
@@ -1173,9 +1215,7 @@ Proof.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
 ...
-*)
 
-(*
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem I_opt_mul_1_l : let roi := I_ring_like_op in
@@ -1730,7 +1770,9 @@ symmetry in Hor.
 destruct or; [ | easy ].
 apply (I_ring_like_when_ord Hor).
 Qed.
+*)
 
+(* to be completed
 Definition I_ring_like_prop : ring_like_prop (ideal T) :=
   let roi := I_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
