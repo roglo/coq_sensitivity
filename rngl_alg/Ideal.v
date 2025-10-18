@@ -940,8 +940,38 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     rewrite Nat_sub_succ_1.
     reflexivity.
   }
-  rewrite <- Hllc in Hdab, Hdc.
+  rewrite <- Hllb in Hdab.
+  rewrite <- Hllc in Hdc.
   rewrite <- List_map_nth_seq in Hdc.
+Theorem glop {A B} :
+  ∀ llb (f : _ → _ → list A → B),
+  List.map
+    (λ i : nat,
+       List.map
+         (λ j : nat, f i j (ListDef.nth i llb []))
+         (List.seq 1 (length (ListDef.nth i llb []))))
+    (List.seq 0 (length llb)) =
+  [].
+Proof.
+intros.
+Search (List.map (λ _, List.map _ _) _).
+(*
+Theorem glip :
+  ∀ la f,
+  List.map (λ i, List.map f (List.seq 1 (f i))) (List.seq 0 (length la)) =
+  List.map f (List.map (λ i, List.seq 1 (f i)) la).
+*)
+...
+List_map_nth_seq:
+  ∀ {A : Type} (d : A) (la : list A),
+    la =
+    ListDef.map (λ i : nat, ListDef.nth i la d) (ListDef.seq 0 (length la))
+List_map_seq:
+  ∀ (A : Type) (f : nat → A) (sta len : nat),
+    ListDef.map f (ListDef.seq sta len) =
+    ListDef.map (λ i : nat, f (sta + i)) (ListDef.seq 0 len)
+... ...
+rewrite (glop _ (λ i j lla, (la.[i] * lla.[j-1])%L)) in Hdab.
 ...
   subst lc.
 Search (List.map _ (List.seq _ _)).
