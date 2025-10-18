@@ -641,6 +641,7 @@ Theorem I_mul_subtype_1_l a :
 Proof.
 destruct_ix.
 intros * Ha1 *.
+clear Ha1.
 progress unfold I_mul_subtype.
 apply propositional_extensionality.
 split. {
@@ -690,6 +691,7 @@ split. {
   now apply H5; right.
 } {
   intros Hax.
+...
   exists 1, [x], [1%L].
   split; [ easy | ].
   split; [ easy | ].
