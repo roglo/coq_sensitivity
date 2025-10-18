@@ -633,12 +633,43 @@ Qed.
 (* to be completed
 Theorem I_mul_subtype_1_l a x : I_mul_subtype 1 a x = ip_subtype a x.
 Proof.
+destruct_ix.
 intros.
 progress unfold I_mul_subtype.
 apply propositional_extensionality.
 split. {
-  intros (n & lx & ly & H1 & H2 & H3 & H4 & H5 & H6).
+  intros (n & lx & ly & H1 & H2 & H3 & _ & H5 & H6).
   subst x.
+  revert H1 lx ly H2 H3 H5.
+  induction n; intros; [ easy | ].
+  clear H1.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n.
+    rewrite rngl_summation_only_one.
+    apply ip_mul_l.
+    apply H5.
+    rewrite Nat.sub_diag.
+    apply List.nth_In.
+    now rewrite H3.
+  }
+  specialize (IHn Hnz).
+  destruct lx as [| x]. {
+    rewrite all_0_rngl_summation_0; [ apply ip_zero | ].
+    intros i Hi.
+    rewrite List_nth_nil.
+    apply (rngl_mul_0_l Hos).
+  }
+  destruct ly as [| y]. {
+    rewrite all_0_rngl_summation_0; [ apply ip_zero | ].
+    intros i Hi.
+    rewrite List_nth_nil.
+    apply (rngl_mul_0_r Hos).
+  }
+  rewrite (rngl_summation_split 1); [ | flia ].
+  rewrite rngl_summation_only_one.
+  rewrite Nat.sub_diag.
+  do 2 rewrite List_nth_0_cons.
+  apply ip_add.
 ...
 
 Theorem I_mul_1_l : ∀ a : ideal T, (1 * a)%I = a.
