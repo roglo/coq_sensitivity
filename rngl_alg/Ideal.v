@@ -943,6 +943,34 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   rewrite <- Hllb in Hdab.
   rewrite <- Hllc in Hdc.
   rewrite <- List_map_nth_seq in Hdc.
+...
+Theorem glop {A B} :
+  ∀ (llb : list (list A)) (f : _ → _ → B),
+  List.map
+    (λ i : nat, List.map (f i) (List.seq 1 (length (ListDef.nth i llb []))))
+    (List.seq 0 (length llb)) =
+  [].
+Proof.
+intros.
+induction llb as [| lb]; [ easy | ].
+rewrite List.length_cons.
+rewrite List.seq_S.
+rewrite Nat.add_0_l.
+erewrite List.map_ext_in. 2: {
+  intros i Hi.
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. 2: {
+    replace i with (S (i - 1)) at 2 by flia Hiz.
+    rewrite List_nth_succ_cons.
+    reflexivity.
+  }
+  cbn - [ List.nth ].
+  apply List.in_app_or in Hi.
+  destruct Hi as [Hi| Hi]. {
+...
+  destruct Hi as [Hi| Hi].
+... ...
+rewrite (glop _ (λ i j, (la.[i] * (List.nth i llb []).[j-1])%L)) in Hdab.
+...
 Theorem glop {A B} :
   ∀ llb (f : _ → _ → list A → B),
   List.map
@@ -954,13 +982,32 @@ Theorem glop {A B} :
   [].
 Proof.
 intros.
+induction llb as [| lb]; [ easy | ].
+rewrite List.length_cons.
+rewrite List.seq_S.
+rewrite Nat.add_0_l.
+erewrite List.map_ext_in. 2: {
+  intros i Hi.
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. 2: {
+    replace i with (S (i - 1)) at 1 by flia Hiz.
+    rewrite List_nth_succ_cons.
+    erewrite List.map_ext_in. 2: {
+      intros j Hj.
+      replace i with (S (i - 1)) at 2 by flia Hiz.
+      rewrite List_nth_succ_cons.
+      reflexivity.
+    }
+... ...
+   subst i.
+   rewrite List_nth_0_cons.
+...
+rewrite (glop _ (λ i j lla, (la.[i] * lla.[j-1])%L)) in Hdab.
+...
 Search (List.map (λ _, List.map _ _) _).
-(*
 Theorem glip :
   ∀ la f,
   List.map (λ i, List.map f (List.seq 1 (f i))) (List.seq 0 (length la)) =
   List.map f (List.map (λ i, List.seq 1 (f i)) la).
-*)
 ...
 List_map_nth_seq:
   ∀ {A : Type} (d : A) (la : list A),
