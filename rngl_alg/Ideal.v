@@ -584,6 +584,20 @@ apply functional_extensionality_dep.
 apply I_add_subtype_0_l.
 Qed.
 
+(* to be completed
+Theorem I_mul_subtype_comm a b x : I_mul_subtype a b x = I_mul_subtype b a x.
+Proof.
+....
+
+Theorem I_mul_comm a b : (a * b)%I = (b * a)%I.
+Proof.
+apply eq_ideal_eq; cbn.
+apply functional_extensionality_dep.
+...
+apply I_mul_subtype_comm.
+...
+*)
+
 Theorem forall_exists_exists_forall {A B} (da : A) (dn : B) P la :
   (∀ a, a ∈ la → ∃ n, P a n)
   → ∃ nl, length nl = length la ∧
