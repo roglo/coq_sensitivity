@@ -630,18 +630,11 @@ intros.
 apply (I_mul_subtype_comm Hic).
 Qed.
 
-(* ah ouais, mais c'est chiant, il faut que 1 appartienne à l'idéal,
-   of course. Et j'ai pas prévu qu'un ring-like n'ait pas le 1. Je
-   l'avais, avant, cette option, mais je l'ai supprimée, comme un con.
-   Il faut dire que ça ne sert que pour les idéaux, justement. *)
-(* to be completed
 Theorem I_mul_subtype_1_l a :
-  ip_subtype a 1 →
   ∀ x, I_mul_subtype 1 a x = ip_subtype a x.
 Proof.
 destruct_ix.
-intros * Ha1 *.
-clear Ha1.
+intros.
 progress unfold I_mul_subtype.
 apply propositional_extensionality.
 split. {
@@ -691,8 +684,7 @@ split. {
   now apply H5; right.
 } {
   intros Hax.
-...
-  exists 1, [x], [1%L].
+  exists 1, [1%L], [x].
   split; [ easy | ].
   split; [ easy | ].
   split; [ easy | ].
@@ -700,29 +692,23 @@ split. {
   split. {
     intros y Hy.
     destruct Hy as [Hy| Hy]; [ | easy ].
-    subst y.
-    apply Ha1.
+    now subst y.
   }
   rewrite rngl_summation_only_one.
   rewrite Nat.sub_diag.
   cbn; symmetry.
-  apply rngl_mul_1_r.
+  apply rngl_mul_1_l.
 }
 Qed.
 
-(* même remarque que pour I_mul_subtype_1_l *)
-Theorem I_mul_1_l :
-  ∀ a : ideal T,
-  ip_subtype a 1 →
-  (1 * a)%I = a.
+Theorem I_mul_1_l : ∀ a : ideal T, (1 * a)%I = a.
 Proof.
-intros * Ha1.
+intros.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
 intros.
-now apply I_mul_subtype_1_l.
+apply I_mul_subtype_1_l.
 Qed.
-*)
 
 (* to be completed
 Theorem I_mul_add_distr_l :
