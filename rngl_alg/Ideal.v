@@ -943,6 +943,23 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   rewrite <- Hllb in Hdab.
   rewrite <- Hllc in Hdc.
   rewrite <- List_map_nth_seq in Hdc.
+  rewrite <- List.seq_shift.
+  rewrite List.map_map.
+  remember (List.concat _) as x in |-*.
+  replace x with lab. 2: {
+    rewrite Hdab, Heqx.
+    rewrite Hllb.
+    progress f_equal.
+    apply List.map_ext_in.
+    intros i Hi.
+    rewrite Nat_sub_succ_1.
+    specialize (Hbc i Hi).
+    move Hbc at bottom.
+    destruct Hbc as (_ & H1 & _).
+    rewrite H1.
+    apply List.map_ext_in.
+    intros j Hj.
+(* chiasse de pute, y a un truc qui déconne *)
 ...
 Theorem glop {A B} :
   ∀ (llb : list (list A)) (f : _ → _ → B),
