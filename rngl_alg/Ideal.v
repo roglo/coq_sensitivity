@@ -584,138 +584,6 @@ apply functional_extensionality_dep.
 apply I_add_subtype_0_l.
 Qed.
 
-Theorem I_mul_subtype_comm :
-  rngl_mul_is_comm T = true →
-  ∀ a b x, I_mul_subtype a b x = I_mul_subtype b a x.
-Proof.
-intros Hic *.
-progress unfold I_mul_subtype.
-apply propositional_extensionality.
-split; intros (n & lx & ly & H1 & H2 & H3 & H4 & H5 & H6). {
-  exists n, ly, lx.
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  subst x.
-  apply rngl_summation_eq_compat.
-  intros i Hi.
-  apply (rngl_mul_comm Hic).
-} {
-  exists n, ly, lx.
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  subst x.
-  apply rngl_summation_eq_compat.
-  intros i Hi.
-  apply (rngl_mul_comm Hic).
-}
-Qed.
-
-Theorem I_opt_mul_comm :
-  if rngl_mul_is_comm T then ∀ a b : ideal T, (a * b)%I = (b * a)%I
-  else not_applicable.
-Proof.
-remember (rngl_mul_is_comm T) as ic eqn:Hic.
-symmetry in Hic.
-destruct ic; [ | easy ].
-intros.
-apply eq_ideal_eq; cbn.
-apply functional_extensionality_dep.
-intros.
-apply (I_mul_subtype_comm Hic).
-Qed.
-
-Theorem I_mul_subtype_1_l a :
-  ∀ x, I_mul_subtype 1 a x = ip_subtype a x.
-Proof.
-destruct_ix.
-intros.
-progress unfold I_mul_subtype.
-apply propositional_extensionality.
-split. {
-  intros (n & lx & ly & H1 & H2 & H3 & _ & H5 & H6).
-  subst x.
-  revert H1 lx ly H2 H3 H5.
-  induction n; intros; [ easy | ].
-  clear H1.
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-    subst n.
-    rewrite rngl_summation_only_one.
-    apply ip_mul_l.
-    apply H5.
-    rewrite Nat.sub_diag.
-    apply List.nth_In.
-    now rewrite H3.
-  }
-  specialize (IHn Hnz).
-  destruct lx as [| x]. {
-    rewrite all_0_rngl_summation_0; [ apply ip_zero | ].
-    intros i Hi.
-    rewrite List_nth_nil.
-    apply (rngl_mul_0_l Hos).
-  }
-  destruct ly as [| y]. {
-    rewrite all_0_rngl_summation_0; [ apply ip_zero | ].
-    intros i Hi.
-    rewrite List_nth_nil.
-    apply (rngl_mul_0_r Hos).
-  }
-  rewrite (rngl_summation_split 1); [ | flia ].
-  rewrite rngl_summation_only_one.
-  rewrite Nat.sub_diag.
-  do 2 rewrite List_nth_0_cons.
-  apply ip_add; [ now apply ip_mul_l, H5; left | ].
-  rewrite rngl_summation_succ_succ.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros i Hi.
-    replace (S i - 1) with (S (i - 1)) by flia Hi.
-    cbn.
-    reflexivity.
-  }
-  cbn in H2, H3 |-*.
-  apply Nat.succ_inj in H2, H3.
-  apply IHn; [ easy | easy | ].
-  intros z Hz.
-  now apply H5; right.
-} {
-  intros Hax.
-  exists 1, [1%L], [x].
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split. {
-    intros y Hy.
-    destruct Hy as [Hy| Hy]; [ | easy ].
-    now subst y.
-  }
-  rewrite rngl_summation_only_one.
-  rewrite Nat.sub_diag.
-  cbn; symmetry.
-  apply rngl_mul_1_l.
-}
-Qed.
-
-Theorem I_mul_1_l : ∀ a : ideal T, (1 * a)%I = a.
-Proof.
-intros.
-apply eq_ideal_eq; cbn.
-apply functional_extensionality_dep.
-intros.
-apply I_mul_subtype_1_l.
-Qed.
-
-(* to be completed
-Theorem I_mul_add_distr_l :
-  ∀ a b c : ideal T, (a * (b + c))%I = (a * b + a * c)%I.
-...
-*)
-
 Theorem forall_exists_exists_forall {A B} (da : A) (dn : B) P la :
   (∀ a, a ∈ la → ∃ n, P a n)
   → ∃ nl, length nl = length la ∧
@@ -1203,7 +1071,141 @@ Proof.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
 ...
+*)
 
+Theorem I_mul_subtype_1_l a :
+  ∀ x, I_mul_subtype 1 a x = ip_subtype a x.
+Proof.
+destruct_ix.
+intros.
+progress unfold I_mul_subtype.
+apply propositional_extensionality.
+split. {
+  intros (n & lx & ly & H1 & H2 & H3 & _ & H5 & H6).
+  subst x.
+  revert H1 lx ly H2 H3 H5.
+  induction n; intros; [ easy | ].
+  clear H1.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n.
+    rewrite rngl_summation_only_one.
+    apply ip_mul_l.
+    apply H5.
+    rewrite Nat.sub_diag.
+    apply List.nth_In.
+    now rewrite H3.
+  }
+  specialize (IHn Hnz).
+  destruct lx as [| x]. {
+    rewrite all_0_rngl_summation_0; [ apply ip_zero | ].
+    intros i Hi.
+    rewrite List_nth_nil.
+    apply (rngl_mul_0_l Hos).
+  }
+  destruct ly as [| y]. {
+    rewrite all_0_rngl_summation_0; [ apply ip_zero | ].
+    intros i Hi.
+    rewrite List_nth_nil.
+    apply (rngl_mul_0_r Hos).
+  }
+  rewrite (rngl_summation_split 1); [ | flia ].
+  rewrite rngl_summation_only_one.
+  rewrite Nat.sub_diag.
+  do 2 rewrite List_nth_0_cons.
+  apply ip_add; [ now apply ip_mul_l, H5; left | ].
+  rewrite rngl_summation_succ_succ.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    replace (S i - 1) with (S (i - 1)) by flia Hi.
+    cbn.
+    reflexivity.
+  }
+  cbn in H2, H3 |-*.
+  apply Nat.succ_inj in H2, H3.
+  apply IHn; [ easy | easy | ].
+  intros z Hz.
+  now apply H5; right.
+} {
+  intros Hax.
+  exists 1, [1%L], [x].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split. {
+    intros y Hy.
+    destruct Hy as [Hy| Hy]; [ | easy ].
+    now subst y.
+  }
+  rewrite rngl_summation_only_one.
+  rewrite Nat.sub_diag.
+  cbn; symmetry.
+  apply rngl_mul_1_l.
+}
+Qed.
+
+Theorem I_mul_1_l : ∀ a : ideal T, (1 * a)%I = a.
+Proof.
+intros.
+apply eq_ideal_eq; cbn.
+apply functional_extensionality_dep.
+intros.
+apply I_mul_subtype_1_l.
+Qed.
+
+Theorem I_mul_subtype_comm :
+  rngl_mul_is_comm T = true →
+  ∀ a b x, I_mul_subtype a b x = I_mul_subtype b a x.
+Proof.
+intros Hic *.
+progress unfold I_mul_subtype.
+apply propositional_extensionality.
+split; intros (n & lx & ly & H1 & H2 & H3 & H4 & H5 & H6). {
+  exists n, ly, lx.
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  subst x.
+  apply rngl_summation_eq_compat.
+  intros i Hi.
+  apply (rngl_mul_comm Hic).
+} {
+  exists n, ly, lx.
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  subst x.
+  apply rngl_summation_eq_compat.
+  intros i Hi.
+  apply (rngl_mul_comm Hic).
+}
+Qed.
+
+Theorem I_opt_mul_comm :
+  if rngl_mul_is_comm T then ∀ a b : ideal T, (a * b)%I = (b * a)%I
+  else not_applicable.
+Proof.
+remember (rngl_mul_is_comm T) as ic eqn:Hic.
+symmetry in Hic.
+destruct ic; [ | easy ].
+intros.
+apply eq_ideal_eq; cbn.
+apply functional_extensionality_dep.
+intros.
+apply (I_mul_subtype_comm Hic).
+Qed.
+
+(* to be completed
+Theorem I_mul_add_distr_l :
+  ∀ a b c : ideal T, (a * (b + c))%I = (a * b + a * c)%I.
+...
+*)
+
+(*
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem I_opt_mul_1_l : let roi := I_ring_like_op in
