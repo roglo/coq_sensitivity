@@ -631,12 +631,28 @@ apply (I_mul_subtype_comm Hic).
 Qed.
 
 (* to be completed
-Theorem I_opt_mul_1_l : ∀ a : ideal T, (1 * a)%I = a.
-Admitted.
+Theorem I_mul_subtype_1_l a x : I_mul_subtype 1 a x = ip_subtype a x.
+Proof.
+intros.
+progress unfold I_mul_subtype.
+apply propositional_extensionality.
+split. {
+  intros (n & lx & ly & H1 & H2 & H3 & H4 & H5 & H6).
+  subst x.
+...
+
+Theorem I_mul_1_l : ∀ a : ideal T, (1 * a)%I = a.
+Proof.
+intros.
+apply eq_ideal_eq; cbn.
+apply functional_extensionality_dep.
+intros.
+apply I_mul_subtype_1_l.
+...
 
 Theorem I_mul_add_distr_l :
   ∀ a b c : ideal T, (a * (b + c))%I = (a * b + a * c)%I.
-Admitted.
+...
 *)
 
 Theorem forall_exists_exists_forall {A B} (da : A) (dn : B) P la :
@@ -1120,13 +1136,11 @@ Search (∑ (_ = _, _), ∑ (_ = _, _), _).
   now exists y, z.
 }
 ...
-*)
 
 Theorem I_mul_assoc a b c : (a * (b * c))%I = ((a * b) * c)%I.
 Proof.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
-Admitted. (*
 ...
 *)
 
@@ -1696,7 +1710,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_add_assoc := I_add_assoc;
      rngl_add_0_l := I_add_0_l;
      rngl_mul_assoc := I_mul_assoc;
-     rngl_mul_1_l := I_opt_mul_1_l;
+     rngl_mul_1_l := I_mul_1_l;
      rngl_mul_add_distr_l := I_mul_add_distr_l;
      rngl_opt_mul_comm := I_opt_mul_comm;
      rngl_opt_mul_1_r := true; (*I_opt_mul_1_r;*)
