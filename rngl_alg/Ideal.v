@@ -943,17 +943,16 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   rewrite <- Hllb in Hdab.
   rewrite <- Hllc in Hdc.
   rewrite <- List_map_nth_seq in Hdc.
-  rewrite <- List.seq_shift.
-  rewrite List.map_map.
-  rewrite <- List.flat_map_concat_map.
-  erewrite List_flat_map_ext'. 2: {
-    intros i Hi.
-    rewrite Nat_sub_succ_1.
-    reflexivity.
-  }
+  rewrite <- List.flat_map_concat_map in Hpairs, Hdab |-*.
+  remember (List.flat_map _ _) as x in |-*.
+  replace x with
+    (List.map
+       (λ i,
+          let aa := List.nth i pairs (0, 0)%L in
+          (fst aa * snd aa)%L)
+       (List.seq 0 (length pairs))). 2: {
+    subst x.
 ...
-  remember (List.concat _) as x in |-*.
-  replace x with lab. 2: {
     rewrite Hdab, Heqx.
     rewrite Hllb.
     progress f_equal.
