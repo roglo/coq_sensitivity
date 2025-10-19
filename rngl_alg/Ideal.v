@@ -942,6 +942,36 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   rewrite <- List_map_nth_seq in Hdc.
   rewrite <- List.flat_map_concat_map in Hpairs, Hdab |-*.
   remember (List.flat_map _ _) as x in |-*.
+  assert (Hx : length x = m). {
+    subst x.
+    rewrite List_flat_length_map.
+    replace add with (@rngl_add nat _) by easy.
+    replace 0 with (@rngl_zero nat _) at 2 by easy.
+    rewrite rngl_summation_seq_summation; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    rewrite Hm.
+    apply rngl_summation_eq_compat.
+    intros i Hi.
+    rewrite List.length_map.
+    now rewrite List.length_seq.
+  }
+  subst x.
+  rewrite <- rngl_summation_summation_list_flat_map'.
+  move Hbc at bottom.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros i Hi.
+    specialize (Hbc (i - 1)).
+    assert (H : i - 1 ∈ List.seq 0 n). {
+      apply List.in_seq in Hi.
+      apply List.in_seq; flia Hi.
+    }
+    specialize (Hbc H); clear H.
+    destruct Hbc as (H1 & H2 & _).
+    rewrite <- H2.
+    reflexivity.
+  }
+  cbn.
+...
   replace x with
     (List.map
        (λ i,
