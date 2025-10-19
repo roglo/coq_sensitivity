@@ -677,38 +677,35 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   remember (List.map fst pairs) as lab eqn:Hdab.
   remember (List.map snd pairs) as lc eqn:Hdc.
   exists lab, lc.
-  assert (Hlab : length lab = m). {
-    subst lab.
-    clear lc Hdc; subst pairs.
-    rewrite List.length_map.
-    rewrite <- List.flat_map_concat_map.
-    rewrite List_flat_length_map.
+  assert (Hlpairs : length pairs = m). {
+    rewrite Hpairs.
+    rewrite List.length_concat.
+    progress unfold List.list_sum.
+    rewrite <- (List.rev_involutive (List.map (length (A:=T*T)) _)).
+    rewrite List.fold_left_rev_right.
+    do 2 rewrite <- List.map_rev.
     replace add with (@rngl_add nat _) by easy.
     replace 0 with (@rngl_zero nat _) at 2 by easy.
+    rewrite List.map_map.
+    erewrite List_fold_left_ext_in. 2: {
+      intros i j Hij.
+      apply rngl_add_comm.
+    }
+    erewrite List.map_ext_in. 2: {
+      intros i Hi.
+      rewrite List.length_map.
+      rewrite List.length_seq.
+      reflexivity.
+    }
+    rewrite fold_iter_list.
+    rewrite rngl_summation_list_map.
+    rewrite rngl_summation_list_rev.
     rewrite rngl_summation_seq_summation; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
-    subst m.
-    apply rngl_summation_eq_compat.
-    intros i Hi.
-    rewrite List.length_map.
-    apply List.length_seq.
+    easy.
   }
-  assert (Hlc : length lc = m). {
-    subst lc.
-    clear lab Hdab Hlab; subst pairs.
-    rewrite List.length_map.
-    rewrite <- List.flat_map_concat_map.
-    rewrite List_flat_length_map.
-    replace add with (@rngl_add nat _) by easy.
-    replace 0 with (@rngl_zero nat _) at 2 by easy.
-    rewrite rngl_summation_seq_summation; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    subst m.
-    apply rngl_summation_eq_compat.
-    intros i Hi.
-    rewrite List.length_map.
-    apply List.length_seq.
-  }
+  assert (Hlab : length lab = m) by now subst lab; rewrite List.length_map.
+  assert (Hlc : length lc = m) by now subst lc; rewrite List.length_map.
   move lc before lab.
   assert (Hmz : m ≠ 0). {
     intros H; move H at top; subst m.
