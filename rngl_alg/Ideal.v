@@ -945,6 +945,13 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   rewrite <- List_map_nth_seq in Hdc.
   rewrite <- List.seq_shift.
   rewrite List.map_map.
+  rewrite <- List.flat_map_concat_map.
+  erewrite List_flat_map_ext'. 2: {
+    intros i Hi.
+    rewrite Nat_sub_succ_1.
+    reflexivity.
+  }
+...
   remember (List.concat _) as x in |-*.
   replace x with lab. 2: {
     rewrite Hdab, Heqx.
