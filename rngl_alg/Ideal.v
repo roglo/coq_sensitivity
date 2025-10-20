@@ -1000,9 +1000,8 @@ move Hpairs at bottom.
        (λ i,
           let aa := List.nth i pairs (0, 0)%L in
           (fst aa * snd aa)%L)
-       (List.seq 0 (length pairs))). 2: {
+       (List.seq 0 m)). 2: {
     subst x.
-    rewrite Hlpairs.
 ...
     rewrite Hdab, Heqx.
     rewrite Hllb.
