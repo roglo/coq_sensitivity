@@ -995,19 +995,6 @@ move Hpairs at bottom.
 }
 ...
 *)
-...
-  replace x with
-    (List.flat_map
-       (λ i,
-          List.map
-            (λ j,
-               let aa := List.nth i pairs (0, 0)%L in
-               (fst aa * snd aa)%L)
-            (List.seq 1 (List.nth (i - 1) nl 0)))
-       (List.seq 0 (length pairs))). 2: {
-    subst x.
-    rewrite Hlpairs.
-...
   replace x with
     (List.map
        (λ i,
