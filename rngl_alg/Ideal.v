@@ -941,6 +941,25 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   rewrite <- Hllc in Hdc.
   rewrite <- List_map_nth_seq in Hdc.
   rewrite <- List.flat_map_concat_map in Hpairs, Hdab |-*.
+(*
+...
+(*
+  erewrite List_flat_map_ext'. 2: {
+    intros i Hi.
+    erewrite List.map_ext_in. 2: {
+      intros j Hj.
+      rewrite <- rngl_mul_assoc.
+      reflexivity.
+    }
+    reflexivity.
+  }
+*)
+remember (List.flat_map _ _) as x in |-*.
+remember (List.flat_map _ _) as y in Hpairs.
+move y after x.
+move Hpairs at bottom.
+...
+*)
   remember (List.flat_map _ _) as x in |-*.
   assert (Hx : length x = m). {
     subst x.
@@ -955,6 +974,7 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     rewrite List.length_map.
     now rewrite List.length_seq.
   }
+(*
   subst x.
   rewrite <- rngl_summation_summation_list_flat_map'.
   move Hbc at bottom.
@@ -972,6 +992,22 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   }
   cbn.
 ...
+}
+...
+*)
+...
+  replace x with
+    (List.flat_map
+       (λ i,
+          List.map
+            (λ j,
+               let aa := List.nth i pairs (0, 0)%L in
+               (fst aa * snd aa)%L)
+            (List.seq 1 (List.nth (i - 1) nl 0)))
+       (List.seq 0 (length pairs))). 2: {
+    subst x.
+    rewrite Hlpairs.
+...
   replace x with
     (List.map
        (λ i,
@@ -979,6 +1015,7 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
           (fst aa * snd aa)%L)
        (List.seq 0 (length pairs))). 2: {
     subst x.
+    rewrite Hlpairs.
 ...
     rewrite Hdab, Heqx.
     rewrite Hllb.
