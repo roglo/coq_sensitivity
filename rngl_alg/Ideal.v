@@ -1006,8 +1006,8 @@ move Hpairs at bottom.
 Check List.fold_left.
 Theorem glop {A} a lb (f : A → _) :
   List.seq a (∑ (i ∈ lb), f i) =
-    List.fold_left (λ la d, la ++ List.seq (a + length la) d)
-      (List.map f lb) [].
+  List.fold_left (λ la d, la ++ List.seq (a + length la) d)
+    (List.map f lb) [].
 Proof.
 intros.
 revert a.
@@ -1019,6 +1019,32 @@ cbn - [ rngl_zero rngl_add ].
 rewrite IHlb.
 symmetry.
 rewrite Nat.add_0_r.
+(**)
+destruct lb as [| b2]. {
+  cbn.
+  now rewrite List.app_nil_r.
+}
+cbn; rewrite List.length_seq.
+rewrite Nat.add_0_r.
+(**)
+destruct lb as [| b3]; [ easy | ].
+cbn; rewrite List.length_app.
+do 2 rewrite List.length_seq.
+rewrite Nat.add_assoc.
+rewrite <- List.app_assoc.
+(**)
+destruct lb as [| b4]; [ easy | ].
+cbn; do 2 rewrite List.length_app.
+do 3 rewrite List.length_seq.
+do 2 rewrite Nat.add_assoc.
+do 2 rewrite <- List.app_assoc.
+(**)
+destruct lb as [| b5]; [ easy | ].
+cbn; do 3 rewrite List.length_app.
+do 4 rewrite List.length_seq.
+do 3 rewrite Nat.add_assoc.
+do 3 rewrite <- List.app_assoc.
+...
 About fold_left_rngl_add_fun_from_0.
 Check @fold_left_op_fun_from_d.
 Theorem fold_left_fun_from {A} zero add :
