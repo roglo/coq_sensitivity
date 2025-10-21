@@ -1019,16 +1019,48 @@ cbn - [ rngl_zero rngl_add ].
 rewrite IHlb.
 symmetry.
 rewrite Nat.add_0_r.
-Check fold_left_rngl_add_fun_from_0.
+About fold_left_rngl_add_fun_from_0.
+Check @fold_left_op_fun_from_d.
+Theorem fold_left_fun_from {A} zero add :
+  ∀ {B} (a : A) (lb : list B) f,
+  (∀ x, add zero x = x)
+  → (∀ x, add x zero = x)
+  → (∀ a b c, add a (add b c) = add (add a b) c)
+  → List.fold_left (λ c i, add c (f i c)) lb a =
+      add a (List.fold_left (λ c i, add c (f i c)) lb zero).
+Proof.
+intros * add_0_l add_0_r add_assoc.
+revert a.
+induction lb as [| b]; intros; [ symmetry; apply add_0_r | cbn ].
+rewrite IHlb; symmetry; rewrite IHlb.
+rewrite add_0_l.
+rewrite add_assoc.
+progress f_equal.
+progress f_equal.
+...
+rewrite (fold_left_fun_from []).
+...
+Proof.
+intros Haz Hza Has *.
+revert a.
+induction lb as [| b]; intros; cbn; [ symmetry; apply Haz | ].
+rewrite Hza.
+rewrite IHlb.
+symmetry.
+rewrite IHlb.
+remember (List.fold_left _ _ _) as c.
+rewrite Has.
+f_equal.
+...
+rewrite (fold_left_rngl_fun_from []).
+...
 Theorem fold_left_rngl_app_fun_from_nil :
-  ∀ A B la lb f,
-  List.fold_left (λ lc (i : A), (lc ++ f i)%L) la lb =
-  (lb ++ List.fold_left (λ (lc : list B) (i : A), lc ++ f i) la [])%L.
+  ∀ A la lb f,
+  List.fold_left (λ lc (i : nat), (lc ++ f i lc)%L) la lb =
+  (lb ++ List.fold_left (λ (lc : list A) i, lc ++ f (i - 1) lc) la [])%L.
 Proof.
 intros.
-(*
-...
-revert b.
+revert lb.
 induction la as [| a]; intros; cbn; [ now rewrite List.app_nil_r | ].
 rewrite IHla.
 rewrite <- List.app_assoc.
@@ -1036,8 +1068,7 @@ progress f_equal.
 symmetry.
 rewrite IHla.
 progress f_equal.
-*)
-Admitted.
+...
 rewrite fold_left_rngl_app_fun_from_nil.
 progress f_equal.
 ...
