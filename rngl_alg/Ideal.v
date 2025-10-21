@@ -1002,6 +1002,67 @@ move Hpairs at bottom.
           (fst aa * snd aa)%L)
        (List.seq 0 m)). 2: {
     subst x.
+    rewrite Hm.
+Check List.fold_left.
+Theorem glop {A} a lb (f : A → _) :
+  List.seq a (∑ (i ∈ lb), f i) =
+    List.fold_left (λ la d, la ++ List.seq (a + length la) d)
+      (List.map f lb) [].
+Proof.
+intros.
+revert a.
+induction lb as [| b]; intros; [ easy | ].
+rewrite rngl_summation_list_cons.
+rewrite List.seq_app.
+rewrite List.map_cons.
+cbn - [ rngl_zero rngl_add ].
+rewrite IHlb.
+symmetry.
+rewrite Nat.add_0_r.
+Check fold_left_rngl_add_fun_from_0.
+Theorem fold_left_rngl_app_fun_from_nil :
+  ∀ A B la lb f,
+  List.fold_left (λ lc (i : A), (lc ++ f i)%L) la lb =
+  (lb ++ List.fold_left (λ (lc : list B) (i : A), lc ++ f i) la [])%L.
+Proof.
+intros.
+(*
+...
+revert b.
+induction la as [| a]; intros; cbn; [ now rewrite List.app_nil_r | ].
+rewrite IHla.
+rewrite <- List.app_assoc.
+progress f_equal.
+symmetry.
+rewrite IHla.
+progress f_equal.
+*)
+Admitted.
+rewrite fold_left_rngl_app_fun_from_nil.
+progress f_equal.
+...
+specialize fold_left_rngl_fun_from as H1.
+specialize (H1 (list nat) (list nat)).
+...
+rewrite fold_left_rngl_fun_from.
+...
+Search (List.fold_left _ _ _ = _).
+...
+
+
+Theorem fold_left_rngl_add_fun_from_0' :
+  ∀ (A : Type) (a : T) (l : list A) f,
+  List.fold_left f l a = f (a + List.fold_left l 0 [])%L.
+
+rewrite (fold_left_rngl_add_fun_from_0 _ []).
+...
+do 2 rewrite fold_iter_list.
+Search (iter_list _ _ _ = _).
+rewrite (iter_list_op_fun_from_d []).
+rewrite fold_left_rngl_add_fun_from_0.
+... ...
+progress unfold iter_seq at 1.
+rewrite glop.
 ...
     rewrite Hdab, Heqx.
     rewrite Hllb.
