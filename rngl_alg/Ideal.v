@@ -466,6 +466,35 @@ Notation "a * b" := (I_mul a b) : ideal_scope.
 Notation "- a" := (rngl_opp a) : ideal_scope.
 *)
 
+Theorem List_seq_rngl_summation_r {T} a lb (f : T → _) :
+  List.seq a (∑ (i ∈ lb), f i) =
+  List.fold_left (λ la d, la ++ List.seq (a + length la) d)
+    (List.map f lb) [].
+Proof.
+intros.
+revert a.
+induction lb as [| b]; intros; [ easy | ].
+rewrite rngl_summation_list_cons.
+rewrite List.seq_app.
+rewrite List.map_cons.
+cbn - [ rngl_zero rngl_add ].
+rewrite Nat.add_0_r.
+rewrite IHlb.
+clear IHlb.
+remember (f b) as b'.
+clear b Heqb'; rename b' into b.
+revert a b.
+induction lb as [| c]; intros; cbn; [ now rewrite List.app_nil_r | ].
+rewrite List.length_seq.
+rewrite Nat.add_0_r.
+rewrite <- List.seq_app.
+rewrite <- IHlb.
+rewrite List.app_assoc.
+rewrite <- List.seq_app.
+rewrite <- IHlb.
+now rewrite Nat.add_assoc.
+Qed.
+
 Section a.
 
 Context {T : Type}.
@@ -1003,123 +1032,17 @@ move Hpairs at bottom.
        (List.seq 0 m)). 2: {
     subst x.
     rewrite Hm.
-Check List.fold_left.
-Theorem glop {A} a lb (f : A → _) :
-  List.seq a (∑ (i ∈ lb), f i) =
-  List.fold_left (λ la d, la ++ List.seq (a + length la) d)
-    (List.map f lb) [].
-Proof.
-intros.
-revert a.
-induction lb as [| b]; intros; [ easy | ].
-rewrite rngl_summation_list_cons.
-rewrite List.seq_app.
-rewrite List.map_cons.
-cbn - [ rngl_zero rngl_add ].
-rewrite IHlb.
-symmetry.
-rewrite Nat.add_0_r.
-(**)
-destruct lb as [| b2]. {
-  cbn.
-  now rewrite List.app_nil_r.
-}
-cbn; rewrite List.length_seq.
-rewrite Nat.add_0_r.
-(**)
-destruct lb as [| b3]; [ easy | ].
-cbn; rewrite List.length_app.
-do 2 rewrite List.length_seq.
-rewrite Nat.add_assoc.
-rewrite <- List.app_assoc.
-(**)
-destruct lb as [| b4]; [ easy | ].
-cbn; do 2 rewrite List.length_app.
-do 3 rewrite List.length_seq.
-do 2 rewrite Nat.add_assoc.
-do 2 rewrite <- List.app_assoc.
-(**)
-destruct lb as [| b5]; [ easy | ].
-cbn; do 3 rewrite List.length_app.
-do 4 rewrite List.length_seq.
-do 3 rewrite Nat.add_assoc.
-do 3 rewrite <- List.app_assoc.
-...
-About fold_left_rngl_add_fun_from_0.
-Check @fold_left_op_fun_from_d.
-Theorem fold_left_fun_from {A} zero add :
-  ∀ {B} (a : A) (lb : list B) f,
-  (∀ x, add zero x = x)
-  → (∀ x, add x zero = x)
-  → (∀ a b c, add a (add b c) = add (add a b) c)
-  → List.fold_left (λ c i, add c (f i c)) lb a =
-      add a (List.fold_left (λ c i, add c (f i c)) lb zero).
-Proof.
-intros * add_0_l add_0_r add_assoc.
-revert a.
-induction lb as [| b]; intros; [ symmetry; apply add_0_r | cbn ].
-rewrite IHlb; symmetry; rewrite IHlb.
-rewrite add_0_l.
-rewrite add_assoc.
-progress f_equal.
-progress f_equal.
-...
-rewrite (fold_left_fun_from []).
-...
-Proof.
-intros Haz Hza Has *.
-revert a.
-induction lb as [| b]; intros; cbn; [ symmetry; apply Haz | ].
-rewrite Hza.
-rewrite IHlb.
-symmetry.
-rewrite IHlb.
-remember (List.fold_left _ _ _) as c.
-rewrite Has.
-f_equal.
-...
-rewrite (fold_left_rngl_fun_from []).
-...
-Theorem fold_left_rngl_app_fun_from_nil :
-  ∀ A la lb f,
-  List.fold_left (λ lc (i : nat), (lc ++ f i lc)%L) la lb =
-  (lb ++ List.fold_left (λ (lc : list A) i, lc ++ f (i - 1) lc) la [])%L.
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; cbn; [ now rewrite List.app_nil_r | ].
-rewrite IHla.
-rewrite <- List.app_assoc.
-progress f_equal.
-symmetry.
-rewrite IHla.
-progress f_equal.
-...
-rewrite fold_left_rngl_app_fun_from_nil.
-progress f_equal.
-...
-specialize fold_left_rngl_fun_from as H1.
-specialize (H1 (list nat) (list nat)).
-...
-rewrite fold_left_rngl_fun_from.
-...
-Search (List.fold_left _ _ _ = _).
-...
-
-
-Theorem fold_left_rngl_add_fun_from_0' :
-  ∀ (A : Type) (a : T) (l : list A) f,
-  List.fold_left f l a = f (a + List.fold_left l 0 [])%L.
-
-rewrite (fold_left_rngl_add_fun_from_0 _ []).
-...
-do 2 rewrite fold_iter_list.
-Search (iter_list _ _ _ = _).
-rewrite (iter_list_op_fun_from_d []).
-rewrite fold_left_rngl_add_fun_from_0.
-... ...
-progress unfold iter_seq at 1.
-rewrite glop.
+    progress unfold iter_seq at 1.
+    rewrite List_seq_rngl_summation_r.
+    rewrite Nat_sub_succ_1.
+    rewrite <- List.seq_shift at 1.
+    rewrite List.map_map.
+    erewrite (List.map_ext_in _ _ (List.seq 0 n)). 2: {
+      intros; rewrite Nat_sub_succ_1; reflexivity.
+    }
+    rewrite <- Hnl at 1.
+    rewrite <- List_map_nth_seq.
+    cbn.
 ...
     rewrite Hdab, Heqx.
     rewrite Hllb.
