@@ -1043,6 +1043,44 @@ move Hpairs at bottom.
     rewrite <- Hnl at 1.
     rewrite <- List_map_nth_seq.
     cbn.
+    replace (List.fold_left _ _ []) with (List.seq 0 m). 2: {
+      clear - nl Hnl Hm.
+      subst m n.
+      progress unfold iter_seq.
+      progress unfold iter_list.
+      rewrite Nat_sub_succ_1.
+      rewrite <- List.seq_shift.
+      rewrite List_fold_left_map.
+      induction nl as [| n]; [ easy | ].
+      rewrite List.length_cons.
+      cbn - [ List.nth rngl_zero ].
+symmetry.
+specialize (@List_seq_rngl_summation_r (list nat) 0) as H1.
+(* pffff.... fait chier *)
+...
+cbn - [ rngl_add rngl_zero ] in H1.
+rewrite (fold_left_op_fun_from_d []).
+fold_left_rngl_add_fun_from_0:
+  ∀ {T : Type} {ro : ring_like_op T},
+    ring_like_prop T
+    → ∀ (A : Type) (a : T) (l : list A) (f : A → T),
+        List.fold_left (λ (c : T) (i : A), (c + f i)%L) l a =
+        (a + List.fold_left (λ (c : T) (i : A), c + f i) l 0)%L
+fold_left_op_fun_from_d:
+  ∀ {T A : Type} (d : T) (op : T → T → T) (a : T) (l : list A) (f : A → T),
+    (∀ x : T, op d x = x)
+    → (∀ x : T, op x d = x)
+      → (∀ a0 b c : T, op a0 (op b c) = op (op a0 b) c)
+        → List.fold_left (λ (c : T) (i : A), op c (f i)) l a =
+          op a (List.fold_left (λ (c : T) (i : A), op c (f i)) l d)
+List_seq_rngl_summation_r:
+  ∀ {T : Type} (a : nat) (lb : list T) (f : T → nat),
+    ListDef.seq a (∑ (i ∈ lb), f i) =
+    List.fold_left
+      (λ (la : list nat) (d : nat), la ++ ListDef.seq (a + length la) d)
+      (ListDef.map f lb) []
+
+      rewrite List_nth_0_cons, Nat.add_0_l.
 ...
     rewrite Hdab, Heqx.
     rewrite Hllb.
