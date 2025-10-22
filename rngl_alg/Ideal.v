@@ -1051,8 +1051,50 @@ move Hpairs at bottom.
       rewrite Nat_sub_succ_1.
       rewrite <- List.seq_shift.
       rewrite List_fold_left_map.
+      erewrite List_fold_left_ext_in. 2: {
+        intros * Hb.
+        now rewrite Nat_sub_succ_1.
+      }
+      cbn.
       induction nl as [| n]; [ easy | ].
       rewrite List.length_cons.
+      rewrite <- Nat.add_1_l.
+      rewrite List.seq_app.
+      replace (List.seq 0 1) with [0] by easy.
+      rewrite Nat.add_0_l.
+      rewrite List.fold_left_app.
+      remember (List.fold_left _ [0] 0) as x.
+      cbn in Heqx; subst x.
+      rewrite <- List.seq_shift.
+      rewrite List_fold_left_map.
+      erewrite List_fold_left_ext_in. 2: {
+        now intros * Hb; cbn.
+      }
+      specialize fold_left_rngl_add_fun_from_0 as H1.
+      rewrite (H1 nat n); clear H1.
+      cbn.
+      rewrite Nat.add_comm.
+      rewrite List.seq_app.
+      rewrite IHnl; cbn.
+      symmetry.
+(* fait chier *)
+...
+      rewrite (fold_left_op_fun_from_d []).
+Print fold_left_rngl_add_fun_from_0.
+Check fold_left_op_fun_from_d.
+      rewrite (H1 nat n); clear H1.
+...
+).
+
+replace n with (rngl_of_nat n).
+
+...
+      cbn - [ List.nth rngl_zero ].
+      rewrite rngl_add_0_l.
+...
+Search (List.seq _ _ = List.seq _ _).
+rewrite List_seq_shiftr.
+...
       cbn - [ List.nth rngl_zero ].
 symmetry.
 specialize (@List_seq_rngl_summation_r (list nat) 0) as H1.
