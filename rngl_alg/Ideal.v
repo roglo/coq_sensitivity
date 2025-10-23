@@ -901,6 +901,7 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   Après sum_flat_map et Hpairs, la somme devient la somme sur pairs
   de fst(pair)*snd(pair) (avec les notations appropriées).
   *)
+...
   rewrite Hpairs in Hdab, Hdc.
   rewrite List.concat_map in Hdab, Hdc.
   rewrite List.map_map in Hdab, Hdc.
@@ -1043,6 +1044,7 @@ move Hpairs at bottom.
     rewrite <- Hnl at 1.
     rewrite <- List_map_nth_seq.
     cbn.
+...
     replace (List.fold_left _ _ []) with (List.seq 0 m). 2: {
       clear - nl Hnl Hm.
       subst m n.
@@ -1076,8 +1078,26 @@ move Hpairs at bottom.
       rewrite Nat.add_comm.
       rewrite List.seq_app.
       rewrite IHnl; cbn.
-      symmetry.
-(* fait chier *)
+      clear IHnl.
+revert nl.
+induction n; intros. {
+apply List.app_nil_r.
+}
+symmetry.
+Search (List.seq _ (S _)).
+rewrite List.seq_S.
+Search (List.fold_left _ _ (_ ++ _)).
+
+rewrite <- List.cons_seq.
+rewrite List_seq_succ_r.
+...
+  ============================
+  List.fold_left (λ (la : list nat) (d : nat), la ++ ListDef.seq (length la) d) nl (ListDef.seq 0 n) =
+  List.fold_left (λ (la : list nat) (d : nat), la ++ ListDef.seq (length la) d) nl [] ++
+  ListDef.seq (List.fold_left (λ c i : nat, c + ListDef.nth i nl 0) (ListDef.seq 0 (length nl)) 0) n
+...
+Print fold_left_op_fun_from_d.
+rewrite (fold_left_op_fun_from_d []).
 ...
       rewrite (fold_left_op_fun_from_d []).
 Print fold_left_rngl_add_fun_from_0.
