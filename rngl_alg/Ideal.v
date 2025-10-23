@@ -844,6 +844,62 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     apply List.in_seq in Hj.
     flia Hj.
   }
+  erewrite (rngl_summation_eq_compat _ _ _ p). 2: {
+    intros i Hi.
+    progress replace ((lab ++ _).[_]) with lab.[i-1]. {
+      progress replace ((lc ++ _).[_]) with lc.[i-1]. {
+        reflexivity.
+      }
+      destruct (lt_dec (i - 1) (length lc)) as [H1| H1]. {
+        now symmetry; apply List.app_nth1.
+      }
+      apply Nat.nlt_ge in H1.
+      rewrite List.app_nth2; [ | easy ].
+      rewrite List.nth_repeat.
+      now apply List.nth_overflow.
+    }
+    destruct (lt_dec (i - 1) (length lab)) as [H1| H1]. {
+      now symmetry; apply List.app_nth1.
+    }
+    apply Nat.nlt_ge in H1.
+    rewrite List.app_nth2; [ | easy ].
+    rewrite List.nth_repeat.
+    now apply List.nth_overflow.
+  }
+  cbn.
+  progress replace (∑ (i = 1, n), _)
+    with (∑ (i = 1, p), la.[i - 1] * lbc.[i - 1]). 2: {
+    rewrite (rngl_summation_split n).
+    rewrite (all_0_rngl_summation_0 (n + 1)).
+    apply rngl_add_0_r.
+    intros i Hi.
+    rewrite List.nth_overflow.
+    apply (rngl_mul_0_l Hos).
+    flia Hla Hi.
+    flia Hp.
+  }
+  (* ouais, mais c'est pas dans le même ordre, hein *)
+...
+  subst lab lc.
+Search (List.flat_map _ _ * List.flat_map _ _)%L.
+Search (List.nth _ _ _ * List.nth _ _ _)%L.
+... ... faut voir...
+Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
+Check rngl_summation_list_permut.
+  progress unfold iter_seq.
+Check rngl_summation_list_permut.
+rngl_summation_list_permut:
+  ∀ {T : Type} {ro : ring_like_op T},
+    ring_like_prop T
+    → ∀ {A : Type} {eqb : A → A → bool},
+        equality eqb
+        → ∀ (la lb : list A) (f : A → T),
+            permutation eqb la lb → ∑ (i ∈ la), f i = ∑ (i ∈ lb), f i
+Require Import RingLike.PermutationFun.
+
+  rewrite Nat_sub_succ_1.
+Search (List.flat_map
+
 ... fin essai 1
   exists m, lab, lc.
   split; [ easy | ].
