@@ -690,8 +690,8 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   remember (∀ i, _) as P eqn:H in Hbc; subst P. (* renaming *)
   progress unfold I_mul_subtype.
   eenough (H : ∃ m lab lc, _) by apply H. (* renaming *)
-(**)
   remember (∑ (i = 1, n), nl.[i-1]) as m eqn:Hm.
+(**)
   remember
     (List.flat_map
        (λ i,
@@ -825,9 +825,35 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     apply List.in_seq in Hj.
     flia Hj.
   }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    apply (f_equal (rngl_mul _)).
+    specialize (Hbc (i-1)).
+    assert (H : i - 1 ∈ ListDef.seq 0 n). {
+      apply List.in_seq.
+      flia Hi.
+    }
+    specialize (Hbc H); clear H.
+    destruct Hbc as (_ & _ & _ & _ & _ & Hbc).
+    rewrite Hbc.
+    remember (∑ (j = _, _), _) as x in |-*; subst x. (* renaming *)
+    reflexivity.
+  }
+  cbn.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    rewrite (rngl_mul_summation_distr_l Hos).
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite rngl_mul_assoc.
+      reflexivity.
+    }
+    remember (∑ (j = _, _), _) as x in |-*; subst x. (* renaming *)
+    reflexivity.
+  }
+  cbn.
 ...
   (* conseils de ChatGPT: *)
-  remember (∑ (i = 1, n), nl.[i-1]) as m eqn:Hm.
   exists m.
   remember
     (List.concat
