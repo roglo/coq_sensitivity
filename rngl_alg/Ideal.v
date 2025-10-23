@@ -879,8 +879,38 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     flia Hp.
   }
   (* ouais, mais c'est pas dans le même ordre, hein *)
+  rewrite rngl_summation_eq_compat with
+    (h := λ i,
+       (la.[i - 1] *
+          if (i - 1 <? n)%nat then
+            ∑ (j = 1, ListDef.nth (i - 1) nl 0),
+              (ListDef.nth (i - 1) llb []).[j - 1] *
+              (ListDef.nth (i - 1) llc []).[j - 1]
+          else 0)%L). 2: {
+      intros i Hi.
+      progress f_equal.
+      remember (i - 1 <? n) as x eqn:Hx.
+      symmetry in Hx.
+      destruct x. 2: {
+        apply Nat.ltb_ge in Hx.
+        rewrite (List.nth_overflow lbc); [ easy | ].
+        now rewrite Hlbc.
+      }
+      apply Nat.ltb_lt in Hx.
+      specialize (Hbc (i - 1)).
+      assert (H : i - 1 ∈ List.seq 0 n). {
+        apply List.in_seq.
+        flia Hp Hi Hx Hlbc.
+      }
+      specialize (Hbc H); clear H.
+      destruct Hbc as (_ & _ & _ & _ & _ & Hbc).
+      rewrite Hbc.
+      easy.
+    }
+(* ouais mais on s'en fout, de i-1 < n, faut que je revoie le truc *)
 ...
   subst lab lc.
+...
 Search (List.flat_map _ _ * List.flat_map _ _)%L.
 Search (List.nth _ _ _ * List.nth _ _ _)%L.
 ... ... faut voir...
