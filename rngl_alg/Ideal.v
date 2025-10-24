@@ -699,15 +699,35 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
             (λ j : nat, (la.[i - 1] * (ListDef.nth (i - 1) llb []).[j - 1])%L)
             (List.seq 1 nl.[i - 1]))
        (ListDef.seq 1 n)) as lab eqn:Hdab.
-...
-Theorem glop :
-  ∀ A (d : A) l a f,
-  (List.map (λ i, a * f (List.nth i l d)) (List.seq 0 (length l)) =
-   List.map (λ u, a * f u) l)%L.
-... ...
   erewrite List.flat_map_ext in Hdab. 2: {
     intros i.
     specialize (Hbc (i - 1)); move Hbc at bottom.
+...
+    erewrite List.map_ext_in. 2: {
+      intros j Hj.
+Theorem glop :
+  ∀ a llb i j,
+  (a * List.nth j (ListDef.nth i llb []) 0 =
+   List.nth j
+     (List.nth i (List.map (λ lb, List.map (λ b, a * b) lb) llb) []) 0)%L.
+... ...
+rewrite glop.
+easy.
+}
+Search (List.map (λ _, List.map _ _)).
+Check List.map_map.
+  ============================
+  ListDef.map
+    (λ j : nat,
+       (ListDef.nth (i - 1)
+          (ListDef.map (λ lb : list T, ListDef.map (λ b0 : T, (la.[i - 1] * b0)%L) lb) llb) [])
+         .[j - 1])
+    (ListDef.seq 1 nl.[i - 1]) =
+...
+Theorem glop :
+  ∀ a llb i j,
+  (List.nth j (a * List.nth i llb []) 0 =
+   List.nth i (List.map (List.map (λ b, (a * b))) llb) 0)%L.
 ...
 Search (List.map (λ _, (_ * _))%L _).
 Search (List.map _ (List.seq _ _)).
