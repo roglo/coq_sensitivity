@@ -882,54 +882,49 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   rewrite rngl_summation_eq_compat with
     (h := λ i,
        (la.[i - 1] *
-          if (i - 1 <? n)%nat then
-            ∑ (j = 1, ListDef.nth (i - 1) nl 0),
-              (ListDef.nth (i - 1) llb []).[j - 1] *
-              (ListDef.nth (i - 1) llc []).[j - 1]
-          else 0)%L). 2: {
-      intros i Hi.
-      progress f_equal.
-      remember (i - 1 <? n) as x eqn:Hx.
-      symmetry in Hx.
-      destruct x. 2: {
-        apply Nat.ltb_ge in Hx.
-        rewrite (List.nth_overflow lbc); [ easy | ].
-        now rewrite Hlbc.
-      }
-      apply Nat.ltb_lt in Hx.
-      specialize (Hbc (i - 1)).
-      assert (H : i - 1 ∈ List.seq 0 n). {
-        apply List.in_seq.
-        flia Hp Hi Hx Hlbc.
-      }
-      specialize (Hbc H); clear H.
-      destruct Hbc as (_ & _ & _ & _ & _ & Hbc).
-      rewrite Hbc.
-      easy.
+        ∑ (j = 1, p),
+          (ListDef.nth (i - 1) llb []).[j - 1] *
+          (ListDef.nth (i - 1) llc []).[j - 1])%L). 2: {
+    intros i Hi.
+    destruct (lt_dec (i - 1) n) as [H1| H1]. 2: {
+      apply Nat.nlt_ge in H1.
+      rewrite (List.nth_overflow la); [ | now rewrite Hla ].
+      now do 2 rewrite (rngl_mul_0_l Hos).
     }
-(* ouais mais on s'en fout, de i-1 < n, faut que je revoie le truc *)
-...
-  subst lab lc.
-...
-Search (List.flat_map _ _ * List.flat_map _ _)%L.
-Search (List.nth _ _ _ * List.nth _ _ _)%L.
-... ... faut voir...
-Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
-Check rngl_summation_list_permut.
-  progress unfold iter_seq.
-Check rngl_summation_list_permut.
-rngl_summation_list_permut:
-  ∀ {T : Type} {ro : ring_like_op T},
-    ring_like_prop T
-    → ∀ {A : Type} {eqb : A → A → bool},
-        equality eqb
-        → ∀ (la lb : list A) (f : A → T),
-            permutation eqb la lb → ∑ (i ∈ la), f i = ∑ (i ∈ lb), f i
-Require Import RingLike.PermutationFun.
-
-  rewrite Nat_sub_succ_1.
-Search (List.flat_map
-
+    progress f_equal.
+    specialize (Hbc (i - 1)).
+    assert (H : i - 1 ∈ List.seq 0 n) by now apply List.in_seq.
+    specialize (Hbc H); clear H.
+    destruct Hbc as (_ & Hlb & _ & _ & _ & Hbc).
+    rewrite Hbc.
+    rewrite (rngl_summation_split (List.nth (i - 1) nl 0) _ _ p). {
+      rewrite (all_0_rngl_summation_0 _ p).
+      symmetry; apply rngl_add_0_r.
+      intros j Hj.
+      rewrite List.nth_overflow; [ | rewrite Hlb; flia Hj ].
+      apply (rngl_mul_0_l Hos).
+    }
+    split; [ flia | ].
+    apply -> Nat.succ_le_mono.
+    rewrite Hp.
+    eapply Nat.le_trans; [ | apply Nat.le_max_l ].
+    rewrite Hm.
+    rewrite (rngl_summation_split3 i). 2: {
+      split; [ easy | flia H1 ].
+    }
+    replace 0 with (@rngl_zero nat _) at 2 by easy.
+    rewrite Nat.add_shuffle0.
+    apply Nat.le_add_l.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    rewrite (rngl_mul_summation_distr_l Hos).
+    remember (∑ (j = _, _), _) as x in |-*; subst x. (* renaming *)
+    easy.
+  }
+  cbn.
+  rewrite rngl_summation_summation_exch.
+(* ouais, chais pas. Y a de l'idée, mais faut voir *)
 ... fin essai 1
   exists m, lab, lc.
   split; [ easy | ].
