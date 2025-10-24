@@ -699,6 +699,27 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
             (λ j : nat, (la.[i - 1] * (ListDef.nth (i - 1) llb []).[j - 1])%L)
             (List.seq 1 nl.[i - 1]))
        (ListDef.seq 1 n)) as lab eqn:Hdab.
+...
+Theorem glop :
+  ∀ A (d : A) l a f,
+  (List.map (λ i, a * f (List.nth i l d)) (List.seq 0 (length l)) =
+   List.map (λ u, a * f u) l)%L.
+... ...
+  erewrite List.flat_map_ext in Hdab. 2: {
+    intros i.
+    specialize (Hbc (i - 1)); move Hbc at bottom.
+...
+Search (List.map (λ _, (_ * _))%L _).
+Search (List.map _ (List.seq _ _)).
+
+  List.map (λ i, a * List.map f lb) (List.seq
+...
+Check List.flat_map_concat_map.
+Check List.flat_map.
+Theorem glop :
+  List.flat_map f (List.seq a b) =
+  List.map (λ u,
+...
   remember
     (List.flat_map
        (λ i,
@@ -924,7 +945,8 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   }
   cbn.
   rewrite rngl_summation_summation_exch.
-(* ouais, chais pas. Y a de l'idée, mais faut voir *)
+  (* ouais, chais pas. Y a de l'idée, mais faut voir *)
+  rewrite Hdc.
 ... fin essai 1
   exists m, lab, lc.
   split; [ easy | ].
