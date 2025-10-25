@@ -925,7 +925,66 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   cbn.
   rewrite rngl_summation_summation_exch.
   (* ouais, chais pas. Y a de l'idée, mais faut voir *)
-  rewrite Hdc.
+  set (u := λ i, List.nth (i - 1) llb []).
+  set (v := λ i, List.nth (i - 1) llc []).
+  erewrite List_flat_map_ext' in Hdab. 2: {
+    intros j Hj.
+    specialize (Hbc (j - 1)); move Hbc at bottom.
+    assert (H : j - 1 ∈ ListDef.seq 0 n). {
+      apply List.in_seq.
+      apply List.in_seq in Hj.
+      flia Hj.
+    }
+    specialize (Hbc H); clear H.
+    destruct Hbc as (_ & H & _).
+    progress replace 0 with (@rngl_zero nat _) in H at 3 by easy.
+    rewrite <- H.
+    progress fold (u j).
+    remember (λ k, _) as x in |-*; subst x. (* renaming *)
+    easy.
+  }
+  erewrite List_flat_map_ext' in Hdc. 2: {
+    intros j Hj.
+    specialize (Hbc (j - 1)); move Hbc at bottom.
+    assert (H : j - 1 ∈ ListDef.seq 0 n). {
+      apply List.in_seq.
+      apply List.in_seq in Hj.
+      flia Hj.
+    }
+    specialize (Hbc H); clear H.
+    destruct Hbc as (_ & _ & H & _).
+    progress replace 0 with (@rngl_zero nat _) in H at 3 by easy.
+    rewrite <- H.
+    progress fold (v j).
+    remember (λ k, _) as x in |-*; subst x. (* renaming *)
+    rewrite List_map_seq.
+    erewrite List.map_ext_in. 2: {
+      intros k Hk.
+      rewrite Nat.add_comm, Nat.add_sub.
+      easy.
+    }
+    rewrite <- List_map_nth_seq.
+    easy.
+  }
+  rewrite Hdab, Hdc.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      progress fold (u j).
+      progress fold (v j).
+      easy.
+    }
+    remember (∑ (j = _, _), _) as x in |-*; subst x. (* renaming *)
+    easy.
+  }
+  cbn.
+...
+Search (List.map _ (List.seq _ (length _))).
+List_map_nth_seq:
+  ∀ {A : Type} (d : A) (la : list A),
+    la =
+    ListDef.map (λ i : nat, ListDef.nth i la d) (ListDef.seq 0 (length la))
 ... fin essai 1
   exists m, lab, lc.
   split; [ easy | ].
