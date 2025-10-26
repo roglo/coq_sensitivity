@@ -966,7 +966,6 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     rewrite <- List_map_nth_seq.
     easy.
   }
-  rewrite Hdab, Hdc.
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
     erewrite rngl_summation_eq_compat. 2: {
@@ -978,7 +977,7 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     remember (∑ (j = _, _), _) as x in |-*; subst x. (* renaming *)
     easy.
   }
-  cbn.
+  rewrite Hdab, Hdc.
 ...
 Search (List.map _ (List.seq _ (length _))).
 List_map_nth_seq:
