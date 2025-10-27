@@ -661,8 +661,7 @@ destruct_ix.
 apply propositional_extensionality.
 split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   cbn in Hbc.
-  assert (H : ∀ yz, yz ∈ lbc → I_mul_subtype b c yz) by easy.
-  clear Hbc; rename H into Hbc.
+  remember (∀ yz, _) as x in Hbc; subst x. (* renaming *)
   progress unfold I_mul_subtype in Hbc.
   apply (forall_exists_exists_forall 0%L 0) in Hbc.
   destruct Hbc as (nl & Hnl & Hbc).
@@ -704,6 +703,8 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   progress unfold I_mul_subtype.
   eenough (H : ∃ m lab lc, _) by apply H. (* renaming *)
   remember (∑ (i = 1, n), nl.[i-1]) as m eqn:Hm.
+(**)
+...
 (**)
   remember
     (List.flat_map
