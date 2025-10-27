@@ -626,31 +626,42 @@ apply functional_extensionality_dep.
 apply I_add_subtype_0_l.
 Qed.
 
-Theorem forall_exists_exists_forall {A B} (da : A) (dn : B) P la :
+Theorem forall_exists_exists_forall {A B} (da : A) (db : B) P la :
   (∀ a, a ∈ la → ∃ n, P a n)
-  → ∃ nl, length nl = length la ∧
-    ∀ i, i ∈ List.seq 0 (length nl) → P (List.nth i la da) (List.nth i nl dn).
+  ↔ ∃ lb, length lb = length la ∧
+    ∀ i, i ∈ List.seq 0 (length lb) → P (List.nth i la da) (List.nth i lb db).
 Proof.
-intros * Ha.
-induction la as [| a]; [ now exists [] | ].
-assert (H : ∀ a, a ∈ la → ∃ n, P a n). {
-  intros b Hb.
-  apply Ha.
-  now right.
+split. {
+  intros Ha.
+  induction la as [| a]; [ now exists [] | ].
+  assert (H : ∀ a, a ∈ la → ∃ n, P a n). {
+    intros b Hb.
+    apply Ha.
+    now right.
+  }
+  specialize (IHla H); clear H.
+  destruct IHla as (nl & H1 & H2).
+  destruct (Ha a (List.in_eq _ _)) as (na, Hna).
+  exists (na :: nl).
+  split; [ now cbn; f_equal | ].
+  intros i Hi.
+  destruct i; [ easy | cbn ].
+  apply H2.
+  apply List.in_seq in Hi.
+  apply List.in_seq.
+  destruct Hi as (_, Hi); cbn in Hi.
+  split; [ easy | ].
+  now apply Nat.succ_lt_mono in Hi.
+} {
+  intros (lb & H1 & H2) * Ha.
+  apply (List.In_nth _ _ da) in Ha.
+  destruct Ha as (n & Hna & Ha).
+  subst a.
+  exists (List.nth n lb db).
+  apply H2.
+  apply List.in_seq.
+  now rewrite H1.
 }
-specialize (IHla H); clear H.
-destruct IHla as (nl & H1 & H2).
-destruct (Ha a (List.in_eq _ _)) as (na, Hna).
-exists (na :: nl).
-split; [ now cbn; f_equal | ].
-intros i Hi.
-destruct i; [ easy | cbn ].
-apply H2.
-apply List.in_seq in Hi.
-apply List.in_seq.
-destruct Hi as (_, Hi); cbn in Hi.
-split; [ easy | ].
-now apply Nat.succ_lt_mono in Hi.
 Qed.
 
 (* to be completed
@@ -668,6 +679,7 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
   move nl before lbc.
   move Hnl before Hlbc.
   rewrite Hlbc in Hnl.
+...
   apply (forall_exists_exists_forall 0 []) in Hbc.
   destruct Hbc as (llb & Hllb & Hbc).
   rewrite List.length_seq, Hnl in Hllb.
