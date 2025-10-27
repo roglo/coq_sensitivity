@@ -1011,6 +1011,12 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     reflexivity.
   }
   subst x.
+Theorem glop :
+  List.nth (i - 1)
+    (List.flat_map (λ j : nat, ListDef.map (rngl_mul la.[j - 1]) (u j))
+        (ListDef.seq 1 n))
+    d =
+  (List.nth (i - 1) (List.flat_map u (ListDef.seq 1 n)) d) *
 ...
   ============================
   ∑ (i = 1, p), ∑ (j = 1, p), la.[j - 1] * ((u j).[i - 1] * (v j).[i - 1]) =
