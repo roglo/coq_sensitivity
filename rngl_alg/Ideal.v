@@ -89,6 +89,19 @@ intros a b Hab.
 now apply Nat.eq_add_0.
 Qed.
 
+(* to be moved too *)
+Theorem List_map_f_seq :
+  ∀ A B d (f : A → B) la,
+  (List.map (λ i, f (List.nth i la d)) (List.seq 0 (length la)) =
+   List.map f la)%L.
+Proof.
+intros.
+induction la as [| a]; [ easy | ].
+cbn - [ List.nth ].
+progress f_equal.
+now rewrite List_map_seq.
+Qed.
+
 (* end to be added *)
 
 (* for propositional and functional extensionalities *)
@@ -978,12 +991,34 @@ split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
     easy.
   }
   rewrite Hdab, Hdc.
+  remember (∑ (i = _, _), _) as x in |-*.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    erewrite List.flat_map_ext. 2: {
+      intros j.
+      rewrite List_map_seq.
+      erewrite List.map_ext_in. 2: {
+        intros k Hk.
+        rewrite Nat.add_comm, Nat.add_sub.
+        reflexivity.
+      }
+      rewrite List_map_f_seq.
+(*
+      remember (List.map (λ y, _) _) as y in |-*; subst y. (* renaming *)
+*)
+      reflexivity.
+    }
+    reflexivity.
+  }
+  subst x.
 ...
-Search (List.map _ (List.seq _ (length _))).
-List_map_nth_seq:
-  ∀ {A : Type} (d : A) (la : list A),
-    la =
-    ListDef.map (λ i : nat, ListDef.nth i la d) (ListDef.seq 0 (length la))
+  ============================
+  ∑ (i = 1, p), ∑ (j = 1, p), la.[j - 1] * ((u j).[i - 1] * (v j).[i - 1]) =
+  ∑ (i = 1, p),
+    (List.flat_map (λ j : nat, ListDef.map (rngl_mul la.[j - 1]) (u j))
+       (ListDef.seq 1 n))
+      .[i - 1] *
+    (List.flat_map v (ListDef.seq 1 n)).[i - 1]
 ... fin essai 1
   exists m, lab, lc.
   split; [ easy | ].
