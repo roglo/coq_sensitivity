@@ -639,7 +639,8 @@ Theorem I_mul_subtype_assoc a b c x :
 Proof.
 destruct_ix.
 apply propositional_extensionality.
-split; intros (n & lx & lyz & Hnz & Hlx & Hlyz & Ha & Hbc & H); subst x. {
+split; intros (lxyz & Hlxyz & Habc & H); subst x. {
+...
   cbn in Hbc.
   remember (∀ yz, _) as x in Hbc; subst x. (* renaming *)
   progress unfold I_mul_subtype in Hbc.
