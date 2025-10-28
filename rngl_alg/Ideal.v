@@ -633,7 +633,7 @@ split. {
 }
 Qed.
 
-(* to be completed, but later
+(* to be completed
 Theorem I_mul_subtype_assoc a b c x :
   I_mul_subtype a (b * c) x = I_mul_subtype (a * b) c x.
 Proof.
@@ -1845,7 +1845,6 @@ intros.
 apply I_mul_subtype_1_l.
 Qed.
 
-(* to be completed
 Theorem I_mul_subtype_comm :
   rngl_mul_is_comm T = true →
   ∀ a b x, I_mul_subtype a b x = I_mul_subtype b a x.
@@ -1853,27 +1852,41 @@ Proof.
 intros Hic *.
 progress unfold I_mul_subtype.
 apply propositional_extensionality.
-split; intros (n & lx & ly & H1 & H2 & H3 & H4 & H5 & H6). {
-  exists n, ly, lx.
+split; intros (lxy & Hlxy & H1 & H). {
+  exists (List.map (λ xy, (snd xy, fst xy)) lxy).
+  rewrite List.length_map.
   split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
+  split. {
+    intros y z Hyz.
+    apply List.in_map_iff in Hyz.
+    destruct Hyz as ((u, v) & Hu & Huv).
+    injection Hu; clear Hu; intros; subst u v.
+    rewrite and_comm.
+    now apply H1.
+  }
   subst x.
-  apply rngl_summation_eq_compat.
-  intros i Hi.
+  do 2 rewrite rngl_summation_list_pair.
+  rewrite rngl_summation_list_map; cbn.
+  apply rngl_summation_list_eq_compat.
+  intros.
   apply (rngl_mul_comm Hic).
 } {
-  exists n, ly, lx.
+  exists (List.map (λ xy, (snd xy, fst xy)) lxy).
+  rewrite List.length_map.
   split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
+  split. {
+    intros y z Hyz.
+    apply List.in_map_iff in Hyz.
+    destruct Hyz as ((u, v) & Hu & Huv).
+    injection Hu; clear Hu; intros; subst u v.
+    rewrite and_comm.
+    now apply H1.
+  }
   subst x.
-  apply rngl_summation_eq_compat.
-  intros i Hi.
+  do 2 rewrite rngl_summation_list_pair.
+  rewrite rngl_summation_list_map; cbn.
+  apply rngl_summation_list_eq_compat.
+  intros.
   apply (rngl_mul_comm Hic).
 }
 Qed.
@@ -1891,7 +1904,6 @@ apply functional_extensionality_dep.
 intros.
 apply (I_mul_subtype_comm Hic).
 Qed.
-*)
 
 (* to be completed
 Theorem I_mul_add_distr_l :
