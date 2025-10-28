@@ -232,34 +232,46 @@ Definition I_add (a b : ideal T) : ideal T :=
 
 (* multiplication *)
 
+Notation "'∑' ( ( i , j ) ∈ l ) , g" :=
+  (iter_list l (λ c '(i, j), (c + g)%L) 0%L)
+  (at level 45, l at level 60,
+   right associativity,
+   format "'[hv  ' ∑  ( ( i ,  j )  ∈  l ) ,  '/' '[' g ']' ']'").
+
+Theorem rngl_summation_list_pair :
+  ∀ A l (f : A → A → _),
+  ∑ ((x, y) ∈ l), f x y = ∑ (xy ∈ l), f (fst xy) (snd xy).
+Proof.
+intros.
+progress unfold iter_list; cbn.
+apply List_fold_left_ext_in.
+now intros (x, y) z Hxy.
+Qed.
+
 Definition I_mul_subtype a b z :=
-  ∃ n lx ly,
+  ∃ n lxy,
   n ≠ 0 ∧
-  length lx = n ∧ length ly = n ∧
-  (∀ x, x ∈ lx → ip_subtype a x) ∧
-  (∀ y, y ∈ ly → ip_subtype b y) ∧
-  z = ∑ (i = 1, n), lx.[i-1] * ly.[i-1].
+  length lxy = n ∧
+  (∀ x y, (x, y) ∈ lxy → ip_subtype a x ∧ ip_subtype b y) ∧
+  z = ∑ ((x, y) ∈ lxy), x * y.
 
 Arguments I_mul_subtype a b z%_L.
 
 Theorem I_mul_zero a b : I_mul_subtype a b 0%L.
 Proof.
 destruct_ix.
-exists 1, [0%L], [0%L].
-split; [ easy | ].
+exists 1, [(0, 0)%L].
 split; [ easy | ].
 split; [ easy | ].
 split. {
-  cbn; intros x Hx; destruct Hx as [Hx| ]; [ | easy ].
-  subst x; apply ip_zero.
-}
-split. {
-  cbn; intros x Hx; destruct Hx as [Hx| ]; [ | easy ].
-  subst x; apply ip_zero.
+  cbn; intros x y Hxy; destruct Hxy as [Hxy| ]; [ | easy ].
+  injection Hxy; clear Hxy; intros; subst x y.
+  split; apply ip_zero.
 }
 symmetry.
-rewrite rngl_summation_only_one; cbn.
-apply (rngl_mul_0_l Hos).
+progress unfold iter_list; cbn.
+rewrite (rngl_mul_0_l Hos).
+apply rngl_add_0_l.
 Qed.
 
 Theorem I_mul_add a b :
@@ -267,79 +279,51 @@ Theorem I_mul_add a b :
   I_mul_subtype a b x → I_mul_subtype a b y → I_mul_subtype a b (x + y)%L.
 Proof.
 intros * Hx Hy.
-destruct Hx as (nx & la1 & lb1 & Hnx & Hla1 & Hlb1 & Ha1 & Hb1 & Hx).
-destruct Hy as (ny & la2 & lb2 & Hny & Hla2 & Hlb2 & Ha2 & Hb2 & Hy).
+destruct Hx as (nx & lab1 & Hnx & Hlab1 & Hab1 & Hx).
+destruct Hy as (ny & lab2 & Hny & Hlab2 & Hab2 & Hy).
 subst x y.
 progress unfold I_mul_subtype.
 exists (nx + ny).
-exists (la1 ++ la2), (lb1 ++ lb2).
-do 2 rewrite List.length_app.
-rewrite Hla1, Hlb1, Hla2, Hlb2.
+exists (lab1 ++ lab2).
+rewrite List.length_app.
+rewrite Hlab1, Hlab2.
 split; [ flia Hnx Hny | ].
 split; [ easy | ].
-split; [ easy | ].
 split. {
-  intros x Hx.
-  apply List.in_app_or in Hx.
-  now destruct Hx; [ apply Ha1 | apply Ha2 ].
+  intros x y Hxy.
+  apply List.in_app_or in Hxy.
+  now destruct Hxy; [ apply Hab1 | apply Hab2 ].
 }
-split. {
-  intros y Hy.
-  apply List.in_app_or in Hy.
-  now destruct Hy; [ apply Hb1 | apply Hb2 ].
-}
-symmetry.
-rewrite (rngl_summation_split nx); [ | flia ].
-f_equal. {
-  apply rngl_summation_eq_compat.
-  intros i Hi.
-  rewrite List.app_nth1; [ | flia Hla1 Hi ].
-  rewrite List.app_nth1; [ | flia Hlb1 Hi ].
-  easy.
-}
-destruct (Nat.eq_dec ny 0) as [Hnyz| Hnyz]. {
-  move Hnyz at top; subst ny.
-  rewrite rngl_summation_empty; [ | flia ].
-  rewrite rngl_summation_empty; [ | flia ].
-  easy.
-} {
-  rewrite (rngl_summation_shift nx); [ | flia Hnyz ].
-  do 2 rewrite Nat.add_comm, Nat.add_sub.
-  apply rngl_summation_eq_compat.
-  intros i Hi.
-  rewrite List.app_nth2; [ | flia Hla1 Hi ].
-  rewrite List.app_nth2; [ | flia Hlb1 Hi ].
-  rewrite Hla1, Hlb1.
-  f_equal; f_equal; flia.
-}
+do 3 rewrite rngl_summation_list_pair.
+rewrite rngl_summation_list_app.
+easy.
 Qed.
 
 Theorem I_mul_opp a b : ∀ x, I_mul_subtype a b x → I_mul_subtype a b (- x).
 Proof.
 destruct_ix.
-intros * Hx.
-destruct Hx as (n & la & lb & Hn & Hla & Hlb & Ha & Hb & Hx).
-subst x.
+intros z Hz.
+destruct Hz as (n & lxy & Hn & Hlxy & Hxy & Hz).
+subst z.
 progress unfold I_mul_subtype.
-exists n, (List.map rngl_opp la), lb.
+exists n, (List.map (λ xy, (- fst xy, snd xy))%L lxy).
 rewrite List.length_map.
 split; [ easy | ].
 split; [ easy | ].
-split; [ easy | ].
 split. {
-  intros x Hx.
-  apply List.in_map_iff in Hx.
-  destruct Hx as (y & Hyx & Hy).
-  subst x.
-  now apply ip_opp, Ha.
+  intros x y Hxy'.
+  apply List.in_map_iff in Hxy'.
+  destruct Hxy' as ((x', y') & Hxy' & Hxyl).
+  injection Hxy'; clear Hxy'; intros; subst x y.
+  specialize (Hxy _ _ Hxyl).
+  now split; [ apply ip_opp | ].
 }
-split; [ easy | ].
-rewrite (rngl_opp_summation Hop).
-apply rngl_summation_eq_compat.
+do 2 rewrite rngl_summation_list_pair.
+rewrite (rngl_opp_summation_list Hop).
+rewrite rngl_summation_list_map; cbn.
+apply rngl_summation_list_eq_compat.
 intros i Hi.
-rewrite <- (rngl_mul_opp_l Hop).
-progress f_equal.
-rewrite (List_map_nth' 0%L); [ easy | flia Hi Hla ].
+now rewrite (rngl_mul_opp_l Hop).
 Qed.
 
 Theorem I_mul_mul_l a b :
@@ -347,28 +331,27 @@ Theorem I_mul_mul_l a b :
 Proof.
 destruct_ix.
 intros * H.
-destruct H as (n & la & lb & Hn & Hla & Hlb & Ha & Hb & H).
-subst y.
+destruct H as (n & lxy & Hn & Hlxy & Hab & Hz).
+subst y; rename x into t.
 progress unfold I_mul_subtype.
-exists n, (List.map (rngl_mul x) la), lb.
+exists n, (List.map (λ '(x, y), (t * x, y)%L) lxy).
 rewrite List.length_map.
 split; [ easy | ].
 split; [ easy | ].
-split; [ easy | ].
 split. {
-  intros z Hz.
-  apply List.in_map_iff in Hz.
-  destruct Hz as (y & Hxy & Hz).
-  subst z.
-  now apply ip_mul_l, Ha.
+  intros x' y' Hxy'.
+  apply List.in_map_iff in Hxy'.
+  destruct Hxy' as ((x, y) & H & Hxy').
+  injection H; clear H; intros; subst x' y'.
+  specialize (Hab _ _ Hxy').
+  now split; [ apply ip_mul_l | ].
 }
-split; [ easy | ].
-rewrite (rngl_mul_summation_distr_l Hos).
-apply rngl_summation_eq_compat.
-intros i Hi.
-rewrite rngl_mul_assoc.
-progress f_equal.
-rewrite (List_map_nth' 0%L); [ easy | flia Hi Hla ].
+do 2 rewrite rngl_summation_list_pair.
+rewrite (rngl_mul_summation_list_distr_l Hos).
+rewrite rngl_summation_list_map.
+apply rngl_summation_list_eq_compat.
+intros (x, y) Hxy; cbn.
+apply rngl_mul_assoc.
 Qed.
 
 Theorem I_mul_mul_r a b :
@@ -376,28 +359,27 @@ Theorem I_mul_mul_r a b :
 Proof.
 destruct_ix.
 intros * H.
-destruct H as (n & la & lb & Hn & Hla & Hlb & Ha & Hb & H).
-subst x.
+destruct H as (n & lxy & Hn & Hlxy & Hab & Hz).
+subst x; rename y into t.
 progress unfold I_mul_subtype.
-exists n, la, (List.map (λ z, rngl_mul z y) lb).
+exists n, (List.map (λ '(x, y), (x, rngl_mul y t)) lxy).
 rewrite List.length_map.
 split; [ easy | ].
 split; [ easy | ].
-split; [ easy | ].
-split; [ easy | ].
 split. {
-  intros z Hz.
-  apply List.in_map_iff in Hz.
-  destruct Hz as (x & Hxy & Hx).
-  subst z.
-  now apply ip_mul_r, Hb.
+  intros x y Hxy.
+  apply List.in_map_iff in Hxy.
+  destruct Hxy as ((x', y') & H & Hxy).
+  injection H; clear H; intros; subst x y.
+  specialize (Hab _ _ Hxy).
+  now split; [ | apply ip_mul_r ].
 }
-rewrite (rngl_mul_summation_distr_r Hos).
-apply rngl_summation_eq_compat.
-intros i Hi.
-rewrite <- rngl_mul_assoc.
-progress f_equal.
-rewrite (List_map_nth' 0%L); [ easy | flia Hi Hlb ].
+do 2 rewrite rngl_summation_list_pair.
+rewrite (rngl_mul_summation_list_distr_r Hos).
+rewrite rngl_summation_list_map.
+apply rngl_summation_list_eq_compat.
+intros (x, y) Hxy; cbn.
+symmetry; apply rngl_mul_assoc.
 Qed.
 
 Definition I_mul (a b : ideal T) : ideal T :=
@@ -664,7 +646,7 @@ split. {
 }
 Qed.
 
-(* to be completed
+(* to be completed, but later
 Theorem I_mul_subtype_assoc a b c x :
   I_mul_subtype a (b * c) x = I_mul_subtype (a * b) c x.
 Proof.
@@ -1823,6 +1805,7 @@ apply functional_extensionality_dep.
 ...
 *)
 
+(* to be completed
 Theorem I_mul_subtype_1_l a :
   ∀ x, I_mul_subtype 1 a x = ip_subtype a x.
 Proof.
@@ -1831,6 +1814,7 @@ intros.
 progress unfold I_mul_subtype.
 apply propositional_extensionality.
 split. {
+...
   intros (n & lx & ly & H1 & H2 & H3 & _ & H5 & H6).
   subst x.
   revert H1 lx ly H2 H3 H5.
@@ -1948,6 +1932,7 @@ apply functional_extensionality_dep.
 intros.
 apply (I_mul_subtype_comm Hic).
 Qed.
+*)
 
 (* to be completed
 Theorem I_mul_add_distr_l :
