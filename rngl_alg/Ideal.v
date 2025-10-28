@@ -249,9 +249,8 @@ now intros (x, y) z Hxy.
 Qed.
 
 Definition I_mul_subtype a b z :=
-  ∃ n lxy,
-  n ≠ 0 ∧
-  length lxy = n ∧
+  ∃ lxy,
+  length lxy ≠ 0 ∧
   (∀ x y, (x, y) ∈ lxy → ip_subtype a x ∧ ip_subtype b y) ∧
   z = ∑ ((x, y) ∈ lxy), x * y.
 
@@ -260,8 +259,7 @@ Arguments I_mul_subtype a b z%_L.
 Theorem I_mul_zero a b : I_mul_subtype a b 0%L.
 Proof.
 destruct_ix.
-exists 1, [(0, 0)%L].
-split; [ easy | ].
+exists [(0, 0)%L].
 split; [ easy | ].
 split. {
   cbn; intros x y Hxy; destruct Hxy as [Hxy| ]; [ | easy ].
@@ -279,16 +277,13 @@ Theorem I_mul_add a b :
   I_mul_subtype a b x → I_mul_subtype a b y → I_mul_subtype a b (x + y)%L.
 Proof.
 intros * Hx Hy.
-destruct Hx as (nx & lab1 & Hnx & Hlab1 & Hab1 & Hx).
-destruct Hy as (ny & lab2 & Hny & Hlab2 & Hab2 & Hy).
+destruct Hx as (lab1 & Hlab1 & Hab1 & Hx).
+destruct Hy as (lab2 & Hlab2 & Hab2 & Hy).
 subst x y.
 progress unfold I_mul_subtype.
-exists (nx + ny).
 exists (lab1 ++ lab2).
 rewrite List.length_app.
-rewrite Hlab1, Hlab2.
-split; [ flia Hnx Hny | ].
-split; [ easy | ].
+split; [ flia Hlab1 Hlab2 | ].
 split. {
   intros x y Hxy.
   apply List.in_app_or in Hxy.
@@ -302,20 +297,17 @@ Qed.
 Theorem I_mul_opp a b : ∀ x, I_mul_subtype a b x → I_mul_subtype a b (- x).
 Proof.
 destruct_ix.
-intros z Hz.
-destruct Hz as (n & lxy & Hn & Hlxy & Hxy & Hz).
-subst z.
+intros z (lxy & Hlxy & Hab & Hz); subst z.
 progress unfold I_mul_subtype.
-exists n, (List.map (λ xy, (- fst xy, snd xy))%L lxy).
+exists (List.map (λ xy, (- fst xy, snd xy))%L lxy).
 rewrite List.length_map.
-split; [ easy | ].
 split; [ easy | ].
 split. {
   intros x y Hxy'.
   apply List.in_map_iff in Hxy'.
   destruct Hxy' as ((x', y') & Hxy' & Hxyl).
   injection Hxy'; clear Hxy'; intros; subst x y.
-  specialize (Hxy _ _ Hxyl).
+  specialize (Hab _ _ Hxyl).
   now split; [ apply ip_opp | ].
 }
 do 2 rewrite rngl_summation_list_pair.
@@ -330,13 +322,11 @@ Theorem I_mul_mul_l a b :
   ∀ x y, I_mul_subtype a b y → I_mul_subtype a b (x * y).
 Proof.
 destruct_ix.
-intros * H.
-destruct H as (n & lxy & Hn & Hlxy & Hab & Hz).
+intros * (lxy & Hlxy & Hab & Hz).
 subst y; rename x into t.
 progress unfold I_mul_subtype.
-exists n, (List.map (λ '(x, y), (t * x, y)%L) lxy).
+exists (List.map (λ '(x, y), (t * x, y)%L) lxy).
 rewrite List.length_map.
-split; [ easy | ].
 split; [ easy | ].
 split. {
   intros x' y' Hxy'.
@@ -358,13 +348,11 @@ Theorem I_mul_mul_r a b :
   ∀ x y, I_mul_subtype a b x → I_mul_subtype a b (x * y).
 Proof.
 destruct_ix.
-intros * H.
-destruct H as (n & lxy & Hn & Hlxy & Hab & Hz).
+intros * (lxy & Hlxy & Hab & Hz).
 subst x; rename y into t.
 progress unfold I_mul_subtype.
-exists n, (List.map (λ '(x, y), (x, rngl_mul y t)) lxy).
+exists (List.map (λ '(x, y), (x, y * t)%L) lxy).
 rewrite List.length_map.
-split; [ easy | ].
 split; [ easy | ].
 split. {
   intros x y Hxy.
