@@ -670,17 +670,19 @@ Theorem I_mul_subtype_assoc a b c x :
 Proof.
 destruct_ix.
 apply propositional_extensionality.
-split; intros (n & la & lbc & Hnz & Hla & Hlbc & Ha & Hbc & H); subst x. {
+split; intros (n & lx & lyz & Hnz & Hlx & Hlyz & Ha & Hbc & H); subst x. {
   cbn in Hbc.
   remember (∀ yz, _) as x in Hbc; subst x. (* renaming *)
   progress unfold I_mul_subtype in Hbc.
   apply (forall_exists_exists_forall 0%L 0) in Hbc.
+  remember (∃ nl, _ ∧ ∀ j, _) as x in Hbc; subst x. (* renaming *)
   destruct Hbc as (nl & Hnl & Hbc).
-  move nl before lbc.
-  move Hnl before Hlbc.
-  rewrite Hlbc in Hnl.
-...
+  move nl before lyz.
+  move Hnl before Hlyz.
+  rewrite Hlyz in Hnl.
   apply (forall_exists_exists_forall 0 []) in Hbc.
+  rewrite List.length_seq in Hbc.
+...
   destruct Hbc as (llb & Hllb & Hbc).
   rewrite List.length_seq, Hnl in Hllb.
   move llb before nl.
