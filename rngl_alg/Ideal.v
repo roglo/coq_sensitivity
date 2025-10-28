@@ -640,11 +640,59 @@ Proof.
 destruct_ix.
 apply propositional_extensionality.
 split; intros (lxyz & Hlxyz & Habc & H); subst x. {
+  remember (∀ x yz, _) as x in Habc; subst x. (* renaming *)
+  cbn in Habc.
+  progress unfold I_mul_subtype in Habc.
+... oh et puis crotte...
+Theorem glop {A B} (da : A) (db : B) P Q la :
+  (∀ a b, (a, b) ∈ la → Q a ∧ ∃ n, P a b n)
+  ↔ ∃ lc, length lc = length la ∧
+    ∀ i, i ∈ List.seq 0 (length lc)
+    → Q (List.nth i la da) ∧
+      P (List.nth i la da) (List.nth i lb db) (List.nth i lc 0).
+Admitted.
+  apply glop in Habc.
 ...
-  cbn in Hbc.
-  remember (∀ yz, _) as x in Hbc; subst x. (* renaming *)
-  progress unfold I_mul_subtype in Hbc.
-  apply (forall_exists_exists_forall 0%L 0) in Hbc.
+  (∀ a, a ∈ la → ∃ n, P a n)
+  ↔ ∃ lb, length lb = length la ∧
+    ∀ i, i ∈ List.seq 0 (length lb) → P (List.nth i la da) (List.nth i lb db).
+Proof.
+...
+Theorem glop {A B} (da : A) (db : B) P la :
+  (∀ a, a ∈ la → P a ∧ ∃ n, Q a n)
+  → (∀ a, a ∈ la → ∃ n, P a ∧ Q a n).
+  ↔ ∃ lb, length lb = length la ∧
+    ∀ i, i ∈ List.seq 0 (length lb) → P (List.nth i la da) (List.nth i lb db).
+...
+Theorem glop {P} :
+  (∀ a b : T, P a b → Q a b ∧ ∃ l : list _, R a b l) ↔
+  (∃ l, ∀ a b : T, P a b → Q a b ∧ R a b c).
+Admitted.
+  specialize (proj1 glop Habc) as H1.
+
+  cbn in H1; clear Habc; rename H1 into Habc.
+Theorem glop {P} :
+  (∀ a b : T, P a b) ↔ (∀ '(a, b), P a b).
+Admitted.
+  specialize (proj1 glop Habc) as H1.
+  cbn in H1; clear Habc; rename H1 into Habc.
+...
+Theorem glip {A B} {P : A → _} {Q : A → B → _} :
+  (∀ a, P a ∧ ∃  b, Q a b) ↔ (∀ a, P a ∧ ∃ b, Q a b).
+Admitted.
+  specialize (@glip (T * T)) as H1.
+  specialize (H1 (list (T * T))).
+  specialize (H1 (λ x, x ∈ lxyz)).
+  specialize (proj1 (H1 _) Habc).
+...
+  specialize (proj1 glip Habc) as H1.
+
+Theorem forall_exists_exists_forall' {A B} (da : A) (db : B) P la :
+  (∀ a, a ∈ la → ∃ n, P a n)
+  ↔ ∃ lb, length lb = length la ∧
+    ∀ i, i ∈ List.seq 0 (length lb) → P (List.nth i la da) (List.nth i lb db).
+...
+  apply (forall_exists_exists_forall 0%L 0) in Habc.
   remember (∃ nl, _ ∧ ∀ j, _) as x in Hbc; subst x. (* renaming *)
   destruct Hbc as (nl & Hnl & Hbc).
   move nl before lyz.
