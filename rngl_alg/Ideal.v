@@ -715,6 +715,15 @@ split. {
     rewrite List.split_nth in Hab_c.
     injection Hab_c; clear Hab_c; intros Hz Hxy.
     move Hxy after Hz.
+    rewrite Hnl2 in Hn.
+    split. {
+      subst xy.
+      specialize (Habc n).
+      assert (H : n ∈ List.seq 0 (length nl)) by now apply List.in_seq.
+      specialize (Habc H); clear H.
+      destruct Habc as (Ha & Hlnl & Hbc & Habc).
+      cbn.
+      progress unfold I_mul_subtype.
 ...
   remember (∑ (i = 1, n), nl.[i-1]) as m eqn:Hm.
 (**)
