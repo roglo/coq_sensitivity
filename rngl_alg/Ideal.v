@@ -125,6 +125,14 @@ split; intros * H *; [ apply H | ].
 apply (H (a, b)).
 Qed.
 
+Theorem forall_pair_in {A B P l} :
+  (∀ ab : A * B, (fst ab, snd ab) ∈ l → P ab) ↔
+  (∀ ab : A * B, ab ∈ l → P ab).
+Proof.
+intros.
+now split; intros H * Hab; apply H; destruct ab.
+Qed.
+
 (* end to be added *)
 
 (* for propositional and functional extensionalities *)
@@ -602,22 +610,25 @@ apply functional_extensionality_dep.
 apply I_add_subtype_0_l.
 Qed.
 
-Theorem forall_exists_exists_forall {A B} (da : A) (db : B) P la :
-  (∀ a, a ∈ la → ∃ n, P a n)
+Theorem forall_exists_exists_forall {A B} (da : A) (db : B) P Q la :
+  (∀ a, a ∈ la → P a ∧ ∃ n, Q a n)
   ↔ ∃ lb, length lb = length la ∧
-    ∀ i, i ∈ List.seq 0 (length lb) → P (List.nth i la da) (List.nth i lb db).
+    ∀ i,
+    i ∈ List.seq 0 (length lb)
+    → P (List.nth i la da) ∧ Q (List.nth i la da) (List.nth i lb db).
 Proof.
+intros.
 split. {
   intros Ha.
   induction la as [| a]; [ now exists [] | ].
-  assert (H : ∀ a, a ∈ la → ∃ n, P a n). {
+  assert (H : ∀ a, a ∈ la → P a ∧ ∃ n, Q a n). {
     intros b Hb.
     apply Ha.
     now right.
   }
   specialize (IHla H); clear H.
   destruct IHla as (nl & H1 & H2).
-  destruct (Ha a (List.in_eq _ _)) as (na, Hna).
+  destruct (Ha a (List.in_eq _ _)) as (HP & na & Hna).
   exists (na :: nl).
   split; [ now cbn; f_equal | ].
   intros i Hi.
@@ -633,10 +644,14 @@ split. {
   apply (List.In_nth _ _ da) in Ha.
   destruct Ha as (n & Hna & Ha).
   subst a.
-  exists (List.nth n lb db).
-  apply H2.
-  apply List.in_seq.
-  now rewrite H1.
+  specialize (H2 n).
+  assert (H : n ∈ List.seq 0 (length lb)). {
+    rewrite H1.
+    now apply List.in_seq.
+  }
+  specialize (H2 H); clear H.
+  split; [ easy | ].
+  now exists (List.nth n lb db).
 }
 Qed.
 
@@ -653,56 +668,11 @@ split; intros (lxyz & Hlxyz & Habc & H); subst x. {
   specialize ((proj1 forall_pair) Habc) as H1.
   cbn in H1.
   clear Habc; rename H1 into Habc.
+  specialize ((proj1 forall_pair_in) Habc) as H1.
+  cbn in H1.
+  clear Habc; rename H1 into Habc.
+  apply (forall_exists_exists_forall (0, 0)%L []) in Habc.
 ...
-Theorem glop {A B} (da : A) (db : B) P Q la :
-  (∀ a b, (a, b) ∈ la → Q a ∧ ∃ n, P a b n)
-  ↔ ∃ lc, length lc = length la ∧
-    ∀ i, i ∈ List.seq 0 (length lc)
-    → Q (List.nth i la da) ∧
-      P (List.nth i la da) (List.nth i lb db) (List.nth i lc 0).
-Admitted.
-  apply glop in Habc.
-...
-  (∀ a, a ∈ la → ∃ n, P a n)
-  ↔ ∃ lb, length lb = length la ∧
-    ∀ i, i ∈ List.seq 0 (length lb) → P (List.nth i la da) (List.nth i lb db).
-Proof.
-...
-Theorem glop {A B} (da : A) (db : B) P la :
-  (∀ a, a ∈ la → P a ∧ ∃ n, Q a n)
-  → (∀ a, a ∈ la → ∃ n, P a ∧ Q a n).
-  ↔ ∃ lb, length lb = length la ∧
-    ∀ i, i ∈ List.seq 0 (length lb) → P (List.nth i la da) (List.nth i lb db).
-...
-Theorem glop {P} :
-  (∀ a b : T, P a b → Q a b ∧ ∃ l : list _, R a b l) ↔
-  (∃ l, ∀ a b : T, P a b → Q a b ∧ R a b c).
-Admitted.
-  specialize (proj1 glop Habc) as H1.
-
-  cbn in H1; clear Habc; rename H1 into Habc.
-Theorem glop {P} :
-  (∀ a b : T, P a b) ↔ (∀ '(a, b), P a b).
-Admitted.
-  specialize (proj1 glop Habc) as H1.
-  cbn in H1; clear Habc; rename H1 into Habc.
-...
-Theorem glip {A B} {P : A → _} {Q : A → B → _} :
-  (∀ a, P a ∧ ∃  b, Q a b) ↔ (∀ a, P a ∧ ∃ b, Q a b).
-Admitted.
-  specialize (@glip (T * T)) as H1.
-  specialize (H1 (list (T * T))).
-  specialize (H1 (λ x, x ∈ lxyz)).
-  specialize (proj1 (H1 _) Habc).
-...
-  specialize (proj1 glip Habc) as H1.
-
-Theorem forall_exists_exists_forall' {A B} (da : A) (db : B) P la :
-  (∀ a, a ∈ la → ∃ n, P a n)
-  ↔ ∃ lb, length lb = length la ∧
-    ∀ i, i ∈ List.seq 0 (length lb) → P (List.nth i la da) (List.nth i lb db).
-...
-  apply (forall_exists_exists_forall 0%L 0) in Habc.
   remember (∃ nl, _ ∧ ∀ j, _) as x in Hbc; subst x. (* renaming *)
   destruct Hbc as (nl & Hnl & Hbc).
   move nl before lyz.
