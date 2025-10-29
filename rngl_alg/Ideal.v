@@ -661,7 +661,8 @@ Theorem I_mul_subtype_assoc a b c x :
 Proof.
 destruct_ix.
 apply propositional_extensionality.
-split; intros (lxyz & Hlxyz & Habc & H); subst x. {
+split. {
+  intros (l_x_yz & Hl_x_yz & Habc & H); subst x.
   remember (∀ x yz, _) as x in Habc; subst x. (* renaming *)
   cbn in Habc.
   progress unfold I_mul_subtype in Habc.
@@ -672,28 +673,13 @@ split; intros (lxyz & Hlxyz & Habc & H); subst x. {
   cbn in H1.
   clear Habc; rename H1 into Habc.
   apply (forall_exists_exists_forall (0, 0)%L []) in Habc.
+  destruct Habc as (nl & Hnl & Habc).
+  move nl after l_x_yz.
+(*
+  apply List.Forall_forall in Habc.
+  eapply List.Forall_impl in Habc. 2: {
+    intros d (Ha & Hlnl & Hbc & Hxyz).
 ...
-  remember (∃ nl, _ ∧ ∀ j, _) as x in Hbc; subst x. (* renaming *)
-  destruct Hbc as (nl & Hnl & Hbc).
-  move nl before lyz.
-  move Hnl before Hlyz.
-  rewrite Hlyz in Hnl.
-  apply (forall_exists_exists_forall 0 []) in Hbc.
-  rewrite List.length_seq in Hbc.
-...
-  destruct Hbc as (llb & Hllb & Hbc).
-  rewrite List.length_seq, Hnl in Hllb.
-  move llb before nl.
-  move Hllb before Hnl.
-  apply (forall_exists_exists_forall 0 []) in Hbc.
-  destruct Hbc as (llc & Hllc & Hbc).
-  rewrite List.length_seq, Hllb in Hllc.
-  move llc before llb.
-  move Hllc before Hllb.
-  rewrite Hnl, Hllb, Hllc in Hbc.
-  apply List.Forall_forall in Hbc.
-  eapply List.Forall_impl in Hbc. 2: {
-    intros d H7.
     destruct (le_dec n d) as [Hnd| Hnd]. {
       destruct H7 as (H7 & H8 & H9 & H10 & H11 & H12).
       move d before n.
@@ -712,8 +698,10 @@ split; intros (lxyz & Hlxyz & Habc & H); subst x. {
   clear Hbc.
   rename H1 into Hbc; cbn in Hbc.
   remember (∀ i, _) as P eqn:H in Hbc; subst P. (* renaming *)
+*)
   progress unfold I_mul_subtype.
-  eenough (H : ∃ m lab lc, _) by apply H. (* renaming *)
+  eenough (H : ∃ l_xy_z, _) by apply H. (* renaming *)
+...
   remember (∑ (i = 1, n), nl.[i-1]) as m eqn:Hm.
 (**)
 ...
