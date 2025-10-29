@@ -118,6 +118,13 @@ apply List_fold_left_ext_in.
 now intros (x, y) z Hxy.
 Qed.
 
+Theorem forall_pair {A B} {P : A → B → Prop} :
+  (∀ a b, P a b) ↔ (∀ ab, P (fst ab) (snd ab)).
+Proof.
+split; intros * H *; [ apply H | ].
+apply (H (a, b)).
+Qed.
+
 (* end to be added *)
 
 (* for propositional and functional extensionalities *)
@@ -643,7 +650,10 @@ split; intros (lxyz & Hlxyz & Habc & H); subst x. {
   remember (∀ x yz, _) as x in Habc; subst x. (* renaming *)
   cbn in Habc.
   progress unfold I_mul_subtype in Habc.
-... oh et puis crotte...
+  specialize ((proj1 forall_pair) Habc) as H1.
+  cbn in H1.
+  clear Habc; rename H1 into Habc.
+...
 Theorem glop {A B} (da : A) (db : B) P Q la :
   (∀ a b, (a, b) ∈ la → Q a ∧ ∃ n, P a b n)
   ↔ ∃ lc, length lc = length la ∧
