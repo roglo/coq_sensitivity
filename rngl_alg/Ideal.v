@@ -662,8 +662,24 @@ Proof.
 destruct_ix.
 apply propositional_extensionality.
 split. {
+(*
+  intros (l_xy_z & Hl_xy_z & Hab_c & H); subst x.
+  remember (∀ xy z, _) as x in Hab_c; subst x. (* renaming *)
+  remember (∑ ((xy, z) ∈ _), _) as x; subst x. (* renaming *)
+...
+  Hab_c : ∀ xy z : T, (xy, z) ∈ l_xy_z → ip_subtype (a * b) xy ∧ ip_subtype c z
+  ============================
+  I_mul_subtype a (b * c) (∑ ((xy, z) ∈ l_xy_z), xy * z)
+  progress unfold I_mul_subtype.
+*)
   intros (l_x_yz & Hl_x_yz & Ha_bc & H); subst x.
   remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
+  remember (∑ ((x, yz) ∈ _), _) as x; subst x. (* renaming *)
+(*
+  Ha_bc : ∀ x yz : T, (x, yz) ∈ l_x_yz → ip_subtype a x ∧ ip_subtype (b * c) yz
+  ============================
+  I_mul_subtype (a * b) c (∑ ((x, yz) ∈ l_x_yz), x * yz)
+*)
   cbn in Ha_bc.
   progress unfold I_mul_subtype in Ha_bc.
   specialize ((proj1 forall_pair) Ha_bc) as H1.
@@ -675,32 +691,35 @@ split. {
   apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
   destruct Ha_bc as (nl & Hnl & Habc).
   move nl after l_x_yz.
-(*
-  apply List.Forall_forall in Habc.
-  eapply List.Forall_impl in Habc. 2: {
-    intros d (Ha & Hlnl & Hbc & Hxyz).
-...
-    destruct (le_dec n d) as [Hnd| Hnd]. {
-      destruct H7 as (H7 & H8 & H9 & H10 & H11 & H12).
-      move d before n.
-      rewrite <- H9 in H7.
-      exfalso.
-      rewrite (@List.nth_overflow _ _ d) in H7; [ easy | congruence ].
-    }
-    apply Nat.nle_gt in Hnd.
-    clear Hbc.
-    rewrite List.seq_nth in H7; [ | now rewrite List.seq_nth ].
-    rewrite List.seq_nth in H7; [ | easy ].
-    cbn in H7.
-    apply H7.
-  }
-  specialize (proj1 (List.Forall_forall _ _) Hbc) as H1.
-  clear Hbc.
-  rename H1 into Hbc; cbn in Hbc.
-  remember (∀ i, _) as P eqn:H in Hbc; subst P. (* renaming *)
-*)
   progress unfold I_mul_subtype.
   eenough (H : ∃ l_xy_z, _) by apply H. (* renaming *)
+...
+  assert
+    (∃ inl_xyz, length inl_xyz = length nl ∧
+     ∀ inl ixyz, (inl, ixyz) ∈ inl_xyz →
+     ip_subtype a (fst ixyz)
+     ∧ length inl ≠ 0
+        ∧ (∀ x y : T, (x, y) ∈ inl → ip_subtype b x ∧ ip_subtype c y)
+          ∧ snd ixyz = ∑ ((x, y) ∈ inl), x * y). {
+    exists
+      (List.map (λ i, (List.nth i nl [], List.nth i l_x_yz (0, 0)%L))
+         (List.seq 0 (length nl))).
+    rewrite List.length_map, List.length_seq.
+    split; [ easy | ].
+    intros inl ixyz Hii.
+    apply List.in_map_iff in Hii.
+    destruct Hii as (i & Hii & Hi).
+    specialize (Habc _ Hi).
+    now injection Hii; clear Hii; intros; subst inl ixyz.
+  }
+  clear Habc.
+  destruct H as (inl_xyz & Hnl_xyz & Habc).
+...
+    apply List.Forall_forall in Habc.
+    specialize (proj1 (List.Forall_nth _ _) Habc) as H1.
+    clear Habc; rename H1 into Habc.
+    cbn in Habc.
+...
   remember l_x_yz as l_xy_z in a. (* pour rire *)
   assert (Hnl2 : length l_xy_z = length nl) by congruence.
   clear Heql_xy_z .
