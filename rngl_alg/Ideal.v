@@ -662,18 +662,18 @@ Proof.
 destruct_ix.
 apply propositional_extensionality.
 split. {
-  intros (l_x_yz & Hl_x_yz & Habc & H); subst x.
-  remember (∀ x yz, _) as x in Habc; subst x. (* renaming *)
-  cbn in Habc.
-  progress unfold I_mul_subtype in Habc.
-  specialize ((proj1 forall_pair) Habc) as H1.
+  intros (l_x_yz & Hl_x_yz & Ha_bc & H); subst x.
+  remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
+  cbn in Ha_bc.
+  progress unfold I_mul_subtype in Ha_bc.
+  specialize ((proj1 forall_pair) Ha_bc) as H1.
   cbn in H1.
-  clear Habc; rename H1 into Habc.
-  specialize ((proj1 forall_pair_in) Habc) as H1.
+  clear Ha_bc; rename H1 into Ha_bc.
+  specialize ((proj1 forall_pair_in) Ha_bc) as H1.
   cbn in H1.
-  clear Habc; rename H1 into Habc.
-  apply (forall_exists_exists_forall (0, 0)%L []) in Habc.
-  destruct Habc as (nl & Hnl & Habc).
+  clear Ha_bc; rename H1 into Ha_bc.
+  apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
+  destruct Ha_bc as (nl & Hnl & Habc).
   move nl after l_x_yz.
 (*
   apply List.Forall_forall in Habc.
@@ -701,6 +701,20 @@ split. {
 *)
   progress unfold I_mul_subtype.
   eenough (H : ∃ l_xy_z, _) by apply H. (* renaming *)
+  remember l_x_yz as l_xy_z in a. (* pour rire *)
+  assert (Hnl2 : length l_xy_z = length nl) by congruence.
+  clear Heql_xy_z .
+  move Hnl2 before Hnl.
+  move l_xy_z before l_x_yz.
+  exists l_xy_z.
+  split; [ congruence | ].
+  split. {
+    intros xy z Hab_c.
+    apply (List.In_nth _ _ (0, 0)%L) in Hab_c.
+    destruct Hab_c as (n & Hn & Hab_c).
+    rewrite List.split_nth in Hab_c.
+    injection Hab_c; clear Hab_c; intros Hz Hxy.
+    move Hxy after Hz.
 ...
   remember (∑ (i = 1, n), nl.[i-1]) as m eqn:Hm.
 (**)
