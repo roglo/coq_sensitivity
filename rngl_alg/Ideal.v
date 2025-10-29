@@ -693,7 +693,6 @@ split. {
   move nl after l_x_yz.
   progress unfold I_mul_subtype.
   eenough (H : ∃ l_xy_z, _) by apply H. (* renaming *)
-...
   assert
     (∃ inl_xyz, length inl_xyz = length nl ∧
      ∀ inl ixyz, (inl, ixyz) ∈ inl_xyz →
