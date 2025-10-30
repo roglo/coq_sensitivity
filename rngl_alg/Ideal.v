@@ -689,7 +689,7 @@ split. {
   clear Ha_bc; rename H1 into Ha_bc.
   apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
   rename Hl_x_yz into Hnl.
-  destruct Ha_bc as (nl & H & Habc).
+  destruct Ha_bc as (nll & H & Habc).
   rewrite <- H in Hnl; symmetry in H.
   rename H into Hl_x_yz.
   progress unfold I_mul_subtype.
@@ -719,12 +719,21 @@ split. {
 (* to try to guess what could be the first value *)
   specialize (Habc 0).
   cbn in Habc.
-  assert (H : 0 ∈ List.seq 0 (length nl)) by (apply List.in_seq; flia Hnl).
+  assert (H : 0 ∈ List.seq 0 (length nll)) by (apply List.in_seq; flia Hnl).
   specialize (Habc H); clear H.
   remember (∑ ((x, yz) ∈ _), _) as x in Habc; subst x. (* renaming *)
   destruct Habc as (Ha & Hnlz & Hbc & Hxy_z).
   destruct l_x_yz as [| l_x_yz_0]; [ now symmetry in Hl_x_yz | ].
   clear Hnl; cbn in Hl_x_yz, Ha, Hnlz, Hbc, Hxy_z.
+  destruct nll as [| nl]; [ easy | ].
+  cbn in Hl_x_yz; apply Nat.succ_inj in Hl_x_yz.
+  cbn in Hnlz, Hbc, Hxy_z.
+  destruct nl as [| (x1, y1)]; [ easy | clear Hnlz ].
+  cbn in Hbc.
+  destruct nll as [| nl2]. {
+    cbn in Hl_x_yz.
+    apply List.length_zero_iff_nil in Hl_x_yz.
+    subst l_x_yz.
 ...
 (**)
   exists [List.hd (0, 0) l_x_yz]%L.
