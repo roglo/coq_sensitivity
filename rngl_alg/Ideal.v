@@ -21,10 +21,10 @@ Require Import RingLike.Nat_algebra.
 Record ideal {T} {ro : ring_like_op T} := mk_ip
   { ip_subtype : T → Prop;
     ip_zero : ip_subtype rngl_zero;
-    ip_add : ∀ a b, ip_subtype a → ip_subtype b → ip_subtype (a + b)%L;
-    ip_opp : ∀ a, ip_subtype a → ip_subtype (- a)%L;
-    ip_mul_l : ∀ a b, ip_subtype b → ip_subtype (a * b)%L;
-    ip_mul_r : ∀ a b, ip_subtype a → ip_subtype (a * b)%L }.
+    ip_add : ∀ x y, ip_subtype x → ip_subtype y → ip_subtype (x + y)%L;
+    ip_opp : ∀ x, ip_subtype x → ip_subtype (- x)%L;
+    ip_mul_l : ∀ x y, ip_subtype y → ip_subtype (x * y)%L;
+    ip_mul_r : ∀ x y, ip_subtype x → ip_subtype (x * y)%L }.
 
 Declare Scope ideal_scope.
 Delimit Scope ideal_scope with I.
@@ -32,7 +32,7 @@ Bind Scope ideal_scope with ideal.
 
 Arguments ideal T {ro}.
 Arguments ip_subtype {T ro} i%_I a%_L.
-Arguments ip_opp {T ro} i%_I a%_L.
+Arguments ip_opp {T ro} i%_I x%_L.
 
 Class ideal_ctx T {ro : ring_like_op T} :=
   { ix_op : rngl_has_opp T = true }.
