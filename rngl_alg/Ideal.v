@@ -34,6 +34,8 @@ Arguments ideal T {ro}.
 Arguments ip_subtype {T ro} i%_I a%_L.
 Arguments ip_opp {T ro} i%_I x%_L.
 
+Notation "x '∈' a" := (ip_subtype a x) : ideal_scope.
+
 Class ideal_ctx T {ro : ring_like_op T} :=
   { ix_op : rngl_has_opp T = true }.
 
