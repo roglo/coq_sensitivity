@@ -654,7 +654,7 @@ split. {
 }
 Qed.
 
-(* to be completed
+(* to be completed, mais peut-être mauvaise piste à annuler
 Theorem I_mul_subtype_assoc a b c x :
   I_mul_subtype a (b * c) x = I_mul_subtype (a * b) c x.
 Proof.
@@ -1877,10 +1877,14 @@ Search (∑ (_ = _, _), ∑ (_ = _, _), _).
   now exists y, z.
 }
 ...
+*)
 
+(* to be completed
 Theorem I_mul_assoc a b c : (a * (b * c))%I = ((a * b) * c)%I.
 Proof.
 apply eq_ideal_eq; cbn.
+Print I_mul_subtype.
+...
 apply functional_extensionality_dep.
 ...
 *)
