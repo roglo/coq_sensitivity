@@ -686,10 +686,13 @@ split. {
   cbn in H1.
   clear Ha_bc; rename H1 into Ha_bc.
   apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
-  destruct Ha_bc as (nl & Hnl & Habc).
-  move nl after l_x_yz.
+  rename Hl_x_yz into Hnl.
+  destruct Ha_bc as (nl & H & Habc).
+  rewrite <- H in Hnl; symmetry in H.
+  rename H into Hl_x_yz.
   progress unfold I_mul_subtype.
   eenough (H : ∃ l_xy_z, _) by apply H. (* renaming *)
+(*
   assert
     (∃ inl_xyz, length inl_xyz = length nl ∧
      ∀ inl ixyz, (inl, ixyz) ∈ inl_xyz →
@@ -710,11 +713,35 @@ split. {
   }
   clear Habc.
   destruct H as (inl_xyz & Hnl_xyz & Habc).
+*)
+(* to try to guess what could be the first value *)
+  specialize (Habc 0).
+  cbn in Habc.
+  assert (H : 0 ∈ List.seq 0 (length nl)) by (apply List.in_seq; flia Hnl).
+  specialize (Habc H); clear H.
+  remember (∑ ((x, yz) ∈ _), _) as x in Habc; subst x. (* renaming *)
+  destruct Habc as (Ha & Hnlz & Hbc & Hxy_z).
+  destruct l_x_yz as [| l_x_yz_0]; [ now symmetry in Hl_x_yz | ].
+  clear Hnl; cbn in Hl_x_yz, Ha, Hnlz, Hbc, Hxy_z.
 ...
-    apply List.Forall_forall in Habc.
-    specialize (proj1 (List.Forall_nth _ _) Habc) as H1.
-    clear Habc; rename H1 into Habc.
-    cbn in Habc.
+(**)
+  exists [List.hd (0, 0) l_x_yz]%L.
+  split; [ easy | ].
+  split. {
+    intros xy z H.
+    destruct H as [Hxy_z| H]; [ | easy ].
+    destruct l_x_yz as [| x_yz]. {
+      injection Hxy_z; clear Hxy_z; intros; subst xy z.
+      split; apply ip_zero.
+    }
+    cbn in Hxy_z.
+...
+  }
+  destruct l_x_yz as [| xy_z]; [ easy | clear Hl_x_yz ].
+  do 2 rewrite rngl_summation_list_pair.
+  rewrite rngl_summation_list_cons.
+  rewrite rngl_summation_list_only_one.
+  cbn.
 ...
   remember l_x_yz as l_xy_z in a. (* pour rire *)
   assert (Hnl2 : length l_xy_z = length nl) by congruence.
