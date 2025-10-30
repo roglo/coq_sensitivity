@@ -174,22 +174,6 @@ destruct_ix.
 intros; subst; apply (rngl_mul_0_l Hos).
 Qed.
 
-Definition I_zero : ideal T :=
-  {| ip_subtype a := a = 0%L;
-     ip_zero := eq_refl;
-     ip_add := I_zero_add;
-     ip_opp := I_zero_opp;
-     ip_mul_l := I_zero_mul_l;
-     ip_mul_r := I_zero_mul_r |}.
-
-Definition I_one : ideal T :=
-  {| ip_subtype a := True;
-     ip_zero := I;
-     ip_add _ _ _ _ := I;
-     ip_opp _ _ := I;
-     ip_mul_l _ _ _ := I;
-     ip_mul_r _ _ _ := I |}.
-
 (* addition *)
 
 Definition I_add_subtype a b z :=
@@ -252,14 +236,6 @@ exists (x1 * y)%L, (x2 * y)%L.
 split; [ | now split; apply ip_mul_r ].
 apply rngl_mul_add_distr_r.
 Qed.
-
-Definition I_add (a b : ideal T) : ideal T :=
-  {| ip_subtype := I_add_subtype a b;
-     ip_zero := I_add_zero a b;
-     ip_add := I_add_add a b;
-     ip_opp := I_add_opp a b;
-     ip_mul_l := I_add_mul_l a b;
-     ip_mul_r := I_add_mul_r a b |}.
 
 (* multiplication *)
 
@@ -384,14 +360,6 @@ intros (x, y) Hxy; cbn.
 symmetry; apply rngl_mul_assoc.
 Qed.
 
-Definition I_mul (a b : ideal T) : ideal T :=
-  {| ip_subtype := I_mul_subtype a b;
-     ip_zero := I_mul_zero a b;
-     ip_add := I_mul_add a b;
-     ip_opp := I_mul_opp a b;
-     ip_mul_l := I_mul_mul_l a b;
-     ip_mul_r := I_mul_mul_r a b |}.
-
 (* opposite *)
 
 Theorem I_opp_add a :
@@ -424,6 +392,40 @@ apply ip_opp, ip_mul_r.
 rewrite <- (rngl_opp_involutive Hop).
 now apply ip_opp.
 Qed.
+
+(* *)
+
+Definition I_zero : ideal T :=
+  {| ip_subtype a := a = 0%L;
+     ip_zero := eq_refl;
+     ip_add := I_zero_add;
+     ip_opp := I_zero_opp;
+     ip_mul_l := I_zero_mul_l;
+     ip_mul_r := I_zero_mul_r |}.
+
+Definition I_one : ideal T :=
+  {| ip_subtype a := True;
+     ip_zero := I;
+     ip_add _ _ _ _ := I;
+     ip_opp _ _ := I;
+     ip_mul_l _ _ _ := I;
+     ip_mul_r _ _ _ := I |}.
+
+Definition I_add (a b : ideal T) : ideal T :=
+  {| ip_subtype := I_add_subtype a b;
+     ip_zero := I_add_zero a b;
+     ip_add := I_add_add a b;
+     ip_opp := I_add_opp a b;
+     ip_mul_l := I_add_mul_l a b;
+     ip_mul_r := I_add_mul_r a b |}.
+
+Definition I_mul (a b : ideal T) : ideal T :=
+  {| ip_subtype := I_mul_subtype a b;
+     ip_zero := I_mul_zero a b;
+     ip_add := I_mul_add a b;
+     ip_opp := I_mul_opp a b;
+     ip_mul_l := I_mul_mul_l a b;
+     ip_mul_r := I_mul_mul_r a b |}.
 
 Definition I_opp (a : ideal T) : ideal T :=
   {| ip_subtype x := ip_subtype a (-x);
@@ -537,11 +539,6 @@ apply functional_extensionality_dep.
 intros z.
 apply I_add_subtype_comm.
 Qed.
-
-(*
-Print Assumptions eq_ideal_eq.
-Print Assumptions I_add_comm.
-*)
 
 Theorem I_add_subtype_assoc_l a b c x z :
   ip_subtype a x
