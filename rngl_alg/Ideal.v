@@ -1895,12 +1895,17 @@ Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 Theorem glop a b c : ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
 Proof.
 intros t Ht.
-cbn in Ht |-*.
-progress unfold I_mul_subtype in Ht.
-destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
-remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
-remember (∑ ((x, yz) ∈ _), _) as x in Ht; subst x. (* renaming *)
-rewrite rngl_summation_list_pair in Ht.
+assert
+  (∃ n f lx ly lz,
+   t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
+  cbn in Ht.
+  progress unfold I_mul_subtype in Ht.
+  destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
+  remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
+  remember (∑ ((x, yz) ∈ _), _) as x in Ht; subst x. (* renaming *)
+  rewrite rngl_summation_list_pair in Ht.
+  subst t.
+  exists (length lx_yz).
 ...
 erewrite rngl_summation_list_eq_compat in Ht. 2: {
   intros x_yz Hx_yz; cbn.
