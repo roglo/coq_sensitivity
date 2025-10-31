@@ -716,6 +716,18 @@ split. {
   clear Habc.
   destruct H as (inl_xyz & Hnl_xyz & Habc).
 *)
+(**)
+  remember 0 as i in nll.
+  clear Heqi.
+  specialize (Habc i).
+  enough (Hi : i ∈ List.seq 0 (length nll)).
+  specialize (Habc Hi).
+  remember (∑ ((y, z) ∈ _), _) as x in Habc; subst x. (* renaming *)
+  remember (∀ y z, _) as x in Habc; subst x. (* renaming *)
+  destruct Habc as (Ha & Hnlz & Hbc & Hxy_z).
+  remember (fst (List.nth i l_x_yz (0, 0)%L)) as x eqn:Hx.
+  remember (snd (List.nth i l_x_yz (0, 0)%L)) as xyz eqn:Hxyz.
+...
 (* to try to guess what could be the first value *)
   specialize (Habc 0).
   cbn in Habc.
@@ -1880,11 +1892,31 @@ Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 *)
 
 (* to be completed
+Theorem glop a b c : ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
+Proof.
+intros t Ht.
+cbn in Ht |-*.
+progress unfold I_mul_subtype in Ht.
+destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
+remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
+remember (∑ ((x, yz) ∈ _), _) as x in Ht; subst x. (* renaming *)
+rewrite rngl_summation_list_pair in Ht.
+...
+erewrite rngl_summation_list_eq_compat in Ht. 2: {
+  intros x_yz Hx_yz; cbn.
+  specialize (Ha_bc (fst x_yz) (snd x_yz)).
+  rewrite <- surjective_pairing in Ha_bc.
+  specialize (Ha_bc Hx_yz).
+  destruct Ha_bc as (Ha, Hbc).
+  cbn in Hbc.
+  progress unfold I_mul_subtype in Hbc.
+  destruct Hbc as (lxy & Hlxy & Hab & Hu).
+  rewrite Hu.
+...
+
 Theorem I_mul_assoc a b c : (a * (b * c))%I = ((a * b) * c)%I.
 Proof.
 apply eq_ideal_eq; cbn.
-Print I_mul_subtype.
-...
 apply functional_extensionality_dep.
 ...
 *)
