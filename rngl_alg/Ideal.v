@@ -1895,17 +1895,38 @@ Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 Theorem glop a b c : ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
 Proof.
 intros t Ht.
+(*
 assert
   (∃ n f lx ly lz,
    t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
+*)
   cbn in Ht.
   progress unfold I_mul_subtype in Ht.
   destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
   remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
+(*
   remember (∑ ((x, yz) ∈ _), _) as x in Ht; subst x. (* renaming *)
+*)
   rewrite rngl_summation_list_pair in Ht.
-  subst t.
-  exists (length lx_yz).
+  specialize ((proj1 forall_pair) Ha_bc) as H1.
+  cbn in H1.
+  clear Ha_bc; rename H1 into Ha_bc.
+  specialize ((proj1 forall_pair_in) Ha_bc) as H1.
+  cbn in H1.
+  clear Ha_bc; rename H1 into Ha_bc.
+  remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
+  progress unfold I_mul_subtype in Ha_bc.
+  apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
+  destruct Ha_bc as (llyz & Hllyz & Hyz).
+  remember (length lx_yz) as n eqn:Hn.
+  rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
+  move Hn before n; symmetry in Hlx_yz.
+  move Hlx_yz before Hllyz.
+  move llyz before lx_yz.
+  cbn.
+assert
+  (∃ f lx ly lz,
+   t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
 ...
 erewrite rngl_summation_list_eq_compat in Ht. 2: {
   intros x_yz Hx_yz; cbn.
