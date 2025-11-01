@@ -1924,6 +1924,33 @@ assert
   move Hlx_yz before Hllyz.
   move llyz before lx_yz.
   cbn.
+Theorem glop {A B} da db la lb (P : A → B → Prop) :
+  (∀ i,
+   i ∈ List.seq 0 (length la) → P (List.nth i la da) (List.nth i lb db)) ↔
+  (∃ lab, la = List.map fst lab → lb = List.map snd lab →
+   ∀ ab, ab ∈ lab → P (fst ab) (snd ab)).
+Proof.
+intros.
+split; intros Hp. {
+  exists (List.combine la lb).
+  intros Hla Hlb (a, b) Ha; cbn.
+  generalize Ha; intros Hb.
+  apply List.in_combine_l in Ha.
+  apply List.in_combine_r in Hb.
+...
+Print List.combine.
+Search (List.map _ (List.combine _ _)).
+Search List.combine.
+... ...
+  set (P u v :=
+    (fst v ∈ a)%I
+    ∧ length u ≠ 0
+    ∧ (∀ x y : T, (x, y) ∈ u → (x ∈ b)%I ∧ (y ∈ c)%I)
+    ∧ snd v =
+        ∑ ((x, y) ∈ u), x * y).
+  apply (proj1 (glop _ _ _ _ P)) in Hyz.
+  subst P; cbn in Hyz.
+...
 assert
   (∃ f lx ly lz,
    t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
