@@ -1934,13 +1934,21 @@ intros.
 split; intros Hp. {
   exists (List.combine la lb).
   intros Hla Hlb (a, b) Ha; cbn.
-  generalize Ha; intros Hb.
-  apply List.in_combine_l in Ha.
-  apply List.in_combine_r in Hb.
-...
-Print List.combine.
-Search (List.map _ (List.combine _ _)).
-Search List.combine.
+  apply (List.In_nth _ _ (da, db)) in Ha.
+  destruct Ha as (i & Hi & Hab).
+  rewrite List.combine_nth in Hab.
+  injection Hab; clear Hab; intros; subst a b.
+  apply Hp.
+  rewrite List.length_combine in Hi.
+  apply List.in_seq.
+  split; [ easy | ].
+  now apply Nat.min_glb_lt_iff in Hi.
+  rewrite Hla.
+  rewrite Hlb at 2.
+  do 2 rewrite List.length_map.
+  easy.
+} {
+  intros i Hi.
 ... ...
   set (P u v :=
     (fst v ∈ a)%I
