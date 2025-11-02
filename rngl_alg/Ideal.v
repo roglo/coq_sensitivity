@@ -135,6 +135,63 @@ intros.
 now split; intros H * Hab; apply H; destruct ab.
 Qed.
 
+Theorem forall_in_seq {A B} da db la lb (P : A → B → Prop) :
+  length la = length lb →
+  (∀ i,
+   i ∈ List.seq 0 (length la) → P (List.nth i la da) (List.nth i lb db)) ↔
+  (∃ lab, la = List.map fst lab ∧ lb = List.map snd lab ∧
+   ∀ ab, ab ∈ lab → P (fst ab) (snd ab)).
+Proof.
+intros * Hlab.
+split; intros Hp. {
+  exists (List.combine la lb).
+  split. {
+    clear P Hp.
+    revert lb Hlab.
+    induction la as [| a]; intros; [ easy | ].
+    destruct lb; [ easy | ].
+    cbn in Hlab |-*.
+    apply Nat.succ_inj in Hlab.
+    f_equal.
+    now apply IHla.
+  }
+  split. {
+    clear P Hp.
+    revert la Hlab.
+    induction lb as [| b]; intros. {
+      apply List.length_zero_iff_nil in Hlab.
+      now subst la.
+    }
+    destruct la; [ easy | ].
+    cbn in Hlab |-*.
+    apply Nat.succ_inj in Hlab.
+    f_equal.
+    now apply IHlb.
+  }
+  intros (a, b) Hab.
+  apply (List.In_nth _ _ (da, db)) in Hab.
+  destruct Hab as (i & Hi & Hab).
+  rewrite List.length_combine in Hi.
+  rewrite List.combine_nth in Hab; [ | easy ].
+  injection Hab; clear Hab; intros; subst a b; cbn.
+  apply Hp.
+  apply List.in_seq.
+  apply Nat.min_glb_lt_iff in Hi.
+  easy.
+} {
+  intros i Hi.
+  destruct Hp as (lab & Hla & Hlb & Hp).
+  subst la lb.
+  clear Hlab.
+  apply List.in_seq in Hi.
+  rewrite List.length_map in Hi.
+  rewrite (List_map_nth' (da, db) da); [ | easy ].
+  rewrite (List_map_nth' (da, db) db); [ | easy ].
+  apply Hp.
+  now apply List.nth_In.
+}
+Qed.
+
 (* end to be added *)
 
 (* for propositional and functional extensionalities *)
@@ -1923,41 +1980,23 @@ assert
   move Hn before n; symmetry in Hlx_yz.
   move Hlx_yz before Hllyz.
   move llyz before lx_yz.
-  cbn.
-Theorem glop {A B} da db la lb (P : A → B → Prop) :
-  (∀ i,
-   i ∈ List.seq 0 (length la) → P (List.nth i la da) (List.nth i lb db)) ↔
-  (∃ lab, la = List.map fst lab → lb = List.map snd lab →
-   ∀ ab, ab ∈ lab → P (fst ab) (snd ab)).
-Proof.
-intros.
-split; intros Hp. {
-  exists (List.combine la lb).
-  intros Hla Hlb (a, b) Ha; cbn.
-  apply (List.In_nth _ _ (da, db)) in Ha.
-  destruct Ha as (i & Hi & Hab).
-  rewrite List.combine_nth in Hab.
-  injection Hab; clear Hab; intros; subst a b.
-  apply Hp.
-  rewrite List.length_combine in Hi.
-  apply List.in_seq.
-  split; [ easy | ].
-  now apply Nat.min_glb_lt_iff in Hi.
-  rewrite Hla.
-  rewrite Hlb at 2.
-  do 2 rewrite List.length_map.
-  easy.
-} {
-  intros i Hi.
-... ...
+  rewrite Hllyz in Hyz.
   set (P u v :=
     (fst v ∈ a)%I
     ∧ length u ≠ 0
     ∧ (∀ x y : T, (x, y) ∈ u → (x ∈ b)%I ∧ (y ∈ c)%I)
     ∧ snd v =
         ∑ ((x, y) ∈ u), x * y).
-  apply (proj1 (glop _ _ _ _ P)) in Hyz.
-  subst P; cbn in Hyz.
+  specialize (@forall_in_seq) as H1.
+  specialize (H1 (list (T * T)) (T * T)%type).
+  specialize (H1 [] (0, 0)%L).
+  specialize (H1 llyz lx_yz).
+  specialize (H1 P).
+  rewrite Hlx_yz, Hllyz in H1.
+  specialize (H1 eq_refl).
+  subst P; cbn in H1.
+  specialize (proj1 H1) as H2; clear H1.
+  specialize (H2 Hyz).
 ...
 assert
   (∃ f lx ly lz,
