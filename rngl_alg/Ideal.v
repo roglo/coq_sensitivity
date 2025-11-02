@@ -11,6 +11,7 @@ Require Import RingLike.Core.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
 Require Import RingLike.IterAdd.
+Require Import RingLike.IterMax.
 Require Import RingLike.Nat_algebra.
 
 (* ideal: non empty set type with some properties *)
@@ -1987,20 +1988,18 @@ assert
     ∧ (∀ x y : T, (x, y) ∈ u → (x ∈ b)%I ∧ (y ∈ c)%I)
     ∧ snd v =
         ∑ ((x, y) ∈ u), x * y).
-  specialize (@forall_in_seq) as H1.
-  specialize (H1 (list (T * T)) (T * T)%type).
-  specialize (H1 [] (0, 0)%L).
-  specialize (H1 llyz lx_yz).
-  specialize (H1 P).
+  specialize (forall_in_seq [] (0, 0)%L llyz lx_yz P) as H1.
   rewrite Hlx_yz, Hllyz in H1.
   specialize (H1 eq_refl).
   subst P; cbn in H1.
   specialize (proj1 H1) as H2; clear H1.
   specialize (H2 Hyz).
-...
+  clear Hyz; rename H2 into Hyz.
+  destruct Hyz as (lab & Hllyzm & Hlx_yzm & Hyz).
+  remember (max n (Max (l ∈ llyz), length l)) as m eqn:Hm.
 assert
-  (∃ f lx ly lz,
-   t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
+  (∃ lx ly lz,
+   t = ∑ (i = 0, m), lx.[i] * ∑ (j = 0, m), ly.[j] * lz.[j]). {
 ...
 erewrite rngl_summation_list_eq_compat in Ht. 2: {
   intros x_yz Hx_yz; cbn.
