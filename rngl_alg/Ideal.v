@@ -2025,7 +2025,6 @@ Theorem I_mul_subtype_1_l a :
 Proof.
 destruct_ix.
 intros.
-progress unfold I_mul_subtype.
 apply propositional_extensionality.
 split. {
   intros (lxy & Hlxy & H1 & H); subst x.
