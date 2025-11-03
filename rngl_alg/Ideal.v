@@ -1952,6 +1952,7 @@ Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 (* to be completed
 Theorem glop a b c : ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
 Proof.
+destruct_ix.
 intros t Ht.
 (*
 assert
@@ -1962,17 +1963,14 @@ assert
   progress unfold I_mul_subtype in Ht.
   destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
   remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
-(*
-  remember (∑ ((x, yz) ∈ _), _) as x in Ht; subst x. (* renaming *)
-*)
   rewrite rngl_summation_list_pair in Ht.
+  remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
   specialize ((proj1 forall_pair) Ha_bc) as H1.
   cbn in H1.
   clear Ha_bc; rename H1 into Ha_bc.
   specialize ((proj1 forall_pair_in) Ha_bc) as H1.
   cbn in H1.
   clear Ha_bc; rename H1 into Ha_bc.
-  remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
   progress unfold I_mul_subtype in Ha_bc.
   apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
   destruct Ha_bc as (llyz & Hllyz & Hyz).
@@ -1996,7 +1994,68 @@ assert
   specialize (H2 Hyz).
   clear Hyz; rename H2 into Hyz.
   destruct Hyz as (lab & Hllyzm & Hlx_yzm & Hyz).
+(**)
   remember (max n (Max (l ∈ llyz), length l)) as m eqn:Hm.
+  remember (lab ++ [(List.repeat (0, 0)%L (m - n), (0, 0)%L)]) as lab'.
+  move lab' before lab.
+  remember (List.map fst lab') as llyz' eqn:Hllyzm'.
+  move llyz' before llyz.
+  move Hllyzm' before Hllyzm.
+  remember (List.map snd lab') as lx_yz' eqn:Hlx_yzm'.
+  move lx_yz' before lx_yz.
+  move Hlx_yzm' before Hlx_yzm.
+  assert (Hyz' :
+    ∀ ab : list (T * T) * (T * T),
+      ab ∈ lab'
+      → (fst (snd ab) ∈ a)%I
+        ∧ length (fst ab) ≠ 0
+          ∧ (∀ x y : T, (x, y) ∈ fst ab → (x ∈ b)%I ∧ (y ∈ c)%I)
+            ∧ snd (snd ab) = ∑ ((x, y) ∈ fst ab), x * y). {
+    intros ab Hab.
+    subst lab'.
+    apply List.in_app_or in Hab.
+    destruct Hab as [Hab| Hab]; [ now apply Hyz | ].
+    destruct Hab as [Hab| Hab]; [ | easy ].
+    subst ab; cbn.
+    rewrite List.repeat_length.
+...
+  clear lab Hllyzm Hlx_yzm.
+...
+  remember (lx_yz ++ List.repeat (0, 0)%L (m - n)) as l eqn:Hl.
+  assert (Ht' : t = ∑ (x_yz ∈ l), fst x_yz * snd x_yz). {
+    rewrite (rngl_summation_list_split _ _ _ n).
+    subst t l.
+    rewrite List.firstn_app, List.skipn_app.
+    rewrite Hlx_yz, Nat.sub_diag.
+    rewrite List.app_nil_r; cbn.
+    rewrite <- Hlx_yz at 1 2.
+    rewrite List.firstn_all, List.skipn_all.
+    rewrite List.app_nil_l.
+    rewrite (all_0_rngl_summation_list_0 _ (List.repeat _ _)). {
+      symmetry; apply rngl_add_0_r.
+    }
+    intros (x, y) Hxy; cbn.
+    apply List.repeat_spec in Hxy.
+    injection Hxy; clear Hxy; intros; subst x y.
+    apply (rngl_mul_0_l Hos).
+  }
+  move l before lx_yz.
+  move Ht' before Ht.
+  assert (Hlx_yz' : length l = m). {
+    subst l.
+    rewrite List.length_app.
+    rewrite Hlx_yz.
+    rewrite List.repeat_length, Nat.add_comm.
+    apply Nat.sub_add.
+    subst m.
+    apply Nat.le_max_l.
+  }
+  move Hlx_yz' before Hlx_yz.
+  move m before n.
+...
+  assert (Hlx_yzm' : l = List.map fst lab).
+  clear lx_yz Ht Hlx_yz.
+...
 assert
   (∃ lx ly lz,
    t = ∑ (i = 0, m), lx.[i] * ∑ (j = 0, m), ly.[j] * lz.[j]). {
