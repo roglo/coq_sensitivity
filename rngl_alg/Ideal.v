@@ -1996,7 +1996,7 @@ assert
   destruct Hyz as (lab & Hllyzm & Hlx_yzm & Hyz).
 (**)
   remember (max n (Max (l ∈ llyz), length l)) as m eqn:Hm.
-  remember (lab ++ [(List.repeat (0, 0)%L (m - n), (0, 0)%L)]) as lab'.
+  remember (lab ++ List.repeat (List.repeat(0, 0)%L (m - n), (0, 0)%L) (m - n)) as lab'.
   move lab' before lab.
   remember (List.map fst lab') as llyz' eqn:Hllyzm'.
   move llyz' before llyz.
@@ -2015,6 +2015,10 @@ assert
     subst lab'.
     apply List.in_app_or in Hab.
     destruct Hab as [Hab| Hab]; [ now apply Hyz | ].
+    apply List.repeat_spec in Hab.
+    subst ab; cbn.
+    rewrite List.repeat_length.
+...
     destruct Hab as [Hab| Hab]; [ | easy ].
     subst ab; cbn.
     rewrite List.repeat_length.
