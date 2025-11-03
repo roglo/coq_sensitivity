@@ -2008,27 +2008,89 @@ assert
     ∀ ab : list (T * T) * (T * T),
       ab ∈ lab'
       → (fst (snd ab) ∈ a)%I
+(*
         ∧ length (fst ab) ≠ 0
+*)
           ∧ (∀ x y : T, (x, y) ∈ fst ab → (x ∈ b)%I ∧ (y ∈ c)%I)
             ∧ snd (snd ab) = ∑ ((x, y) ∈ fst ab), x * y). {
     intros ab Hab.
     subst lab'.
     apply List.in_app_or in Hab.
-    destruct Hab as [Hab| Hab]; [ now apply Hyz | ].
+    destruct Hab as [Hab| Hab]; [ now specialize (Hyz ab Hab) | ].
     apply List.repeat_spec in Hab.
     subst ab; cbn.
-    rewrite List.repeat_length.
-...
-    destruct Hab as [Hab| Hab]; [ | easy ].
-    subst ab; cbn.
-    rewrite List.repeat_length.
-...
-  clear lab Hllyzm Hlx_yzm.
-...
-  remember (lx_yz ++ List.repeat (0, 0)%L (m - n)) as l eqn:Hl.
-  assert (Ht' : t = ∑ (x_yz ∈ l), fst x_yz * snd x_yz). {
+    split; [ apply ip_zero | ].
+    split. {
+      intros y z H.
+      apply List.repeat_spec in H.
+      injection H; clear H; intros; subst y z.
+      split; apply ip_zero.
+    }
+    symmetry.
+    rewrite rngl_summation_list_pair.
+    apply all_0_rngl_summation_list_0.
+    intros (x, y) H; cbn.
+    apply List.repeat_spec in H.
+    injection H; clear H; intros; subst x y.
+    apply (rngl_mul_0_l Hos).
+  }
+  move Hyz' before Hyz.
+  assert (H : length lab = n). {
+    rewrite <- Hlx_yz.
+    rewrite Hlx_yzm.
+    symmetry; apply List.length_map.
+  }
+  assert (Hlx_yz' : length lx_yz' = m). {
+    subst lx_yz' lab'.
+    rewrite List.length_map.
+    rewrite List.length_app.
+    rewrite List.repeat_length, H, Nat.add_comm.
+    apply Nat.sub_add.
+    subst m.
+    apply Nat.le_max_l.
+  }
+  move Hlx_yz' before Hlx_yz.
+  move m before n.
+  assert (Hllyz' : length llyz' = m). {
+    subst llyz' lab'.
+    rewrite List.length_map.
+    rewrite List.length_app.
+    rewrite List.repeat_length, H, Nat.add_comm, Hm.
+    apply Nat.sub_add.
+    subst m.
+    apply Nat.le_max_l.
+  }
+  move Hllyz' before Hllyz.
+  assert (Ht' : t = ∑ (x_yz ∈ lx_yz'), fst x_yz * snd x_yz). {
     rewrite (rngl_summation_list_split _ _ _ n).
-    subst t l.
+    rewrite Hlx_yzm', Heqlab'.
+    rewrite List.firstn_map, List.skipn_map.
+    rewrite List.firstn_app, List.skipn_app.
+    rewrite H, Nat.sub_diag.
+    rewrite List.firstn_0, List.skipn_0.
+    rewrite List.skipn_all2; [ | flia H ].
+    rewrite List.app_nil_r.
+    rewrite <- List.firstn_map.
+    rewrite <- Hlx_yzm.
+    rewrite List.firstn_all2; [ | flia Hlx_yz ].
+    cbn.
+    rewrite List.map_repeat.
+    rewrite (all_0_rngl_summation_list_0 _ (List.repeat _ _)). 2: {
+      intros (x, y) Hxy.
+      apply List.repeat_spec in Hxy; cbn in Hxy.
+      injection Hxy; clear Hxy; intros; subst x y.
+      apply (rngl_mul_0_l Hos).
+    }
+    symmetry; rewrite Ht.
+    apply rngl_add_0_r.
+  }
+  move Ht' before Ht.
+...
+  clear lab Hllyzm Hlx_yzm Hyz Heqlab' H.
+  clear lx_yz Ht Hlx_yz.
+  clear llyz Hllyz Hm.
+...
+    subst t lx_yz' lab'.
     rewrite List.firstn_app, List.skipn_app.
     rewrite Hlx_yz, Nat.sub_diag.
     rewrite List.app_nil_r; cbn.
@@ -2057,6 +2119,7 @@ assert
   move Hlx_yz' before Hlx_yz.
   move m before n.
 ...
+  clear lab Hllyzm Hlx_yzm Hyz Heqlab' H.
   assert (Hlx_yzm' : l = List.map fst lab).
   clear lx_yz Ht Hlx_yz.
 ...
