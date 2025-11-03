@@ -1995,8 +1995,13 @@ assert
   clear Hyz; rename H2 into Hyz.
   destruct Hyz as (lab & Hllyzm & Hlx_yzm & Hyz).
 (**)
+... pfff... ci-dessous vraiment chiant...
   remember (max n (Max (l ∈ llyz), length l)) as m eqn:Hm.
-  remember (lab ++ List.repeat (List.repeat(0, 0)%L (m - n), (0, 0)%L) (m - n)) as lab'.
+  remember
+    (List.map
+       (λ ll, (fst ll ++ List.repeat (0, 0)%L (m - length (fst ll)), snd ll))
+       (lab ++ List.repeat ([], (0, 0)%L) (m - n)))
+    as lab'.
   move lab' before lab.
   remember (List.map fst lab') as llyz' eqn:Hllyzm'.
   move llyz' before llyz.
@@ -2015,8 +2020,14 @@ assert
             ∧ snd (snd ab) = ∑ ((x, y) ∈ fst ab), x * y). {
     intros ab Hab.
     subst lab'.
-    apply List.in_app_or in Hab.
-    destruct Hab as [Hab| Hab]; [ now specialize (Hyz ab Hab) | ].
+    apply List.in_map_iff in Hab.
+    destruct Hab as (ll & Hab1 & Hab2).
+    apply List.in_app_or in Hab2.
+    destruct Hab2 as [Hab2| Hab2]. {
+      specialize (Hyz _ Hab2).
+      subst ab.
+...
+    destruct Hab2 as [Hab2| Hab2]; [ now specialize (Hyz ab Hab) | ].
     apply List.repeat_spec in Hab.
     subst ab; cbn.
     split; [ apply ip_zero | ].
@@ -2085,43 +2096,22 @@ assert
     apply rngl_add_0_r.
   }
   move Ht' before Ht.
-...
-  clear lab Hllyzm Hlx_yzm Hyz Heqlab' H.
-  clear lx_yz Ht Hlx_yz.
-  clear llyz Hllyz Hm.
-...
-    subst t lx_yz' lab'.
-    rewrite List.firstn_app, List.skipn_app.
-    rewrite Hlx_yz, Nat.sub_diag.
-    rewrite List.app_nil_r; cbn.
-    rewrite <- Hlx_yz at 1 2.
-    rewrite List.firstn_all, List.skipn_all.
-    rewrite List.app_nil_l.
-    rewrite (all_0_rngl_summation_list_0 _ (List.repeat _ _)). {
-      symmetry; apply rngl_add_0_r.
-    }
-    intros (x, y) Hxy; cbn.
-    apply List.repeat_spec in Hxy.
-    injection Hxy; clear Hxy; intros; subst x y.
-    apply (rngl_mul_0_l Hos).
-  }
-  move l before lx_yz.
-  move Ht' before Ht.
-  assert (Hlx_yz' : length l = m). {
+  assert (H1 : ∀ l, l ∈ llyz' → length l = m). {
+    intros l Hl.
+    rewrite <- Hllyz'.
+    rewrite Hllyzm' in Hl |-*.
+    rewrite List.length_map.
+    apply List.in_map_iff in Hl.
+    destruct Hl as (l2 & Hl & Hl').
     subst l.
+    rewrite Heqlab'.
     rewrite List.length_app.
-    rewrite Hlx_yz.
-    rewrite List.repeat_length, Nat.add_comm.
-    apply Nat.sub_add.
-    subst m.
-    apply Nat.le_max_l.
-  }
-  move Hlx_yz' before Hlx_yz.
-  move m before n.
+    rewrite H, List.repeat_length, Nat.add_comm.
+    rewrite Heqlab' in Hl'.
+    apply List.in_app_or in Hl'.
+    destruct Hl' as [Hl'| Hl']. {
 ...
-  clear lab Hllyzm Hlx_yzm Hyz Heqlab' H.
-  assert (Hlx_yzm' : l = List.map fst lab).
-  clear lx_yz Ht Hlx_yz.
+  clear lx_yz llyz lab Hyz Ht Hlx_yz Hllyz Hllyzm Hlx_yzm Heqlab' H Hm.
 ...
 assert
   (∃ lx ly lz,
