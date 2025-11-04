@@ -1964,28 +1964,27 @@ assert
   (∃ n f lx ly lz,
    t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
 *)
-  cbn in Ht.
-  progress unfold I_mul_subtype in Ht.
-  destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
-  remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
-  rewrite rngl_summation_list_pair in Ht.
-  remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
-  specialize ((proj1 forall_pair) Ha_bc) as H1.
-  cbn in H1.
-  clear Ha_bc; rename H1 into Ha_bc.
-  specialize ((proj1 forall_pair_in) Ha_bc) as H1.
-  cbn in H1.
-  clear Ha_bc; rename H1 into Ha_bc.
-Check @forall_exists_exists_forall.
+cbn in Ht.
+progress unfold I_mul_subtype in Ht.
+destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
+remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
+rewrite rngl_summation_list_pair in Ht.
+remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
+specialize ((proj1 forall_pair) Ha_bc) as H1.
+cbn in H1.
+clear Ha_bc; rename H1 into Ha_bc.
+specialize ((proj1 forall_pair_in) Ha_bc) as H1.
+cbn in H1.
+clear Ha_bc; rename H1 into Ha_bc.
+apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
+destruct Ha_bc as (llyz & Hllyz & Hyz).
+remember (length lx_yz) as n eqn:Hn.
+rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
+move Hn before n; symmetry in Hlx_yz.
+move Hlx_yz before Hllyz.
+move llyz before lx_yz.
+rewrite Hllyz in Hyz.
 ...
-  apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
-  destruct Ha_bc as (llyz & Hllyz & Hyz).
-  remember (length lx_yz) as n eqn:Hn.
-  rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
-  move Hn before n; symmetry in Hlx_yz.
-  move Hlx_yz before Hllyz.
-  move llyz before lx_yz.
-  rewrite Hllyz in Hyz.
   set (P u v :=
     (fst v ∈ a)%I
     ∧ length u ≠ 0
