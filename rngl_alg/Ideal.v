@@ -1993,8 +1993,11 @@ specialize (proj1 H1) as H2; clear H1.
 specialize (H2 Hyz).
 clear Hyz; rename H2 into Hyz.
 destruct Hyz as (lab & Hllyzm & Hlx_yzm & Hyz).
-...
-progress unfold I_mul_subtype_prop in Hyz.
+subst lx_yz llyz.
+move Hllyz before Hlx_yz.
+rewrite List.length_map in Hlx_yz, Hllyz.
+clear Hlx_yz; rename Hllyz into Hlab.
+rewrite rngl_summation_list_map in Ht.
 ...
 assert
   (∃ n f lx ly lz,
