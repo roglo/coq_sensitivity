@@ -1995,6 +1995,9 @@ assert
   clear Hyz; rename H2 into Hyz.
   destruct Hyz as (lab & Hllyzm & Hlx_yzm & Hyz).
 (**)
+assert
+  (∃ n f lx ly lz,
+   t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
 ... pfff... ci-dessous vraiment chiant...
   remember (max n (Max (l ∈ llyz), length l)) as m eqn:Hm.
   remember
