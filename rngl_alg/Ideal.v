@@ -1984,22 +1984,18 @@ move Hn before n; symmetry in Hlx_yz.
 move Hlx_yz before Hllyz.
 move llyz before lx_yz.
 rewrite Hllyz in Hyz.
+set (P u v := (fst v ∈ a)%I ∧ I_mul_subtype_prop b c u (snd v)).
+specialize (forall_in_seq [] (0, 0)%L llyz lx_yz P) as H1.
+rewrite Hlx_yz, Hllyz in H1.
+specialize (H1 eq_refl).
+subst P; cbn in H1.
+specialize (proj1 H1) as H2; clear H1.
+specialize (H2 Hyz).
+clear Hyz; rename H2 into Hyz.
+destruct Hyz as (lab & Hllyzm & Hlx_yzm & Hyz).
 ...
-  set (P u v :=
-    (fst v ∈ a)%I
-    ∧ length u ≠ 0
-    ∧ (∀ x y : T, (x, y) ∈ u → (x ∈ b)%I ∧ (y ∈ c)%I)
-    ∧ snd v =
-        ∑ ((x, y) ∈ u), x * y).
-  specialize (forall_in_seq [] (0, 0)%L llyz lx_yz P) as H1.
-  rewrite Hlx_yz, Hllyz in H1.
-  specialize (H1 eq_refl).
-  subst P; cbn in H1.
-  specialize (proj1 H1) as H2; clear H1.
-  specialize (H2 Hyz).
-  clear Hyz; rename H2 into Hyz.
-  destruct Hyz as (lab & Hllyzm & Hlx_yzm & Hyz).
-(**)
+progress unfold I_mul_subtype_prop in Hyz.
+...
 assert
   (∃ n f lx ly lz,
    t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
