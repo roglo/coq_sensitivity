@@ -299,11 +299,12 @@ Qed.
 
 (* multiplication *)
 
-Definition I_mul_subtype a b z :=
-  ∃ lxy,
+Definition I_mul_subtype_prop a b lxy z :=
   length lxy ≠ 0 ∧
   (∀ x y, (x, y) ∈ lxy → ip_subtype a x ∧ ip_subtype b y) ∧
   z = ∑ ((x, y) ∈ lxy), x * y.
+
+Definition I_mul_subtype a b z := ∃ lxy, I_mul_subtype_prop a b lxy z.
 
 Arguments I_mul_subtype a b z%_L.
 
@@ -332,6 +333,7 @@ destruct Hx as (lab1 & Hlab1 & Hab1 & Hx).
 destruct Hy as (lab2 & Hlab2 & Hab2 & Hy).
 subst x y.
 progress unfold I_mul_subtype.
+progress unfold I_mul_subtype_prop.
 exists (lab1 ++ lab2).
 rewrite List.length_app.
 split; [ flia Hlab1 Hlab2 | ].
@@ -349,6 +351,7 @@ Proof.
 destruct_ix.
 intros z (lxy & Hlxy & Hab & Hz); subst z.
 progress unfold I_mul_subtype.
+progress unfold I_mul_subtype_prop.
 exists (List.map (λ xy, (- fst xy, snd xy))%L lxy).
 rewrite List.length_map.
 split; [ easy | ].
@@ -375,6 +378,7 @@ destruct_ix.
 intros * (lxy & Hlxy & Hab & Hz).
 subst y; rename x into t.
 progress unfold I_mul_subtype.
+progress unfold I_mul_subtype_prop.
 exists (List.map (λ '(x, y), (t * x, y)%L) lxy).
 rewrite List.length_map.
 split; [ easy | ].
@@ -401,6 +405,7 @@ destruct_ix.
 intros * (lxy & Hlxy & Hab & Hz).
 subst x; rename y into t.
 progress unfold I_mul_subtype.
+progress unfold I_mul_subtype_prop.
 exists (List.map (λ '(x, y), (x, y * t)%L) lxy).
 rewrite List.length_map.
 split; [ easy | ].
@@ -1971,7 +1976,8 @@ assert
   specialize ((proj1 forall_pair_in) Ha_bc) as H1.
   cbn in H1.
   clear Ha_bc; rename H1 into Ha_bc.
-  progress unfold I_mul_subtype in Ha_bc.
+Check @forall_exists_exists_forall.
+...
   apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
   destruct Ha_bc as (llyz & Hllyz & Hyz).
   remember (length lx_yz) as n eqn:Hn.
@@ -2197,6 +2203,7 @@ Theorem I_mul_subtype_comm :
 Proof.
 intros Hic *.
 progress unfold I_mul_subtype.
+progress unfold I_mul_subtype_prop.
 apply propositional_extensionality.
 split; intros (lxy & Hlxy & H1 & H). {
   exists (List.map (λ xy, (snd xy, fst xy)) lxy).
