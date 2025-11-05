@@ -1984,8 +1984,9 @@ move Hn before n; symmetry in Hlx_yz.
 move Hlx_yz before Hllyz.
 move llyz before lx_yz.
 rewrite Hllyz in Hyz.
-set (P u v := (fst v ∈ a)%I ∧ I_mul_subtype_prop b c u (snd v)).
-specialize (forall_in_seq [] (0, 0)%L llyz lx_yz P) as H1.
+(**)
+set (P u v := (fst u ∈ a)%I ∧ I_mul_subtype_prop b c v (snd u)).
+specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
 rewrite Hlx_yz, Hllyz in H1.
 specialize (H1 eq_refl).
 subst P; cbn in H1.
@@ -1998,6 +1999,7 @@ move Hllyz before Hlx_yz.
 rewrite List.length_map in Hlx_yz, Hllyz.
 clear Hlx_yz; rename Hllyz into Hlab.
 rewrite rngl_summation_list_map in Ht.
+remember (∀ x_yz_t, _) as x in Hyz; subst x. (* renaming *)
 ...
 assert
   (∃ n f lx ly lz,
