@@ -1962,11 +1962,6 @@ Theorem glop a b c : ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
 Proof.
 destruct_ix.
 intros t Ht.
-(*
-assert
-  (∃ n f lx ly lz,
-   t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
-*)
 cbn in Ht.
 progress unfold I_mul_subset in Ht.
 destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
@@ -1996,17 +1991,17 @@ subst P; cbn in H1.
 specialize (proj1 H1) as H2; clear H1.
 specialize (H2 Hyz).
 clear Hyz; rename H2 into Hyz.
-destruct Hyz as (lab & Hllyzm & Hlx_yzm & Hyz).
+destruct Hyz as (labc & Hllyzm & Hlx_yzm & Hyz).
 subst lx_yz llyz.
 move Hllyz before Hlx_yz.
 rewrite List.length_map in Hlx_yz, Hllyz.
-clear Hlx_yz; rename Hllyz into Hlab.
+clear Hlx_yz; rename Hllyz into Hlabc.
 rewrite rngl_summation_list_map in Ht.
 remember (∀ x_yz_t, _) as x in Hyz; subst x. (* renaming *)
 remember (∑ (x_yz_t ∈ _), _) as x in Ht; subst x. (* renaming *)
 assert
   (∀ x_yz_t,
-   x_yz_t ∈ lab
+   x_yz_t ∈ labc
    → snd (fst x_yz_t) = ∑ ((y, z) ∈ snd x_yz_t), y * z). {
   intros * Hx_yz_t.
   specialize (Hyz _ Hx_yz_t) as (Ha & Hlx_yz_t & Hbc & H).
@@ -2019,6 +2014,19 @@ erewrite rngl_summation_list_eq_compat in Ht. 2: {
 }
 clear H.
 cbn in Ht.
+erewrite rngl_summation_list_eq_compat in Ht. 2: {
+  intros i Hi.
+  rewrite rngl_summation_list_pair.
+  rewrite (rngl_mul_summation_list_distr_l Hos).
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_mul_assoc.
+    reflexivity.
+  }
+  remember (∑ (yz ∈ _), _) as x in |-*; subst x. (* renaming *)
+  reflexivity.
+}
+remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
 ...
 ... pfff... ci-dessous vraiment chiant...
   remember (max n (Max (l ∈ llyz), length l)) as m eqn:Hm.
