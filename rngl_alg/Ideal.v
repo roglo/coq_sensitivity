@@ -20,22 +20,22 @@ Require Import RingLike.Nat_algebra.
 (* another version of ideals using bool instead of Prop follows *)
 
 Record ideal {T} {ro : ring_like_op T} := mk_ip
-  { ip_subtype : T → Prop;
-    ip_zero : ip_subtype rngl_zero;
-    ip_add : ∀ x y, ip_subtype x → ip_subtype y → ip_subtype (x + y)%L;
-    ip_opp : ∀ x, ip_subtype x → ip_subtype (- x)%L;
-    ip_mul_l : ∀ x y, ip_subtype y → ip_subtype (x * y)%L;
-    ip_mul_r : ∀ x y, ip_subtype x → ip_subtype (x * y)%L }.
+  { i_subset : T → Prop;
+    i_zero : i_subset 0%L;
+    i_add : ∀ x y, i_subset x → i_subset y → i_subset (x + y)%L;
+    i_opp : ∀ x, i_subset x → i_subset (- x)%L;
+    i_mul_l : ∀ x y, i_subset y → i_subset (x * y)%L;
+    i_mul_r : ∀ x y, i_subset x → i_subset (x * y)%L }.
 
 Declare Scope ideal_scope.
 Delimit Scope ideal_scope with I.
 Bind Scope ideal_scope with ideal.
 
 Arguments ideal T {ro}.
-Arguments ip_subtype {T ro} i%_I a%_L.
-Arguments ip_opp {T ro} i%_I x%_L.
+Arguments i_subset {T ro} i%_I a%_L.
+Arguments i_opp {T ro} i%_I x%_L.
 
-Notation "x '∈' a" := (ip_subtype a x) : ideal_scope.
+Notation "x '∈' a" := (i_subset a x) : ideal_scope.
 
 Class ideal_ctx T {ro : ring_like_op T} :=
   { ix_op : rngl_has_opp T = true }.
@@ -237,7 +237,7 @@ Qed.
 (* addition *)
 
 Definition I_add_subtype a b z :=
-  ∃ x y, z = (x + y)%L ∧ ip_subtype a x ∧ ip_subtype b y.
+  ∃ x y, z = (x + y)%L ∧ i_subset a x ∧ i_subset b y.
 
 Arguments I_add_subtype a b z%_L.
 
@@ -245,7 +245,7 @@ Theorem I_add_zero a b : I_add_subtype a b 0%L.
 Proof.
 exists 0%L, 0%L.
 split; [ symmetry; apply rngl_add_0_l | ].
-split; apply ip_zero.
+split; apply i_zero.
 Qed.
 
 Theorem I_add_add a b :
@@ -257,7 +257,7 @@ destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
 destruct Hy as (y1 & y2 & Hy & Hy1 & Hy2).
 subst x y.
 exists (x1 + y1)%L, (x2 + y2)%L.
-split; [ | now split; apply ip_add ].
+split; [ | now split; apply i_add ].
 do 2 rewrite rngl_add_assoc.
 progress f_equal.
 apply rngl_add_add_swap.
@@ -269,7 +269,7 @@ destruct_ix.
 intros * Hx.
 destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2); subst.
 exists (- x1)%L, (- x2)%L.
-split; [ | now split; apply ip_opp ].
+split; [ | now split; apply i_opp ].
 rewrite rngl_add_comm.
 rewrite (rngl_add_opp_r Hop).
 rewrite <- (rngl_opp_sub_distr Hop).
@@ -283,7 +283,7 @@ Proof.
 intros * H.
 destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
 exists (x * x1)%L, (x * x2)%L.
-split; [ | now split; apply ip_mul_l ].
+split; [ | now split; apply i_mul_l ].
 apply rngl_mul_add_distr_l.
 Qed.
 
@@ -293,7 +293,7 @@ Proof.
 intros * H.
 destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
 exists (x1 * y)%L, (x2 * y)%L.
-split; [ | now split; apply ip_mul_r ].
+split; [ | now split; apply i_mul_r ].
 apply rngl_mul_add_distr_r.
 Qed.
 
@@ -301,7 +301,7 @@ Qed.
 
 Definition I_mul_subtype_prop a b z lxy :=
   length lxy ≠ 0 ∧
-  (∀ x y, (x, y) ∈ lxy → ip_subtype a x ∧ ip_subtype b y) ∧
+  (∀ x y, (x, y) ∈ lxy → i_subset a x ∧ i_subset b y) ∧
   z = ∑ ((x, y) ∈ lxy), x * y.
 
 Definition I_mul_subtype a b z := ∃ lxy, I_mul_subtype_prop a b z lxy.
@@ -316,7 +316,7 @@ split; [ easy | ].
 split. {
   cbn; intros x y Hxy; destruct Hxy as [Hxy| ]; [ | easy ].
   injection Hxy; clear Hxy; intros; subst x y.
-  split; apply ip_zero.
+  split; apply i_zero.
 }
 symmetry.
 progress unfold iter_list; cbn.
@@ -361,7 +361,7 @@ split. {
   destruct Hxy' as ((x', y') & Hxy' & Hxyl).
   injection Hxy'; clear Hxy'; intros; subst x y.
   specialize (Hab _ _ Hxyl).
-  now split; [ apply ip_opp | ].
+  now split; [ apply i_opp | ].
 }
 do 2 rewrite rngl_summation_list_pair.
 rewrite (rngl_opp_summation_list Hop).
@@ -388,7 +388,7 @@ split. {
   destruct Hxy' as ((x, y) & H & Hxy').
   injection H; clear H; intros; subst x' y'.
   specialize (Hab _ _ Hxy').
-  now split; [ apply ip_mul_l | ].
+  now split; [ apply i_mul_l | ].
 }
 do 2 rewrite rngl_summation_list_pair.
 rewrite (rngl_mul_summation_list_distr_l Hos).
@@ -415,7 +415,7 @@ split. {
   destruct Hxy as ((x', y') & H & Hxy).
   injection H; clear H; intros; subst x y.
   specialize (Hab _ _ Hxy).
-  now split; [ | apply ip_mul_r ].
+  now split; [ | apply i_mul_r ].
 }
 do 2 rewrite rngl_summation_list_pair.
 rewrite (rngl_mul_summation_list_distr_r Hos).
@@ -428,77 +428,77 @@ Qed.
 (* opposite *)
 
 Theorem I_opp_add a :
-  ∀ x y, ip_subtype a (- x) → ip_subtype a (- y) → ip_subtype a (- (x + y)%L).
+  ∀ x y, i_subset a (- x) → i_subset a (- y) → i_subset a (- (x + y)%L).
 Proof.
 destruct_ix.
 intros * Hx Hy.
-apply ip_opp in Hx, Hy.
+apply i_opp in Hx, Hy.
 rewrite (rngl_opp_involutive Hop) in Hx, Hy.
-apply ip_opp.
-now apply ip_add.
+apply i_opp.
+now apply i_add.
 Qed.
 
 Theorem I_opp_mul_l a :
-  ∀ x y, ip_subtype a (- y) → ip_subtype a (- (x * y)%L).
+  ∀ x y, i_subset a (- y) → i_subset a (- (x * y)%L).
 Proof.
 destruct_ix.
 intros * H.
-apply ip_opp, ip_mul_l.
+apply i_opp, i_mul_l.
 rewrite <- (rngl_opp_involutive Hop).
-now apply ip_opp.
+now apply i_opp.
 Qed.
 
 Theorem I_opp_mul_r a :
-  ∀ x y, ip_subtype a (- x) → ip_subtype a (- (x * y)%L).
+  ∀ x y, i_subset a (- x) → i_subset a (- (x * y)%L).
 Proof.
 destruct_ix.
 intros * H.
-apply ip_opp, ip_mul_r.
+apply i_opp, i_mul_r.
 rewrite <- (rngl_opp_involutive Hop).
-now apply ip_opp.
+now apply i_opp.
 Qed.
 
 (* *)
 
 Definition I_zero : ideal T :=
-  {| ip_subtype a := a = 0%L;
-     ip_zero := eq_refl;
-     ip_add := I_zero_add;
-     ip_opp := I_zero_opp;
-     ip_mul_l := I_zero_mul_l;
-     ip_mul_r := I_zero_mul_r |}.
+  {| i_subset a := a = 0%L;
+     i_zero := eq_refl;
+     i_add := I_zero_add;
+     i_opp := I_zero_opp;
+     i_mul_l := I_zero_mul_l;
+     i_mul_r := I_zero_mul_r |}.
 
 Definition I_one : ideal T :=
-  {| ip_subtype a := True;
-     ip_zero := I;
-     ip_add _ _ _ _ := I;
-     ip_opp _ _ := I;
-     ip_mul_l _ _ _ := I;
-     ip_mul_r _ _ _ := I |}.
+  {| i_subset a := True;
+     i_zero := I;
+     i_add _ _ _ _ := I;
+     i_opp _ _ := I;
+     i_mul_l _ _ _ := I;
+     i_mul_r _ _ _ := I |}.
 
 Definition I_add (a b : ideal T) : ideal T :=
-  {| ip_subtype := I_add_subtype a b;
-     ip_zero := I_add_zero a b;
-     ip_add := I_add_add a b;
-     ip_opp := I_add_opp a b;
-     ip_mul_l := I_add_mul_l a b;
-     ip_mul_r := I_add_mul_r a b |}.
+  {| i_subset := I_add_subtype a b;
+     i_zero := I_add_zero a b;
+     i_add := I_add_add a b;
+     i_opp := I_add_opp a b;
+     i_mul_l := I_add_mul_l a b;
+     i_mul_r := I_add_mul_r a b |}.
 
 Definition I_mul (a b : ideal T) : ideal T :=
-  {| ip_subtype := I_mul_subtype a b;
-     ip_zero := I_mul_zero a b;
-     ip_add := I_mul_add a b;
-     ip_opp := I_mul_opp a b;
-     ip_mul_l := I_mul_mul_l a b;
-     ip_mul_r := I_mul_mul_r a b |}.
+  {| i_subset := I_mul_subtype a b;
+     i_zero := I_mul_zero a b;
+     i_add := I_mul_add a b;
+     i_opp := I_mul_opp a b;
+     i_mul_l := I_mul_mul_l a b;
+     i_mul_r := I_mul_mul_r a b |}.
 
 Definition I_opp (a : ideal T) : ideal T :=
-  {| ip_subtype x := ip_subtype a (-x);
-     ip_zero := ip_opp a 0 (ip_zero a);
-     ip_add := I_opp_add a;
-     ip_opp x := ip_opp a (-x);
-     ip_mul_l := I_opp_mul_l a;
-     ip_mul_r := I_opp_mul_r a |}.
+  {| i_subset x := i_subset a (-x);
+     i_zero := i_opp a 0 (i_zero a);
+     i_add := I_opp_add a;
+     i_opp x := i_opp a (-x);
+     i_mul_l := I_opp_mul_l a;
+     i_mul_r := I_opp_mul_r a |}.
 
 (* ideal ring like op *)
 
@@ -567,7 +567,7 @@ Context {rp : ring_like_prop T}.
 Context {ix : ideal_ctx T}.
 
 Theorem eq_ideal_eq : ∀ a b,
-  ip_subtype a = ip_subtype b
+  i_subset a = i_subset b
   → a = b.
 Proof.
 intros * Hab.
@@ -606,8 +606,8 @@ apply I_add_subtype_comm.
 Qed.
 
 Theorem I_add_subtype_assoc_l a b c x z :
-  ip_subtype a x
-  → ip_subtype (b + c)%I z
+  i_subset a x
+  → i_subset (b + c)%I z
   → I_add_subtype (a + b) c (x + z)%L.
 Proof.
 intros H1 H2.
@@ -649,7 +649,7 @@ intros x; cbn.
 apply I_add_subtype_assoc.
 Qed.
 
-Theorem I_add_subtype_0_l a x : I_add_subtype 0 a x = ip_subtype a x.
+Theorem I_add_subtype_0_l a x : I_add_subtype 0 a x = i_subset a x.
 Proof.
 destruct_ix.
 progress unfold I_add_subtype; cbn.
@@ -729,7 +729,7 @@ split. {
   remember (∀ xy z, _) as x in Hab_c; subst x. (* renaming *)
   remember (∑ ((xy, z) ∈ _), _) as x; subst x. (* renaming *)
 ...
-  Hab_c : ∀ xy z : T, (xy, z) ∈ l_xy_z → ip_subtype (a * b) xy ∧ ip_subtype c z
+  Hab_c : ∀ xy z : T, (xy, z) ∈ l_xy_z → i_subset (a * b) xy ∧ i_subset c z
   ============================
   I_mul_subtype a (b * c) (∑ ((xy, z) ∈ l_xy_z), xy * z)
   progress unfold I_mul_subtype.
@@ -738,7 +738,7 @@ split. {
   remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
   remember (∑ ((x, yz) ∈ _), _) as x; subst x. (* renaming *)
 (*
-  Ha_bc : ∀ x yz : T, (x, yz) ∈ l_x_yz → ip_subtype a x ∧ ip_subtype (b * c) yz
+  Ha_bc : ∀ x yz : T, (x, yz) ∈ l_x_yz → i_subset a x ∧ i_subset (b * c) yz
   ============================
   I_mul_subtype (a * b) c (∑ ((x, yz) ∈ l_x_yz), x * yz)
 *)
@@ -761,9 +761,9 @@ split. {
   assert
     (∃ inl_xyz, length inl_xyz = length nl ∧
      ∀ inl ixyz, (inl, ixyz) ∈ inl_xyz →
-     ip_subtype a (fst ixyz)
+     i_subset a (fst ixyz)
      ∧ length inl ≠ 0
-        ∧ (∀ x y : T, (x, y) ∈ inl → ip_subtype b x ∧ ip_subtype c y)
+        ∧ (∀ x y : T, (x, y) ∈ inl → i_subset b x ∧ i_subset c y)
           ∧ snd ixyz = ∑ ((x, y) ∈ inl), x * y). {
     exists
       (List.map (λ i, (List.nth i nl [], List.nth i l_x_yz (0, 0)%L))
@@ -818,7 +818,7 @@ split. {
     destruct H as [Hxy_z| H]; [ | easy ].
     destruct l_x_yz as [| x_yz]. {
       injection Hxy_z; clear Hxy_z; intros; subst xy z.
-      split; apply ip_zero.
+      split; apply i_zero.
     }
     cbn in Hxy_z.
 ...
@@ -927,7 +927,7 @@ split. {
     apply List.in_app_or in Hxy.
     destruct Hxy as [Hxy| Hxy]. 2: {
       apply List.repeat_spec in Hxy; subst xy.
-      apply ip_zero.
+      apply i_zero.
     }
     rewrite Hdab in Hxy.
     apply List.in_flat_map in Hxy.
@@ -984,7 +984,7 @@ split. {
     apply List.in_app_or in Hz.
     destruct Hz as [Hz| Hz]. 2: {
       apply List.repeat_spec in Hz; subst z.
-      apply ip_zero.
+      apply i_zero.
     }
     rewrite Hdc in Hz.
     apply List.in_flat_map in Hz.
@@ -2039,12 +2039,12 @@ assert
     destruct Hab2 as [Hab2| Hab2]; [ now specialize (Hyz ab Hab) | ].
     apply List.repeat_spec in Hab.
     subst ab; cbn.
-    split; [ apply ip_zero | ].
+    split; [ apply i_zero | ].
     split. {
       intros y z H.
       apply List.repeat_spec in H.
       injection H; clear H; intros; subst y z.
-      split; apply ip_zero.
+      split; apply i_zero.
     }
     symmetry.
     rewrite rngl_summation_list_pair.
@@ -2146,7 +2146,7 @@ apply functional_extensionality_dep.
 *)
 
 Theorem I_mul_subtype_1_l a :
-  ∀ x, I_mul_subtype 1 a x = ip_subtype a x.
+  ∀ x, I_mul_subtype 1 a x = i_subset a x.
 Proof.
 destruct_ix.
 intros.
@@ -2160,13 +2160,13 @@ split. {
     apply List.length_zero_iff_nil in Hnz.
     subst lxy.
     rewrite rngl_summation_list_only_one.
-    apply ip_mul_l; cbn.
+    apply i_mul_l; cbn.
     now apply (H1 x y); left.
   }
   specialize (IHlxy Hnz).
   rewrite rngl_summation_list_cons; cbn.
-  apply ip_add. {
-    apply ip_mul_l.
+  apply i_add. {
+    apply i_mul_l.
     now apply (H1 x y); left.
   }
   apply IHlxy.
