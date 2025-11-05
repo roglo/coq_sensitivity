@@ -2003,6 +2003,7 @@ rewrite List.length_map in Hlx_yz, Hllyz.
 clear Hlx_yz; rename Hllyz into Hlab.
 rewrite rngl_summation_list_map in Ht.
 remember (∀ x_yz_t, _) as x in Hyz; subst x. (* renaming *)
+remember (∑ (x_yz_t ∈ _), _) as x in Ht; subst x. (* renaming *)
 ...
 assert
   (∃ n f lx ly lz,
