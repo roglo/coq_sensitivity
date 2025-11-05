@@ -2004,10 +2004,22 @@ clear Hlx_yz; rename Hllyz into Hlab.
 rewrite rngl_summation_list_map in Ht.
 remember (∀ x_yz_t, _) as x in Hyz; subst x. (* renaming *)
 remember (∑ (x_yz_t ∈ _), _) as x in Ht; subst x. (* renaming *)
-...
 assert
-  (∃ n f lx ly lz,
-   t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
+  (∀ x_yz_t,
+   x_yz_t ∈ lab
+   → snd (fst x_yz_t) = ∑ ((y, z) ∈ snd x_yz_t), y * z). {
+  intros * Hx_yz_t.
+  specialize (Hyz _ Hx_yz_t) as (Ha & Hlx_yz_t & Hbc & H).
+  easy.
+}
+erewrite rngl_summation_list_eq_compat in Ht. 2: {
+  intros i Hi.
+  rewrite H; [ | easy ].
+  easy.
+}
+clear H.
+cbn in Ht.
+...
 ... pfff... ci-dessous vraiment chiant...
   remember (max n (Max (l ∈ llyz), length l)) as m eqn:Hm.
   remember
