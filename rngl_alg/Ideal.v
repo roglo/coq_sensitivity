@@ -299,12 +299,12 @@ Qed.
 
 (* multiplication *)
 
-Definition I_mul_subtype_prop a b lxy z :=
+Definition I_mul_subtype_prop a b z lxy :=
   length lxy ≠ 0 ∧
   (∀ x y, (x, y) ∈ lxy → ip_subtype a x ∧ ip_subtype b y) ∧
   z = ∑ ((x, y) ∈ lxy), x * y.
 
-Definition I_mul_subtype a b z := ∃ lxy, I_mul_subtype_prop a b lxy z.
+Definition I_mul_subtype a b z := ∃ lxy, I_mul_subtype_prop a b z lxy.
 
 Arguments I_mul_subtype a b z%_L.
 
@@ -1985,7 +1985,7 @@ move Hlx_yz before Hllyz.
 move llyz before lx_yz.
 rewrite Hllyz in Hyz.
 (**)
-set (P u v := (fst u ∈ a)%I ∧ I_mul_subtype_prop b c v (snd u)).
+set (P u v := (fst u ∈ a)%I ∧ I_mul_subtype_prop b c (snd u) v).
 specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
 rewrite Hlx_yz, Hllyz in H1.
 specialize (H1 eq_refl).
