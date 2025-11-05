@@ -1991,20 +1991,20 @@ subst P; cbn in H1.
 specialize (proj1 H1) as H2; clear H1.
 specialize (H2 Hyz).
 clear Hyz; rename H2 into Hyz.
-destruct Hyz as (labc & Hllyzm & Hlx_yzm & Hyz).
+destruct Hyz as (lx_yz_lyz & Hllyzm & Hlx_yzm & Hyz).
 subst lx_yz llyz.
 move Hllyz before Hlx_yz.
 rewrite List.length_map in Hlx_yz, Hllyz.
-clear Hlx_yz; rename Hllyz into Hlabc.
+clear Hlx_yz; rename Hllyz into Hlx_yz_lyz.
 rewrite rngl_summation_list_map in Ht.
-remember (∀ x_yz_t, _) as x in Hyz; subst x. (* renaming *)
-remember (∑ (x_yz_t ∈ _), _) as x in Ht; subst x. (* renaming *)
+remember (∀ x_yz_lyz, _) as x in Hyz; subst x. (* renaming *)
+remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
 assert
-  (∀ x_yz_t,
-   x_yz_t ∈ labc
-   → snd (fst x_yz_t) = ∑ ((y, z) ∈ snd x_yz_t), y * z). {
-  intros * Hx_yz_t.
-  specialize (Hyz _ Hx_yz_t) as (Ha & Hlx_yz_t & Hbc & H).
+  (∀ x_yz_lyz,
+   x_yz_lyz ∈ lx_yz_lyz
+   → snd (fst x_yz_lyz) = ∑ ((y, z) ∈ snd x_yz_lyz), y * z). {
+  intros * Hx_yz_lyz.
+  specialize (Hyz _ Hx_yz_lyz) as (Ha & Hllx_yz_lyz & Hbc & H).
   easy.
 }
 erewrite rngl_summation_list_eq_compat in Ht. 2: {
@@ -2026,7 +2026,7 @@ erewrite rngl_summation_list_eq_compat in Ht. 2: {
   remember (∑ (yz ∈ _), _) as x in |-*; subst x. (* renaming *)
   reflexivity.
 }
-remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
+remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
 ...
 ... pfff... ci-dessous vraiment chiant...
   remember (max n (Max (l ∈ llyz), length l)) as m eqn:Hm.
