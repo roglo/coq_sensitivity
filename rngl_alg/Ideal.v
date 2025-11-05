@@ -237,7 +237,7 @@ Qed.
 (* addition *)
 
 Definition I_add_subtype a b z :=
-  ∃ x y, i_subset a x ∧ i_subset b y ∧ z = (x + y)%L.
+  ∃ x y, (x ∈ a)%I ∧ (y ∈ b)%I ∧ z = (x + y)%L.
 
 Arguments I_add_subtype a b z%_L.
 
@@ -306,7 +306,7 @@ Qed.
 
 Definition I_mul_subtype_prop a b z lxy :=
   length lxy ≠ 0 ∧
-  (∀ x y, (x, y) ∈ lxy → i_subset a x ∧ i_subset b y) ∧
+  (∀ x y, (x, y) ∈ lxy → (x ∈ a)%I ∧ (y ∈ b)%I) ∧
   z = ∑ ((x, y) ∈ lxy), x * y.
 
 Definition I_mul_subtype a b z := ∃ lxy, I_mul_subtype_prop a b z lxy.
@@ -433,7 +433,7 @@ Qed.
 (* opposite *)
 
 Theorem I_opp_add a :
-  ∀ x y, i_subset a (- x) → i_subset a (- y) → i_subset a (- (x + y)%L).
+  ∀ x y : T, (- x ∈ a)%I → (- y ∈ a)%I → (- (x + y)%L ∈ a)%I.
 Proof.
 destruct_ix.
 intros * Hx Hy.
@@ -444,7 +444,7 @@ now apply i_add.
 Qed.
 
 Theorem I_opp_mul_l a :
-  ∀ x y, i_subset a (- y) → i_subset a (- (x * y)%L).
+  ∀ t x : T, (- x ∈ a)%I → (- (t * x)%L ∈ a)%I.
 Proof.
 destruct_ix.
 intros * H.
@@ -454,7 +454,7 @@ now apply i_opp.
 Qed.
 
 Theorem I_opp_mul_r a :
-  ∀ x y, i_subset a (- x) → i_subset a (- (x * y)%L).
+  ∀ x t : T, (- x ∈ a)%I → (- (x * t)%L ∈ a)%I.
 Proof.
 destruct_ix.
 intros * H.
@@ -611,9 +611,7 @@ apply I_add_subtype_comm.
 Qed.
 
 Theorem I_add_subtype_assoc_l a b c x z :
-  i_subset a x
-  → i_subset (b + c)%I z
-  → I_add_subtype (a + b) c (x + z)%L.
+  (x ∈ a)%I → (z ∈ b + c)%I → I_add_subtype (a + b) c (x + z)%L.
 Proof.
 intros H1 H2.
 cbn in H2.
@@ -654,7 +652,7 @@ intros x; cbn.
 apply I_add_subtype_assoc.
 Qed.
 
-Theorem I_add_subtype_0_l a x : I_add_subtype 0 a x = i_subset a x.
+Theorem I_add_subtype_0_l a x : I_add_subtype 0 a x = (x ∈ a)%I.
 Proof.
 destruct_ix.
 progress unfold I_add_subtype; cbn.
@@ -2151,7 +2149,7 @@ apply functional_extensionality_dep.
 *)
 
 Theorem I_mul_subtype_1_l a :
-  ∀ x, I_mul_subtype 1 a x = i_subset a x.
+  ∀ x, I_mul_subtype 1 a x = (x ∈ a)%I.
 Proof.
 destruct_ix.
 intros.
