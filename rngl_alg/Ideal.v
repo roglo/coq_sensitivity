@@ -237,15 +237,16 @@ Qed.
 (* addition *)
 
 Definition I_add_subtype a b z :=
-  ∃ x y, z = (x + y)%L ∧ i_subset a x ∧ i_subset b y.
+  ∃ x y, i_subset a x ∧ i_subset b y ∧ z = (x + y)%L.
 
 Arguments I_add_subtype a b z%_L.
 
 Theorem I_add_zero a b : I_add_subtype a b 0%L.
 Proof.
 exists 0%L, 0%L.
-split; [ symmetry; apply rngl_add_0_l | ].
-split; apply i_zero.
+split; [ apply i_zero | ].
+split; [ apply i_zero | ].
+symmetry; apply rngl_add_0_l.
 Qed.
 
 Theorem I_add_add a b :
@@ -257,7 +258,8 @@ destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
 destruct Hy as (y1 & y2 & Hy & Hy1 & Hy2).
 subst x y.
 exists (x1 + y1)%L, (x2 + y2)%L.
-split; [ | now split; apply i_add ].
+split; [ now apply i_add | ].
+split; [ now apply i_add | ].
 do 2 rewrite rngl_add_assoc.
 progress f_equal.
 apply rngl_add_add_swap.
@@ -269,7 +271,8 @@ destruct_ix.
 intros * Hx.
 destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2); subst.
 exists (- x1)%L, (- x2)%L.
-split; [ | now split; apply i_opp ].
+split; [ now apply i_opp | ].
+split; [ now apply i_opp | ].
 rewrite rngl_add_comm.
 rewrite (rngl_add_opp_r Hop).
 rewrite <- (rngl_opp_sub_distr Hop).
@@ -283,7 +286,8 @@ Proof.
 intros * H.
 destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
 exists (x * x1)%L, (x * x2)%L.
-split; [ | now split; apply i_mul_l ].
+split; [ now apply i_mul_l | ].
+split; [ now apply i_mul_l | ].
 apply rngl_mul_add_distr_l.
 Qed.
 
@@ -293,7 +297,8 @@ Proof.
 intros * H.
 destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
 exists (x1 * y)%L, (x2 * y)%L.
-split; [ | now split; apply i_mul_r ].
+split; [ now apply i_mul_r | ].
+split; [ now apply i_mul_r | ].
 apply rngl_mul_add_distr_r.
 Qed.
 
@@ -619,9 +624,9 @@ destruct H2 as (y & t & H & H2 & H3); subst z.
 rename t into z.
 move y before x; move z before y.
 exists (x + y)%L, z.
-split; [ apply rngl_add_assoc | ].
-split; [ | easy ].
-now exists x, y.
+split; [ now exists x, y | ].
+split; [ easy | ].
+apply rngl_add_assoc.
 Qed.
 
 Theorem I_add_subtype_assoc a b c x :
