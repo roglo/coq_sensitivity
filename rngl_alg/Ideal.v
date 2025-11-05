@@ -236,12 +236,12 @@ Qed.
 
 (* addition *)
 
-Definition I_add_subtype a b z :=
+Definition I_add_subset a b z :=
   ∃ x y, (x ∈ a)%I ∧ (y ∈ b)%I ∧ z = (x + y)%L.
 
-Arguments I_add_subtype a b z%_L.
+Arguments I_add_subset a b z%_L.
 
-Theorem I_add_zero a b : I_add_subtype a b 0%L.
+Theorem I_add_zero a b : I_add_subset a b 0%L.
 Proof.
 exists 0%L, 0%L.
 split; [ apply i_zero | ].
@@ -251,7 +251,7 @@ Qed.
 
 Theorem I_add_add a b :
   ∀ x y,
-  I_add_subtype a b x → I_add_subtype a b y → I_add_subtype a b (x + y)%L.
+  I_add_subset a b x → I_add_subset a b y → I_add_subset a b (x + y)%L.
 Proof.
 intros * Hx Hy.
 destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
@@ -265,7 +265,7 @@ progress f_equal.
 apply rngl_add_add_swap.
 Qed.
 
-Theorem I_add_opp a b : ∀ x, I_add_subtype a b x → I_add_subtype a b (- x).
+Theorem I_add_opp a b : ∀ x, I_add_subset a b x → I_add_subset a b (- x).
 Proof.
 destruct_ix.
 intros * Hx.
@@ -281,7 +281,7 @@ now f_equal.
 Qed.
 
 Theorem I_add_mul_l a b :
-  ∀ x y, I_add_subtype a b y → I_add_subtype a b (x * y).
+  ∀ x y, I_add_subset a b y → I_add_subset a b (x * y).
 Proof.
 intros * H.
 destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
@@ -292,7 +292,7 @@ apply rngl_mul_add_distr_l.
 Qed.
 
 Theorem I_add_mul_r a b :
-  ∀ x y, I_add_subtype a b x → I_add_subtype a b (x * y).
+  ∀ x y, I_add_subset a b x → I_add_subset a b (x * y).
 Proof.
 intros * H.
 destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
@@ -304,16 +304,16 @@ Qed.
 
 (* multiplication *)
 
-Definition I_mul_subtype_prop a b z lxy :=
+Definition I_mul_subset_prop a b z lxy :=
   length lxy ≠ 0 ∧
   (∀ x y, (x, y) ∈ lxy → (x ∈ a)%I ∧ (y ∈ b)%I) ∧
   z = ∑ ((x, y) ∈ lxy), x * y.
 
-Definition I_mul_subtype a b z := ∃ lxy, I_mul_subtype_prop a b z lxy.
+Definition I_mul_subset a b z := ∃ lxy, I_mul_subset_prop a b z lxy.
 
-Arguments I_mul_subtype a b z%_L.
+Arguments I_mul_subset a b z%_L.
 
-Theorem I_mul_zero a b : I_mul_subtype a b 0%L.
+Theorem I_mul_zero a b : I_mul_subset a b 0%L.
 Proof.
 destruct_ix.
 exists [(0, 0)%L].
@@ -331,14 +331,14 @@ Qed.
 
 Theorem I_mul_add a b :
   ∀ x y,
-  I_mul_subtype a b x → I_mul_subtype a b y → I_mul_subtype a b (x + y)%L.
+  I_mul_subset a b x → I_mul_subset a b y → I_mul_subset a b (x + y)%L.
 Proof.
 intros * Hx Hy.
 destruct Hx as (lab1 & Hlab1 & Hab1 & Hx).
 destruct Hy as (lab2 & Hlab2 & Hab2 & Hy).
 subst x y.
-progress unfold I_mul_subtype.
-progress unfold I_mul_subtype_prop.
+progress unfold I_mul_subset.
+progress unfold I_mul_subset_prop.
 exists (lab1 ++ lab2).
 rewrite List.length_app.
 split; [ flia Hlab1 Hlab2 | ].
@@ -351,12 +351,12 @@ do 3 rewrite rngl_summation_list_pair.
 symmetry; apply rngl_summation_list_app.
 Qed.
 
-Theorem I_mul_opp a b : ∀ x, I_mul_subtype a b x → I_mul_subtype a b (- x).
+Theorem I_mul_opp a b : ∀ x, I_mul_subset a b x → I_mul_subset a b (- x).
 Proof.
 destruct_ix.
 intros z (lxy & Hlxy & Hab & Hz); subst z.
-progress unfold I_mul_subtype.
-progress unfold I_mul_subtype_prop.
+progress unfold I_mul_subset.
+progress unfold I_mul_subset_prop.
 exists (List.map (λ xy, (- fst xy, snd xy))%L lxy).
 rewrite List.length_map.
 split; [ easy | ].
@@ -377,13 +377,13 @@ now rewrite (rngl_mul_opp_l Hop).
 Qed.
 
 Theorem I_mul_mul_l a b :
-  ∀ x y, I_mul_subtype a b y → I_mul_subtype a b (x * y).
+  ∀ x y, I_mul_subset a b y → I_mul_subset a b (x * y).
 Proof.
 destruct_ix.
 intros * (lxy & Hlxy & Hab & Hz).
 subst y; rename x into t.
-progress unfold I_mul_subtype.
-progress unfold I_mul_subtype_prop.
+progress unfold I_mul_subset.
+progress unfold I_mul_subset_prop.
 exists (List.map (λ '(x, y), (t * x, y)%L) lxy).
 rewrite List.length_map.
 split; [ easy | ].
@@ -404,13 +404,13 @@ apply rngl_mul_assoc.
 Qed.
 
 Theorem I_mul_mul_r a b :
-  ∀ x y, I_mul_subtype a b x → I_mul_subtype a b (x * y).
+  ∀ x y, I_mul_subset a b x → I_mul_subset a b (x * y).
 Proof.
 destruct_ix.
 intros * (lxy & Hlxy & Hab & Hz).
 subst x; rename y into t.
-progress unfold I_mul_subtype.
-progress unfold I_mul_subtype_prop.
+progress unfold I_mul_subset.
+progress unfold I_mul_subset_prop.
 exists (List.map (λ '(x, y), (x, y * t)%L) lxy).
 rewrite List.length_map.
 split; [ easy | ].
@@ -482,7 +482,7 @@ Definition I_one : ideal T :=
      i_mul_r _ _ _ := I |}.
 
 Definition I_add (a b : ideal T) : ideal T :=
-  {| i_subset := I_add_subtype a b;
+  {| i_subset := I_add_subset a b;
      i_zero := I_add_zero a b;
      i_add := I_add_add a b;
      i_opp := I_add_opp a b;
@@ -490,7 +490,7 @@ Definition I_add (a b : ideal T) : ideal T :=
      i_mul_r := I_add_mul_r a b |}.
 
 Definition I_mul (a b : ideal T) : ideal T :=
-  {| i_subset := I_mul_subtype a b;
+  {| i_subset := I_mul_subset a b;
      i_zero := I_mul_zero a b;
      i_add := I_mul_add a b;
      i_opp := I_mul_opp a b;
@@ -588,9 +588,9 @@ apply proof_irrelevance.
 apply proof_irrelevance.
 Qed.
 
-Theorem I_add_subtype_comm a b z : I_add_subtype a b z = I_add_subtype b a z.
+Theorem I_add_subset_comm a b z : I_add_subset a b z = I_add_subset b a z.
 Proof.
-progress unfold I_add_subtype.
+progress unfold I_add_subset.
 apply propositional_extensionality.
 split; intros (x & y & H1 & H2 & H3). {
   exists y, x.
@@ -607,17 +607,17 @@ intros.
 apply eq_ideal_eq.
 apply functional_extensionality_dep.
 intros z.
-apply I_add_subtype_comm.
+apply I_add_subset_comm.
 Qed.
 
-Theorem I_add_subtype_assoc_l a b c x z :
-  (x ∈ a)%I → (z ∈ b + c)%I → I_add_subtype (a + b) c (x + z)%L.
+Theorem I_add_subset_assoc_l a b c x z :
+  (x ∈ a)%I → (z ∈ b + c)%I → I_add_subset (a + b) c (x + z)%L.
 Proof.
 intros H1 H2.
 cbn in H2.
-progress unfold I_add_subtype; cbn.
-progress unfold I_add_subtype in H2.
-progress unfold I_add_subtype.
+progress unfold I_add_subset; cbn.
+progress unfold I_add_subset in H2.
+progress unfold I_add_subset.
 destruct H2 as (y & t & H & H2 & H3); subst z.
 rename t into z.
 move y before x; move z before y.
@@ -627,18 +627,18 @@ split; [ easy | ].
 apply rngl_add_assoc.
 Qed.
 
-Theorem I_add_subtype_assoc a b c x :
-  I_add_subtype a (b + c) x = I_add_subtype (a + b) c x.
+Theorem I_add_subset_assoc a b c x :
+  I_add_subset a (b + c) x = I_add_subset (a + b) c x.
 Proof.
 destruct_ix.
 apply propositional_extensionality.
 split; intros (y & z & H & H1 & H2); subst x. {
-  now apply I_add_subtype_assoc_l.
+  now apply I_add_subset_assoc_l.
 } {
-  rewrite I_add_subtype_comm.
+  rewrite I_add_subset_comm.
   rewrite I_add_comm.
   rewrite rngl_add_comm.
-  apply I_add_subtype_assoc_l; [ easy | ].
+  apply I_add_subset_assoc_l; [ easy | ].
   now rewrite I_add_comm.
 }
 Qed.
@@ -649,13 +649,13 @@ intros.
 apply eq_ideal_eq.
 apply functional_extensionality_dep.
 intros x; cbn.
-apply I_add_subtype_assoc.
+apply I_add_subset_assoc.
 Qed.
 
-Theorem I_add_subtype_0_l a x : I_add_subtype 0 a x = (x ∈ a)%I.
+Theorem I_add_subset_0_l a x : I_add_subset 0 a x = (x ∈ a)%I.
 Proof.
 destruct_ix.
-progress unfold I_add_subtype; cbn.
+progress unfold I_add_subset; cbn.
 apply propositional_extensionality.
 split. {
   intros (y & z & H & H1 & H2); subst x y.
@@ -672,7 +672,7 @@ Proof.
 intros.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
-apply I_add_subtype_0_l.
+apply I_add_subset_0_l.
 Qed.
 
 Theorem forall_exists_exists_forall {A B} (da : A) (db : B) P Q la :
@@ -721,8 +721,8 @@ split. {
 Qed.
 
 (* to be completed, mais peut-être mauvaise piste à annuler
-Theorem I_mul_subtype_assoc a b c x :
-  I_mul_subtype a (b * c) x = I_mul_subtype (a * b) c x.
+Theorem I_mul_subset_assoc a b c x :
+  I_mul_subset a (b * c) x = I_mul_subset (a * b) c x.
 Proof.
 destruct_ix.
 apply propositional_extensionality.
@@ -734,8 +734,8 @@ split. {
 ...
   Hab_c : ∀ xy z : T, (xy, z) ∈ l_xy_z → i_subset (a * b) xy ∧ i_subset c z
   ============================
-  I_mul_subtype a (b * c) (∑ ((xy, z) ∈ l_xy_z), xy * z)
-  progress unfold I_mul_subtype.
+  I_mul_subset a (b * c) (∑ ((xy, z) ∈ l_xy_z), xy * z)
+  progress unfold I_mul_subset.
 *)
   intros (l_x_yz & Hl_x_yz & Ha_bc & H); subst x.
   remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
@@ -743,10 +743,10 @@ split. {
 (*
   Ha_bc : ∀ x yz : T, (x, yz) ∈ l_x_yz → i_subset a x ∧ i_subset (b * c) yz
   ============================
-  I_mul_subtype (a * b) c (∑ ((x, yz) ∈ l_x_yz), x * yz)
+  I_mul_subset (a * b) c (∑ ((x, yz) ∈ l_x_yz), x * yz)
 *)
   cbn in Ha_bc.
-  progress unfold I_mul_subtype in Ha_bc.
+  progress unfold I_mul_subset in Ha_bc.
   specialize ((proj1 forall_pair) Ha_bc) as H1.
   cbn in H1.
   clear Ha_bc; rename H1 into Ha_bc.
@@ -758,7 +758,7 @@ split. {
   destruct Ha_bc as (nll & H & Habc).
   rewrite <- H in Hnl; symmetry in H.
   rename H into Hl_x_yz.
-  progress unfold I_mul_subtype.
+  progress unfold I_mul_subset.
   eenough (H : ∃ l_xy_z, _) by apply H. (* renaming *)
 (*
   assert
@@ -854,7 +854,7 @@ split. {
       specialize (Habc H); clear H.
       destruct Habc as (Ha & Hlnl & Hbc & Habc).
       cbn.
-      progress unfold I_mul_subtype.
+      progress unfold I_mul_subset.
 ...
   remember (∑ (i = 1, n), nl.[i-1]) as m eqn:Hm.
 (**)
@@ -1374,7 +1374,7 @@ Theorem glop :
     clear z Hz.
     cbn.
     remember (List.nth (i - 1) llb []) as lb eqn:Hdlb.
-    progress unfold I_mul_subtype.
+    progress unfold I_mul_subset.
     apply List.in_seq in Hi.
     apply List.in_seq in Hj.
     exists 1, [la.[i-1]], [lb.[j-1]].
@@ -1945,8 +1945,8 @@ Search (∑ (_ = _, _), ∑ (_ = _, _), _).
     }
 ...
 } {
-  progress unfold I_add_subtype in H1.
-  progress unfold I_add_subtype.
+  progress unfold I_add_subset in H1.
+  progress unfold I_add_subset.
   destruct H1 as (x & t & H & H1 & H3); subst y.
   rename t into y.
   exists x, (y + z)%L.
@@ -1968,7 +1968,7 @@ assert
    t = ∑ (i = 0, n), lx.[i] * ∑ (j = 0, f i), ly.[j] * lz.[j]). {
 *)
 cbn in Ht.
-progress unfold I_mul_subtype in Ht.
+progress unfold I_mul_subset in Ht.
 destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
 remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
 rewrite rngl_summation_list_pair in Ht.
@@ -1988,7 +1988,7 @@ move Hlx_yz before Hllyz.
 move llyz before lx_yz.
 rewrite Hllyz in Hyz.
 (**)
-set (P u v := (fst u ∈ a)%I ∧ I_mul_subtype_prop b c (snd u) v).
+set (P u v := (fst u ∈ a)%I ∧ I_mul_subset_prop b c (snd u) v).
 specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
 rewrite Hlx_yz, Hllyz in H1.
 specialize (H1 eq_refl).
@@ -2136,7 +2136,7 @@ erewrite rngl_summation_list_eq_compat in Ht. 2: {
   specialize (Ha_bc Hx_yz).
   destruct Ha_bc as (Ha, Hbc).
   cbn in Hbc.
-  progress unfold I_mul_subtype in Hbc.
+  progress unfold I_mul_subset in Hbc.
   destruct Hbc as (lxy & Hlxy & Hab & Hu).
   rewrite Hu.
 ...
@@ -2148,8 +2148,8 @@ apply functional_extensionality_dep.
 ...
 *)
 
-Theorem I_mul_subtype_1_l a :
-  ∀ x, I_mul_subtype 1 a x = (x ∈ a)%I.
+Theorem I_mul_subset_1_l a :
+  ∀ x, I_mul_subset 1 a x = (x ∈ a)%I.
 Proof.
 destruct_ix.
 intros.
@@ -2197,16 +2197,16 @@ intros.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
 intros.
-apply I_mul_subtype_1_l.
+apply I_mul_subset_1_l.
 Qed.
 
-Theorem I_mul_subtype_comm :
+Theorem I_mul_subset_comm :
   rngl_mul_is_comm T = true →
-  ∀ a b x, I_mul_subtype a b x = I_mul_subtype b a x.
+  ∀ a b x, I_mul_subset a b x = I_mul_subset b a x.
 Proof.
 intros Hic *.
-progress unfold I_mul_subtype.
-progress unfold I_mul_subtype_prop.
+progress unfold I_mul_subset.
+progress unfold I_mul_subset_prop.
 apply propositional_extensionality.
 split; intros (lxy & Hlxy & H1 & H). {
   exists (List.map (λ xy, (snd xy, fst xy)) lxy).
@@ -2258,7 +2258,7 @@ intros.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
 intros.
-apply (I_mul_subtype_comm Hic).
+apply (I_mul_subset_comm Hic).
 Qed.
 
 (* to be completed
