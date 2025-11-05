@@ -22,10 +22,10 @@ Require Import RingLike.Nat_algebra.
 Record ideal {T} {ro : ring_like_op T} := mk_ip
   { i_subset : T → Prop;
     i_zero : i_subset 0%L;
-    i_add : ∀ x y, i_subset x → i_subset y → i_subset (x + y)%L;
-    i_opp : ∀ x, i_subset x → i_subset (- x)%L;
-    i_mul_l : ∀ x y, i_subset y → i_subset (x * y)%L;
-    i_mul_r : ∀ x y, i_subset x → i_subset (x * y)%L }.
+    i_add x y : i_subset x → i_subset y → i_subset (x + y)%L;
+    i_opp x : i_subset x → i_subset (- x)%L;
+    i_mul_l x y : i_subset y → i_subset (x * y)%L;
+    i_mul_r x y : i_subset x → i_subset (x * y)%L }.
 
 Declare Scope ideal_scope.
 Delimit Scope ideal_scope with I.
