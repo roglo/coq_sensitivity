@@ -1957,6 +1957,13 @@ Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 ...
 *)
 
+Theorem I_mul_subset_prop_in_ideal :
+  ∀ a b z lxy, I_mul_subset_prop a b z lxy → (z ∈ a * b)%I.
+Proof.
+intros * H; cbn.
+now exists lxy.
+Qed.
+
 (* to be completed
 Theorem glop a b c : ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
 Proof.
@@ -2027,6 +2034,34 @@ erewrite rngl_summation_list_eq_compat in Ht. 2: {
   reflexivity.
 }
 remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
+assert (H :
+  t = ∑ (i = 0, n - 1),
+      let x_yz_lyz := List.nth i lx_yz_lyz ((0, 0), []) in
+      ∑ (j = 0, n - 1),
+      let yz := List.nth j (snd x_yz_lyz) (0, 0) in
+      fst (fst x_yz_lyz) * fst yz * snd yz). {
+   cbn.
+(*
+   progress unfold iter_seq.
+   rewrite <- Nat_succ_sub_succ_r; [ | now apply Nat.neq_0_lt_0 ].
+   do 2 rewrite Nat.sub_0_r.
+*)
+   subst t.
+Theorem glop {A} (da : A) la f :
+  ∑ (a ∈ la), f a = ∑ (i = 0, length la - 1), f (List.nth i la da).
+Proof.
+intros.
+Search (∑ (_ = _, _), _ = ∑ (_ ∈ _), _).
+Search (∑ (_ ∈ _), _ = ∑ (_ = _, _), _).
+(* ça devrait le faire mais j'ai la flemme *)
+...
+rewrite (glop ((0, 0), []))%L.
+Search (∑ (_ ∈ _), _).
+...
+Search (∑ (_ = _, _), _ = ∑ (_ ∈ _), _).
+Search (∑ (_ ∈ _), _ = ∑ (_ = _, _), _).
+   rewrite rngl_summation_seq_summation.
+
 ...
 ... pfff... ci-dessous vraiment chiant...
   remember (max n (Max (l ∈ llyz), length l)) as m eqn:Hm.
