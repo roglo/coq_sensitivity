@@ -2044,7 +2044,7 @@ Proof.
 intros * Ha Hb Hc.
 cbn.
 progress unfold I_mul_subset.
-(* pas si évident que ça, finalement *)
+progress unfold I_mul_subset_prop.
 ... ...
 rewrite Ht.
 apply glop. {
