@@ -2041,10 +2041,39 @@ Theorem glop {A B} :
   → (∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I)
   → (∑ (i ∈ li), ∑ (j ∈ lj i), f i j * g i j * h i j ∈ a * b * c)%I.
 Proof.
+destruct_ix.
 intros * Ha Hb Hc.
 cbn.
 progress unfold I_mul_subset.
 progress unfold I_mul_subset_prop.
+destruct li as [| i1]. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  exists [(0, 0)]%L.
+  split; [ easy | ].
+  split. {
+    intros x y Hxy.
+    destruct Hxy as [Hxy| Hxy]; [ | easy ].
+    injection Hxy; clear Hxy; intros; subst x y.
+    split; apply i_zero.
+  }
+  rewrite rngl_summation_list_pair; symmetry.
+  rewrite rngl_summation_list_only_one.
+  apply (rngl_mul_0_l Hos).
+}
+destruct li as [| i2]. {
+  exists [(∑ (j ∈ lj i1), f i1 j * g i1 j, 0)]%L. (* au pif *)
+  split; [ easy | ].
+  split. {
+    intros x y Hxy.
+    destruct Hxy as [Hxy| Hxy]; [ | easy ].
+    injection Hxy; clear Hxy; intros; subst x y.
+    split; [ | apply i_zero ].
+    admit. (* ouais, ça a l'air vrai *)
+  }
+  rewrite rngl_summation_list_pair; symmetry.
+  do 2 rewrite rngl_summation_list_only_one.
+  cbn.
+(* ouais, bof *)
 ... ...
 rewrite Ht.
 apply glop. {
