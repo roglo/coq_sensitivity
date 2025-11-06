@@ -2047,6 +2047,12 @@ assert (H :
    do 2 rewrite Nat.sub_0_r.
 *)
    subst t.
+   admit.
+}
+cbn in H.
+rewrite rngl_summation_summation_exch in H.
+(* non, ça marche pas, les 3 termes dépendent de j *)
+...
 Theorem glop {A} (da : A) la f :
   ∑ (a ∈ la), f a = ∑ (i = 0, length la - 1), f (List.nth i la da).
 Proof.
