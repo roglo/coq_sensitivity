@@ -2034,6 +2034,38 @@ erewrite rngl_summation_list_eq_compat in Ht. 2: {
   reflexivity.
 }
 remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
+Theorem glop {A B} :
+  ∀ a b c li lj (f g h : A → B → T),
+  (∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I)
+  → (∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I)
+  → (∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I)
+  → (∑ (i ∈ li), ∑ (j ∈ lj i), f i j * g i j * h i j ∈ a * b * c)%I.
+Proof.
+intros * Ha Hb Hc.
+cbn.
+progress unfold I_mul_subset.
+(* pas si évident que ça, finalement *)
+... ...
+rewrite Ht.
+apply glop. {
+  intros * Hi Hj.
+  now specialize (Hyz _ Hi).
+} {
+  intros * Hi Hj.
+  specialize (Hyz _ Hi).
+  destruct Hyz as (_, H).
+  destruct H as (lli & H1 & H2).
+  destruct j as (j, k).
+  now specialize (H1 j k Hj).
+} {
+  intros * Hi Hj.
+  specialize (Hyz _ Hi).
+  destruct Hyz as (_, H).
+  destruct H as (lli & H1 & H2).
+  destruct j as (j, k).
+  now specialize (H1 j k Hj).
+}
+...
 assert (H :
   t = ∑ (i = 0, n - 1),
       let x_yz_lyz := List.nth i lx_yz_lyz ((0, 0), []) in
