@@ -821,6 +821,7 @@ now intros i Hi; apply Hb; [ left | ].
 now intros i Hi; apply Hc; [ left | ].
 Qed.
 
+(* I_mul_subset a (b * c) z → I_mul_subset (a * b) c z *)
 Theorem I_subset_mul_assoc_l_mul_assoc_r a b c :
   ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
 Proof.
@@ -846,7 +847,6 @@ move Hn before n; symmetry in Hlx_yz.
 move Hlx_yz before Hllyz.
 move llyz before lx_yz.
 rewrite Hllyz in Hyz.
-(**)
 set (P u v := (fst u ∈ a)%I ∧ I_mul_subset_prop b c (snd u) v).
 specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
 rewrite Hlx_yz, Hllyz in H1.
@@ -913,21 +913,123 @@ apply I_subset_sum_sum_mul_assoc_l. {
 }
 Qed.
 
-Theorem I_mul_subset_prop_in_ideal :
-  ∀ a b z lxy, I_mul_subset_prop a b z lxy → (z ∈ a * b)%I.
+(* I_mul_subset (a * b) c z → I_mul_subset a (b * c) z *)
+(* to be completed
+Theorem I_subset_mul_assoc_l_mul_assoc_l a b c :
+  ∀ z, (z ∈ (a * b) * c → z ∈ a * (b * c))%I.
 Proof.
-intros * H.
-now exists lxy.
+destruct_ix.
+intros t Ht.
+cbn in Ht.
+progress unfold I_mul_subset in Ht.
+destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
+remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
+rewrite rngl_summation_list_pair in Ht.
+remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
+specialize ((proj1 forall_pair) Ha_bc) as H1.
+cbn in H1.
+clear Ha_bc; rename H1 into Ha_bc.
+specialize ((proj1 forall_pair_in) Ha_bc) as H1.
+cbn in H1.
+clear Ha_bc; rename H1 into Ha_bc.
+(**)
+assert (H : ∀ ab, ab ∈ lx_yz → (snd ab ∈ c)%I ∧ I_mul_subset a b (fst ab)). {
+  intros ab Hab.
+  now specialize (Ha_bc ab Hab).
+}
+apply (forall_exists_exists_forall (0, 0)%L []) in H.
+clear Ha_bc; rename H into Ha_bc.
+(*
+apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
+*)
+destruct Ha_bc as (llyz & Hllyz & Hyz).
+remember (length lx_yz) as n eqn:Hn.
+rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
+move Hn before n; symmetry in Hlx_yz.
+move Hlx_yz before Hllyz.
+move llyz before lx_yz.
+rewrite Hllyz in Hyz.
+set (P u v := (fst u ∈ a)%I ∧ I_mul_subset_prop b c (snd u) v).
+specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
+rewrite Hlx_yz, Hllyz in H1.
+specialize (H1 eq_refl).
+subst P; cbn in H1.
+specialize (proj1 H1) as H2; clear H1.
+...
+specialize (H2 Hyz).
+clear Hyz; rename H2 into Hyz.
+destruct Hyz as (lx_yz_lyz & Hllyzm & Hlx_yzm & Hyz).
+subst lx_yz llyz.
+move Hllyz before Hlx_yz.
+rewrite List.length_map in Hlx_yz, Hllyz.
+clear Hlx_yz; rename Hllyz into Hlx_yz_lyz.
+rewrite rngl_summation_list_map in Ht.
+remember (∀ x_yz_lyz, _) as x in Hyz; subst x. (* renaming *)
+remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
+assert
+  (∀ x_yz_lyz,
+   x_yz_lyz ∈ lx_yz_lyz
+   → snd (fst x_yz_lyz) = ∑ ((y, z) ∈ snd x_yz_lyz), y * z). {
+  intros * Hx_yz_lyz.
+  specialize (Hyz _ Hx_yz_lyz) as (Ha & Hllx_yz_lyz & Hbc & H).
+  easy.
+}
+erewrite rngl_summation_list_eq_compat in Ht. 2: {
+  intros i Hi.
+  rewrite H; [ | easy ].
+  easy.
+}
+clear H.
+cbn in Ht.
+erewrite rngl_summation_list_eq_compat in Ht. 2: {
+  intros i Hi.
+  rewrite rngl_summation_list_pair.
+  rewrite (rngl_mul_summation_list_distr_l Hos).
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_mul_assoc.
+    reflexivity.
+  }
+  remember (∑ (yz ∈ _), _) as x in |-*; subst x. (* renaming *)
+  reflexivity.
+}
+remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
+cbn.
+rewrite Ht.
+apply I_subset_sum_sum_mul_assoc_l. {
+  intros * Hi Hj.
+  now specialize (Hyz _ Hi).
+} {
+  intros * Hi Hj.
+  specialize (Hyz _ Hi).
+  destruct Hyz as (_, H).
+  destruct H as (lli & H1 & H2).
+  destruct j as (j, k).
+  now specialize (H1 j k Hj).
+} {
+  intros * Hi Hj.
+  specialize (Hyz _ Hi).
+  destruct Hyz as (_, H).
+  destruct H as (lli & H1 & H2).
+  destruct j as (j, k).
+  now specialize (H1 j k Hj).
+}
 Qed.
+*)
 
 (* to be completed
 Theorem I_mul_subset_assoc a b c x :
   I_mul_subset a (b * c) x = I_mul_subset (a * b) c x.
 Proof.
-destruct_ix.
 apply propositional_extensionality.
-split. {
-  intros H.
+split.
+now apply I_subset_mul_assoc_l_mul_assoc_r.
+... ...
+now apply I_subset_mul_assoc_l_mul_assoc_l.
+...
+  I_mul_subset (a * b) c x → I_mul_subset a (b * c) x
+now apply I_subset_mul_assoc_l_mul_assoc_l.
+...
   progress unfold I_mul_subset in H.
   progress unfold I_mul_subset.
 ...
