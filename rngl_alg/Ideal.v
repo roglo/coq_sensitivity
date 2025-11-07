@@ -1,4 +1,4 @@
-(* Ideal.v *)
+l(* Ideal.v *)
 
 (* ideals on a RingLike *)
 
@@ -2061,9 +2061,20 @@ destruct li as [| i1]. {
   apply (rngl_mul_0_l Hos).
 }
 destruct li as [| i2]. {
-  remember (lj i1) as lji1 eqn:Hlji1.
-  symmetry in Hlji1.
-  destruct lji1 as [| j1]. {
+  assert (H : ∀ j, j ∈ lj i1 → (f i1 j ∈ a)%I). {
+    now intros j Hj; apply Ha; [ left | ].
+  }
+  move H before Ha; clear Ha; rename H into Ha.
+  assert (H : ∀ j, j ∈ lj i1 → (g i1 j ∈ b)%I). {
+    now intros j Hj; apply Hb; [ left | ].
+  }
+  move H before Hb; clear Hb; rename H into Hb.
+  assert (H : ∀ j, j ∈ lj i1 → (h i1 j ∈ c)%I). {
+    now intros j Hj; apply Hc; [ left | ].
+  }
+  move H before Hc; clear Hc; rename H into Hc.
+  rewrite rngl_summation_list_only_one.
+  induction (lj i1) as [| j1 lji1]. {
     exists [(0, 0)]%L.
     split; [ easy | ].
     split. {
@@ -2072,92 +2083,48 @@ destruct li as [| i2]. {
       injection Hxy; clear Hxy; intros; subst x y.
       split; apply i_zero.
     }
-    rewrite rngl_summation_list_only_one.
-    rewrite Hlji1.
     rewrite rngl_summation_list_pair.
     rewrite rngl_summation_list_only_one.
     rewrite rngl_summation_list_empty; [ symmetry | easy ].
     apply (rngl_mul_0_l Hos).
   }
-  destruct lji1 as [| j2]. {
-    exists [(f i1 j1 * g i1 j1, h i1 j1)]%L.
+  assert (H : ∀ j, j ∈ lji1 → (f i1 j ∈ a)%I). {
+    now intros j Hj; apply Ha; right.
+  }
+  specialize (IHlji1 H); clear H.
+  assert (H : ∀ j, j ∈ lji1 → (g i1 j ∈ b)%I). {
+    now intros j Hj; apply Hb; right.
+  }
+  specialize (IHlji1 H); clear H.
+  assert (H : ∀ j, j ∈ lji1 → (h i1 j ∈ c)%I). {
+    now intros j Hj; apply Hc; right.
+  }
+  specialize (IHlji1 H); clear H.
+  destruct IHlji1 as (lxy & H1 & H2 & H3).
+  exists ((f i1 j1 * g i1 j1, h i1 j1) :: lxy)%L.
+  split; [ easy | ].
+  split. {
+    intros * Hxy.
+    destruct Hxy as [Hxy| Hxy]; [ | now apply H2 ].
+    injection Hxy; clear Hxy; intros; subst x y.
+    split; [ | now apply Hc; left ].
+    exists [(f i1 j1, g i1 j1)].
+    progress unfold I_mul_subset_prop.
     split; [ easy | ].
     split. {
       intros x y Hxy.
       destruct Hxy as [Hxy| Hxy]; [ | easy ].
       injection Hxy; clear Hxy; intros; subst x y.
-      split. {
-        exists [(f i1 j1, g i1 j1)].
-        progress unfold I_mul_subset_prop.
-        split; [ easy | ].
-        split. {
-          intros x y Hxy.
-          destruct Hxy as [Hxy| Hxy]; [ | easy ].
-          injection Hxy; clear Hxy; intros; subst x y.
-          split.
-          now apply Ha; [ | rewrite Hlji1 ]; left.
-          now apply Hb; [ | rewrite Hlji1 ]; left.
-        }
-        rewrite rngl_summation_list_pair; symmetry.
-        now rewrite rngl_summation_list_only_one.
-      }
-      now apply Hc; [ | rewrite Hlji1 ]; left.
+      now split; [ apply Ha | apply Hb ]; left.
     }
-    rewrite rngl_summation_list_only_one.
-    rewrite Hlji1.
-    rewrite rngl_summation_list_pair.
-    rewrite rngl_summation_list_only_one.
+    rewrite rngl_summation_list_pair; symmetry.
     now rewrite rngl_summation_list_only_one.
   }
-  destruct lji1 as [| j3]. {
-    exists [(f i1 j1 * g i1 j1, h i1 j1); (f i1 j2 * g i1 j2, h i1 j2)]%L.
-    split; [ easy | ].
-    split. {
-      intros x y Hxy.
-      destruct Hxy as [Hxy| Hxy]. {
-        injection Hxy; clear Hxy; intros; subst x y.
-        split. {
-          exists [(f i1 j1, g i1 j1)].
-          progress unfold I_mul_subset_prop.
-          split; [ easy | ].
-          split. {
-            intros x y Hxy.
-            destruct Hxy as [Hxy| Hxy]; [ | easy ].
-            injection Hxy; clear Hxy; intros; subst x y.
-            split.
-            now apply Ha; [ | rewrite Hlji1 ]; left.
-            now apply Hb; [ | rewrite Hlji1 ]; left.
-          }
-          rewrite rngl_summation_list_pair; symmetry.
-          now rewrite rngl_summation_list_only_one.
-        }
-        now apply Hc; [ | rewrite Hlji1 ]; left.
-      }
-      destruct Hxy as [Hxy| Hxy]; [ | easy ].
-      injection Hxy; clear Hxy; intros; subst x y.
-      split. {
-        exists [(f i1 j2, g i1 j2)].
-        progress unfold I_mul_subset_prop.
-        split; [ easy | ].
-        split. {
-          intros x y Hxy.
-          destruct Hxy as [Hxy| Hyx]; [ | easy ].
-          injection Hxy; clear Hxy; intros; subst x y.
-          split.
-          now apply Ha; [ | rewrite Hlji1; right ]; left.
-          now apply Hb; [ | rewrite Hlji1; right ]; left.
-        }
-        progress unfold iter_list; cbn.
-        symmetry; apply rngl_add_0_l.
-      }
-      apply Hc; [ now left | ].
-      now rewrite Hlji1; right; left.
-    }
-    rewrite rngl_summation_list_only_one.
-    rewrite Hlji1.
-    rewrite rngl_summation_list_pair.
-    now progress unfold iter_list; cbn.
-  }
+  rewrite rngl_summation_list_pair.
+  do 2 rewrite rngl_summation_list_cons.
+  rewrite H3.
+  now rewrite rngl_summation_list_pair.
+}
 ... ...
 rewrite Ht.
 apply glop. {
