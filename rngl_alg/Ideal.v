@@ -2136,17 +2136,11 @@ destruct li as [| i2]. {
       destruct Hxy as [Hxy| Hxy]; [ | easy ].
       injection Hxy; clear Hxy; intros; subst x y.
       split. {
-        exists [(f i1 j1, g i1 j1); (f i1 j2, g i1 j2)].
+        exists [(f i1 j2, g i1 j2)].
         progress unfold I_mul_subset_prop.
         split; [ easy | ].
         split. {
           intros x y Hxy.
-          destruct Hxy as [Hxy| Hxy]. {
-            injection Hxy; clear Hxy; intros; subst x y.
-            split.
-            now apply Ha; [ | rewrite Hlji1 ]; left.
-            now apply Hb; [ | rewrite Hlji1 ]; left.
-          }
           destruct Hxy as [Hxy| Hyx]; [ | easy ].
           injection Hxy; clear Hxy; intros; subst x y.
           split.
@@ -2154,8 +2148,16 @@ destruct li as [| i2]. {
           now apply Hb; [ | rewrite Hlji1; right ]; left.
         }
         progress unfold iter_list; cbn.
-        rewrite rngl_add_0_l.
-        (* ah non, tiens... *)
+        symmetry; apply rngl_add_0_l.
+      }
+      apply Hc; [ now left | ].
+      now rewrite Hlji1; right; left.
+    }
+    rewrite rngl_summation_list_only_one.
+    rewrite Hlji1.
+    rewrite rngl_summation_list_pair.
+    now progress unfold iter_list; cbn.
+  }
 ... ...
 rewrite Ht.
 apply glop. {
