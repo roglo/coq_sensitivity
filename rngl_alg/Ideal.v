@@ -720,6 +720,107 @@ split. {
 }
 Qed.
 
+Theorem I_subset_mul_assoc_l :
+  ∀ a b c x y z, (x ∈ a → y ∈ b → z ∈ c → x * y * z ∈ a * b * c)%I.
+Proof.
+intros * Ha Hb Hc.
+exists [(x * y, z)]%L.
+split; [ easy | ].
+split. {
+  intros x' y' Hxy.
+  destruct Hxy as [Hxy| Hxy]; [ | easy ].
+  injection Hxy; clear Hxy; intros; subst x' y'.
+  split; [ | now apply Hc; left ].
+  exists [(x, y)].
+  split; [ easy | ].
+  split. {
+    intros x' y' Hxy.
+    destruct Hxy as [Hxy| Hxy]; [ | easy ].
+    now injection Hxy; clear Hxy; intros; subst x y.
+  }
+  progress unfold iter_list; cbn; symmetry.
+  apply rngl_add_0_l.
+}
+progress unfold iter_list; cbn; symmetry.
+apply rngl_add_0_l.
+Qed.
+
+Theorem I_subset_sum_mul_assoc_l {A} :
+  ∀ a b c li (f g h : A → T),
+  (∀ i, i ∈ li → (f i ∈ a)%I)
+  → (∀ i, i ∈ li → (g i ∈ b)%I)
+  → (∀ i, i ∈ li → (h i ∈ c)%I)
+  → (∑ (i ∈ li), f i * g i * h i ∈ a * b * c)%I.
+Proof.
+intros * Ha Hb Hc.
+induction li as [| i1]. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  apply i_zero.
+}
+rewrite rngl_summation_list_cons.
+assert (H : ∀ i, i ∈ li → (f i ∈ a)%I). {
+  now intros i Hi; apply Ha; right.
+}
+specialize (IHli H); clear H.
+assert (H : ∀ i, i ∈ li → (g i ∈ b)%I). {
+  now intros i Hi; apply Hb; right.
+}
+specialize (IHli H); clear H.
+assert (H : ∀ i, i ∈ li → (h i ∈ c)%I). {
+  now intros i Hi; apply Hc; right.
+}
+specialize (IHli H); clear H.
+apply i_add; [ | apply IHli ].
+clear - Ha Hb Hc.
+apply I_subset_mul_assoc_l.
+now apply Ha; left.
+now apply Hb; left.
+now apply Hc; left.
+Qed.
+
+Theorem I_subset_sum_sum_mul_assoc_l {A B} :
+  ∀ a b c li lj (f g h : A → B → T),
+  (∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I)
+  → (∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I)
+  → (∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I)
+  → (∑ (i ∈ li), ∑ (j ∈ lj i), f i j * g i j * h i j ∈ a * b * c)%I.
+Proof.
+destruct_ix.
+intros * Ha Hb Hc.
+induction li as [| i1]. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  exists [(0, 0)]%L.
+  split; [ easy | ].
+  split. {
+    intros x y Hxy.
+    destruct Hxy as [Hxy| Hxy]; [ | easy ].
+    injection Hxy; clear Hxy; intros; subst x y.
+    split; apply i_zero.
+  }
+  rewrite rngl_summation_list_pair; symmetry.
+  rewrite rngl_summation_list_only_one.
+  apply (rngl_mul_0_l Hos).
+}
+rewrite rngl_summation_list_cons.
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I). {
+  now intros * Hi Hj; apply Ha; [ right | ].
+}
+specialize (IHli H); clear H.
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I). {
+  now intros * Hi Hj; apply Hb; [ right | ].
+}
+specialize (IHli H); clear H.
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I). {
+  now intros * Hi Hj; apply Hc; [ right | ].
+}
+specialize (IHli H); clear H.
+apply i_add; [ | apply IHli ].
+apply I_subset_sum_mul_assoc_l.
+now intros i Hi; apply Ha; [ left | ].
+now intros i Hi; apply Hb; [ left | ].
+now intros i Hi; apply Hc; [ left | ].
+Qed.
+
 (* to be completed, mais peut-être mauvaise piste à annuler
 Theorem I_mul_subset_assoc a b c x :
   I_mul_subset a (b * c) x = I_mul_subset (a * b) c x.
@@ -1964,8 +2065,8 @@ intros * H; cbn.
 now exists lxy.
 Qed.
 
-(* to be completed
-Theorem glop a b c : ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
+Theorem I_subset_mul_assoc_l_mul_assoc_r a b c :
+  ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
 Proof.
 destruct_ix.
 intros t Ht.
@@ -2034,140 +2135,9 @@ erewrite rngl_summation_list_eq_compat in Ht. 2: {
   reflexivity.
 }
 remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
-Theorem glop {A B} :
-  ∀ a b c li lj (f g h : A → B → T),
-  (∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I)
-  → (∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I)
-  → (∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I)
-  → (∑ (i ∈ li), ∑ (j ∈ lj i), f i j * g i j * h i j ∈ a * b * c)%I.
-Proof.
-destruct_ix.
-intros * Ha Hb Hc.
-(**)
-induction li as [| i1]. {
-  rewrite rngl_summation_list_empty; [ | easy ].
-  exists [(0, 0)]%L.
-  split; [ easy | ].
-  split. {
-    intros x y Hxy.
-    destruct Hxy as [Hxy| Hxy]; [ | easy ].
-    injection Hxy; clear Hxy; intros; subst x y.
-    split; apply i_zero.
-  }
-  rewrite rngl_summation_list_pair; symmetry.
-  rewrite rngl_summation_list_only_one.
-  apply (rngl_mul_0_l Hos).
-}
-rewrite rngl_summation_list_cons.
-assert (H : ∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I). {
-  now intros * Hi Hj; apply Ha; [ right | ].
-}
-specialize (IHli H); clear H.
-assert (H : ∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I). {
-  now intros * Hi Hj; apply Hb; [ right | ].
-}
-specialize (IHli H); clear H.
-assert (H : ∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I). {
-  now intros * Hi Hj; apply Hc; [ right | ].
-}
-specialize (IHli H); clear H.
-apply i_add; [ | easy ].
-destruct IHli as (lxy & H1 & H2 & H3).
-exists lxy. (* hey, il faut être plus précis, mon gars ! *)
-split; [ easy | ].
-split; [ easy | ].
-...
-exists ((∑ (j ∈ lj i1), f i1 j * g i1 j, h i1 j) :: lxy).
-progress unfold I_mul_subset_prop.
-split; [ easy | ].
-split; [ now intros * Hxy; apply H2 | ].
-
-...
 cbn.
-progress unfold I_mul_subset.
-progress unfold I_mul_subset_prop.
-destruct li as [| i1]. {
-  rewrite rngl_summation_list_empty; [ | easy ].
-  exists [(0, 0)]%L.
-  split; [ easy | ].
-  split. {
-    intros x y Hxy.
-    destruct Hxy as [Hxy| Hxy]; [ | easy ].
-    injection Hxy; clear Hxy; intros; subst x y.
-    split; apply i_zero.
-  }
-  rewrite rngl_summation_list_pair; symmetry.
-  rewrite rngl_summation_list_only_one.
-  apply (rngl_mul_0_l Hos).
-}
-destruct li as [| i2]. {
-  assert (H : ∀ j, j ∈ lj i1 → (f i1 j ∈ a)%I). {
-    now intros j Hj; apply Ha; [ left | ].
-  }
-  move H before Ha; clear Ha; rename H into Ha.
-  assert (H : ∀ j, j ∈ lj i1 → (g i1 j ∈ b)%I). {
-    now intros j Hj; apply Hb; [ left | ].
-  }
-  move H before Hb; clear Hb; rename H into Hb.
-  assert (H : ∀ j, j ∈ lj i1 → (h i1 j ∈ c)%I). {
-    now intros j Hj; apply Hc; [ left | ].
-  }
-  move H before Hc; clear Hc; rename H into Hc.
-  rewrite rngl_summation_list_only_one.
-  induction (lj i1) as [| j1 lji1]. {
-    exists [(0, 0)]%L.
-    split; [ easy | ].
-    split. {
-      intros x y Hxy.
-      destruct Hxy as [Hxy| Hxy]; [ | easy ].
-      injection Hxy; clear Hxy; intros; subst x y.
-      split; apply i_zero.
-    }
-    rewrite rngl_summation_list_pair.
-    rewrite rngl_summation_list_only_one.
-    rewrite rngl_summation_list_empty; [ symmetry | easy ].
-    apply (rngl_mul_0_l Hos).
-  }
-  assert (H : ∀ j, j ∈ lji1 → (f i1 j ∈ a)%I). {
-    now intros j Hj; apply Ha; right.
-  }
-  specialize (IHlji1 H); clear H.
-  assert (H : ∀ j, j ∈ lji1 → (g i1 j ∈ b)%I). {
-    now intros j Hj; apply Hb; right.
-  }
-  specialize (IHlji1 H); clear H.
-  assert (H : ∀ j, j ∈ lji1 → (h i1 j ∈ c)%I). {
-    now intros j Hj; apply Hc; right.
-  }
-  specialize (IHlji1 H); clear H.
-  destruct IHlji1 as (lxy & H1 & H2 & H3).
-  exists ((f i1 j1 * g i1 j1, h i1 j1) :: lxy)%L.
-  split; [ easy | ].
-  split. {
-    intros * Hxy.
-    destruct Hxy as [Hxy| Hxy]; [ | now apply H2 ].
-    injection Hxy; clear Hxy; intros; subst x y.
-    split; [ | now apply Hc; left ].
-    exists [(f i1 j1, g i1 j1)].
-    progress unfold I_mul_subset_prop.
-    split; [ easy | ].
-    split. {
-      intros x y Hxy.
-      destruct Hxy as [Hxy| Hxy]; [ | easy ].
-      injection Hxy; clear Hxy; intros; subst x y.
-      now split; [ apply Ha | apply Hb ]; left.
-    }
-    rewrite rngl_summation_list_pair; symmetry.
-    now rewrite rngl_summation_list_only_one.
-  }
-  rewrite rngl_summation_list_pair.
-  do 2 rewrite rngl_summation_list_cons.
-  rewrite H3.
-  now rewrite rngl_summation_list_pair.
-}
-... ...
 rewrite Ht.
-apply glop. {
+apply I_subset_sum_sum_mul_assoc_l. {
   intros * Hi Hj.
   now specialize (Hyz _ Hi).
 } {
@@ -2185,6 +2155,10 @@ apply glop. {
   destruct j as (j, k).
   now specialize (H1 j k Hj).
 }
+Qed.
+
+(* to be completed
+...
 ...
 assert (H :
   t = ∑ (i = 0, n - 1),
@@ -2199,7 +2173,6 @@ assert (H :
    do 2 rewrite Nat.sub_0_r.
 *)
    subst t.
-   admit.
 }
 cbn in H.
 rewrite rngl_summation_summation_exch in H.
