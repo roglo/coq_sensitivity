@@ -891,22 +891,28 @@ erewrite rngl_summation_list_eq_compat in Ht. 2: {
   reflexivity.
 }
 remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
-cbn.
-rewrite Ht.
+clear - Ht Hyz.
+(**)
+rename lx_yz_lyz into lxyz.
+rename Hyz into Hxyz.
+remember (∑ (xyz ∈ _), _) as x in Ht; subst x. (* renaming *)
+remember (∀ xyz, _) as x in Hxyz; subst x. (* renaming *)
+subst t.
+(**)
 apply I_subset_sum_sum_mul_assoc_l. {
   intros * Hi Hj.
-  now specialize (Hyz _ Hi).
+  now specialize (Hxyz _ Hi).
 } {
   intros * Hi Hj.
-  specialize (Hyz _ Hi).
-  destruct Hyz as (_, H).
+  specialize (Hxyz _ Hi).
+  destruct Hxyz as (_, H).
   destruct H as (lli & H1 & H2).
   destruct j as (j, k).
   now specialize (H1 j k Hj).
 } {
   intros * Hi Hj.
-  specialize (Hyz _ Hi).
-  destruct Hyz as (_, H).
+  specialize (Hxyz _ Hi).
+  destruct Hxyz as (_, H).
   destruct H as (lli & H1 & H2).
   destruct j as (j, k).
   now specialize (H1 j k Hj).
