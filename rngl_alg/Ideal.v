@@ -821,13 +821,121 @@ now intros i Hi; apply Hb; [ left | ].
 now intros i Hi; apply Hc; [ left | ].
 Qed.
 
-(* to be completed, mais peut-être mauvaise piste à annuler
+Theorem I_subset_mul_assoc_l_mul_assoc_r a b c :
+  ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
+Proof.
+destruct_ix.
+intros t Ht.
+cbn in Ht.
+progress unfold I_mul_subset in Ht.
+destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
+remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
+rewrite rngl_summation_list_pair in Ht.
+remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
+specialize ((proj1 forall_pair) Ha_bc) as H1.
+cbn in H1.
+clear Ha_bc; rename H1 into Ha_bc.
+specialize ((proj1 forall_pair_in) Ha_bc) as H1.
+cbn in H1.
+clear Ha_bc; rename H1 into Ha_bc.
+apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
+destruct Ha_bc as (llyz & Hllyz & Hyz).
+remember (length lx_yz) as n eqn:Hn.
+rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
+move Hn before n; symmetry in Hlx_yz.
+move Hlx_yz before Hllyz.
+move llyz before lx_yz.
+rewrite Hllyz in Hyz.
+(**)
+set (P u v := (fst u ∈ a)%I ∧ I_mul_subset_prop b c (snd u) v).
+specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
+rewrite Hlx_yz, Hllyz in H1.
+specialize (H1 eq_refl).
+subst P; cbn in H1.
+specialize (proj1 H1) as H2; clear H1.
+specialize (H2 Hyz).
+clear Hyz; rename H2 into Hyz.
+destruct Hyz as (lx_yz_lyz & Hllyzm & Hlx_yzm & Hyz).
+subst lx_yz llyz.
+move Hllyz before Hlx_yz.
+rewrite List.length_map in Hlx_yz, Hllyz.
+clear Hlx_yz; rename Hllyz into Hlx_yz_lyz.
+rewrite rngl_summation_list_map in Ht.
+remember (∀ x_yz_lyz, _) as x in Hyz; subst x. (* renaming *)
+remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
+assert
+  (∀ x_yz_lyz,
+   x_yz_lyz ∈ lx_yz_lyz
+   → snd (fst x_yz_lyz) = ∑ ((y, z) ∈ snd x_yz_lyz), y * z). {
+  intros * Hx_yz_lyz.
+  specialize (Hyz _ Hx_yz_lyz) as (Ha & Hllx_yz_lyz & Hbc & H).
+  easy.
+}
+erewrite rngl_summation_list_eq_compat in Ht. 2: {
+  intros i Hi.
+  rewrite H; [ | easy ].
+  easy.
+}
+clear H.
+cbn in Ht.
+erewrite rngl_summation_list_eq_compat in Ht. 2: {
+  intros i Hi.
+  rewrite rngl_summation_list_pair.
+  rewrite (rngl_mul_summation_list_distr_l Hos).
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_mul_assoc.
+    reflexivity.
+  }
+  remember (∑ (yz ∈ _), _) as x in |-*; subst x. (* renaming *)
+  reflexivity.
+}
+remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
+cbn.
+rewrite Ht.
+apply I_subset_sum_sum_mul_assoc_l. {
+  intros * Hi Hj.
+  now specialize (Hyz _ Hi).
+} {
+  intros * Hi Hj.
+  specialize (Hyz _ Hi).
+  destruct Hyz as (_, H).
+  destruct H as (lli & H1 & H2).
+  destruct j as (j, k).
+  now specialize (H1 j k Hj).
+} {
+  intros * Hi Hj.
+  specialize (Hyz _ Hi).
+  destruct Hyz as (_, H).
+  destruct H as (lli & H1 & H2).
+  destruct j as (j, k).
+  now specialize (H1 j k Hj).
+}
+Qed.
+
+Theorem I_mul_subset_prop_in_ideal :
+  ∀ a b z lxy, I_mul_subset_prop a b z lxy → (z ∈ a * b)%I.
+Proof.
+intros * H.
+now exists lxy.
+Qed.
+
+(* to be completed
 Theorem I_mul_subset_assoc a b c x :
   I_mul_subset a (b * c) x = I_mul_subset (a * b) c x.
 Proof.
 destruct_ix.
 apply propositional_extensionality.
 split. {
+  intros H.
+  progress unfold I_mul_subset in H.
+  progress unfold I_mul_subset.
+...
+  destruct H as (lxy, H).
+  exists lxy.
+  apply I_mul_subset_prop_in_ideal in H.
+...
+
 (*
   intros (l_xy_z & Hl_xy_z & Hab_c & H); subst x.
   remember (∀ xy z, _) as x in Hab_c; subst x. (* renaming *)
@@ -2058,276 +2166,7 @@ Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 ...
 *)
 
-Theorem I_mul_subset_prop_in_ideal :
-  ∀ a b z lxy, I_mul_subset_prop a b z lxy → (z ∈ a * b)%I.
-Proof.
-intros * H; cbn.
-now exists lxy.
-Qed.
-
-Theorem I_subset_mul_assoc_l_mul_assoc_r a b c :
-  ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
-Proof.
-destruct_ix.
-intros t Ht.
-cbn in Ht.
-progress unfold I_mul_subset in Ht.
-destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
-remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
-rewrite rngl_summation_list_pair in Ht.
-remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
-specialize ((proj1 forall_pair) Ha_bc) as H1.
-cbn in H1.
-clear Ha_bc; rename H1 into Ha_bc.
-specialize ((proj1 forall_pair_in) Ha_bc) as H1.
-cbn in H1.
-clear Ha_bc; rename H1 into Ha_bc.
-apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
-destruct Ha_bc as (llyz & Hllyz & Hyz).
-remember (length lx_yz) as n eqn:Hn.
-rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
-move Hn before n; symmetry in Hlx_yz.
-move Hlx_yz before Hllyz.
-move llyz before lx_yz.
-rewrite Hllyz in Hyz.
-(**)
-set (P u v := (fst u ∈ a)%I ∧ I_mul_subset_prop b c (snd u) v).
-specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
-rewrite Hlx_yz, Hllyz in H1.
-specialize (H1 eq_refl).
-subst P; cbn in H1.
-specialize (proj1 H1) as H2; clear H1.
-specialize (H2 Hyz).
-clear Hyz; rename H2 into Hyz.
-destruct Hyz as (lx_yz_lyz & Hllyzm & Hlx_yzm & Hyz).
-subst lx_yz llyz.
-move Hllyz before Hlx_yz.
-rewrite List.length_map in Hlx_yz, Hllyz.
-clear Hlx_yz; rename Hllyz into Hlx_yz_lyz.
-rewrite rngl_summation_list_map in Ht.
-remember (∀ x_yz_lyz, _) as x in Hyz; subst x. (* renaming *)
-remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
-assert
-  (∀ x_yz_lyz,
-   x_yz_lyz ∈ lx_yz_lyz
-   → snd (fst x_yz_lyz) = ∑ ((y, z) ∈ snd x_yz_lyz), y * z). {
-  intros * Hx_yz_lyz.
-  specialize (Hyz _ Hx_yz_lyz) as (Ha & Hllx_yz_lyz & Hbc & H).
-  easy.
-}
-erewrite rngl_summation_list_eq_compat in Ht. 2: {
-  intros i Hi.
-  rewrite H; [ | easy ].
-  easy.
-}
-clear H.
-cbn in Ht.
-erewrite rngl_summation_list_eq_compat in Ht. 2: {
-  intros i Hi.
-  rewrite rngl_summation_list_pair.
-  rewrite (rngl_mul_summation_list_distr_l Hos).
-  erewrite rngl_summation_list_eq_compat. 2: {
-    intros j Hj.
-    rewrite rngl_mul_assoc.
-    reflexivity.
-  }
-  remember (∑ (yz ∈ _), _) as x in |-*; subst x. (* renaming *)
-  reflexivity.
-}
-remember (∑ (x_yz_lyz ∈ _), _) as x in Ht; subst x. (* renaming *)
-cbn.
-rewrite Ht.
-apply I_subset_sum_sum_mul_assoc_l. {
-  intros * Hi Hj.
-  now specialize (Hyz _ Hi).
-} {
-  intros * Hi Hj.
-  specialize (Hyz _ Hi).
-  destruct Hyz as (_, H).
-  destruct H as (lli & H1 & H2).
-  destruct j as (j, k).
-  now specialize (H1 j k Hj).
-} {
-  intros * Hi Hj.
-  specialize (Hyz _ Hi).
-  destruct Hyz as (_, H).
-  destruct H as (lli & H1 & H2).
-  destruct j as (j, k).
-  now specialize (H1 j k Hj).
-}
-Qed.
-
 (* to be completed
-...
-...
-assert (H :
-  t = ∑ (i = 0, n - 1),
-      let x_yz_lyz := List.nth i lx_yz_lyz ((0, 0), []) in
-      ∑ (j = 0, n - 1),
-      let yz := List.nth j (snd x_yz_lyz) (0, 0) in
-      fst (fst x_yz_lyz) * fst yz * snd yz). {
-   cbn.
-(*
-   progress unfold iter_seq.
-   rewrite <- Nat_succ_sub_succ_r; [ | now apply Nat.neq_0_lt_0 ].
-   do 2 rewrite Nat.sub_0_r.
-*)
-   subst t.
-}
-cbn in H.
-rewrite rngl_summation_summation_exch in H.
-(* non, ça marche pas, les 3 termes, et surtout le 3e, dépendent de j *)
-...
-Theorem glop {A} (da : A) la f :
-  ∑ (a ∈ la), f a = ∑ (i = 0, length la - 1), f (List.nth i la da).
-Proof.
-intros.
-Search (∑ (_ = _, _), _ = ∑ (_ ∈ _), _).
-Search (∑ (_ ∈ _), _ = ∑ (_ = _, _), _).
-(* ça devrait le faire mais j'ai la flemme *)
-...
-rewrite (glop ((0, 0), []))%L.
-Search (∑ (_ ∈ _), _).
-...
-Search (∑ (_ = _, _), _ = ∑ (_ ∈ _), _).
-Search (∑ (_ ∈ _), _ = ∑ (_ = _, _), _).
-   rewrite rngl_summation_seq_summation.
-
-...
-... pfff... ci-dessous vraiment chiant...
-  remember (max n (Max (l ∈ llyz), length l)) as m eqn:Hm.
-  remember
-    (List.map
-       (λ ll, (fst ll ++ List.repeat (0, 0)%L (m - length (fst ll)), snd ll))
-       (lab ++ List.repeat ([], (0, 0)%L) (m - n)))
-    as lab'.
-  move lab' before lab.
-  remember (List.map fst lab') as llyz' eqn:Hllyzm'.
-  move llyz' before llyz.
-  move Hllyzm' before Hllyzm.
-  remember (List.map snd lab') as lx_yz' eqn:Hlx_yzm'.
-  move lx_yz' before lx_yz.
-  move Hlx_yzm' before Hlx_yzm.
-  assert (Hyz' :
-    ∀ ab : list (T * T) * (T * T),
-      ab ∈ lab'
-      → (fst (snd ab) ∈ a)%I
-(*
-        ∧ length (fst ab) ≠ 0
-*)
-          ∧ (∀ x y : T, (x, y) ∈ fst ab → (x ∈ b)%I ∧ (y ∈ c)%I)
-            ∧ snd (snd ab) = ∑ ((x, y) ∈ fst ab), x * y). {
-    intros ab Hab.
-    subst lab'.
-    apply List.in_map_iff in Hab.
-    destruct Hab as (ll & Hab1 & Hab2).
-    apply List.in_app_or in Hab2.
-    destruct Hab2 as [Hab2| Hab2]. {
-      specialize (Hyz _ Hab2).
-      subst ab.
-...
-    destruct Hab2 as [Hab2| Hab2]; [ now specialize (Hyz ab Hab) | ].
-    apply List.repeat_spec in Hab.
-    subst ab; cbn.
-    split; [ apply i_zero | ].
-    split. {
-      intros y z H.
-      apply List.repeat_spec in H.
-      injection H; clear H; intros; subst y z.
-      split; apply i_zero.
-    }
-    symmetry.
-    rewrite rngl_summation_list_pair.
-    apply all_0_rngl_summation_list_0.
-    intros (x, y) H; cbn.
-    apply List.repeat_spec in H.
-    injection H; clear H; intros; subst x y.
-    apply (rngl_mul_0_l Hos).
-  }
-  move Hyz' before Hyz.
-  assert (H : length lab = n). {
-    rewrite <- Hlx_yz.
-    rewrite Hlx_yzm.
-    symmetry; apply List.length_map.
-  }
-  assert (Hlx_yz' : length lx_yz' = m). {
-    subst lx_yz' lab'.
-    rewrite List.length_map.
-    rewrite List.length_app.
-    rewrite List.repeat_length, H, Nat.add_comm.
-    apply Nat.sub_add.
-    subst m.
-    apply Nat.le_max_l.
-  }
-  move Hlx_yz' before Hlx_yz.
-  move m before n.
-  assert (Hllyz' : length llyz' = m). {
-    subst llyz' lab'.
-    rewrite List.length_map.
-    rewrite List.length_app.
-    rewrite List.repeat_length, H, Nat.add_comm, Hm.
-    apply Nat.sub_add.
-    subst m.
-    apply Nat.le_max_l.
-  }
-  move Hllyz' before Hllyz.
-  assert (Ht' : t = ∑ (x_yz ∈ lx_yz'), fst x_yz * snd x_yz). {
-    rewrite (rngl_summation_list_split _ _ _ n).
-    rewrite Hlx_yzm', Heqlab'.
-    rewrite List.firstn_map, List.skipn_map.
-    rewrite List.firstn_app, List.skipn_app.
-    rewrite H, Nat.sub_diag.
-    rewrite List.firstn_0, List.skipn_0.
-    rewrite List.skipn_all2; [ | flia H ].
-    rewrite List.app_nil_r.
-    rewrite <- List.firstn_map.
-    rewrite <- Hlx_yzm.
-    rewrite List.firstn_all2; [ | flia Hlx_yz ].
-    cbn.
-    rewrite List.map_repeat.
-    rewrite (all_0_rngl_summation_list_0 _ (List.repeat _ _)). 2: {
-      intros (x, y) Hxy.
-      apply List.repeat_spec in Hxy; cbn in Hxy.
-      injection Hxy; clear Hxy; intros; subst x y.
-      apply (rngl_mul_0_l Hos).
-    }
-    symmetry; rewrite Ht.
-    apply rngl_add_0_r.
-  }
-  move Ht' before Ht.
-  assert (H1 : ∀ l, l ∈ llyz' → length l = m). {
-    intros l Hl.
-    rewrite <- Hllyz'.
-    rewrite Hllyzm' in Hl |-*.
-    rewrite List.length_map.
-    apply List.in_map_iff in Hl.
-    destruct Hl as (l2 & Hl & Hl').
-    subst l.
-    rewrite Heqlab'.
-    rewrite List.length_app.
-    rewrite H, List.repeat_length, Nat.add_comm.
-    rewrite Heqlab' in Hl'.
-    apply List.in_app_or in Hl'.
-    destruct Hl' as [Hl'| Hl']. {
-...
-  clear lx_yz llyz lab Hyz Ht Hlx_yz Hllyz Hllyzm Hlx_yzm Heqlab' H Hm.
-...
-assert
-  (∃ lx ly lz,
-   t = ∑ (i = 0, m), lx.[i] * ∑ (j = 0, m), ly.[j] * lz.[j]). {
-...
-erewrite rngl_summation_list_eq_compat in Ht. 2: {
-  intros x_yz Hx_yz; cbn.
-  specialize (Ha_bc (fst x_yz) (snd x_yz)).
-  rewrite <- surjective_pairing in Ha_bc.
-  specialize (Ha_bc Hx_yz).
-  destruct Ha_bc as (Ha, Hbc).
-  cbn in Hbc.
-  progress unfold I_mul_subset in Hbc.
-  destruct Hbc as (lxy & Hlxy & Hab & Hu).
-  rewrite Hu.
-...
-
 Theorem I_mul_assoc a b c : (a * (b * c))%I = ((a * b) * c)%I.
 Proof.
 apply eq_ideal_eq; cbn.
