@@ -2043,6 +2043,46 @@ Theorem glop {A B} :
 Proof.
 destruct_ix.
 intros * Ha Hb Hc.
+(**)
+induction li as [| i1]. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  exists [(0, 0)]%L.
+  split; [ easy | ].
+  split. {
+    intros x y Hxy.
+    destruct Hxy as [Hxy| Hxy]; [ | easy ].
+    injection Hxy; clear Hxy; intros; subst x y.
+    split; apply i_zero.
+  }
+  rewrite rngl_summation_list_pair; symmetry.
+  rewrite rngl_summation_list_only_one.
+  apply (rngl_mul_0_l Hos).
+}
+rewrite rngl_summation_list_cons.
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I). {
+  now intros * Hi Hj; apply Ha; [ right | ].
+}
+specialize (IHli H); clear H.
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I). {
+  now intros * Hi Hj; apply Hb; [ right | ].
+}
+specialize (IHli H); clear H.
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I). {
+  now intros * Hi Hj; apply Hc; [ right | ].
+}
+specialize (IHli H); clear H.
+apply i_add; [ | easy ].
+destruct IHli as (lxy & H1 & H2 & H3).
+exists lxy. (* hey, il faut être plus précis, mon gars ! *)
+split; [ easy | ].
+split; [ easy | ].
+...
+exists ((∑ (j ∈ lj i1), f i1 j * g i1 j, h i1 j) :: lxy).
+progress unfold I_mul_subset_prop.
+split; [ easy | ].
+split; [ now intros * Hxy; apply H2 | ].
+
+...
 cbn.
 progress unfold I_mul_subset.
 progress unfold I_mul_subset_prop.
