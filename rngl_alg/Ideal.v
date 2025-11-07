@@ -1,4 +1,4 @@
-l(* Ideal.v *)
+(* Ideal.v *)
 
 (* ideals on a RingLike *)
 
