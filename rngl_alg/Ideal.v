@@ -1233,6 +1233,9 @@ cbn in H1.
 clear Ha_bc; rename H1 into Ha_bc.
 apply (forall_exists_exists_forall (0, 0) 0)%L in Ha_bc.
 destruct Ha_bc as (la & Hla & Hxyz).
+(**)
+(* c'est là, peut-être, qu'il faut utiliser forall_in_seq, d'abord *)
+...
 apply (forall_exists_exists_forall 0 0%L) in Hxyz.
 rewrite List.length_seq in Hxyz.
 destruct Hxyz as (lb & Hlb & Hxyz).
@@ -1243,8 +1246,24 @@ move Hn before n; symmetry in Hlx_yz.
 move Hla before Hlx_yz; move Hlb before Hla.
 move la before n; move lb before la.
 (**)
-specialize (@forall_in_seq T (list T) 0%L [] lb) as H1.
-... (* ah putain fait chier, faut réfléchir... *)
+assert (H :
+  ∀ i, i ∈ List.seq 0 n →
+  (fst (ListDef.nth i lx_yz (0%L, 0%L)) ∈ a)%I ∧
+  (la.[i] ∈ b)%I ∧
+  (lb.[i] ∈ c)%I ∧
+  snd (ListDef.nth i lx_yz (0%L, 0%L)) = (la.[i] + lb.[i])%L). {
+  intros i Hin.
+  specialize (Hxyz i).
+  rewrite Hla in Hxyz.
+  rewrite Hlb in Hxyz.
+  apply List.in_seq in Hin.
+  rewrite List.seq_nth in Hxyz; [ | easy ].
+  now apply Hxyz, List.in_seq.
+}
+clear Hxyz; rename H into Hxyz.
+specialize (@forall_in_seq T T 0%L 0%L lb la) as H1.
+(* ah crotte, P doit avoir un 3e paramètre pour List.nth i lx_yz (0, 0) *)
+...
 specialize (forall_in_seq (0, 0)%L [] lx_yz lb) as H1.
 ...
 set (P u v := (fst u ∈ a)%I ∧ I_mul_subset_prop b c (snd u) v).
