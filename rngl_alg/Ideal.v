@@ -1213,6 +1213,12 @@ intros.
 apply I_mul_subset_1_l.
 Qed.
 
+(* to be completed
+Theorem I_mul_add_distr_l :
+  ∀ a b c : ideal T, (a * (b + c))%I = (a * b + a * c)%I.
+...
+*)
+
 Theorem I_mul_subset_comm :
   rngl_mul_is_comm T = true →
   ∀ a b x, I_mul_subset a b x = I_mul_subset b a x.
@@ -1273,12 +1279,6 @@ apply functional_extensionality_dep.
 intros.
 apply (I_mul_subset_comm Hic).
 Qed.
-
-(* to be completed
-Theorem I_mul_add_distr_l :
-  ∀ a b c : ideal T, (a * (b + c))%I = (a * b + a * c)%I.
-...
-*)
 
 (*
 Arguments rngl_opt_one T {ring_like_op}.
