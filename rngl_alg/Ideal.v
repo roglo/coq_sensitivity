@@ -11,7 +11,6 @@ Require Import RingLike.Core.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
 Require Import RingLike.IterAdd.
-Require Import RingLike.IterMax.
 Require Import RingLike.Nat_algebra.
 
 (* ideal: non empty set type with some properties *)
