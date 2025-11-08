@@ -778,6 +778,17 @@ now apply Hb; left.
 now apply Hc; left.
 Qed.
 
+(* to be completed
+Theorem I_subset_sum_mul_assoc_r {A} :
+  ∀ a b c li (f g h : A → T),
+  (∀ i, i ∈ li → (f i ∈ a)%I)
+  → (∀ i, i ∈ li → (g i ∈ b)%I)
+  → (∀ i, i ∈ li → (h i ∈ c)%I)
+  → (∑ (i ∈ li), f i * g i * h i ∈ a * (b * c))%I.
+Proof.
+...
+*)
+
 Theorem I_subset_sum_sum_mul_assoc_l {A B} :
   ∀ a b c li lj (f g h : A → B → T),
   (∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I)
@@ -860,6 +871,7 @@ assert (H : ∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I). {
 specialize (IHli H); clear H.
 apply i_add; [ | apply IHli ].
 (**)
+... ...
 apply I_subset_sum_mul_assoc_r.
 (*
 apply I_subset_sum_mul_assoc_l.
