@@ -821,7 +821,7 @@ now intros i Hi; apply Hb; [ left | ].
 now intros i Hi; apply Hc; [ left | ].
 Qed.
 
-(* to be completed with theorem above
+(* to be completed
 Theorem I_subset_sum_sum_mul_assoc_r {A B} :
   ∀ a b c li lj (f g h : A → B → T),
   (∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I)
@@ -829,6 +829,44 @@ Theorem I_subset_sum_sum_mul_assoc_r {A B} :
   → (∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I)
   → (∑ (i ∈ li), ∑ (j ∈ lj i), f i j * g i j * h i j ∈ a * (b * c))%I.
 Proof.
+destruct_ix.
+intros * Ha Hb Hc.
+induction li as [| i1]. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  exists [(0, 0)]%L.
+  split; [ easy | ].
+  split. {
+    intros x y Hxy.
+    destruct Hxy as [Hxy| Hxy]; [ | easy ].
+    injection Hxy; clear Hxy; intros; subst x y.
+    split; apply i_zero.
+  }
+  rewrite rngl_summation_list_pair; symmetry.
+  rewrite rngl_summation_list_only_one.
+  apply (rngl_mul_0_l Hos).
+}
+rewrite rngl_summation_list_cons.
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I). {
+  now intros * Hi Hj; apply Ha; [ right | ].
+}
+specialize (IHli H); clear H.
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I). {
+  now intros * Hi Hj; apply Hb; [ right | ].
+}
+specialize (IHli H); clear H.
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I). {
+  now intros * Hi Hj; apply Hc; [ right | ].
+}
+specialize (IHli H); clear H.
+apply i_add; [ | apply IHli ].
+(**)
+apply I_subset_sum_mul_assoc_r.
+(*
+apply I_subset_sum_mul_assoc_l.
+*)
+now intros i Hi; apply Ha; [ left | ].
+now intros i Hi; apply Hb; [ left | ].
+now intros i Hi; apply Hc; [ left | ].
 ...
 *)
 
