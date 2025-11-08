@@ -1217,6 +1217,10 @@ Qed.
 Theorem I_mul_subset_add_distr_l a b c x :
   I_mul_subset a (b + c) x = I_add_subset (a * b) (a * c) x.
 Proof.
+apply propositional_extensionality.
+split.
+...
+now apply I_subset_mul_assoc_l_mul_assoc_r.
 ...
 
 Theorem I_mul_add_distr_l a b c : (a * (b + c))%I = (a * b + a * c)%I.
