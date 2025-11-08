@@ -821,6 +821,17 @@ now intros i Hi; apply Hb; [ left | ].
 now intros i Hi; apply Hc; [ left | ].
 Qed.
 
+(* to be completed with theorem above
+Theorem I_subset_sum_sum_mul_assoc_r {A B} :
+  ∀ a b c li lj (f g h : A → B → T),
+  (∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I)
+  → (∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I)
+  → (∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I)
+  → (∑ (i ∈ li), ∑ (j ∈ lj i), f i j * g i j * h i j ∈ a * (b * c))%I.
+Proof.
+...
+*)
+
 (* I_mul_subset a (b * c) z → I_mul_subset (a * b) c z *)
 Theorem I_subset_mul_assoc_l_mul_assoc_r a b c :
   ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
@@ -996,7 +1007,25 @@ clear - Ht Hxyz.
 remember (∑ (xyz ∈ _), _) as x in Ht; subst x. (* renaming *)
 subst t.
 (**)
-...
+apply I_subset_sum_sum_mul_assoc_r. {
+  intros * Hi Hj.
+  specialize (Hxyz _ Hi).
+  destruct Hxyz as (_, H).
+  destruct H as (lli & H1 & H2).
+  destruct j as (j, k).
+  now specialize (H1 j k Hj).
+} {
+  intros * Hi Hj.
+  specialize (Hxyz _ Hi).
+  destruct Hxyz as (_, H).
+  destruct H as (lli & H1 & H2).
+  destruct j as (j, k).
+  now specialize (H1 j k Hj).
+} {
+  intros * Hi Hj.
+  now specialize (Hxyz _ Hi).
+}
+(*
 apply I_subset_sum_sum_mul_assoc_l. {
   intros * Hi Hj.
   now specialize (Hxyz _ Hi).
@@ -1015,9 +1044,7 @@ apply I_subset_sum_sum_mul_assoc_l. {
   destruct j as (j, k).
   now specialize (H1 j k Hj).
 }
-Qed.
-Proof.
-...
+*)
 Qed.
 *)
 
