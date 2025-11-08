@@ -1241,6 +1241,29 @@ specialize (forall_in_seq 0%L (0, 0)%L la lx_yz P Hla) as H1.
 specialize (proj1 H1 Hxyz) as H2.
 subst P; clear H1 Hxyz; rename H2 into Hxyz.
 destruct Hxyz as (lxyz & Hlaxyz & Hlxxyz & Hxyz).
+specialize (@forall_exists_exists_forall (T * (T * T)) T) as H1.
+specialize (H1 (0, (0, 0))%L 0%L).
+specialize (H1 (λ ab, (fst (snd ab) ∈ a)%I)).
+cbn in H1.
+specialize (H1 (λ ab y, (fst ab ∈ b)%I ∧ (y ∈ c)%I ∧ snd (snd ab) = (fst ab + y)%L)).
+cbn in H1.
+specialize (proj1 (H1 lxyz) Hxyz) as (lb & Hlb & H).
+clear Hxyz H1.
+rename H into Hxyz.
+move lb before la.
+move Hlb before Hla.
+move lxyz before lx_yz.
+remember (length lx_yz) as n eqn:Hn.
+rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
+move la before lxyz; move lb before la.
+symmetry in Hlx_yz.
+move Hla before Hlx_yz; move Hlb before Hla.
+replace (length lxyz) with n in Hlb. 2: {
+  rewrite <- Hlx_yz.
+  rewrite Hlxxyz.
+  apply List.length_map.
+}
+move Hn before n.
 ...
 apply (forall_exists_exists_forall 0 0%L) in Hxyz.
 rewrite List.length_seq in Hxyz.
