@@ -1214,8 +1214,18 @@ apply I_mul_subset_1_l.
 Qed.
 
 (* to be completed
-Theorem I_mul_add_distr_l :
-  ∀ a b c : ideal T, (a * (b + c))%I = (a * b + a * c)%I.
+Theorem I_mul_subset_add_distr_l a b c x :
+  I_mul_subset a (b + c) x = I_add_subset (a * b) (a * c) x.
+Proof.
+...
+
+Theorem I_mul_add_distr_l a b c : (a * (b + c))%I = (a * b + a * c)%I.
+Proof.
+intros.
+apply eq_ideal_eq; cbn.
+apply functional_extensionality_dep.
+... ...
+apply I_mul_subset_add_distr_l.
 ...
 *)
 
