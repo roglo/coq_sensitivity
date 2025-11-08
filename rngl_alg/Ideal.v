@@ -1149,8 +1149,8 @@ Theorem I_mul_subset_assoc a b c x :
 Proof.
 apply propositional_extensionality.
 split.
-now apply I_subset_mul_assoc_l_mul_assoc_r.
-now apply I_subset_mul_assoc_l_mul_assoc_l.
+apply I_subset_mul_assoc_l_mul_assoc_r.
+apply I_subset_mul_assoc_l_mul_assoc_l.
 Qed.
 
 Theorem I_mul_assoc a b c : (a * (b * c))%I = ((a * b) * c)%I.
@@ -1213,13 +1213,21 @@ apply I_mul_subset_1_l.
 Qed.
 
 (* to be completed
+(* I_mul_subset a (b + c) z → I_mul_subset (a * b) (a * c) z *)
+Theorem I_mul_subset_add_distr_l_1 a b c t :
+  (t ∈ a * (b + c) → t ∈ a * b + a * c)%I.
+Proof.
+...
+
 Theorem I_mul_subset_add_distr_l a b c x :
   I_mul_subset a (b + c) x = I_add_subset (a * b) (a * c) x.
 Proof.
 apply propositional_extensionality.
 split.
+apply I_mul_subset_add_distr_l_1.
+apply I_mul_subset_add_distr_l_2.
 ...
-now apply I_subset_mul_assoc_l_mul_assoc_r.
+apply I_subset_mul_assoc_l_mul_assoc_r.
 ...
 
 Theorem I_mul_add_distr_l a b c : (a * (b + c))%I = (a * b + a * c)%I.
