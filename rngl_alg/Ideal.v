@@ -745,6 +745,13 @@ progress unfold iter_list; cbn; symmetry.
 apply rngl_add_0_l.
 Qed.
 
+(* to be completed
+Theorem I_subset_mul_assoc_r :
+  ∀ a b c x y z, (x ∈ a → y ∈ b → z ∈ c → x * y * z ∈ a * (b * c))%I.
+Proof.
+...
+*)
+
 Theorem I_subset_sum_mul_assoc_l {A} :
   ∀ a b c li (f g h : A → T),
   (∀ i, i ∈ li → (f i ∈ a)%I)
@@ -786,6 +793,35 @@ Theorem I_subset_sum_mul_assoc_r {A} :
   → (∀ i, i ∈ li → (h i ∈ c)%I)
   → (∑ (i ∈ li), f i * g i * h i ∈ a * (b * c))%I.
 Proof.
+intros * Ha Hb Hc.
+induction li as [| i1]. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  apply i_zero.
+}
+rewrite rngl_summation_list_cons.
+assert (H : ∀ i, i ∈ li → (f i ∈ a)%I). {
+  now intros i Hi; apply Ha; right.
+}
+specialize (IHli H); clear H.
+assert (H : ∀ i, i ∈ li → (g i ∈ b)%I). {
+  now intros i Hi; apply Hb; right.
+}
+specialize (IHli H); clear H.
+assert (H : ∀ i, i ∈ li → (h i ∈ c)%I). {
+  now intros i Hi; apply Hc; right.
+}
+specialize (IHli H); clear H.
+apply i_add; [ | apply IHli ].
+clear - Ha Hb Hc.
+(**)
+... ...
+apply I_subset_mul_assoc_r.
+(*
+apply I_subset_mul_assoc_l.
+*)
+now apply Ha; left.
+now apply Hb; left.
+now apply Hc; left.
 ...
 *)
 
