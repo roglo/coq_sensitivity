@@ -1496,11 +1496,60 @@ intros.
 apply (I_mul_subset_comm Hic).
 Qed.
 
-(* to be completed
+Theorem I_mul_subset_1_r a : ∀ x, I_mul_subset a 1 x = (x ∈ a)%I.
+Proof.
+destruct_ix.
+intros.
+apply propositional_extensionality.
+split. {
+  intros (lxy & Hlxy & H1 & H); subst x.
+  rewrite rngl_summation_list_pair.
+  induction lxy as [| (x, y)]; [ easy | ].
+  clear Hlxy.
+  destruct (Nat.eq_dec (length lxy) 0) as [Hnz| Hnz]. {
+    apply List.length_zero_iff_nil in Hnz.
+    subst lxy.
+    rewrite rngl_summation_list_only_one.
+    apply i_mul_r; cbn.
+    now apply (H1 x y); left.
+  }
+  specialize (IHlxy Hnz).
+  rewrite rngl_summation_list_cons; cbn.
+  apply i_add. {
+    apply i_mul_r.
+    now apply (H1 x y); left.
+  }
+  apply IHlxy.
+  intros x' y' Hxy'.
+  now apply H1; right.
+} {
+  intros Hax.
+  exists [(x, 1%L)].
+  split; [ easy | ].
+  split. {
+    intros y z Hyz.
+    destruct Hyz as [Hy| Hy]; [ | easy ].
+    now injection Hy; clear Hy; intros; subst y z.
+  }
+  rewrite rngl_summation_list_pair.
+  rewrite rngl_summation_list_only_one.
+  cbn; symmetry.
+  apply rngl_mul_1_r.
+}
+Qed.
+
 Theorem I_opt_mul_1_r :
   if rngl_mul_is_comm T then not_applicable else ∀ a : ideal T, (a * 1)%I = a.
-...
-*)
+Proof.
+remember (rngl_mul_is_comm T) as ic eqn:Hic.
+symmetry in Hic.
+destruct ic; [ easy | ].
+intros.
+apply eq_ideal_eq; cbn.
+apply functional_extensionality_dep.
+intros.
+apply I_mul_subset_1_r.
+Qed.
 
 (*
 Arguments rngl_opt_one T {ring_like_op}.
