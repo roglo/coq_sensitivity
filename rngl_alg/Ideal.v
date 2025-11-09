@@ -1248,8 +1248,7 @@ cbn in H1.
 specialize (H1 (λ ab y, (fst ab ∈ b)%I ∧ (y ∈ c)%I ∧ snd (snd ab) = (fst ab + y)%L)).
 cbn in H1.
 specialize (proj1 (H1 lxyz) Hxyz) as (lb & Hlb & H).
-clear Hxyz H1.
-rename H into Hxyz.
+clear Hxyz H1; rename H into Hxyz.
 move lb before la.
 move Hlb before Hla.
 move lxyz before lx_yz.
@@ -1258,12 +1257,28 @@ rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
 move la before lxyz; move lb before la.
 symmetry in Hlx_yz.
 move Hla before Hlx_yz; move Hlb before Hla.
-replace (length lxyz) with n in Hlb. 2: {
+assert (Hlxyz : length lxyz = n). {
   rewrite <- Hlx_yz.
-  rewrite Hlxxyz.
+  rewrite Hlxxyz; symmetry.
   apply List.length_map.
 }
 move Hn before n.
+move Hlxyz after Hla.
+rewrite Hlxyz in Hlb.
+set
+  (P u v :=
+     (fst (snd v) ∈ a)%I ∧ (fst v ∈ b)%I ∧ (u ∈ c)%I ∧
+     snd (snd v) = (fst v + u)%L).
+specialize (forall_in_seq 0%L (0, (0, 0))%L) as H1.
+specialize (H1 lb lxyz P).
+rewrite Hlxyz in H1.
+specialize (H1 Hlb).
+subst P.
+cbn in H1.
+specialize ((proj1 H1) Hxyz) as (lxyz' & Hlbxyz & Hlxxyz' & H).
+clear Hxyz H1; rename H into Hxyz.
+move lxyz' before lxyz.
+(*
 ...
 apply (forall_exists_exists_forall 0 0%L) in Hxyz.
 rewrite List.length_seq in Hxyz.
@@ -1284,13 +1299,18 @@ specialize (proj1 H1) as H2; clear H1.
 specialize (H2 Hxyz).
 clear Hxyz; rename H2 into Hxyz.
 destruct Hxyz as (lxyz & Hllyzm & Hlx_yzm & Hxyz).
-subst lx_yz llyz.
-move Hllyz before Hlx_yz.
-rewrite List.length_map in Hlx_yz, Hllyz.
-clear Hlx_yz; rename Hllyz into Hlxyz.
+*)
+subst lxyz.
+rename lxyz' into lxyz.
+rewrite List.map_map in Hlxxyz.
+rewrite List.map_map in Hlaxyz.
+subst lx_yz.
+rewrite List.length_map in Hlx_yz, Hlxyz.
+clear Hlx_yz.
 rewrite rngl_summation_list_map in Ht.
 remember (∀ xyz, _) as x in Hxyz; subst x. (* renaming *)
 remember (∑ (xyz ∈ _), _) as x in Ht; subst x. (* renaming *)
+...
 assert (∀ xyz, xyz ∈ lxyz → snd (fst xyz) = ∑ ((y, z) ∈ snd xyz), y * z). {
   intros * H.
   now specialize (Hxyz _ H) as (Ha & Hllxyz & Hbc & H1).
