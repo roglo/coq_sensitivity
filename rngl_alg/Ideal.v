@@ -1344,13 +1344,19 @@ apply i_add. {
 Qed.
 
 (* to be completed
+(* I_mul_subset (a * b) (a * c) t → I_mul_subset a (b + c) t *)
+Theorem I_mul_subset_add_distr_l_2 a b c :
+  ∀ t, (t ∈ a * b + a * c → t ∈ a * (b + c))%I.
+Proof.
+...
+
 Theorem I_mul_subset_add_distr_l a b c x :
   I_mul_subset a (b + c) x = I_add_subset (a * b) (a * c) x.
 Proof.
 apply propositional_extensionality.
 split.
 apply I_mul_subset_add_distr_l_1.
-...
+... ...
 apply I_mul_subset_add_distr_l_2.
 ...
 apply I_subset_mul_assoc_l_mul_assoc_r.
