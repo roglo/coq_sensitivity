@@ -1496,6 +1496,12 @@ intros.
 apply (I_mul_subset_comm Hic).
 Qed.
 
+(* to be completed
+Theorem I_opt_mul_1_r :
+  if rngl_mul_is_comm T then not_applicable else ∀ a : ideal T, (a * 1)%I = a.
+...
+*)
+
 (*
 Arguments rngl_opt_one T {ring_like_op}.
 
@@ -2067,7 +2073,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_mul_1_l := I_mul_1_l;
      rngl_mul_add_distr_l := I_mul_add_distr_l;
      rngl_opt_mul_comm := I_opt_mul_comm;
-     rngl_opt_mul_1_r := true; (*I_opt_mul_1_r;*)
+     rngl_opt_mul_1_r := I_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := true; (*I_opt_mul_add_distr_r;*)
      rngl_opt_add_opp_diag_l := true; (*I_opt_add_opp_diag_l;*)
      rngl_opt_add_sub := true; (*I_opt_add_sub;*)
