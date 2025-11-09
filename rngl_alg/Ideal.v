@@ -1310,6 +1310,29 @@ clear Hlx_yz.
 rewrite rngl_summation_list_map in Ht.
 remember (∀ xyz, _) as x in Hxyz; subst x. (* renaming *)
 remember (∑ (xyz ∈ _), _) as x in Ht; subst x. (* renaming *)
+clear la Hla Hlaxyz.
+clear lb Hlb Hlbxyz.
+(**)
+subst t.
+clear n Hn Hlxyz.
+induction lxyz as [| xyzt]. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  apply i_zero.
+}
+rewrite rngl_summation_list_cons.
+cbn - [ i_subset ].
+apply i_add. 2: {
+  apply IHlxyz.
+  intros * Hxyz'.
+  now apply Hxyz; right.
+}
+specialize (Hxyz xyzt).
+assert (H : xyzt ∈ xyzt :: lxyz) by now left.
+specialize (Hxyz H); clear H.
+destruct Hxyz as (Ha & Hb & Hc & Ht).
+rewrite Ht.
+rewrite rngl_mul_add_distr_l.
+apply i_add. {
 ...
 assert (∀ xyz, xyz ∈ lxyz → snd (fst xyz) = ∑ ((y, z) ∈ snd xyz), y * z). {
   intros * H.
