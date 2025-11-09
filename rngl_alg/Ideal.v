@@ -1212,7 +1212,6 @@ intros.
 apply I_mul_subset_1_l.
 Qed.
 
-(* to be completed
 (* I_mul_subset a (b + c) t → I_mul_subset (a * b) (a * c) t *)
 Theorem I_mul_subset_add_distr_l_1 a b c :
   ∀ t, (t ∈ a * (b + c) → t ∈ a * b + a * c)%I.
@@ -1233,7 +1232,6 @@ cbn in H1.
 clear Ha_bc; rename H1 into Ha_bc.
 apply (forall_exists_exists_forall (0, 0) 0)%L in Ha_bc.
 destruct Ha_bc as (la & Hla & Hxyz).
-(**)
 set
   (P u v :=
      (fst v ∈ a)%I ∧ ∃ y : T, (u ∈ b)%I ∧ (y ∈ c)%I ∧ snd v = (u + y)%L).
@@ -1278,28 +1276,6 @@ cbn in H1.
 specialize ((proj1 H1) Hxyz) as (lxyz' & Hlbxyz & Hlxxyz' & H).
 clear Hxyz H1; rename H into Hxyz.
 move lxyz' before lxyz.
-(*
-...
-apply (forall_exists_exists_forall 0 0%L) in Hxyz.
-rewrite List.length_seq in Hxyz.
-destruct Hxyz as (lb & Hlb & Hxyz).
-remember (length lx_yz) as n eqn:Hn.
-rewrite Hla in Hlb.
-rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
-move Hn before n; symmetry in Hlx_yz.
-move Hla before Hlx_yz; move Hlb before Hla.
-move la before n; move lb before la.
-specialize (forall_in_seq (0, 0)%L [] lx_yz lb) as H1.
-set (P u v := (fst u ∈ a)%I ∧ I_mul_subset_prop b c (snd u) v).
-specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
-rewrite Hlx_yz, Hllyz in H1.
-specialize (H1 eq_refl).
-subst P; cbn in H1.
-specialize (proj1 H1) as H2; clear H1.
-specialize (H2 Hxyz).
-clear Hxyz; rename H2 into Hxyz.
-destruct Hxyz as (lxyz & Hllyzm & Hlx_yzm & Hxyz).
-*)
 subst lxyz.
 rename lxyz' into lxyz.
 rewrite List.map_map in Hlxxyz.
@@ -1312,7 +1288,6 @@ remember (∀ xyz, _) as x in Hxyz; subst x. (* renaming *)
 remember (∑ (xyz ∈ _), _) as x in Ht; subst x. (* renaming *)
 clear la Hla Hlaxyz.
 clear lb Hlb Hlbxyz.
-(**)
 subst t.
 clear n Hn Hlxyz.
 induction lxyz as [| xyzt]. {
@@ -1333,56 +1308,49 @@ destruct Hxyz as (Ha & Hb & Hc & Ht).
 rewrite Ht.
 rewrite rngl_mul_add_distr_l.
 apply i_add. {
-...
-assert (∀ xyz, xyz ∈ lxyz → snd (fst xyz) = ∑ ((y, z) ∈ snd xyz), y * z). {
-  intros * H.
-  now specialize (Hxyz _ H) as (Ha & Hllxyz & Hbc & H1).
-}
-erewrite rngl_summation_list_eq_compat in Ht; [ | now intros; rewrite H ].
-clear H.
-cbn in Ht.
-erewrite rngl_summation_list_eq_compat in Ht. 2: {
-  intros i Hi.
-  rewrite rngl_summation_list_pair.
-  rewrite (rngl_mul_summation_list_distr_l Hos).
-  erewrite rngl_summation_list_eq_compat. 2: {
-    intros j Hj.
-    rewrite rngl_mul_assoc.
-    reflexivity.
+  cbn.
+  progress unfold I_add_subset.
+  exists (fst (snd (snd xyzt)) * fst (snd xyzt))%L, 0%L.
+  rewrite rngl_add_0_r.
+  split. {
+    exists [(fst (snd (snd xyzt)), fst (snd xyzt))].
+    split; [ easy | ].
+    split. {
+      intros x y Hxy.
+      destruct Hxy as [Hxy| ]; [ | easy ].
+      now injection Hxy; clear Hxy; intros; subst x y.
+    }
+    rewrite rngl_summation_list_pair.
+    now rewrite rngl_summation_list_only_one.
   }
-  remember (∑ (yz ∈ _), _) as x in |-*; subst x. (* renaming *)
-  reflexivity.
-}
-clear - Ht Hxyz.
-remember (∑ (xyz ∈ _), _) as x in Ht; subst x. (* renaming *)
-subst t.
-(**)
-apply I_subset_sum_sum_mul_assoc_l. {
-  intros * Hi Hj.
-  now specialize (Hxyz _ Hi).
+  split; [ apply i_zero | easy ].
 } {
-  intros * Hi Hj.
-  specialize (Hxyz _ Hi).
-  destruct Hxyz as (_, H).
-  destruct H as (lli & H1 & H2).
-  destruct j as (j, k).
-  now specialize (H1 j k Hj).
-} {
-  intros * Hi Hj.
-  specialize (Hxyz _ Hi).
-  destruct Hxyz as (_, H).
-  destruct H as (lli & H1 & H2).
-  destruct j as (j, k).
-  now specialize (H1 j k Hj).
+  cbn.
+  progress unfold I_add_subset.
+  exists 0%L, (fst (snd (snd xyzt)) * fst xyzt)%L.
+  rewrite rngl_add_0_l.
+  split; [ apply i_zero | ].
+  split; [ | easy ].
+  exists [(fst (snd (snd xyzt)), fst xyzt)].
+  split; [ easy | ].
+  split. {
+    intros x y Hxy.
+    destruct Hxy as [Hxy| ]; [ | easy ].
+    now injection Hxy; clear Hxy; intros; subst x y.
+  }
+  rewrite rngl_summation_list_pair.
+  now rewrite rngl_summation_list_only_one.
 }
-...
+Qed.
 
+(* to be completed
 Theorem I_mul_subset_add_distr_l a b c x :
   I_mul_subset a (b + c) x = I_add_subset (a * b) (a * c) x.
 Proof.
 apply propositional_extensionality.
 split.
 apply I_mul_subset_add_distr_l_1.
+...
 apply I_mul_subset_add_distr_l_2.
 ...
 apply I_subset_mul_assoc_l_mul_assoc_r.
