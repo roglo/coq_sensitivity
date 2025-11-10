@@ -394,19 +394,19 @@ Definition I_one : ideal T :=
      i_mul_l _ _ _ := I;
      i_mul_r _ _ _ := I |}.
 
-Definition I_add (a b : ideal T) : ideal T :=
-  {| i_subset := I_add_subset a b;
-     i_zero := I_add_zero a b;
-     i_add := I_add_add a b;
-     i_mul_l := I_add_mul_l a b;
-     i_mul_r := I_add_mul_r a b |}.
+Definition I_add (I J : ideal T) : ideal T :=
+  {| i_subset := I_add_subset I J;
+     i_zero := I_add_zero I J;
+     i_add := I_add_add I J;
+     i_mul_l := I_add_mul_l I J;
+     i_mul_r := I_add_mul_r I J |}.
 
-Definition I_mul (a b : ideal T) : ideal T :=
-  {| i_subset := I_mul_subset a b;
-     i_zero := I_mul_zero a b;
-     i_add := I_mul_add a b;
-     i_mul_l := I_mul_mul_l a b;
-     i_mul_r := I_mul_mul_r a b |}.
+Definition I_mul (I J : ideal T) : ideal T :=
+  {| i_subset := I_mul_subset I J;
+     i_zero := I_mul_zero I J;
+     i_add := I_mul_add I J;
+     i_mul_l := I_mul_mul_l I J;
+     i_mul_r := I_mul_mul_r I J |}.
 
 (* ideal ring like op *)
 
@@ -425,8 +425,8 @@ End a.
 
 Notation "0" := I_zero : ideal_scope.
 Notation "1" := I_one : ideal_scope.
-Notation "a + b" := (I_add a b) : ideal_scope.
-Notation "a * b" := (I_mul a b) : ideal_scope.
+Notation "I + J" := (I_add I J) : ideal_scope.
+Notation "I * J" := (I_mul I J) : ideal_scope.
 
 Theorem List_seq_rngl_summation_r {T} a lb (f : T → _) :
   List.seq a (∑ (i ∈ lb), f i) =
@@ -464,13 +464,13 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ix : ideal_ctx T}.
 
-Theorem eq_ideal_eq : ∀ a b,
-  i_subset a = i_subset b
-  → a = b.
+Theorem eq_ideal_eq : ∀ I J,
+  i_subset I = i_subset J
+  → I = J.
 Proof.
 intros * Hab.
-destruct a.
-destruct b.
+destruct I.
+destruct J.
 cbn in *.
 subst.
 f_equal.
@@ -480,7 +480,7 @@ apply proof_irrelevance.
 apply proof_irrelevance.
 Qed.
 
-Theorem I_add_subset_comm a b z : I_add_subset a b z = I_add_subset b a z.
+Theorem I_add_subset_comm I J z : I_add_subset I J z = I_add_subset J I z.
 Proof.
 progress unfold I_add_subset.
 apply propositional_extensionality.
@@ -493,7 +493,7 @@ split; intros (x & y & H1 & H2 & H3). {
 }
 Qed.
 
-Theorem I_add_comm : ∀ a b, (a + b)%I = (b + a)%I.
+Theorem I_add_comm : ∀ I J, (I + J)%I = (J + I)%I.
 Proof.
 intros.
 apply eq_ideal_eq.
@@ -502,8 +502,8 @@ intros z.
 apply I_add_subset_comm.
 Qed.
 
-Theorem I_add_subset_assoc_l a b c x z :
-  (x ∈ a)%I → (z ∈ b + c)%I → I_add_subset (a + b) c (x + z)%L.
+Theorem I_add_subset_assoc_l I J K x z :
+  (x ∈ I)%I → (z ∈ J + K)%I → I_add_subset (I + J) K (x + z)%L.
 Proof.
 intros H1 H2.
 cbn in H2.
@@ -519,8 +519,8 @@ split; [ easy | ].
 apply rngl_add_assoc.
 Qed.
 
-Theorem I_add_subset_assoc a b c x :
-  I_add_subset a (b + c) x = I_add_subset (a + b) c x.
+Theorem I_add_subset_assoc I J K x :
+  I_add_subset I (J + K) x = I_add_subset (I + J) K x.
 Proof.
 destruct_ix.
 apply propositional_extensionality.
@@ -535,7 +535,7 @@ split; intros (y & z & H & H1 & H2); subst x. {
 }
 Qed.
 
-Theorem I_add_assoc : ∀ a b c, (a + (b + c))%I = ((a + b) + c)%I.
+Theorem I_add_assoc : ∀ I J K, (I + (J + K))%I = ((I + J) + K)%I.
 Proof.
 intros.
 apply eq_ideal_eq.
@@ -544,7 +544,7 @@ intros x; cbn.
 apply I_add_subset_assoc.
 Qed.
 
-Theorem I_add_subset_0_l a x : I_add_subset 0 a x = (x ∈ a)%I.
+Theorem I_add_subset_0_l I x : I_add_subset 0 I x = (x ∈ I)%I.
 Proof.
 destruct_ix.
 progress unfold I_add_subset; cbn.
@@ -559,7 +559,7 @@ split. {
 }
 Qed.
 
-Theorem I_add_0_l a : (0 + a)%I = a.
+Theorem I_add_0_l I : (0 + I)%I = I.
 Proof.
 intros.
 apply eq_ideal_eq; cbn.
@@ -613,7 +613,7 @@ split. {
 Qed.
 
 Theorem I_subset_mul_assoc_l :
-  ∀ a b c x y z, (x ∈ a → y ∈ b → z ∈ c → x * y * z ∈ a * b * c)%I.
+  ∀ I J K x y z, (x ∈ I → y ∈ J → z ∈ K → x * y * z ∈ I * J * K)%I.
 Proof.
 intros * Ha Hb Hc.
 exists [(x * y, z)]%L.
@@ -638,7 +638,7 @@ apply rngl_add_0_l.
 Qed.
 
 Theorem I_subset_mul_assoc_r :
-  ∀ a b c x y z, (x ∈ a → y ∈ b → z ∈ c → x * y * z ∈ a * (b * c))%I.
+  ∀ I J K x y z, (x ∈ I → y ∈ J → z ∈ K → x * y * z ∈ I * (J * K))%I.
 Proof.
 intros * Ha Hb Hc.
 exists [(x, y * z)]%L.
@@ -664,11 +664,11 @@ apply rngl_mul_assoc.
 Qed.
 
 Theorem I_subset_sum_mul_assoc_l {A} :
-  ∀ a b c li (f g h : A → T),
-  (∀ i, i ∈ li → (f i ∈ a)%I)
-  → (∀ i, i ∈ li → (g i ∈ b)%I)
-  → (∀ i, i ∈ li → (h i ∈ c)%I)
-  → (∑ (i ∈ li), f i * g i * h i ∈ a * b * c)%I.
+  ∀ I J K li (f g h : A → T),
+  (∀ i, i ∈ li → (f i ∈ I)%I)
+  → (∀ i, i ∈ li → (g i ∈ J)%I)
+  → (∀ i, i ∈ li → (h i ∈ K)%I)
+  → (∑ (i ∈ li), f i * g i * h i ∈ I * J * K)%I.
 Proof.
 intros * Ha Hb Hc.
 induction li as [| i1]. {
@@ -676,15 +676,15 @@ induction li as [| i1]. {
   apply i_zero.
 }
 rewrite rngl_summation_list_cons.
-assert (H : ∀ i, i ∈ li → (f i ∈ a)%I). {
+assert (H : ∀ i, i ∈ li → (f i ∈ I)%I). {
   now intros i Hi; apply Ha; right.
 }
 specialize (IHli H); clear H.
-assert (H : ∀ i, i ∈ li → (g i ∈ b)%I). {
+assert (H : ∀ i, i ∈ li → (g i ∈ J)%I). {
   now intros i Hi; apply Hb; right.
 }
 specialize (IHli H); clear H.
-assert (H : ∀ i, i ∈ li → (h i ∈ c)%I). {
+assert (H : ∀ i, i ∈ li → (h i ∈ K)%I). {
   now intros i Hi; apply Hc; right.
 }
 specialize (IHli H); clear H.
@@ -697,11 +697,11 @@ now apply Hc; left.
 Qed.
 
 Theorem I_subset_sum_mul_assoc_r {A} :
-  ∀ a b c li (f g h : A → T),
-  (∀ i, i ∈ li → (f i ∈ a)%I)
-  → (∀ i, i ∈ li → (g i ∈ b)%I)
-  → (∀ i, i ∈ li → (h i ∈ c)%I)
-  → (∑ (i ∈ li), f i * g i * h i ∈ a * (b * c))%I.
+  ∀ I J K li (f g h : A → T),
+  (∀ i, i ∈ li → (f i ∈ I)%I)
+  → (∀ i, i ∈ li → (g i ∈ J)%I)
+  → (∀ i, i ∈ li → (h i ∈ K)%I)
+  → (∑ (i ∈ li), f i * g i * h i ∈ I * (J * K))%I.
 Proof.
 intros * Ha Hb Hc.
 induction li as [| i1]. {
@@ -709,15 +709,15 @@ induction li as [| i1]. {
   apply i_zero.
 }
 rewrite rngl_summation_list_cons.
-assert (H : ∀ i, i ∈ li → (f i ∈ a)%I). {
+assert (H : ∀ i, i ∈ li → (f i ∈ I)%I). {
   now intros i Hi; apply Ha; right.
 }
 specialize (IHli H); clear H.
-assert (H : ∀ i, i ∈ li → (g i ∈ b)%I). {
+assert (H : ∀ i, i ∈ li → (g i ∈ J)%I). {
   now intros i Hi; apply Hb; right.
 }
 specialize (IHli H); clear H.
-assert (H : ∀ i, i ∈ li → (h i ∈ c)%I). {
+assert (H : ∀ i, i ∈ li → (h i ∈ K)%I). {
   now intros i Hi; apply Hc; right.
 }
 specialize (IHli H); clear H.
@@ -730,11 +730,11 @@ now apply Hc; left.
 Qed.
 
 Theorem I_subset_sum_sum_mul_assoc_l {A B} :
-  ∀ a b c li lj (f g h : A → B → T),
-  (∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I)
-  → (∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I)
-  → (∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I)
-  → (∑ (i ∈ li), ∑ (j ∈ lj i), f i j * g i j * h i j ∈ a * b * c)%I.
+  ∀ I J K li lj (f g h : A → B → T),
+  (∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ I)%I)
+  → (∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ J)%I)
+  → (∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ K)%I)
+  → (∑ (i ∈ li), ∑ (j ∈ lj i), f i j * g i j * h i j ∈ I * J * K)%I.
 Proof.
 destruct_ix.
 intros * Ha Hb Hc.
@@ -753,15 +753,15 @@ induction li as [| i1]. {
   apply (rngl_mul_0_l Hos).
 }
 rewrite rngl_summation_list_cons.
-assert (H : ∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I). {
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ I)%I). {
   now intros * Hi Hj; apply Ha; [ right | ].
 }
 specialize (IHli H); clear H.
-assert (H : ∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I). {
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ J)%I). {
   now intros * Hi Hj; apply Hb; [ right | ].
 }
 specialize (IHli H); clear H.
-assert (H : ∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I). {
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ K)%I). {
   now intros * Hi Hj; apply Hc; [ right | ].
 }
 specialize (IHli H); clear H.
@@ -773,11 +773,11 @@ now intros i Hi; apply Hc; [ left | ].
 Qed.
 
 Theorem I_subset_sum_sum_mul_assoc_r {A B} :
-  ∀ a b c li lj (f g h : A → B → T),
-  (∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I)
-  → (∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I)
-  → (∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I)
-  → (∑ (i ∈ li), ∑ (j ∈ lj i), f i j * g i j * h i j ∈ a * (b * c))%I.
+  ∀ I J K li lj (f g h : A → B → T),
+  (∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ I)%I)
+  → (∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ J)%I)
+  → (∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ K)%I)
+  → (∑ (i ∈ li), ∑ (j ∈ lj i), f i j * g i j * h i j ∈ I * (J * K))%I.
 Proof.
 destruct_ix.
 intros * Ha Hb Hc.
@@ -796,15 +796,15 @@ induction li as [| i1]. {
   apply (rngl_mul_0_l Hos).
 }
 rewrite rngl_summation_list_cons.
-assert (H : ∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ a)%I). {
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (f i j ∈ I)%I). {
   now intros * Hi Hj; apply Ha; [ right | ].
 }
 specialize (IHli H); clear H.
-assert (H : ∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ b)%I). {
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (g i j ∈ J)%I). {
   now intros * Hi Hj; apply Hb; [ right | ].
 }
 specialize (IHli H); clear H.
-assert (H : ∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I). {
+assert (H : ∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ K)%I). {
   now intros * Hi Hj; apply Hc; [ right | ].
 }
 specialize (IHli H); clear H.
@@ -815,9 +815,9 @@ now intros i Hi; apply Hb; [ left | ].
 now intros i Hi; apply Hc; [ left | ].
 Qed.
 
-(* I_mul_subset a (b * c) z → I_mul_subset (a * b) c z *)
-Theorem I_subset_mul_assoc_l_mul_assoc_r a b c :
-  ∀ z, (z ∈ a * (b * c) → z ∈ (a * b) * c)%I.
+(* I_mul_subset I (J * K) z → I_mul_subset (I * J) K z *)
+Theorem I_subset_mul_assoc_l_mul_assoc_r I J K :
+  ∀ z, (z ∈ I * (J * K) → z ∈ (I * J) * K)%I.
 Proof.
 destruct_ix.
 intros t Ht.
@@ -841,7 +841,7 @@ move Hn before n; symmetry in Hlx_yz.
 move Hlx_yz before Hllyz.
 move llyz before lx_yz.
 rewrite Hllyz in Hxyz.
-set (P u v := (fst u ∈ a)%I ∧ I_mul_subset_prop b c (snd u) v).
+set (P u v := (fst u ∈ I)%I ∧ I_mul_subset_prop J K (snd u) v).
 specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
 rewrite Hlx_yz, Hllyz in H1.
 specialize (H1 eq_refl).
@@ -899,9 +899,9 @@ apply I_subset_sum_sum_mul_assoc_l. {
 }
 Qed.
 
-(* I_mul_subset (a * b) c z → I_mul_subset a (b * c) z *)
-Theorem I_subset_mul_assoc_l_mul_assoc_l a b c :
-  ∀ z, (z ∈ (a * b) * c → z ∈ a * (b * c))%I.
+(* I_mul_subset (I * J) K z → I_mul_subset I (J * K) z *)
+Theorem I_subset_mul_assoc_l_mul_assoc_l I J K :
+  ∀ z, (z ∈ (I * J) * K → z ∈ I * (J * K))%I.
 Proof.
 destruct_ix.
 intros t Ht.
@@ -917,7 +917,7 @@ clear Ha_bc; rename H1 into Ha_bc.
 specialize ((proj1 forall_pair_in) Ha_bc) as H1.
 cbn in H1.
 clear Ha_bc; rename H1 into Ha_bc.
-assert (H : ∀ ab, ab ∈ lx_yz → (snd ab ∈ c)%I ∧ I_mul_subset a b (fst ab)). {
+assert (H : ∀ ab, ab ∈ lx_yz → (snd ab ∈ K)%I ∧ I_mul_subset I J (fst ab)). {
   intros ab Hab.
   now specialize (Ha_bc ab Hab).
 }
@@ -930,7 +930,7 @@ move Hn before n; symmetry in Hlx_yz.
 move Hlx_yz before Hllyz.
 move llyz before lx_yz.
 rewrite Hllyz in Hxyz.
-set (P u v := (snd u ∈ c)%I ∧ I_mul_subset_prop a b (fst u) v).
+set (P u v := (snd u ∈ K)%I ∧ I_mul_subset_prop I J (fst u) v).
 specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
 rewrite Hlx_yz, Hllyz in H1.
 specialize (H1 eq_refl).
@@ -983,8 +983,8 @@ apply I_subset_sum_sum_mul_assoc_r. {
 }
 Qed.
 
-Theorem I_mul_subset_assoc a b c x :
-  I_mul_subset a (b * c) x = I_mul_subset (a * b) c x.
+Theorem I_mul_subset_assoc I J K x :
+  I_mul_subset I (J * K) x = I_mul_subset (I * J) K x.
 Proof.
 apply propositional_extensionality.
 split.
@@ -992,15 +992,14 @@ apply I_subset_mul_assoc_l_mul_assoc_r.
 apply I_subset_mul_assoc_l_mul_assoc_l.
 Qed.
 
-Theorem I_mul_assoc a b c : (a * (b * c))%I = ((a * b) * c)%I.
+Theorem I_mul_assoc I J K : (I * (J * K))%I = ((I * J) * K)%I.
 Proof.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
 apply I_mul_subset_assoc.
 Qed.
 
-Theorem I_mul_subset_1_l a :
-  ∀ x, I_mul_subset 1 a x = (x ∈ a)%I.
+Theorem I_mul_subset_1_l I : ∀ x, I_mul_subset 1 I x = (x ∈ I)%I.
 Proof.
 destruct_ix.
 intros.
@@ -1042,7 +1041,7 @@ split. {
 }
 Qed.
 
-Theorem I_mul_1_l : ∀ a : ideal T, (1 * a)%I = a.
+Theorem I_mul_1_l : ∀ I : ideal T, (1 * I)%I = I.
 Proof.
 intros.
 apply eq_ideal_eq; cbn.
@@ -1051,9 +1050,9 @@ intros.
 apply I_mul_subset_1_l.
 Qed.
 
-(* I_mul_subset a (b + c) t → I_mul_subset (a * b) (a * c) t *)
-Theorem I_mul_subset_add_distr_l_1 a b c :
-  ∀ t, (t ∈ a * (b + c) → t ∈ a * b + a * c)%I.
+(* I_mul_subset I (J + K) t → I_mul_subset (I * J) (I * K) t *)
+Theorem I_mul_subset_add_distr_l_1 I J K :
+  ∀ t, (t ∈ I * (J + K) → t ∈ I * J + I * K)%I.
 Proof.
 destruct_ix.
 intros t Ht.
@@ -1073,17 +1072,17 @@ apply (forall_exists_exists_forall (0, 0) 0)%L in Ha_bc.
 destruct Ha_bc as (la & Hla & Hxyz).
 set
   (P u v :=
-     (fst v ∈ a)%I ∧ ∃ y : T, (u ∈ b)%I ∧ (y ∈ c)%I ∧ snd v = (u + y)%L).
+     (fst v ∈ I)%I ∧ ∃ y : T, (u ∈ J)%I ∧ (y ∈ K)%I ∧ snd v = (u + y)%L).
 specialize (forall_in_seq 0%L (0, 0)%L la lx_yz P Hla) as H1.
 specialize (proj1 H1 Hxyz) as H2.
 subst P; clear H1 Hxyz; rename H2 into Hxyz.
 destruct Hxyz as (lxyz & Hlaxyz & Hlxxyz & Hxyz).
 specialize (@forall_exists_exists_forall (T * (T * T)) T) as H1.
 specialize (H1 (0, (0, 0))%L 0%L).
-specialize (H1 (λ ab, (fst (snd ab) ∈ a)%I)).
+specialize (H1 (λ ab, (fst (snd ab) ∈ I)%I)).
 cbn in H1.
 specialize
-  (H1 (λ ab y, (fst ab ∈ b)%I ∧ (y ∈ c)%I ∧ snd (snd ab) = (fst ab + y)%L)).
+  (H1 (λ ab y, (fst ab ∈ J)%I ∧ (y ∈ K)%I ∧ snd (snd ab) = (fst ab + y)%L)).
 cbn in H1.
 specialize (proj1 (H1 lxyz) Hxyz) as (lb & Hlb & H).
 clear Hxyz H1; rename H into Hxyz.
@@ -1105,7 +1104,7 @@ move Hlxyz after Hla.
 rewrite Hlxyz in Hlb.
 set
   (P u v :=
-     (fst (snd v) ∈ a)%I ∧ (fst v ∈ b)%I ∧ (u ∈ c)%I ∧
+     (fst (snd v) ∈ I)%I ∧ (fst v ∈ J)%I ∧ (u ∈ K)%I ∧
      snd (snd v) = (fst v + u)%L).
 specialize (forall_in_seq 0%L (0, (0, 0))%L) as H1.
 specialize (H1 lb lxyz P).
@@ -1184,9 +1183,9 @@ apply i_add. {
 Qed.
 
 (* to be completed
-(* I_mul_subset (a + b) c x → I_add_subset (a * c) (b * c) x *)
-Theorem I_mul_subset_add_distr_r_1 a b c :
-  ∀ t, (t ∈ (a + b) * c → t ∈ a * c + b * c)%I.
+(* I_mul_subset (I + J) K x → I_add_subset (I * K) (J * K) x *)
+Theorem I_mul_subset_add_distr_r_1 I J K :
+  ∀ t, (t ∈ (I + J) * K → t ∈ I * K + J * K)%I.
 Proof.
 destruct_ix.
 intros t Ht.
@@ -1316,6 +1315,8 @@ apply i_add. {
   now rewrite rngl_summation_list_only_one.
 }
 Qed.
+...
+
 *)
 
 Theorem I_mul_subset_add_distr_l_2_lemma a b c lab :
