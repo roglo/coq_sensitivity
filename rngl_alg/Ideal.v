@@ -186,16 +186,6 @@ split; intros Hp. {
 }
 Qed.
 
-Theorem rngl_opp_1_mul {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_has_opp T = true →
-  ∀ a, (-1 * a = - a)%L.
-Proof.
-intros Hop *.
-rewrite (rngl_mul_opp_l Hop).
-progress f_equal.
-apply rngl_mul_1_l.
-Qed.
-
 (* end to be added *)
 
 (* for propositional and functional extensionalities *)
