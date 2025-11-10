@@ -1082,7 +1082,8 @@ specialize (@forall_exists_exists_forall (T * (T * T)) T) as H1.
 specialize (H1 (0, (0, 0))%L 0%L).
 specialize (H1 (λ ab, (fst (snd ab) ∈ a)%I)).
 cbn in H1.
-specialize (H1 (λ ab y, (fst ab ∈ b)%I ∧ (y ∈ c)%I ∧ snd (snd ab) = (fst ab + y)%L)).
+specialize
+  (H1 (λ ab y, (fst ab ∈ b)%I ∧ (y ∈ c)%I ∧ snd (snd ab) = (fst ab + y)%L)).
 cbn in H1.
 specialize (proj1 (H1 lxyz) Hxyz) as (lb & Hlb & H).
 clear Hxyz H1; rename H into Hxyz.
@@ -1182,6 +1183,141 @@ apply i_add. {
 }
 Qed.
 
+(* to be completed
+(* I_mul_subset (a + b) c x → I_add_subset (a * c) (b * c) x *)
+Theorem I_mul_subset_add_distr_r_1 a b c :
+  ∀ t, (t ∈ (a + b) * c → t ∈ a * c + b * c)%I.
+Proof.
+destruct_ix.
+intros t Ht.
+cbn in Ht.
+progress unfold I_mul_subset in Ht.
+destruct Ht as (lx_yz & Hlx_yz & Ha_bc & Ht).
+remember (∀ x yz, _) as x in Ha_bc; subst x. (* renaming *)
+rewrite rngl_summation_list_pair in Ht.
+remember (∑ (x_yz ∈ _), _) as x in Ht; subst x. (* renaming *)
+specialize ((proj1 forall_pair) Ha_bc) as H1.
+cbn in H1.
+clear Ha_bc; rename H1 into Ha_bc.
+specialize ((proj1 forall_pair_in) Ha_bc) as H1.
+cbn in H1.
+clear Ha_bc; rename H1 into Ha_bc.
+...
+apply (forall_exists_exists_forall (0, 0) 0)%L in Ha_bc.
+destruct Ha_bc as (la & Hla & Hxyz).
+set
+  (P u v :=
+     (fst v ∈ a)%I ∧ ∃ y : T, (u ∈ b)%I ∧ (y ∈ c)%I ∧ snd v = (u + y)%L).
+specialize (forall_in_seq 0%L (0, 0)%L la lx_yz P Hla) as H1.
+specialize (proj1 H1 Hxyz) as H2.
+subst P; clear H1 Hxyz; rename H2 into Hxyz.
+destruct Hxyz as (lxyz & Hlaxyz & Hlxxyz & Hxyz).
+specialize (@forall_exists_exists_forall (T * (T * T)) T) as H1.
+specialize (H1 (0, (0, 0))%L 0%L).
+specialize (H1 (λ ab, (fst (snd ab) ∈ a)%I)).
+cbn in H1.
+specialize
+  (H1 (λ ab y, (fst ab ∈ b)%I ∧ (y ∈ c)%I ∧ snd (snd ab) = (fst ab + y)%L)).
+cbn in H1.
+specialize (proj1 (H1 lxyz) Hxyz) as (lb & Hlb & H).
+clear Hxyz H1; rename H into Hxyz.
+move lb before la.
+move Hlb before Hla.
+move lxyz before lx_yz.
+remember (length lx_yz) as n eqn:Hn.
+rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
+move la before lxyz; move lb before la.
+symmetry in Hlx_yz.
+move Hla before Hlx_yz; move Hlb before Hla.
+assert (Hlxyz : length lxyz = n). {
+  rewrite <- Hlx_yz.
+  rewrite Hlxxyz; symmetry.
+  apply List.length_map.
+}
+move Hn before n.
+move Hlxyz after Hla.
+rewrite Hlxyz in Hlb.
+set
+  (P u v :=
+     (fst (snd v) ∈ a)%I ∧ (fst v ∈ b)%I ∧ (u ∈ c)%I ∧
+     snd (snd v) = (fst v + u)%L).
+specialize (forall_in_seq 0%L (0, (0, 0))%L) as H1.
+specialize (H1 lb lxyz P).
+rewrite Hlxyz in H1.
+specialize (H1 Hlb).
+subst P.
+cbn in H1.
+specialize ((proj1 H1) Hxyz) as (lxyz' & Hlbxyz & Hlxxyz' & H).
+clear Hxyz H1; rename H into Hxyz.
+move lxyz' before lxyz.
+subst lxyz.
+rename lxyz' into lxyz.
+rewrite List.map_map in Hlxxyz.
+rewrite List.map_map in Hlaxyz.
+subst lx_yz.
+rewrite List.length_map in Hlx_yz, Hlxyz.
+clear Hlx_yz.
+rewrite rngl_summation_list_map in Ht.
+remember (∀ xyz, _) as x in Hxyz; subst x. (* renaming *)
+remember (∑ (xyz ∈ _), _) as x in Ht; subst x. (* renaming *)
+clear la Hla Hlaxyz.
+clear lb Hlb Hlbxyz.
+subst t.
+clear n Hn Hlxyz.
+induction lxyz as [| xyzt]. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  apply i_zero.
+}
+rewrite rngl_summation_list_cons.
+cbn - [ i_subset ].
+apply i_add. 2: {
+  apply IHlxyz.
+  intros * Hxyz'.
+  now apply Hxyz; right.
+}
+specialize (Hxyz xyzt).
+assert (H : xyzt ∈ xyzt :: lxyz) by now left.
+specialize (Hxyz H); clear H.
+destruct Hxyz as (Ha & Hb & Hc & Ht).
+rewrite Ht.
+rewrite rngl_mul_add_distr_l.
+apply i_add. {
+  cbn.
+  progress unfold I_add_subset.
+  exists (fst (snd (snd xyzt)) * fst (snd xyzt))%L, 0%L.
+  rewrite rngl_add_0_r.
+  split. {
+    exists [(fst (snd (snd xyzt)), fst (snd xyzt))].
+    split; [ easy | ].
+    split. {
+      intros x y Hxy.
+      destruct Hxy as [Hxy| ]; [ | easy ].
+      now injection Hxy; clear Hxy; intros; subst x y.
+    }
+    rewrite rngl_summation_list_pair.
+    now rewrite rngl_summation_list_only_one.
+  }
+  split; [ apply i_zero | easy ].
+} {
+  cbn.
+  progress unfold I_add_subset.
+  exists 0%L, (fst (snd (snd xyzt)) * fst xyzt)%L.
+  rewrite rngl_add_0_l.
+  split; [ apply i_zero | ].
+  split; [ | easy ].
+  exists [(fst (snd (snd xyzt)), fst xyzt)].
+  split; [ easy | ].
+  split. {
+    intros x y Hxy.
+    destruct Hxy as [Hxy| ]; [ | easy ].
+    now injection Hxy; clear Hxy; intros; subst x y.
+  }
+  rewrite rngl_summation_list_pair.
+  now rewrite rngl_summation_list_only_one.
+}
+Qed.
+*)
+
 Theorem I_mul_subset_add_distr_l_2_lemma a b c lab :
   length lab ≠ 0
   → (∀ x y, (x, y) ∈ lab → (x ∈ a)%I ∧ (y ∈ b)%I)
@@ -1269,6 +1405,13 @@ Qed.
 (* to be completed
 Theorem I_mul_subset_add_distr_r a b c x :
   I_mul_subset (a + b) c x = I_add_subset (a * c) (b * c) x.
+Proof.
+apply propositional_extensionality.
+split.
+... ...
+apply I_mul_subset_add_distr_r_1.
+apply I_mul_subset_add_distr_r_2.
+Qed.
 *)
 
 Theorem I_mul_add_distr_l a b c : (a * (b + c))%I = (a * b + a * c)%I.
