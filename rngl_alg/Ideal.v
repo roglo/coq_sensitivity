@@ -1396,6 +1396,14 @@ apply i_add. {
 }
 Qed.
 
+(* to be completed
+(* I_add_subset (a * c) (b * c) x → I_mul_subset (a + b) c x *)
+Theorem I_mul_subset_add_distr_r_2 a b c :
+  ∀ t, (t ∈ a * c + b * c → t ∈ (a + b) * c)%I.
+Proof.
+...
+*)
+
 Theorem I_mul_subset_add_distr_l a b c x :
   I_mul_subset a (b + c) x = I_add_subset (a * b) (a * c) x.
 Proof.
