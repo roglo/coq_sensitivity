@@ -1371,6 +1371,15 @@ do 2 rewrite rngl_summation_list_pair.
 now rewrite rngl_summation_list_cons.
 Qed.
 
+(* to be completed
+Theorem I_mul_subset_add_distr_r_2_lemma I J K lab :
+  length lab ≠ 0
+  → (∀ x y : T, (x, y) ∈ lab → (x ∈ I)%I ∧ (y ∈ K)%I)
+  → (∑ ((x, y) ∈ lab), x * y ∈ (I + J) * K)%I.
+Proof.
+...
+*)
+
 (* I_mul_subset (I * J) (I * K) t → I_mul_subset I (J + K) t *)
 Theorem I_mul_subset_add_distr_l_2 I J K :
   ∀ t, (t ∈ I * J + I * K → t ∈ I * (J + K))%I.
