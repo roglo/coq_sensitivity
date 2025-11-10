@@ -1371,14 +1371,55 @@ do 2 rewrite rngl_summation_list_pair.
 now rewrite rngl_summation_list_cons.
 Qed.
 
-(* to be completed
 Theorem I_mul_subset_add_distr_r_2_lemma I J K lab :
   length lab ≠ 0
   → (∀ x y : T, (x, y) ∈ lab → (x ∈ I)%I ∧ (y ∈ K)%I)
   → (∑ ((x, y) ∈ lab), x * y ∈ (I + J) * K)%I.
 Proof.
-...
-*)
+intros Hlab Hab; cbn.
+induction lab as [| (x, y) lxy]; [ easy | clear Hlab ].
+destruct lxy as [| (x', y')]. {
+  exists [(x, y)].
+  split; [ easy | ].
+  split; [ | easy ].
+  intros x' y' H.
+  destruct H as [H| ]; [ | easy ].
+  injection H; clear H; intros; subst x' y'.
+  split; [ | now apply (Hab x y); left ].
+  cbn.
+  progress unfold I_add_subset.
+  exists x, 0%L.
+  rewrite rngl_add_0_r.
+  split; [ now apply (Hab x y); left | ].
+  split; [ apply i_zero | easy ].
+}
+specialize (IHlxy (Nat.neq_succ_0 _)).
+rewrite rngl_summation_list_pair.
+rewrite rngl_summation_list_cons; cbn.
+rewrite <- rngl_summation_list_pair.
+assert (H : ∀ x y, (x, y) ∈ (x', y') :: lxy → (x ∈ I ∧ y ∈ K)%I). {
+  intros x'' y'' Hxy.
+  now apply Hab; right.
+}
+specialize (IHlxy H); clear H.
+destruct IHlxy as (lxy' & Hlxy' & H3 & H4).
+exists ((x, y) :: lxy').
+split; [ easy | ].
+rewrite H4.
+split. {
+  intros x'' y'' Hxy.
+  destruct Hxy as [Hxy| Hxy]; [ | now apply H3 ].
+  injection Hxy; clear Hxy; intros; subst x'' y''.
+  specialize (Hab x y) as H1.
+  split; [ | now apply H1; left ].
+  exists x, 0%L.
+  rewrite rngl_add_0_r.
+  split; [ now apply H1; left | ].
+  split; [ apply i_zero | easy ].
+}
+do 2 rewrite rngl_summation_list_pair.
+now rewrite rngl_summation_list_cons.
+Qed.
 
 (* I_mul_subset (I * J) (I * K) t → I_mul_subset I (J + K) t *)
 Theorem I_mul_subset_add_distr_l_2 I J K :
@@ -1405,7 +1446,6 @@ apply i_add. {
 }
 Qed.
 
-(* to be completed
 (* I_add_subset (I * K) (J * K) x → I_mul_subset (I + J) K x *)
 Theorem I_mul_subset_add_distr_r_2 I J K :
   ∀ t, (t ∈ I * K + J * K → t ∈ (I + J) * K)%I.
@@ -1424,14 +1464,12 @@ remember (∀ x z, _) as x in Hac; subst x. (* renaming *)
 remember (∑ ((x, z) ∈ _), _) as x in Hxz; subst x. (* renaming *)
 subst xy xz t.
 apply i_add. {
-... ...
   now apply I_mul_subset_add_distr_r_2_lemma.
 } {
   rewrite I_add_comm.
-  now apply I_mul_subset_add_distr_l_2_lemma.
+  now apply I_mul_subset_add_distr_r_2_lemma.
 }
 Qed.
-*)
 
 Theorem I_mul_subset_add_distr_l I J K x :
   I_mul_subset I (J + K) x = I_add_subset (I * J) (I * K) x.
@@ -1442,17 +1480,14 @@ apply I_mul_subset_add_distr_l_1.
 apply I_mul_subset_add_distr_l_2.
 Qed.
 
-(* to be completed
 Theorem I_mul_subset_add_distr_r I J K x :
   I_mul_subset (I + J) K x = I_add_subset (I * K) (J * K) x.
 Proof.
 apply propositional_extensionality.
 split.
 apply I_mul_subset_add_distr_r_1.
-... ...
 apply I_mul_subset_add_distr_r_2.
 Qed.
-*)
 
 Theorem I_mul_add_distr_l a b c : (a * (b + c))%I = (a * b + a * c)%I.
 Proof.
@@ -1462,16 +1497,13 @@ apply functional_extensionality_dep.
 apply I_mul_subset_add_distr_l.
 Qed.
 
-(* to be completed
 Theorem I_mul_add_distr_r a b c : ((a + b) * c)%I = (a * c + b * c)%I.
 Proof.
 intros.
 apply eq_ideal_eq; cbn.
 apply functional_extensionality_dep.
-... ...
 apply I_mul_subset_add_distr_r.
 Qed.
-*)
 
 Theorem I_mul_subset_comm :
   rngl_mul_is_comm T = true →
@@ -1589,7 +1621,6 @@ intros.
 apply I_mul_subset_1_r.
 Qed.
 
-(* to be completed
 Theorem I_opt_mul_add_distr_r :
   if rngl_mul_is_comm T then not_applicable
   else ∀ a b c : ideal T, ((a + b) * c)%I = (a * c + b * c)%I.
@@ -1597,10 +1628,10 @@ Proof.
 remember (rngl_mul_is_comm T) as ic eqn:Hic.
 symmetry in Hic.
 destruct ic; [ easy | ].
-... ...
 apply I_mul_add_distr_r.
 Qed.
 
+(* to be completed
 Definition I_ring_like_prop : ring_like_prop (ideal T) :=
   let roi := I_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
@@ -1616,10 +1647,10 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_opt_mul_comm := I_opt_mul_comm;
      rngl_opt_mul_1_r := I_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := I_opt_mul_add_distr_r;
-     rngl_opt_add_opp_diag_l := true; (*I_opt_add_opp_diag_l;*)
-     rngl_opt_add_sub := true; (*I_opt_add_sub;*)
-     rngl_opt_sub_add_distr := true; (*I_opt_sub_add_distr;*)
-     rngl_opt_sub_0_l := true; (*I_opt_sub_0_l;*)
+     rngl_opt_add_opp_diag_l := NA;
+     rngl_opt_add_sub := NA;
+     rngl_opt_sub_add_distr := NA;
+     rngl_opt_sub_0_l := NA;
      rngl_opt_mul_inv_diag_l := NA;
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
