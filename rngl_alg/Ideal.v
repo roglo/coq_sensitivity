@@ -1338,6 +1338,17 @@ apply functional_extensionality_dep.
 apply I_mul_subset_add_distr_l.
 Qed.
 
+(* to be completed
+Theorem I_mul_add_distr_r a b c : ((a + b) * c)%I = (a * c + b * c)%I.
+Proof.
+intros.
+apply eq_ideal_eq; cbn.
+apply functional_extensionality_dep.
+... ...
+apply I_mul_subset_add_distr_r.
+Qed.
+*)
+
 Theorem I_mul_subset_comm :
   rngl_mul_is_comm T = true →
   ∀ a b x, I_mul_subset a b x = I_mul_subset b a x.
@@ -1455,6 +1466,17 @@ apply I_mul_subset_1_r.
 Qed.
 
 (* to be completed
+Theorem I_opt_mul_add_distr_r :
+  if rngl_mul_is_comm T then not_applicable
+  else ∀ a b c : ideal T, ((a + b) * c)%I = (a * c + b * c)%I.
+Proof.
+remember (rngl_mul_is_comm T) as ic eqn:Hic.
+symmetry in Hic.
+destruct ic; [ easy | ].
+... ...
+apply I_mul_add_distr_r.
+Qed.
+
 Definition I_ring_like_prop : ring_like_prop (ideal T) :=
   let roi := I_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
@@ -1469,7 +1491,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_mul_add_distr_l := I_mul_add_distr_l;
      rngl_opt_mul_comm := I_opt_mul_comm;
      rngl_opt_mul_1_r := I_opt_mul_1_r;
-     rngl_opt_mul_add_distr_r := true; (*I_opt_mul_add_distr_r;*)
+     rngl_opt_mul_add_distr_r := I_opt_mul_add_distr_r;
      rngl_opt_add_opp_diag_l := true; (*I_opt_add_opp_diag_l;*)
      rngl_opt_add_sub := true; (*I_opt_add_sub;*)
      rngl_opt_sub_add_distr := true; (*I_opt_sub_add_distr;*)
