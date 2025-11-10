@@ -1321,10 +1321,10 @@ apply i_add. {
 }
 Qed.
 
-Theorem I_mul_subset_add_distr_l_2_lemma a b c lab :
+Theorem I_mul_subset_add_distr_l_2_lemma I J K lab :
   length lab ≠ 0
-  → (∀ x y, (x, y) ∈ lab → (x ∈ a)%I ∧ (y ∈ b)%I)
-  → (∑ ((x, y) ∈ lab), x * y ∈ a * (b + c))%I.
+  → (∀ x y, (x, y) ∈ lab → (x ∈ I)%I ∧ (y ∈ J)%I)
+  → (∑ ((x, y) ∈ lab), x * y ∈ I * (J + K))%I.
 Proof.
 intros Hlab Hab; cbn.
 induction lab as [| (x, y) lxy]; [ easy | clear Hlab ].
@@ -1347,7 +1347,7 @@ specialize (IHlxy (Nat.neq_succ_0 _)).
 rewrite rngl_summation_list_pair.
 rewrite rngl_summation_list_cons; cbn.
 rewrite <- rngl_summation_list_pair.
-assert (H : ∀ x y, (x, y) ∈ (x', y') :: lxy → (x ∈ a ∧ y ∈ b)%I). {
+assert (H : ∀ x y, (x, y) ∈ (x', y') :: lxy → (x ∈ I ∧ y ∈ J)%I). {
   intros x'' y'' Hxy.
   now apply Hab; right.
 }
@@ -1371,9 +1371,9 @@ do 2 rewrite rngl_summation_list_pair.
 now rewrite rngl_summation_list_cons.
 Qed.
 
-(* I_mul_subset (a * b) (a * c) t → I_mul_subset a (b + c) t *)
-Theorem I_mul_subset_add_distr_l_2 a b c :
-  ∀ t, (t ∈ a * b + a * c → t ∈ a * (b + c))%I.
+(* I_mul_subset (I * J) (I * K) t → I_mul_subset I (J + K) t *)
+Theorem I_mul_subset_add_distr_l_2 I J K :
+  ∀ t, (t ∈ I * J + I * K → t ∈ I * (J + K))%I.
 Proof.
 destruct_ix.
 intros t Ht.
@@ -1397,15 +1397,35 @@ apply i_add. {
 Qed.
 
 (* to be completed
-(* I_add_subset (a * c) (b * c) x → I_mul_subset (a + b) c x *)
-Theorem I_mul_subset_add_distr_r_2 a b c :
-  ∀ t, (t ∈ a * c + b * c → t ∈ (a + b) * c)%I.
+(* I_add_subset (I * K) (J * K) x → I_mul_subset (I + J) K x *)
+Theorem I_mul_subset_add_distr_r_2 I J K :
+  ∀ t, (t ∈ I * K + J * K → t ∈ (I + J) * K)%I.
 Proof.
-...
+destruct_ix.
+intros t Ht.
+cbn in Ht.
+progress unfold I_add_subset in Ht.
+destruct Ht as (xy & xz & Hxy & Hxz & Ht).
+cbn in Hxy, Hxz.
+destruct Hxy as (lab & Hlab & Hab & Hxy).
+destruct Hxz as (lac & Hlac & Hac & Hxz).
+move lac before lab; move Hlac before Hlab.
+move Hac before Hab.
+remember (∀ x z, _) as x in Hac; subst x. (* renaming *)
+remember (∑ ((x, z) ∈ _), _) as x in Hxz; subst x. (* renaming *)
+subst xy xz t.
+apply i_add. {
+... ...
+  now apply I_mul_subset_add_distr_r_2_lemma.
+} {
+  rewrite I_add_comm.
+  now apply I_mul_subset_add_distr_l_2_lemma.
+}
+Qed.
 *)
 
-Theorem I_mul_subset_add_distr_l a b c x :
-  I_mul_subset a (b + c) x = I_add_subset (a * b) (a * c) x.
+Theorem I_mul_subset_add_distr_l I J K x :
+  I_mul_subset I (J + K) x = I_add_subset (I * J) (I * K) x.
 Proof.
 apply propositional_extensionality.
 split.
@@ -1414,8 +1434,8 @@ apply I_mul_subset_add_distr_l_2.
 Qed.
 
 (* to be completed
-Theorem I_mul_subset_add_distr_r a b c x :
-  I_mul_subset (a + b) c x = I_add_subset (a * c) (b * c) x.
+Theorem I_mul_subset_add_distr_r I J K x :
+  I_mul_subset (I + J) K x = I_add_subset (I * K) (J * K) x.
 Proof.
 apply propositional_extensionality.
 split.
