@@ -29,7 +29,7 @@ Bind Scope ideal_scope with ideal.
 Arguments ideal T {ro}.
 Arguments i_subset {T ro} i%_I a%_L.
 
-Notation "x '∈' a" := (i_subset a x) : ideal_scope.
+Notation "x '∈' I" := (i_subset I x) : ideal_scope.
 
 Class ideal_ctx T {ro : ring_like_op T} :=
   { ix_os : rngl_has_opp_or_psub T = true }.
@@ -226,12 +226,12 @@ Qed.
 
 (* addition *)
 
-Definition I_add_subset a b z :=
-  ∃ x y, (x ∈ a)%I ∧ (y ∈ b)%I ∧ z = (x + y)%L.
+Definition I_add_subset I J z :=
+  ∃ x y, (x ∈ I)%I ∧ (y ∈ J)%I ∧ z = (x + y)%L.
 
-Arguments I_add_subset a b z%_L.
+Arguments I_add_subset (I J)%_I z%_L.
 
-Theorem I_add_zero a b : I_add_subset a b 0%L.
+Theorem I_add_zero I J : I_add_subset I J 0%L.
 Proof.
 exists 0%L, 0%L.
 split; [ apply i_zero | ].
@@ -239,9 +239,8 @@ split; [ apply i_zero | ].
 symmetry; apply rngl_add_0_l.
 Qed.
 
-Theorem I_add_add a b :
-  ∀ x y,
-  I_add_subset a b x → I_add_subset a b y → I_add_subset a b (x + y)%L.
+Theorem I_add_add I J :
+  ∀ x y, I_add_subset I J x → I_add_subset I J y → I_add_subset I J (x + y)%L.
 Proof.
 intros * Hx Hy.
 destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2).
@@ -255,8 +254,8 @@ progress f_equal.
 apply rngl_add_add_swap.
 Qed.
 
-Theorem I_add_mul_l a b :
-  ∀ x y, I_add_subset a b y → I_add_subset a b (x * y).
+Theorem I_add_mul_l I J :
+  ∀ x y, I_add_subset I J y → I_add_subset I J (x * y).
 Proof.
 intros * H.
 destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
@@ -266,8 +265,8 @@ split; [ now apply i_mul_l | ].
 apply rngl_mul_add_distr_l.
 Qed.
 
-Theorem I_add_mul_r a b :
-  ∀ x y, I_add_subset a b x → I_add_subset a b (x * y).
+Theorem I_add_mul_r I J :
+  ∀ x y, I_add_subset I J x → I_add_subset I J (x * y).
 Proof.
 intros * H.
 destruct H as (x1 & x2 & Hx & Hx1 & Hx2); subst.
@@ -279,16 +278,16 @@ Qed.
 
 (* multiplication *)
 
-Definition I_mul_subset_prop a b z lxy :=
+Definition I_mul_subset_prop I J z lxy :=
   length lxy ≠ 0 ∧
-  (∀ x y, (x, y) ∈ lxy → (x ∈ a)%I ∧ (y ∈ b)%I) ∧
+  (∀ x y, (x, y) ∈ lxy → (x ∈ I)%I ∧ (y ∈ J)%I) ∧
   z = ∑ ((x, y) ∈ lxy), x * y.
 
-Definition I_mul_subset a b z := ∃ lxy, I_mul_subset_prop a b z lxy.
+Definition I_mul_subset I J z := ∃ lxy, I_mul_subset_prop I J z lxy.
 
-Arguments I_mul_subset a b z%_L.
+Arguments I_mul_subset (I J)%_I z%_L.
 
-Theorem I_mul_zero a b : I_mul_subset a b 0%L.
+Theorem I_mul_zero I J : I_mul_subset I J 0%L.
 Proof.
 destruct_ix.
 exists [(0, 0)%L].
@@ -304,9 +303,8 @@ rewrite (rngl_mul_0_l Hos).
 apply rngl_add_0_l.
 Qed.
 
-Theorem I_mul_add a b :
-  ∀ x y,
-  I_mul_subset a b x → I_mul_subset a b y → I_mul_subset a b (x + y)%L.
+Theorem I_mul_add I J :
+  ∀ x y, I_mul_subset I J x → I_mul_subset I J y → I_mul_subset I J (x + y)%L.
 Proof.
 intros * Hx Hy.
 destruct Hx as (lab1 & Hlab1 & Hab1 & Hx).
@@ -326,8 +324,8 @@ do 3 rewrite rngl_summation_list_pair.
 symmetry; apply rngl_summation_list_app.
 Qed.
 
-Theorem I_mul_mul_l a b :
-  ∀ x y, I_mul_subset a b y → I_mul_subset a b (x * y).
+Theorem I_mul_mul_l I J :
+  ∀ x y, I_mul_subset I J y → I_mul_subset I J (x * y).
 Proof.
 destruct_ix.
 intros * (lxy & Hlxy & Hab & Hz).
@@ -353,8 +351,8 @@ intros (x, y) Hxy; cbn.
 apply rngl_mul_assoc.
 Qed.
 
-Theorem I_mul_mul_r a b :
-  ∀ x y, I_mul_subset a b x → I_mul_subset a b (x * y).
+Theorem I_mul_mul_r I J :
+  ∀ x y, I_mul_subset I J x → I_mul_subset I J (x * y).
 Proof.
 destruct_ix.
 intros * (lxy & Hlxy & Hab & Hz).
