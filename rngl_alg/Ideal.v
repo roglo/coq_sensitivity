@@ -1201,13 +1201,18 @@ clear Ha_bc; rename H1 into Ha_bc.
 specialize ((proj1 forall_pair_in) Ha_bc) as H1.
 cbn in H1.
 clear Ha_bc; rename H1 into Ha_bc.
-...
+assert (H : ∀ ab, ab ∈ lx_yz → (snd ab ∈ K)%I ∧ I_add_subset I J (fst ab)). {
+  intros ab Hab.
+  now specialize (Ha_bc ab Hab).
+}
+clear Ha_bc; rename H into Ha_bc.
 apply (forall_exists_exists_forall (0, 0) 0)%L in Ha_bc.
 destruct Ha_bc as (la & Hla & Hxyz).
 set
   (P u v :=
-     (fst v ∈ a)%I ∧ ∃ y : T, (u ∈ b)%I ∧ (y ∈ c)%I ∧ snd v = (u + y)%L).
+     (fst v ∈ I)%I ∧ ∃ y : T, (u ∈ J)%I ∧ (y ∈ K)%I ∧ snd v = (u + y)%L).
 specialize (forall_in_seq 0%L (0, 0)%L la lx_yz P Hla) as H1.
+...
 specialize (proj1 H1 Hxyz) as H2.
 subst P; clear H1 Hxyz; rename H2 into Hxyz.
 destruct Hxyz as (lxyz & Hlaxyz & Hlxxyz & Hxyz).
