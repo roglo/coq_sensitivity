@@ -1219,12 +1219,11 @@ subst P; clear H1 Hxyz; rename H2 into Hxyz.
 destruct Hxyz as (lxyz & Hlaxyz & Hlxxyz & Hxyz).
 specialize (@forall_exists_exists_forall (T * (T * T)) T) as H1.
 specialize (H1 (0, (0, 0))%L 0%L).
-specialize (H1 (λ ab, (fst (snd ab) ∈ I)%I)).
+specialize (H1 (λ ab, (snd (snd ab) ∈ K)%I)).
 cbn in H1.
 specialize
-  (H1 (λ ab y, (fst ab ∈ J)%I ∧ (y ∈ K)%I ∧ snd (snd ab) = (fst ab + y)%L)).
+  (H1 (λ ab y, (fst ab ∈ I)%I ∧ (y ∈ J)%I ∧ fst (snd ab) = (fst ab + y)%L)).
 cbn in H1.
-...
 specialize (proj1 (H1 lxyz) Hxyz) as (lb & Hlb & H).
 clear Hxyz H1; rename H into Hxyz.
 move lb before la.
@@ -1245,7 +1244,7 @@ move Hlxyz after Hla.
 rewrite Hlxyz in Hlb.
 set
   (P u v :=
-     (fst (snd v) ∈ a)%I ∧ (fst v ∈ b)%I ∧ (u ∈ c)%I ∧
+     (fst (snd v) ∈ I)%I ∧ (fst v ∈ J)%I ∧ (u ∈ K)%I ∧
      snd (snd v) = (fst v + u)%L).
 specialize (forall_in_seq 0%L (0, (0, 0))%L) as H1.
 specialize (H1 lb lxyz P).
@@ -1253,6 +1252,7 @@ rewrite Hlxyz in H1.
 specialize (H1 Hlb).
 subst P.
 cbn in H1.
+...
 specialize ((proj1 H1) Hxyz) as (lxyz' & Hlbxyz & Hlxxyz' & H).
 clear Hxyz H1; rename H into Hxyz.
 move lxyz' before lxyz.
