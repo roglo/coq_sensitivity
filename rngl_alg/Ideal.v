@@ -380,46 +380,6 @@ intros (x, y) Hxy; cbn.
 symmetry; apply rngl_mul_assoc.
 Qed.
 
-(* opposite *)
-
-Theorem I_opp_0 :
-  rngl_has_opp T = true →
-  ∀ a, (- 0%L ∈ a)%I.
-Proof.
-intros Hop *.
-rewrite (rngl_opp_0 Hop).
-apply i_zero.
-Qed.
-
-Theorem I_opp_add :
-  rngl_has_opp T = true →
-  ∀ a (x y : T), (- x ∈ a)%I → (- y ∈ a)%I → (- (x + y)%L ∈ a)%I.
-Proof.
-intros Hop.
-intros * Hx Hy.
-rewrite (rngl_opp_add_distr Hop).
-rewrite <- (rngl_add_opp_r Hop).
-now apply i_add.
-Qed.
-
-Theorem I_opp_mul_l :
-  rngl_has_opp T = true →
-  ∀ a t x, (- x ∈ a)%I → (- (t * x)%L ∈ a)%I.
-Proof.
-intros Hop * H.
-rewrite <- (rngl_mul_opp_r Hop).
-now apply i_mul_l.
-Qed.
-
-Theorem I_opp_mul_r :
-  rngl_has_opp T = true →
-  ∀ a x t, (- x ∈ a)%I → (- (x * t)%L ∈ a)%I.
-Proof.
-intros Hop * H.
-rewrite <- (rngl_mul_opp_l Hop).
-now apply i_mul_r.
-Qed.
-
 (* *)
 
 Definition I_zero : ideal T :=
@@ -450,22 +410,6 @@ Definition I_mul (a b : ideal T) : ideal T :=
      i_mul_l := I_mul_mul_l a b;
      i_mul_r := I_mul_mul_r a b |}.
 
-Definition I_opp Hop (a : ideal T) : ideal T :=
-  {| i_subset x := i_subset a (-x);
-     i_zero := I_opp_0 Hop a;
-     i_add := I_opp_add Hop a;
-     i_mul_l := I_opp_mul_l Hop a;
-     i_mul_r := I_opp_mul_r Hop a |}.
-
-Definition I_opt_opp_or_psub :
-  option ((ideal T → ideal T) + (ideal T → ideal T → ideal T)).
-Proof.
-remember (rngl_has_opp T) as op eqn:Hop.
-symmetry in Hop.
-destruct op; [ | apply None ].
-apply (Some (inl (I_opp Hop))).
-Qed.
-
 (* ideal ring like op *)
 
 Definition I_ring_like_op : ring_like_op (ideal T) :=
@@ -473,7 +417,7 @@ Definition I_ring_like_op : ring_like_op (ideal T) :=
      rngl_one := I_one;
      rngl_add := I_add;
      rngl_mul := I_mul;
-     rngl_opt_opp_or_psub := I_opt_opp_or_psub;
+     rngl_opt_opp_or_psub := Some (inl (λ a, a));
      rngl_opt_inv_or_pdiv := None;
      rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := None;
@@ -484,13 +428,7 @@ End a.
 Notation "0" := I_zero : ideal_scope.
 Notation "1" := I_one : ideal_scope.
 Notation "a + b" := (I_add a b) : ideal_scope.
-(*
-Notation "a - b" := (rngl_sub a b) : ideal_scope.
-*)
 Notation "a * b" := (I_mul a b) : ideal_scope.
-(*
-Notation "- a" := (rngl_opp a) : ideal_scope.
-*)
 
 Theorem List_seq_rngl_summation_r {T} a lb (f : T → _) :
   List.seq a (∑ (i ∈ lb), f i) =
