@@ -1268,6 +1268,11 @@ apply I_mul_subset_add_distr_l_1.
 apply I_mul_subset_add_distr_l_2.
 Qed.
 
+(* to be completed
+Theorem I_mul_subset_add_distr_r a b c x :
+  I_mul_subset (a + b) c x = I_add_subset (a * c) (b * c) x.
+*)
+
 Theorem I_mul_add_distr_l a b c : (a * (b + c))%I = (a * b + a * c)%I.
 Proof.
 intros.
