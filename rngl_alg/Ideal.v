@@ -1182,7 +1182,6 @@ apply i_add. {
 }
 Qed.
 
-(* to be completed
 (* I_mul_subset (I + J) K x → I_add_subset (I * K) (J * K) x *)
 Theorem I_mul_subset_add_distr_r_1 I J K :
   ∀ t, (t ∈ (I + J) * K → t ∈ I * K + J * K)%I.
@@ -1289,15 +1288,14 @@ rewrite rngl_mul_add_distr_r.
 apply i_add. {
   cbn.
   progress unfold I_add_subset.
-  exists (fst (snd (snd xyzt)) * fst (snd xyzt))%L, 0%L.
+  exists (fst (snd xyzt) * snd (snd (snd xyzt)))%L, 0%L.
   rewrite rngl_add_0_r.
   split. {
-    exists [(fst (snd (snd xyzt)), fst (snd xyzt))].
+    exists [(fst (snd xyzt), snd (snd (snd xyzt)))].
     split; [ easy | ].
     split. {
       intros x y Hxy.
       destruct Hxy as [Hxy| ]; [ | easy ].
-...
       now injection Hxy; clear Hxy; intros; subst x y.
     }
     rewrite rngl_summation_list_pair.
@@ -1307,11 +1305,11 @@ apply i_add. {
 } {
   cbn.
   progress unfold I_add_subset.
-  exists 0%L, (fst (snd (snd xyzt)) * fst xyzt)%L.
+  exists 0%L, (fst xyzt * snd (snd (snd xyzt)))%L.
   rewrite rngl_add_0_l.
   split; [ apply i_zero | ].
   split; [ | easy ].
-  exists [(fst (snd (snd xyzt)), fst xyzt)].
+  exists [(fst xyzt, snd (snd (snd xyzt)))].
   split; [ easy | ].
   split. {
     intros x y Hxy.
@@ -1322,9 +1320,6 @@ apply i_add. {
   now rewrite rngl_summation_list_only_one.
 }
 Qed.
-...
-
-*)
 
 Theorem I_mul_subset_add_distr_l_2_lemma a b c lab :
   length lab ≠ 0
@@ -1416,8 +1411,8 @@ Theorem I_mul_subset_add_distr_r a b c x :
 Proof.
 apply propositional_extensionality.
 split.
-... ...
 apply I_mul_subset_add_distr_r_1.
+... ...
 apply I_mul_subset_add_distr_r_2.
 Qed.
 *)
