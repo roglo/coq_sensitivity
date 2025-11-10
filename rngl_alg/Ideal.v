@@ -1244,15 +1244,14 @@ move Hlxyz after Hla.
 rewrite Hlxyz in Hlb.
 set
   (P u v :=
-     (fst (snd v) ∈ I)%I ∧ (fst v ∈ J)%I ∧ (u ∈ K)%I ∧
-     snd (snd v) = (fst v + u)%L).
+     (snd (snd v) ∈ K)%I ∧ (fst v ∈ I)%I ∧ (u ∈ J)%I ∧
+     fst (snd v) = (fst v + u)%L).
 specialize (forall_in_seq 0%L (0, (0, 0))%L) as H1.
 specialize (H1 lb lxyz P).
 rewrite Hlxyz in H1.
 specialize (H1 Hlb).
 subst P.
 cbn in H1.
-...
 specialize ((proj1 H1) Hxyz) as (lxyz' & Hlbxyz & Hlxxyz' & H).
 clear Hxyz H1; rename H into Hxyz.
 move lxyz' before lxyz.
@@ -1286,7 +1285,7 @@ assert (H : xyzt ∈ xyzt :: lxyz) by now left.
 specialize (Hxyz H); clear H.
 destruct Hxyz as (Ha & Hb & Hc & Ht).
 rewrite Ht.
-rewrite rngl_mul_add_distr_l.
+rewrite rngl_mul_add_distr_r.
 apply i_add. {
   cbn.
   progress unfold I_add_subset.
@@ -1298,6 +1297,7 @@ apply i_add. {
     split. {
       intros x y Hxy.
       destruct Hxy as [Hxy| ]; [ | easy ].
+...
       now injection Hxy; clear Hxy; intros; subst x y.
     }
     rewrite rngl_summation_list_pair.
