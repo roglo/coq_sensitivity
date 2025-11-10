@@ -1210,19 +1210,21 @@ apply (forall_exists_exists_forall (0, 0) 0)%L in Ha_bc.
 destruct Ha_bc as (la & Hla & Hxyz).
 set
   (P u v :=
-     (fst v ∈ I)%I ∧ ∃ y : T, (u ∈ J)%I ∧ (y ∈ K)%I ∧ snd v = (u + y)%L).
+     (snd v ∈ K)%I ∧ ∃ y : T, (u ∈ I)%I ∧ (y ∈ J)%I ∧ fst v = (u + y)%L).
 specialize (forall_in_seq 0%L (0, 0)%L la lx_yz P Hla) as H1.
-...
+progress unfold P in H1.
+cbn in H1.
 specialize (proj1 H1 Hxyz) as H2.
 subst P; clear H1 Hxyz; rename H2 into Hxyz.
 destruct Hxyz as (lxyz & Hlaxyz & Hlxxyz & Hxyz).
 specialize (@forall_exists_exists_forall (T * (T * T)) T) as H1.
 specialize (H1 (0, (0, 0))%L 0%L).
-specialize (H1 (λ ab, (fst (snd ab) ∈ a)%I)).
+specialize (H1 (λ ab, (fst (snd ab) ∈ I)%I)).
 cbn in H1.
 specialize
-  (H1 (λ ab y, (fst ab ∈ b)%I ∧ (y ∈ c)%I ∧ snd (snd ab) = (fst ab + y)%L)).
+  (H1 (λ ab y, (fst ab ∈ J)%I ∧ (y ∈ K)%I ∧ snd (snd ab) = (fst ab + y)%L)).
 cbn in H1.
+...
 specialize (proj1 (H1 lxyz) Hxyz) as (lb & Hlb & H).
 clear Hxyz H1; rename H into Hxyz.
 move lb before la.
