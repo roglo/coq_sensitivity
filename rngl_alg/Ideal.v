@@ -14,15 +14,11 @@ Require Import RingLike.IterAdd.
 Require Import RingLike.Nat_algebra.
 
 (* ideal: non empty set type with some properties *)
-(* drawback: elementary properties, like commutativity of addition of ideals
-   cannot be proven *)
-(* another version of ideals using bool instead of Prop follows *)
 
 Record ideal {T} {ro : ring_like_op T} := mk_ip
   { i_subset : T → Prop;
     i_zero : i_subset 0%L;
     i_add x y : i_subset x → i_subset y → i_subset (x + y)%L;
-    i_opp x : i_subset x → i_subset (- x)%L;
     i_mul_l t x : i_subset x → i_subset (t * x)%L;
     i_mul_r x t : i_subset x → i_subset (x * t)%L }.
 
@@ -32,16 +28,14 @@ Bind Scope ideal_scope with ideal.
 
 Arguments ideal T {ro}.
 Arguments i_subset {T ro} i%_I a%_L.
-Arguments i_opp {T ro} i%_I x%_L.
 
 Notation "x '∈' a" := (i_subset a x) : ideal_scope.
 
 Class ideal_ctx T {ro : ring_like_op T} :=
-  { ix_op : rngl_has_opp T = true }.
+  { ix_os : rngl_has_opp_or_psub T = true }.
 
 Ltac destruct_ix :=
-  set (Hop := ix_op);
-  set (Hos := rngl_has_opp_has_opp_or_psub Hop).
+  set (Hos := ix_os).
 
 (* to be moved somewhere else, probably IterAdd.v *)
 
@@ -192,6 +186,16 @@ split; intros Hp. {
 }
 Qed.
 
+Theorem rngl_opp_1_mul {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_opp T = true →
+  ∀ a, (-1 * a = - a)%L.
+Proof.
+intros Hop *.
+rewrite (rngl_mul_opp_l Hop).
+progress f_equal.
+apply rngl_mul_1_l.
+Qed.
+
 (* end to be added *)
 
 (* for propositional and functional extensionalities *)
@@ -211,15 +215,12 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {ic : ideal_ctx T}.
+Context {ix : ideal_ctx T}.
 
 (* 0 and 1 *)
 
 Theorem I_zero_add a b : a = 0%L → b = 0%L → (a + b = 0)%L.
 Proof. intros; subst; apply rngl_add_0_l. Qed.
-
-Theorem I_zero_opp a : a = 0%L → (- a = 0)%L.
-Proof. destruct_ix; intros; subst; apply (rngl_opp_0 Hop). Qed.
 
 Theorem I_zero_mul_l a b : b = 0%L → (a * b = 0)%L.
 Proof.
@@ -262,21 +263,6 @@ split; [ now apply i_add | ].
 do 2 rewrite rngl_add_assoc.
 progress f_equal.
 apply rngl_add_add_swap.
-Qed.
-
-Theorem I_add_opp a b : ∀ x, I_add_subset a b x → I_add_subset a b (- x).
-Proof.
-destruct_ix.
-intros * Hx.
-destruct Hx as (x1 & x2 & Hx & Hx1 & Hx2); subst.
-exists (- x1)%L, (- x2)%L.
-split; [ now apply i_opp | ].
-split; [ now apply i_opp | ].
-rewrite rngl_add_comm.
-rewrite (rngl_add_opp_r Hop).
-rewrite <- (rngl_opp_sub_distr Hop).
-rewrite (rngl_sub_opp_r Hop).
-now f_equal.
 Qed.
 
 Theorem I_add_mul_l a b :
@@ -350,31 +336,6 @@ do 3 rewrite rngl_summation_list_pair.
 symmetry; apply rngl_summation_list_app.
 Qed.
 
-Theorem I_mul_opp a b : ∀ x, I_mul_subset a b x → I_mul_subset a b (- x).
-Proof.
-destruct_ix.
-intros z (lxy & Hlxy & Hab & Hz); subst z.
-progress unfold I_mul_subset.
-progress unfold I_mul_subset_prop.
-exists (List.map (λ xy, (- fst xy, snd xy))%L lxy).
-rewrite List.length_map.
-split; [ easy | ].
-split. {
-  intros x y Hxy'.
-  apply List.in_map_iff in Hxy'.
-  destruct Hxy' as ((x', y') & Hxy' & Hxyl).
-  injection Hxy'; clear Hxy'; intros; subst x y.
-  specialize (Hab _ _ Hxyl).
-  now split; [ apply i_opp | ].
-}
-do 2 rewrite rngl_summation_list_pair.
-rewrite (rngl_opp_summation_list Hop).
-rewrite rngl_summation_list_map; cbn.
-apply rngl_summation_list_eq_compat.
-intros i Hi.
-now rewrite (rngl_mul_opp_l Hop).
-Qed.
-
 Theorem I_mul_mul_l a b :
   ∀ x y, I_mul_subset a b y → I_mul_subset a b (x * y).
 Proof.
@@ -431,35 +392,42 @@ Qed.
 
 (* opposite *)
 
-Theorem I_opp_add a :
-  ∀ x y : T, (- x ∈ a)%I → (- y ∈ a)%I → (- (x + y)%L ∈ a)%I.
+Theorem I_opp_0 :
+  rngl_has_opp T = true →
+  ∀ a, (- 0%L ∈ a)%I.
 Proof.
-destruct_ix.
+intros Hop *.
+rewrite (rngl_opp_0 Hop).
+apply i_zero.
+Qed.
+
+Theorem I_opp_add :
+  rngl_has_opp T = true →
+  ∀ a (x y : T), (- x ∈ a)%I → (- y ∈ a)%I → (- (x + y)%L ∈ a)%I.
+Proof.
+intros Hop.
 intros * Hx Hy.
-apply i_opp in Hx, Hy.
-rewrite (rngl_opp_involutive Hop) in Hx, Hy.
-apply i_opp.
+rewrite (rngl_opp_add_distr Hop).
+rewrite <- (rngl_add_opp_r Hop).
 now apply i_add.
 Qed.
 
-Theorem I_opp_mul_l a :
-  ∀ t x : T, (- x ∈ a)%I → (- (t * x)%L ∈ a)%I.
+Theorem I_opp_mul_l :
+  rngl_has_opp T = true →
+  ∀ a t x, (- x ∈ a)%I → (- (t * x)%L ∈ a)%I.
 Proof.
-destruct_ix.
-intros * H.
-apply i_opp, i_mul_l.
-rewrite <- (rngl_opp_involutive Hop).
-now apply i_opp.
+intros Hop * H.
+rewrite <- (rngl_mul_opp_r Hop).
+now apply i_mul_l.
 Qed.
 
-Theorem I_opp_mul_r a :
-  ∀ x t : T, (- x ∈ a)%I → (- (x * t)%L ∈ a)%I.
+Theorem I_opp_mul_r :
+  rngl_has_opp T = true →
+  ∀ a x t, (- x ∈ a)%I → (- (x * t)%L ∈ a)%I.
 Proof.
-destruct_ix.
-intros * H.
-apply i_opp, i_mul_r.
-rewrite <- (rngl_opp_involutive Hop).
-now apply i_opp.
+intros Hop * H.
+rewrite <- (rngl_mul_opp_l Hop).
+now apply i_mul_r.
 Qed.
 
 (* *)
@@ -468,7 +436,6 @@ Definition I_zero : ideal T :=
   {| i_subset a := a = 0%L;
      i_zero := eq_refl;
      i_add := I_zero_add;
-     i_opp := I_zero_opp;
      i_mul_l := I_zero_mul_l;
      i_mul_r := I_zero_mul_r |}.
 
@@ -476,7 +443,6 @@ Definition I_one : ideal T :=
   {| i_subset a := True;
      i_zero := I;
      i_add _ _ _ _ := I;
-     i_opp _ _ := I;
      i_mul_l _ _ _ := I;
      i_mul_r _ _ _ := I |}.
 
@@ -484,7 +450,6 @@ Definition I_add (a b : ideal T) : ideal T :=
   {| i_subset := I_add_subset a b;
      i_zero := I_add_zero a b;
      i_add := I_add_add a b;
-     i_opp := I_add_opp a b;
      i_mul_l := I_add_mul_l a b;
      i_mul_r := I_add_mul_r a b |}.
 
@@ -492,17 +457,24 @@ Definition I_mul (a b : ideal T) : ideal T :=
   {| i_subset := I_mul_subset a b;
      i_zero := I_mul_zero a b;
      i_add := I_mul_add a b;
-     i_opp := I_mul_opp a b;
      i_mul_l := I_mul_mul_l a b;
      i_mul_r := I_mul_mul_r a b |}.
 
-Definition I_opp (a : ideal T) : ideal T :=
+Definition I_opp Hop (a : ideal T) : ideal T :=
   {| i_subset x := i_subset a (-x);
-     i_zero := i_opp a 0 (i_zero a);
-     i_add := I_opp_add a;
-     i_opp x := i_opp a (-x);
-     i_mul_l := I_opp_mul_l a;
-     i_mul_r := I_opp_mul_r a |}.
+     i_zero := I_opp_0 Hop a;
+     i_add := I_opp_add Hop a;
+     i_mul_l := I_opp_mul_l Hop a;
+     i_mul_r := I_opp_mul_r Hop a |}.
+
+Definition I_opt_opp_or_psub :
+  option ((ideal T → ideal T) + (ideal T → ideal T → ideal T)).
+Proof.
+remember (rngl_has_opp T) as op eqn:Hop.
+symmetry in Hop.
+destruct op; [ | apply None ].
+apply (Some (inl (I_opp Hop))).
+Qed.
 
 (* ideal ring like op *)
 
@@ -511,11 +483,7 @@ Definition I_ring_like_op : ring_like_op (ideal T) :=
      rngl_one := I_one;
      rngl_add := I_add;
      rngl_mul := I_mul;
-     rngl_opt_opp_or_psub :=
-       match rngl_opt_opp_or_psub T with
-       | Some (inl _) => Some (inl I_opp)
-       | _ => None
-       end;
+     rngl_opt_opp_or_psub := I_opt_opp_or_psub;
      rngl_opt_inv_or_pdiv := None;
      rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := None;
@@ -580,7 +548,6 @@ destruct b.
 cbn in *.
 subst.
 f_equal.
-apply proof_irrelevance.
 apply proof_irrelevance.
 apply proof_irrelevance.
 apply proof_irrelevance.
@@ -830,11 +797,7 @@ assert (H : ∀ i, i ∈ li → (h i ∈ c)%I). {
 specialize (IHli H); clear H.
 apply i_add; [ | apply IHli ].
 clear - Ha Hb Hc.
-(**)
 apply I_subset_mul_assoc_r.
-(*
-apply I_subset_mul_assoc_l.
-*)
 now apply Ha; left.
 now apply Hb; left.
 now apply Hc; left.
@@ -920,11 +883,7 @@ assert (H : ∀ i j, i ∈ li → j ∈ lj i → (h i j ∈ c)%I). {
 }
 specialize (IHli H); clear H.
 apply i_add; [ | apply IHli ].
-(**)
 apply I_subset_sum_mul_assoc_r.
-(*
-apply I_subset_sum_mul_assoc_l.
-*)
 now intros i Hi; apply Ha; [ left | ].
 now intros i Hi; apply Hb; [ left | ].
 now intros i Hi; apply Hc; [ left | ].
@@ -994,7 +953,6 @@ erewrite rngl_summation_list_eq_compat in Ht. 2: {
 clear - Ht Hxyz.
 remember (∑ (xyz ∈ _), _) as x in Ht; subst x. (* renaming *)
 subst t.
-(**)
 apply I_subset_sum_sum_mul_assoc_l. {
   intros * Hi Hj.
   now specialize (Hxyz _ Hi).
@@ -1033,16 +991,12 @@ clear Ha_bc; rename H1 into Ha_bc.
 specialize ((proj1 forall_pair_in) Ha_bc) as H1.
 cbn in H1.
 clear Ha_bc; rename H1 into Ha_bc.
-(**)
 assert (H : ∀ ab, ab ∈ lx_yz → (snd ab ∈ c)%I ∧ I_mul_subset a b (fst ab)). {
   intros ab Hab.
   now specialize (Ha_bc ab Hab).
 }
 apply (forall_exists_exists_forall (0, 0)%L []) in H.
 clear Ha_bc; rename H into Ha_bc.
-(*
-apply (forall_exists_exists_forall (0, 0)%L []) in Ha_bc.
-*)
 destruct Ha_bc as (llyz & Hllyz & Hxyz).
 remember (length lx_yz) as n eqn:Hn.
 rename Hlx_yz into H; rename Hn into Hlx_yz; rename H into Hn.
@@ -1050,11 +1004,7 @@ move Hn before n; symmetry in Hlx_yz.
 move Hlx_yz before Hllyz.
 move llyz before lx_yz.
 rewrite Hllyz in Hxyz.
-(**)
 set (P u v := (snd u ∈ c)%I ∧ I_mul_subset_prop a b (fst u) v).
-(*
-set (P u v := (fst u ∈ a)%I ∧ I_mul_subset_prop b c (snd u) v).
-*)
 specialize (forall_in_seq (0, 0)%L [] lx_yz llyz P) as H1.
 rewrite Hlx_yz, Hllyz in H1.
 specialize (H1 eq_refl).
@@ -1070,40 +1020,23 @@ clear Hlx_yz; rename Hllyz into Hlxyz.
 rewrite rngl_summation_list_map in Ht.
 remember (∀ xyz, _) as x in Hxyz; subst x. (* renaming *)
 remember (∑ (xyz ∈ _), _) as x in Ht; subst x. (* renaming *)
-(**)
 assert (∀ xyz, xyz ∈ lxyz → fst (fst xyz) = ∑ ((y, z) ∈ snd xyz), y * z). {
   intros * H.
   now specialize (Hxyz _ H) as (Ha & Hllxyz & Hbc & H1).
 }
-(*
-assert (∀ xyz, xyz ∈ lxyz → snd (fst xyz) = ∑ ((y, z) ∈ snd xyz), y * z). {
-  intros * H.
-  now specialize (Hxyz _ H) as (Ha & Hllxyz & Hbc & H1).
-}
-*)
 erewrite rngl_summation_list_eq_compat in Ht; [ | now intros; rewrite H ].
 clear H.
 cbn in Ht.
 erewrite rngl_summation_list_eq_compat in Ht. 2: {
   intros i Hi.
   rewrite rngl_summation_list_pair.
-(**)
   rewrite (rngl_mul_summation_list_distr_r Hos).
-(*
-  rewrite (rngl_mul_summation_list_distr_l Hos).
-  erewrite rngl_summation_list_eq_compat. 2: {
-    intros j Hj.
-    rewrite rngl_mul_assoc.
-    reflexivity.
-  }
-*)
   remember (∑ (yz ∈ _), _) as x in |-*; subst x. (* renaming *)
   reflexivity.
 }
 clear - Ht Hxyz.
 remember (∑ (xyz ∈ _), _) as x in Ht; subst x. (* renaming *)
 subst t.
-(**)
 apply I_subset_sum_sum_mul_assoc_r. {
   intros * Hi Hj.
   specialize (Hxyz _ Hi).
@@ -1122,26 +1055,6 @@ apply I_subset_sum_sum_mul_assoc_r. {
   intros * Hi Hj.
   now specialize (Hxyz _ Hi).
 }
-(*
-apply I_subset_sum_sum_mul_assoc_l. {
-  intros * Hi Hj.
-  now specialize (Hxyz _ Hi).
-} {
-  intros * Hi Hj.
-  specialize (Hxyz _ Hi).
-  destruct Hxyz as (_, H).
-  destruct H as (lli & H1 & H2).
-  destruct j as (j, k).
-  now specialize (H1 j k Hj).
-} {
-  intros * Hi Hj.
-  specialize (Hxyz _ Hi).
-  destruct Hxyz as (_, H).
-  destruct H as (lli & H1 & H2).
-  destruct j as (j, k).
-  now specialize (H1 j k Hj).
-}
-*)
 Qed.
 
 Theorem I_mul_subset_assoc a b c x :
@@ -1550,563 +1463,6 @@ apply functional_extensionality_dep.
 intros.
 apply I_mul_subset_1_r.
 Qed.
-
-(*
-Arguments rngl_opt_one T {ring_like_op}.
-
-Theorem I_opt_mul_1_l : let roi := I_ring_like_op in
-  if rngl_has_1 (ideal P) then ∀ a : ideal P, (1 * a)%L = a
-  else not_applicable.
-Proof.
-intros; cbn.
-remember (rngl_has_1 _) as oni eqn:Honi; symmetry in Honi.
-destruct oni; [ | easy ].
-assert (Hon : rngl_has_1 T = true). {
-  progress unfold rngl_has_1 in Honi |-*.
-  progress unfold roi in Honi; cbn in Honi.
-  progress unfold I_opt_one in Honi; cbn in Honi.
-  now destruct rngl_opt_one.
-}
-intros.
-apply eq_ideal_eq; cbn.
-specialize (rngl_mul_1_l (i_val a)) as H1.
-progress unfold rngl_one in H1.
-progress unfold roi.
-progress unfold I_ring_like_op.
-progress unfold rngl_one; cbn.
-progress unfold rngl_has_1 in Honi.
-progress unfold roi in Honi; cbn in Honi.
-progress unfold rngl_has_1 in Hon.
-remember I_opt_one as ion eqn:Hion; symmetry in Hion.
-progress unfold I_opt_one in Hion.
-destruct ion as [ione| ]; [ | easy ].
-clear Honi.
-destruct (rngl_opt_one T) as [one| ]; [ | easy ].
-clear Hon.
-destruct (Bool.bool_dec _ _) as [Hone| ]; [ | easy ].
-injection Hion; clear Hion; intros; subst ione; cbn.
-easy.
-Qed.
-
-Theorem I_mul_add_distr_l : let roi := I_ring_like_op in
-  ∀ a b c : ideal P, (a * (b + c))%L = (a * b + a * c)%L.
-Proof. intros; apply eq_ideal_eq, rngl_mul_add_distr_l. Qed.
-
-Theorem I_opt_mul_comm : let roi := I_ring_like_op in
-  if rngl_mul_is_comm T then ∀ a b : ideal P, (a * b)%L = (b * a)%L
-  else not_applicable.
-Proof.
-intros.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-destruct ic; [ | easy ].
-intros; apply eq_ideal_eq; cbn.
-now apply rngl_mul_comm.
-Qed.
-
-Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
-  if rngl_mul_is_comm T then not_applicable
-  else if rngl_has_1 (ideal P) then ∀ a : ideal P, (a * 1)%L = a
-  else not_applicable.
-Proof.
-intros; cbn.
-destruct rngl_mul_is_comm; [ easy | ].
-remember (rngl_has_1 _) as oni eqn:Honi; symmetry in Honi.
-destruct oni; [ | easy ].
-assert (Hon : rngl_has_1 T = true). {
-  progress unfold rngl_has_1 in Honi |-*.
-  progress unfold roi in Honi; cbn in Honi.
-  progress unfold I_opt_one in Honi; cbn in Honi.
-  now destruct rngl_opt_one.
-}
-intros.
-apply eq_ideal_eq; cbn.
-specialize (rngl_mul_1_r (i_val a)) as H1.
-progress unfold rngl_one in H1.
-progress unfold roi.
-progress unfold I_ring_like_op.
-progress unfold rngl_one; cbn.
-progress unfold rngl_has_1 in Honi.
-progress unfold roi in Honi; cbn in Honi.
-progress unfold rngl_has_1 in Hon.
-remember I_opt_one as ion eqn:Hion; symmetry in Hion.
-progress unfold I_opt_one in Hion.
-destruct ion as [ione| ]; [ | easy ].
-clear Honi.
-destruct (rngl_opt_one T) as [one| ]; [ | easy ].
-clear Hon.
-destruct (Bool.bool_dec _ _) as [Hone| ]; [ | easy ].
-injection Hion; clear Hion; intros; subst ione; cbn.
-easy.
-Qed.
-
-Theorem I_opt_mul_add_distr_r : let roi := I_ring_like_op in
-  if rngl_mul_is_comm T then not_applicable
-  else ∀ a b c : ideal P, ((a + b) * c)%L = (a * c + b * c)%L.
-Proof.
-intros.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
-destruct ic; [ easy | ].
-intros; apply eq_ideal_eq; cbn.
-apply rngl_mul_add_distr_r.
-Qed.
-
-Theorem I_opt_add_opp_diag_l : let roi := I_ring_like_op in
-  if rngl_has_opp (ideal P) then ∀ a : ideal P, (- a + a)%L = 0%L
-  else not_applicable.
-Proof.
-intros.
-specialize (eq_refl (@rngl_has_opp T ro)) as Hop.
-unfold rngl_has_opp in Hop at 2.
-unfold rngl_has_opp, rngl_opp; cbn.
-destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
-destruct os as [opp| psub]; [ | easy ].
-intros; apply eq_ideal_eq, (rngl_add_opp_diag_l Hop).
-Qed.
-
-Theorem rngl_has_psub_I_has_psub :
-  rngl_has_psub T = rngl_has_psub (ideal P).
-Proof.
-progress unfold rngl_has_psub; cbn.
-remember (rngl_opt_opp_or_psub T) as os eqn:Hos.
-symmetry in Hos.
-destruct os as [os| ]; [ | easy ].
-now destruct os.
-Qed.
-
-Theorem I_opt_add_sub : let roi := I_ring_like_op in
-  if rngl_has_psub (ideal P) then ∀ a b : ideal P, (a + b - b)%L = a
-  else not_applicable.
-Proof.
-intros.
-remember (rngl_has_psub (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
-destruct sui; [ | easy ].
-specialize (rngl_has_psub_has_no_opp Hsui) as Hopi.
-assert (Hsu : @rngl_has_psub T ro = true). {
-  unfold rngl_has_psub in Hsui |-*.
-  cbn in Hsui.
-  destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
-  now destruct os.
-}
-specialize (rngl_has_psub_has_no_opp Hsu) as Hop.
-intros.
-apply eq_ideal_eq; cbn.
-specialize rngl_opt_add_sub as H1.
-unfold rngl_has_psub in H1.
-unfold rngl_sub, rngl_psub.
-rewrite Hopi, Hsui.
-unfold rngl_sub in H1.
-rewrite Hsu, Hop in H1.
-progress unfold rngl_has_psub in Hsui, Hsu.
-progress unfold rngl_has_opp in Hopi, Hop.
-progress unfold roi.
-progress unfold roi in Hopi.
-progress unfold roi in Hsui.
-cbn in Hsui, Hopi, Hsu, Hop |-*.
-destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
-destruct os as [opp| psub]; [ easy | ].
-unfold I_psub, I_add; cbn.
-apply H1.
-Qed.
-
-Theorem I_opt_sub_add_distr :
-  let roi := I_ring_like_op in
-  if rngl_has_psub (ideal P) then
-    ∀ a b c : ideal P, (a - (b + c))%L = (a - b - c)%L
-  else not_applicable.
-Proof.
-intros.
-remember (rngl_has_psub (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
-destruct sui; [ | easy ].
-specialize (rngl_has_psub_has_no_opp Hsui) as Hopi.
-assert (Hsu : @rngl_has_psub T ro = true). {
-  unfold rngl_has_psub in Hsui |-*.
-  cbn in Hsui.
-  destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
-  now destruct os.
-}
-specialize (rngl_has_psub_has_no_opp Hsu) as Hop.
-intros.
-apply eq_ideal_eq; cbn.
-specialize rngl_opt_sub_add_distr as H1.
-unfold rngl_has_psub in H1.
-unfold rngl_sub, rngl_psub.
-rewrite Hopi, Hsui.
-unfold rngl_sub in H1.
-rewrite Hsu, Hop in H1.
-progress unfold rngl_has_psub in Hsui, Hsu.
-progress unfold rngl_has_opp in Hopi, Hop.
-progress unfold roi.
-progress unfold roi in Hopi.
-progress unfold roi in Hsui.
-cbn in Hsui, Hopi, Hsu, Hop |-*.
-destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
-destruct os as [opp| psub]; [ easy | ].
-unfold I_psub, I_add; cbn.
-apply H1.
-Qed.
-
-Theorem I_opt_sub_0_l :
-  let roi := I_ring_like_op in
-  if rngl_has_psub (ideal P) then ∀ a : ideal P, (0 - a)%L = 0%L
-  else not_applicable.
-Proof.
-intros.
-remember (rngl_has_psub (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
-destruct sui; [ | easy ].
-specialize (rngl_has_psub_has_no_opp Hsui) as Hopi.
-assert (Hsu : @rngl_has_psub T ro = true). {
-  unfold rngl_has_psub in Hsui |-*.
-  cbn in Hsui.
-  destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
-  now destruct os.
-}
-specialize (rngl_has_psub_has_no_opp Hsu) as Hop.
-intros.
-apply eq_ideal_eq; cbn.
-specialize rngl_opt_sub_0_l as H1.
-unfold rngl_has_psub in H1.
-unfold rngl_sub, rngl_psub.
-rewrite Hopi, Hsui.
-unfold rngl_sub in H1.
-rewrite Hsu, Hop in H1.
-progress unfold rngl_has_psub in Hsui, Hsu.
-progress unfold rngl_has_opp in Hopi, Hop.
-progress unfold roi.
-progress unfold roi in Hopi.
-progress unfold roi in Hsui.
-cbn in Hsui, Hopi, Hsu, Hop |-*.
-destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
-destruct os as [opp| psub]; [ easy | ].
-unfold I_psub, I_add; cbn.
-apply H1.
-Qed.
-
-Theorem I_ord_le_dec :
-  let roi := I_ring_like_op : ring_like_op (ideal P) in
-  rngl_is_ordered (ideal P) = true →
-  ∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}.
-Proof.
-intros roi Hor *.
-specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hor; cbn in Hor.
-progress unfold I_opt_leb in Hor.
-progress unfold rngl_is_ordered in H1.
-destruct rngl_opt_leb; [ cbn in H1 | easy ].
-specialize (rngl_ord_le_dec (i_val a) (i_val b)) as H2.
-destruct H2 as [H2| H2]; [ left | right ]. {
-  progress unfold rngl_le; cbn.
-  progress unfold I_opt_leb.
-  progress unfold rngl_le in H2.
-  now destruct rngl_opt_leb.
-} {
-  intros H; apply H2; clear H2; rename H into H2.
-  progress unfold rngl_le in H2; cbn in H2.
-  progress unfold I_opt_leb in H2.
-  progress unfold rngl_le.
-  now destruct rngl_opt_leb.
-}
-Qed.
-
-Theorem I_ord_le_refl :
-  let roi := I_ring_like_op : ring_like_op (ideal P) in
-  rngl_is_ordered (ideal P) = true →
-  ∀ a : ideal P, (a ≤ a)%L.
-Proof.
-intros roi Hor *.
-specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hor; cbn in Hor.
-progress unfold I_opt_leb in Hor.
-progress unfold rngl_is_ordered in H1.
-destruct rngl_opt_leb; [ cbn in H1 | easy ].
-specialize (rngl_ord_le_refl (i_val a)) as H2.
-progress unfold rngl_le; cbn.
-progress unfold I_opt_leb.
-progress unfold rngl_le in H2.
-now destruct rngl_opt_leb.
-Qed.
-
-Theorem I_ord_le_antisymm :
-  let roi := I_ring_like_op in
-  rngl_is_ordered (ideal P) = true →
-  ∀ a b : ideal P, (a ≤ b)%L → (b ≤ a)%L → a = b.
-Proof.
-intros roi Hor a b Hab Hba.
-specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hor; cbn in Hor.
-progress unfold I_opt_leb in Hor.
-progress unfold rngl_is_ordered in H1.
-destruct rngl_opt_leb; [ cbn in H1 | easy ].
-specialize (rngl_ord_le_antisymm (i_val a) (i_val b)) as H2.
-progress unfold rngl_le in Hab, Hba.
-progress unfold rngl_le in H2.
-progress unfold roi in Hab, Hba.
-progress unfold I_ring_like_op in Hab, Hba.
-cbn in Hab, Hba.
-progress unfold I_opt_leb in Hab, Hba.
-destruct rngl_opt_leb as [le| ]; [ | easy ].
-apply eq_ideal_eq.
-apply (H2 Hab Hba).
-Qed.
-
-Theorem I_ord_le_trans :
-  let roi := I_ring_like_op in
-  rngl_is_ordered (ideal P) = true →
-  ∀ a b c : ideal P, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L.
-Proof.
-intros roi Hor * Hab Hba.
-specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hor; cbn in Hor.
-progress unfold I_opt_leb in Hor.
-progress unfold rngl_is_ordered in H1.
-destruct rngl_opt_leb; [ cbn in H1 | easy ].
-specialize (rngl_ord_le_trans (i_val a) (i_val b) (i_val c)) as H2.
-progress unfold rngl_le in Hab, Hba.
-progress unfold rngl_le in H2.
-progress unfold roi in Hab, Hba.
-progress unfold I_ring_like_op in Hab, Hba.
-progress unfold rngl_le.
-progress unfold roi.
-progress unfold I_ring_like_op.
-cbn in Hab, Hba |-*.
-progress unfold I_opt_leb in Hab, Hba.
-progress unfold I_opt_leb.
-destruct rngl_opt_leb as [le| ]; [ | easy ].
-apply (H2 Hab Hba).
-Qed.
-
-Theorem rngl_is_ordered_ideal :
-  let roi := I_ring_like_op : ring_like_op (ideal P) in
-  rngl_is_ordered (ideal P) = rngl_is_ordered T.
-Proof.
-intros.
-progress unfold rngl_is_ordered; cbn.
-progress unfold I_opt_leb.
-now destruct rngl_opt_leb.
-Qed.
-
-Theorem rngl_has_opp_or_psub_ideal :
-  let roi := I_ring_like_op : ring_like_op (ideal P) in
-  rngl_has_opp_or_psub (ideal P) = rngl_has_opp_or_psub T.
-Proof.
-intros.
-progress unfold rngl_has_opp_or_psub; cbn.
-destruct (rngl_opt_opp_or_psub T) as [os| ]; [ | easy ].
-now destruct os.
-Qed.
-
-Theorem I_ord_add_le_mono_l :
-  let roi := I_ring_like_op in
-  rngl_is_ordered (ideal P) = true →
-  ∀ a b c : ideal P, (b ≤ c)%L ↔ (a + b ≤ a + c)%L.
-Proof.
-intros roi Hor; cbn.
-progress unfold roi in Hor.
-rewrite rngl_is_ordered_ideal in Hor.
-remember (rngl_has_opp_or_psub (ideal P)) as os eqn:Hos.
-symmetry in Hos.
-progress unfold roi in Hos.
-rewrite rngl_has_opp_or_psub_ideal in Hos.
-intros.
-specialize (rngl_add_le_mono_l Hor) as H2.
-specialize (H2 (i_val a) (i_val b) (i_val c)).
-progress unfold rngl_le in H2.
-progress unfold rngl_le; cbn.
-progress unfold I_opt_leb.
-now destruct rngl_opt_leb.
-Qed.
-
-Theorem I_ord_mul_le_compat_nonneg :
-  let roi := I_ring_like_op in
-  rngl_is_ordered (ideal P) = true →
-  if (rngl_has_1 (ideal P) && rngl_has_inv_or_pdiv (ideal P))%bool then
-    ∀ a b c d : ideal P, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
-  else not_applicable.
-Proof.
-intros roi Hor; cbn.
-now rewrite Bool.andb_false_r.
-Qed.
-
-Theorem I_ord_mul_le_compat_nonpos :
-  let roi := I_ring_like_op in
-  rngl_is_ordered (ideal P) = true →
-  if (rngl_has_1 (ideal P) && rngl_has_inv_or_pdiv (ideal P))%bool then
-    ∀ a b c d : ideal P, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
-  else not_applicable.
-Proof.
-intros roi Hor; cbn.
-now rewrite Bool.andb_false_r.
-Qed.
-
-Theorem I_ord_not_le :
-  let roi := I_ring_like_op in
-  rngl_is_ordered (ideal P) = true →
-  ∀ a b : ideal P, ¬ (a ≤ b)%L → a ≠ b ∧ (b ≤ a)%L.
-Proof.
-intros roi Hor.
-intros * Hab.
-specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hor; cbn in Hor.
-progress unfold I_opt_leb in Hor.
-progress unfold rngl_is_ordered in H1.
-destruct rngl_opt_leb; [ cbn in H1 | easy ].
-specialize rngl_ord_not_le as H2.
-specialize (H2 (i_val a) (i_val b)).
-progress unfold rngl_le in Hab.
-progress unfold rngl_le in H2.
-progress unfold roi in Hab.
-progress unfold I_ring_like_op in Hab.
-progress unfold rngl_le.
-progress unfold roi.
-progress unfold I_ring_like_op.
-cbn in Hab |-*.
-progress unfold I_opt_leb in Hab.
-progress unfold I_opt_leb.
-destruct rngl_opt_leb as [le| ]. {
-  specialize (H2 Hab).
-  split; [ | easy ].
-  intros H; subst b.
-  now apply Hab; clear Hab.
-}
-now specialize (H2 Hab).
-Qed.
-
-Theorem I_opt_integral :
-  let roi := I_ring_like_op in
-  ∀ a b : ideal P,
-  (a * b)%L = 0%L
-   → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
-Proof.
-intros * Hab.
-progress unfold rngl_is_zero_divisor.
-progress unfold rngl_opt_is_zero_divisor.
-cbn.
-remember (rngl_opt_is_zero_divisor T) as ozd eqn:Hozd.
-symmetry in Hozd.
-apply eq_ideal_eq in Hab.
-cbn in Hab.
-apply rngl_opt_integral in Hab.
-destruct Hab as [Hab| [Hab| Hab]]. {
-  now left; apply eq_ideal_eq.
-} {
-  now right; left; apply eq_ideal_eq.
-}
-destruct ozd as [f| ]. {
-  destruct Hab as [Hab| Hab]. {
-    right; right; left.
-    progress unfold rngl_is_zero_divisor in Hab.
-    cbn in Hozd.
-    destruct (rngl_opt_is_zero_divisor T); [ | easy ].
-    now injection Hozd; clear Hozd; intros; subst f.
-  } {
-    right; right; right.
-    progress unfold rngl_is_zero_divisor in Hab.
-    cbn in Hozd.
-    destruct (rngl_opt_is_zero_divisor T); [ | easy ].
-    now injection Hozd; clear Hozd; intros; subst f.
-  }
-}
-progress unfold rngl_is_zero_divisor in Hab.
-rewrite Hozd in Hab.
-now destruct Hab.
-Qed.
-
-Theorem i_val_rngl_mul_nat : let roi := I_ring_like_op in
-  ∀ a i, i_val (rngl_mul_nat a i) = rngl_mul_nat (i_val a) i.
-Proof.
-intros.
-induction i; [ easy | cbn ].
-f_equal; apply IHi.
-Qed.
-
-Theorem I_characteristic_prop : let roi := I_ring_like_op in
-  if rngl_has_1 (ideal P) then
-    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
-    else
-      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%L) ∧
-      rngl_of_nat (rngl_characteristic T) = 0%L
-  else not_applicable.
-Proof.
-intros; cbn.
-remember (rngl_has_1 (ideal P)) as oni eqn:Honi; symmetry in Honi.
-destruct oni; [ | easy ].
-assert (Hon : rngl_has_1 T = true). {
-  progress unfold rngl_has_1 in Honi |-*.
-  progress unfold roi in Honi; cbn in Honi.
-  progress unfold I_opt_one in Honi.
-  now destruct (rngl_opt_one T).
-}
-specialize rngl_opt_characteristic_prop as H1.
-rewrite in H1.
-rewrite if_bool_if_dec in H1 |-*.
-progress unfold roi.
-progress unfold I_ring_like_op.
-progress unfold rngl_one; cbn.
-progress unfold I_opt_one.
-progress unfold rngl_has_1 in Hon.
-progress unfold rngl_has_1 in Honi; cbn in Honi.
-progress unfold I_opt_one in Honi.
-destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
-  apply Nat.eqb_eq in Hcz.
-  intros.
-  apply neq_ideal_neq; cbn.
-  specialize (H1 i) as H2.
-  cbn in H2.
-  specialize i_val_rngl_mul_nat as H3.
-  progress unfold rngl_mul_nat in H3.
-  progress unfold mul_nat in H3; cbn in H3.
-  rewrite H3; cbn.
-  progress unfold rngl_one in H2.
-  destruct (rngl_opt_one T) as [one| ]; [ | easy ].
-  now destruct (Bool.bool_dec (P one) true).
-}
-destruct H1 as (Hbef, Hch).
-progress unfold rngl_of_nat.
-progress unfold rngl_of_nat in Hch.
-split. {
-  intros i Hi.
-  specialize (Hbef i Hi) as H1.
-  apply neq_ideal_neq.
-  rewrite i_val_rngl_mul_nat; cbn.
-  progress unfold rngl_of_nat in H1.
-  progress unfold rngl_one in H1.
-  destruct (rngl_opt_one T) as [one| ]; [ | easy ].
-  now destruct (Bool.bool_dec (P one) true).
-}
-apply eq_ideal_eq.
-rewrite i_val_rngl_mul_nat; cbn.
-progress unfold rngl_one in Hch.
-destruct (rngl_opt_one T) as [one| ]; [ | easy ].
-now destruct (Bool.bool_dec (P one) true).
-Qed.
-
-Fixpoint List_map {A B} (f : A → B) l :=
-  match l with
-  | nil => nil
-  | (a :: t)%list => (f a :: List_map f t)%list
-  end.
-
-Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
-  {| rngl_ord_le_dec := I_ord_le_dec Hor;
-     rngl_ord_le_refl := I_ord_le_refl Hor;
-     rngl_ord_le_antisymm := I_ord_le_antisymm Hor;
-     rngl_ord_le_trans := I_ord_le_trans Hor;
-     rngl_ord_add_le_mono_l := I_ord_add_le_mono_l Hor;
-     rngl_ord_mul_le_compat_nonneg := I_ord_mul_le_compat_nonneg Hor; (* fails *)
-     rngl_ord_mul_le_compat_nonpos := I_ord_mul_le_compat_nonpos Hor;
-     rngl_ord_not_le := I_ord_not_le Hor |}.
-
-Theorem I_ring_like_ord :
-  let roi := I_ring_like_op in
-  if rngl_is_ordered (ideal P) then ring_like_ord (ideal P)
-  else not_applicable.
-Proof.
-intros.
-remember (rngl_is_ordered (ideal P)) as or eqn:Hor.
-symmetry in Hor.
-destruct or; [ | easy ].
-apply (I_ring_like_when_ord Hor).
-Qed.
-*)
 
 (* to be completed
 Definition I_ring_like_prop : ring_like_prop (ideal T) :=
