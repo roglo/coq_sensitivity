@@ -5,13 +5,11 @@
 Set Nested Proofs Allowed.
 Require Import Stdlib.Arith.Arith.
 Import List.ListNotations.
-Import Init.Nat.
 Require Import RingLike.Utf8.
 Require Import RingLike.Core.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
 Require Import RingLike.IterAdd.
-Require Import RingLike.Nat_algebra.
 
 (* ideal: non empty set type with some properties *)
 
@@ -29,7 +27,7 @@ Bind Scope ideal_scope with ideal.
 Arguments ideal T {ro}.
 Arguments i_subset {T ro} i%_I a%_L.
 
-Notation "x '∈' I" := (i_subset I x) : ideal_scope.
+Notation "x '∈' I" := (i_subset I x) (at level 70) : ideal_scope.
 
 Class ideal_ctx T {ro : ring_like_op T} :=
   { ix_os : rngl_has_opp_or_psub T = true }.
@@ -37,66 +35,7 @@ Class ideal_ctx T {ro : ring_like_op T} :=
 Ltac destruct_ix :=
   set (Hos := ix_os).
 
-(* to be moved somewhere else, probably IterAdd.v *)
-
-Definition rngl_is_additive_integral T {ro : ring_like_op T} :=
-  (∀ a b : T, (a + b = 0 → a = 0 ∧ b = 0)%L).
-
-Theorem eq_rngl_summation_list_zero
-  {T} {ro : ring_like_op T} {rp : ring_like_prop T} {A} :
-  rngl_is_additive_integral T
-  → ∀ (l : list A) f,
-  ∑ (i ∈ l), f i = 0%L
-  → ∀ i, i ∈ l → f i = 0%L.
-Proof.
-intros Hai * Hs * Hl.
-progress unfold iter_list in Hs.
-revert i Hl.
-induction l as [| a l]; intros; [ easy | ].
-cbn in Hs.
-rewrite rngl_add_0_l in Hs.
-rewrite fold_left_rngl_add_fun_from_0 in Hs.
-apply Hai in Hs.
-destruct Hl as [Hl| Hl]; [ now subst a | ].
-now apply IHl.
-Qed.
-
-Theorem eq_rngl_summation_zero
-  {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_is_additive_integral T →
-  ∀ a b f, ∑ (i = a, b), f i = 0%L
-  → ∀ i, a ≤ i ≤ b → f i = 0%L.
-Proof.
-intros Hai * Hs * Hab.
-apply (eq_rngl_summation_list_zero Hai (List.seq a (S b - a))).
-rewrite rngl_summation_seq_summation.
-rewrite Nat.add_sub_assoc.
-rewrite Nat.add_comm, Nat.add_sub.
-now rewrite Nat_sub_succ_1.
-flia Hab.
-flia Hab.
-apply List.in_seq.
-flia Hab.
-Qed.
-
-Theorem nat_is_additive_integral : rngl_is_additive_integral nat.
-Proof.
-intros a b Hab.
-now apply Nat.eq_add_0.
-Qed.
-
-(* to be moved too *)
-Theorem List_map_f_seq :
-  ∀ A B d (f : A → B) la,
-  (List.map (λ i, f (List.nth i la d)) (List.seq 0 (length la)) =
-   List.map f la)%L.
-Proof.
-intros.
-induction la as [| a]; [ easy | ].
-cbn - [ List.nth ].
-progress f_equal.
-now rewrite List_map_seq.
-Qed.
+(* to be moved somewhere else *)
 
 Notation "'∑' ( ( i , j ) ∈ l ) , g" :=
   (iter_list l (λ c '(i, j), (c + g)%L) 0%L)
@@ -427,35 +366,6 @@ Notation "0" := I_zero : ideal_scope.
 Notation "1" := I_one : ideal_scope.
 Notation "I + J" := (I_add I J) : ideal_scope.
 Notation "I * J" := (I_mul I J) : ideal_scope.
-
-Theorem List_seq_rngl_summation_r {T} a lb (f : T → _) :
-  List.seq a (∑ (i ∈ lb), f i) =
-  List.fold_left (λ la d, la ++ List.seq (a + length la) d)
-    (List.map f lb) [].
-Proof.
-intros.
-revert a.
-induction lb as [| b]; intros; [ easy | ].
-rewrite rngl_summation_list_cons.
-rewrite List.seq_app.
-rewrite List.map_cons.
-cbn - [ rngl_zero rngl_add ].
-rewrite Nat.add_0_r.
-rewrite IHlb.
-clear IHlb.
-remember (f b) as b'.
-clear b Heqb'; rename b' into b.
-revert a b.
-induction lb as [| c]; intros; cbn; [ now rewrite List.app_nil_r | ].
-rewrite List.length_seq.
-rewrite Nat.add_0_r.
-rewrite <- List.seq_app.
-rewrite <- IHlb.
-rewrite List.app_assoc.
-rewrite <- List.seq_app.
-rewrite <- IHlb.
-now rewrite Nat.add_assoc.
-Qed.
 
 Section a.
 
