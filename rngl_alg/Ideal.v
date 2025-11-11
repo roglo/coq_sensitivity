@@ -1400,7 +1400,7 @@ apply I_mul_subset_add_distr_r_1.
 apply I_mul_subset_add_distr_r_2.
 Qed.
 
-Theorem I_mul_add_distr_l a b c : (a * (b + c))%I = (a * b + a * c)%I.
+Theorem I_mul_add_distr_l I J K : (I * (J + K))%I = (I * J + I * K)%I.
 Proof.
 intros.
 apply eq_ideal_eq; cbn.
@@ -1408,7 +1408,7 @@ apply functional_extensionality_dep.
 apply I_mul_subset_add_distr_l.
 Qed.
 
-Theorem I_mul_add_distr_r a b c : ((a + b) * c)%I = (a * c + b * c)%I.
+Theorem I_mul_add_distr_r I J K : ((I + J) * K)%I = (I * K + J * K)%I.
 Proof.
 intros.
 apply eq_ideal_eq; cbn.
@@ -1418,7 +1418,7 @@ Qed.
 
 Theorem I_mul_subset_comm :
   rngl_mul_is_comm T = true →
-  ∀ a b x, I_mul_subset a b x = I_mul_subset b a x.
+  ∀ I J x, I_mul_subset I J x = I_mul_subset J I x.
 Proof.
 intros Hic *.
 progress unfold I_mul_subset.
@@ -1464,7 +1464,7 @@ split; intros (lxy & Hlxy & H1 & H). {
 Qed.
 
 Theorem I_opt_mul_comm :
-  if rngl_mul_is_comm T then ∀ a b : ideal T, (a * b)%I = (b * a)%I
+  if rngl_mul_is_comm T then ∀ I J : ideal T, (I * J)%I = (J * I)%I
   else not_applicable.
 Proof.
 remember (rngl_mul_is_comm T) as ic eqn:Hic.
@@ -1477,7 +1477,7 @@ intros.
 apply (I_mul_subset_comm Hic).
 Qed.
 
-Theorem I_mul_subset_1_r a : ∀ x, I_mul_subset a 1 x = (x ∈ a)%I.
+Theorem I_mul_subset_1_r I : ∀ x, I_mul_subset I 1 x = (x ∈ I)%I.
 Proof.
 destruct_ix.
 intros.
@@ -1520,7 +1520,7 @@ split. {
 Qed.
 
 Theorem I_opt_mul_1_r :
-  if rngl_mul_is_comm T then not_applicable else ∀ a : ideal T, (a * 1)%I = a.
+  if rngl_mul_is_comm T then not_applicable else ∀ I : ideal T, (I * 1)%I = I.
 Proof.
 remember (rngl_mul_is_comm T) as ic eqn:Hic.
 symmetry in Hic.
@@ -1534,7 +1534,7 @@ Qed.
 
 Theorem I_opt_mul_add_distr_r :
   if rngl_mul_is_comm T then not_applicable
-  else ∀ a b c : ideal T, ((a + b) * c)%I = (a * c + b * c)%I.
+  else ∀ I J K : ideal T, ((I + J) * K)%I = (I * K + J * K)%I.
 Proof.
 remember (rngl_mul_is_comm T) as ic eqn:Hic.
 symmetry in Hic.
@@ -1542,8 +1542,8 @@ destruct ic; [ easy | ].
 apply I_mul_add_distr_r.
 Qed.
 
-Theorem I_opt_integral a b :
-  (a * b)%I = 0%I → a = 0%I ∨ b = 0%I ∨ True ∨ True.
+Theorem I_opt_integral I J :
+  (I * J)%I = 0%I → I = 0%I ∨ J = 0%I ∨ True ∨ True.
 Proof. now intros; right; right; left. Qed.
 
 Theorem I_characteristic_prop :
