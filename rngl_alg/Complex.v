@@ -452,19 +452,6 @@ destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
-Theorem gc_opt_sub_0_l :
-  rngl_has_psub T = false →
-  if rngl_has_psub (GComplex T) then ∀ a : GComplex T, (0 - a)%L = 0%L
-  else not_applicable.
-Proof.
-intros * Hsu.
-progress unfold rngl_has_psub; cbn.
-progress unfold gc_opt_opp_or_psub.
-progress unfold rngl_has_psub in Hsu.
-destruct rngl_opt_opp_or_psub as [os| ]; [ | easy ].
-now destruct os.
-Qed.
-
 Theorem gc_inv_re :
   rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
@@ -746,7 +733,6 @@ Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
      rngl_opt_add_opp_diag_l := gc_opt_add_opp_diag_l Hop;
      rngl_opt_add_sub := gc_opt_add_sub Hsu;
      rngl_opt_sub_add_distr := gc_opt_sub_add_distr Hsu;
-     rngl_opt_sub_0_l := gc_opt_sub_0_l Hsu;
      rngl_opt_mul_inv_diag_l := gc_opt_mul_inv_diag_l Hic Hop Hiv Hor;
      rngl_opt_mul_inv_diag_r := gc_opt_mul_inv_diag_r;
      rngl_opt_mul_div := gc_opt_mul_div;

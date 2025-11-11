@@ -1890,7 +1890,6 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_add_opp_diag_l := QG_add_opp_diag_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-     rngl_opt_sub_0_l := NA;
      rngl_opt_mul_inv_diag_l := QG_mul_inv_diag_l;
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
