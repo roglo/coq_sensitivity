@@ -675,7 +675,7 @@ Theorem gc_characteristic_prop :
     ∧ rngl_mul_nat 1 (rngl_characteristic T) = 0%C.
 Proof.
 cbn - [ rngl_mul_nat ].
-specialize rngl_opt_characteristic_prop as H1.
+specialize rngl_characteristic_prop as H1.
 cbn - [ rngl_mul_nat ] in H1 |-*.
 assert
   (Hr :
@@ -752,9 +752,9 @@ Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
      rngl_opt_mul_div := gc_opt_mul_div;
      rngl_opt_integral := gc_integral Hic Hop Hio;
      rngl_opt_alg_closed := NA;
-     rngl_opt_characteristic_prop := gc_characteristic_prop;
      rngl_opt_ord := NA;
-     rngl_opt_archimedean := NA |}.
+     rngl_opt_archimedean := NA;
+     rngl_characteristic_prop := gc_characteristic_prop |}.
 
 End a.
 

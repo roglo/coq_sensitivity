@@ -406,8 +406,8 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) :
      rngl_opt_mul_div := Zn_opt_mul_div NA n;
      rngl_opt_integral := Zn_integral;
      rngl_opt_alg_closed := NA;
-     rngl_opt_characteristic_prop := Zn_characteristic_prop;
      rngl_opt_ord := NA;
-     rngl_opt_archimedean := NA |}.
+     rngl_opt_archimedean := NA;
+     rngl_characteristic_prop := Zn_characteristic_prop |}.
 
 End a.

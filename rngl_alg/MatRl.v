@@ -716,7 +716,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   intros i Hi; flia Hi.
 }
 apply Nat.neq_0_lt_0 in Hnz.
-specialize @rngl_opt_characteristic_prop as H1.
+specialize @rngl_characteristic_prop as H1.
 specialize (H1 T ro rp).
 rewrite if_eqb_eq_dec in H1 |-*.
 destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
@@ -860,8 +860,8 @@ Instance mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
      rngl_opt_mul_div := NA;
      rngl_opt_integral := squ_mat_integral eq_dec n;
      rngl_opt_alg_closed := NA;
-     rngl_opt_characteristic_prop := squ_mat_characteristic_prop eq_dec n;
      rngl_opt_ord := NA;
-     rngl_opt_archimedean := NA |}.
+     rngl_opt_archimedean := NA;
+     rngl_characteristic_prop := squ_mat_characteristic_prop eq_dec n |}.
 
 End a.

@@ -1632,6 +1632,12 @@ apply I_mul_add_distr_r.
 Qed.
 
 (* to be completed
+Theorem I_characteristic_prop :
+  ∀ a b : ideal T,
+    (a * b)%L = 0%L → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
+*)
+
+(* to be completed
 Definition I_ring_like_prop : ring_like_prop (ideal T) :=
   let roi := I_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
@@ -1656,9 +1662,9 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_opt_mul_div := NA;
      rngl_opt_integral := true; (*I_opt_integral;*)
      rngl_opt_alg_closed := NA;
-     rngl_opt_characteristic_prop := true; (*I_characteristic_prop;*)
      rngl_opt_ord := NA; (*I_ring_like_ord;*)
-     rngl_opt_archimedean := NA |}.
+     rngl_opt_archimedean := NA;
+     rngl_characteristic_prop := true; (*I_characteristic_prop;*) |}.
 *)
 
 End a.

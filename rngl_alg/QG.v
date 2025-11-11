@@ -1896,6 +1896,6 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_div := NA;
      rngl_opt_integral := QG_integral;
      rngl_opt_alg_closed := NA;
-     rngl_opt_characteristic_prop := QG_characteristic_prop;
      rngl_opt_ord := QG_ring_like_ord;
-     rngl_opt_archimedean := QG_archimedean |}.
+     rngl_opt_archimedean := QG_archimedean;
+     rngl_characteristic_prop := QG_characteristic_prop |}.

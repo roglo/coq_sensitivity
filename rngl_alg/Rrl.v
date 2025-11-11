@@ -206,9 +206,9 @@ Definition CReal_ring_like_prop : ring_like_prop CReal :=
      rngl_opt_mul_div := NA;
      rngl_opt_integral := CReal_integral;
      rngl_opt_alg_closed := NA;
-     rngl_opt_characteristic_prop := CReal_characteristic_prop;
      rngl_opt_ord := NA;
-     rngl_opt_archimedean := NA |}.
+     rngl_opt_archimedean := NA;
+     rngl_characteristic_prop := CReal_characteristic_prop |}.
 
 (*
 Print Assumptions CReal_ring_like_prop.
@@ -362,9 +362,9 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_div := NA;
      rngl_opt_integral := Rintegral;
      rngl_opt_alg_closed := NA;
-     rngl_opt_characteristic_prop := Rcharacteristic_prop;
      rngl_opt_ord := NA;
-     rngl_opt_archimedean := NA |}.
+     rngl_opt_archimedean := NA;
+     rngl_characteristic_prop := Rcharacteristic_prop |}.
 
 (* complex numbers *)
 (* see also Quaternions.v *)
