@@ -1636,36 +1636,54 @@ Theorem I_opt_integral a b :
   (a * b)%I = 0%I → a = 0%I ∨ b = 0%I ∨ True ∨ True.
 Proof. now intros; right; right; left. Qed.
 
-(* to be completed
 Theorem I_characteristic_prop :
   let roi := I_ring_like_op in
-  ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
+  if Nat.b2n (rngl_characteristic T =? 1) =? 0 then
+    ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
+  else
+   (∀ i : nat,
+      0 < i < Nat.b2n (rngl_characteristic T =? 1) → rngl_of_nat i ≠ 0%L)
+   ∧ rngl_of_nat (Nat.b2n (rngl_characteristic T =? 1)) = 0%L.
 Proof.
 destruct_ix.
-cbn; intros n.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (proj1 (rngl_1_eq_0_iff Hos) Hc1) as H1.
-...
-induction n; cbn. {
-  intros H.
-  rewrite I_add_comm, I_add_0_l in H.
-  apply eq_ideal_eq in H.
-  cbn in H.
-  apply (f_equal (λ f, f 1%L)) in H.
-  symmetry in H.
-  apply rngl_1_neq_0; [ | ].
-  now rewrite H.
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  rewrite Hc1; cbn.
+  split; [ intros i Hi; flia Hi | ].
+  rewrite I_add_comm, I_add_0_l.
+  apply eq_ideal_eq.
+  cbn.
+  apply functional_extensionality_dep.
+  intros x; symmetry.
+  rewrite (H1 x).
+  cbn.
+  now apply propositional_extensionality.
 }
-...
-*)
+apply Nat.eqb_neq in Hc1.
+rewrite Hc1; cbn - [ rngl_of_nat ].
+apply Nat.eqb_neq in Hc1.
+intros n H.
+specialize (rngl_1_neq_0 Hc1) as H1.
+rewrite rngl_of_nat_succ in H.
+cbn in H.
+apply eq_ideal_eq in H.
+apply (f_equal (λ f, f 1%L)) in H.
+cbn in H.
+rewrite <- H in H1; clear H.
+apply H1; clear H1.
+exists 1%L, 0%L.
+rewrite rngl_add_0_r.
+split; [ easy | ].
+split; [ | easy ].
+apply i_zero.
+Qed.
 
-(* to be completed
 Definition I_ring_like_prop : ring_like_prop (ideal T) :=
   let roi := I_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
-     rngl_characteristic := 0;
+     rngl_characteristic := Nat.b2n (rngl_characteristic T =? 1);
      rngl_add_comm := I_add_comm;
      rngl_add_assoc := I_add_assoc;
      rngl_add_0_l := I_add_0_l;
@@ -1686,6 +1704,5 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_opt_ord := NA;
      rngl_opt_archimedean := NA;
      rngl_characteristic_prop := I_characteristic_prop |}.
-*)
 
 End a.
