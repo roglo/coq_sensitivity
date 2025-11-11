@@ -1631,6 +1631,10 @@ destruct ic; [ easy | ].
 apply I_mul_add_distr_r.
 Qed.
 
+Theorem I_opt_integral a b :
+  (a * b)%I = 0%I → a = 0%I ∨ b = 0%I ∨ True ∨ True.
+Proof. now intros; right; right; left. Qed.
+
 (* to be completed
 Theorem I_characteristic_prop :
   ∀ a b : ideal T,
@@ -1656,13 +1660,12 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_opt_add_opp_diag_l := NA;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-     rngl_opt_sub_0_l := NA;
      rngl_opt_mul_inv_diag_l := NA;
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
-     rngl_opt_integral := true; (*I_opt_integral;*)
+     rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
-     rngl_opt_ord := NA; (*I_ring_like_ord;*)
+     rngl_opt_ord := NA;
      rngl_opt_archimedean := NA;
      rngl_characteristic_prop := true; (*I_characteristic_prop;*) |}.
 *)
