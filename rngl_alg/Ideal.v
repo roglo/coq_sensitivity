@@ -1637,8 +1637,11 @@ Proof. now intros; right; right; left. Qed.
 
 (* to be completed
 Theorem I_characteristic_prop :
-  ∀ a b : ideal T,
-    (a * b)%L = 0%L → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
+  let roi := I_ring_like_op in
+  if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%I
+  else
+    (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%I) ∧
+    rngl_of_nat (rngl_characteristic T) = 0%I.
 *)
 
 (* to be completed
@@ -1667,7 +1670,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
      rngl_opt_alg_closed := NA;
      rngl_opt_ord := NA;
      rngl_opt_archimedean := NA;
-     rngl_characteristic_prop := true; (*I_characteristic_prop;*) |}.
+     rngl_characteristic_prop := I_characteristic_prop |}.
 *)
 
 End a.
