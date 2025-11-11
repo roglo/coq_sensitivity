@@ -1641,13 +1641,22 @@ Theorem I_characteristic_prop :
   let roi := I_ring_like_op in
   ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
 Proof.
+destruct_ix.
 cbn; intros n.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (proj1 (rngl_1_eq_0_iff Hos) Hc1) as H1.
+...
 induction n; cbn. {
   intros H.
   rewrite I_add_comm, I_add_0_l in H.
   apply eq_ideal_eq in H.
   cbn in H.
-(* ah putain ça craint *)
+  apply (f_equal (λ f, f 1%L)) in H.
+  symmetry in H.
+  apply rngl_1_neq_0; [ | ].
+  now rewrite H.
+}
+...
 *)
 
 (* to be completed
