@@ -466,9 +466,10 @@ Context {ix : ideal_ctx T}.
 
 Theorem eq_ideal_eq : ∀ I J,
   i_subset I = i_subset J
-  → I = J.
+  ↔ I = J.
 Proof.
-intros * Hab.
+intros.
+split; intros Hab; [ | now subst ].
 destruct I.
 destruct J.
 cbn in *.
@@ -1638,10 +1639,15 @@ Proof. now intros; right; right; left. Qed.
 (* to be completed
 Theorem I_characteristic_prop :
   let roi := I_ring_like_op in
-  if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%I
-  else
-    (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%I) ∧
-    rngl_of_nat (rngl_characteristic T) = 0%I.
+  ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
+Proof.
+cbn; intros n.
+induction n; cbn. {
+  intros H.
+  rewrite I_add_comm, I_add_0_l in H.
+  apply eq_ideal_eq in H.
+  cbn in H.
+(* ah putain ça craint *)
 *)
 
 (* to be completed
@@ -1650,7 +1656,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
-     rngl_characteristic := rngl_characteristic T;
+     rngl_characteristic := 0;
      rngl_add_comm := I_add_comm;
      rngl_add_assoc := I_add_assoc;
      rngl_add_0_l := I_add_0_l;
