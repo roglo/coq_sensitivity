@@ -1,4 +1,4 @@
-TARGET=Qrl.vo Nrl.vo MatRl.vo QuadIntRl.vo GaussIntRl.vo NewtonBinomial.vo AngleRl.vo Work3.vo AngleEuclDistLtAngleLtLt.vo Rrl.vo Ideal.vo QG.vo HyperbolicTrigo.vo Rational.vo
+TARGET=Qrl.vo Nrl.vo MatRl.vo QuadIntRl.vo GaussIntRl.vo NewtonBinomial.vo AngleRl.vo Work3.vo AngleEuclDistLtAngleLtLt.vo Rrl.vo QG.vo HyperbolicTrigo.vo Rational.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 QDIRS=-Q ../sensitivity Sensitivity
 TEST_DIR=test `basename "$<"` = "$<" || { echo "File \"$<\" needs to be recompiled."; echo "Please run 'make' in directory '$$(dirname "$<")' first."; exit 1; }

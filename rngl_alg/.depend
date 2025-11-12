@@ -7,7 +7,6 @@ GPY.vo GPY.glob GPY.v.beautified GPY.required_vo: GPY.v QG.vo
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Nat_ggcd.vo PQ.vo
 GaussIntRl.vo GaussIntRl.glob GaussIntRl.v.beautified GaussIntRl.required_vo: GaussIntRl.v
 HyperbolicTrigo.vo HyperbolicTrigo.glob HyperbolicTrigo.v.beautified HyperbolicTrigo.required_vo: HyperbolicTrigo.v
-Ideal.vo Ideal.glob Ideal.v.beautified Ideal.required_vo: Ideal.v
 MatRl.vo MatRl.glob MatRl.v.beautified MatRl.required_vo: MatRl.v ../sensitivity/Comatrix.vo ../sensitivity/Determinant.vo ../sensitivity/Matrix.vo ../sensitivity/Misc.vo
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v Misc.vo
