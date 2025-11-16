@@ -103,7 +103,7 @@ destruct Hcs as (Hcs, Hzc).
 assert (H : (1 ≤ c²)%L). {
   apply (rngl_sub_move_r Hop) in Hcs.
   rewrite Hcs.
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_squ_nonneg Hos Hor).
 }
 replace 1%L with 1²%L in H by apply rngl_mul_1_l.
@@ -240,7 +240,7 @@ assert (Hyx : (y ≤ x)%L). {
     apply (rngl_le_squ_le Hop Hiq Hor); [ easy | easy | ].
     apply (rngl_sub_move_r Hop) in Hxy.
     rewrite Hxy.
-    apply (rngl_le_add_l Hor).
+    apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_1 Hos Hor).
   }
   apply rngl_leb_nle in Hzy.
@@ -254,7 +254,7 @@ assert (Hyx' : (y' ≤ x')%L). {
     apply (rngl_le_squ_le Hop Hiq Hor); [ easy | easy | ].
     apply (rngl_sub_move_r Hop) in Hxy'.
     rewrite Hxy'.
-    apply (rngl_le_add_l Hor).
+    apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_1 Hos Hor).
   }
   apply rngl_leb_nle in Hzy'.
@@ -267,7 +267,7 @@ destruct (rngl_leb_dec 0 y) as [Hzy| Hzy]. {
   destruct (rngl_leb_dec 0 y') as [Hzy'| Hzy']. {
     apply rngl_leb_le in Hzy'.
     apply (rngl_le_trans Hor _ (y * y' + y * y')). 2: {
-      apply (rngl_add_le_mono_r Hor).
+      apply (rngl_add_le_mono_r Hos Hor).
       now apply (rngl_mul_le_compat_nonneg Hor).
     }
     rewrite <- rngl_mul_2_l.
@@ -279,7 +279,7 @@ destruct (rngl_leb_dec 0 y) as [Hzy| Hzy]. {
   apply (rngl_nle_gt_iff Hor) in Hzy'.
   clear - Hzx' Hyx Hzy Hzy' Hxy' hc Hor Hop Hos Hiq.
   apply (rngl_le_trans Hor _ (y * x' + y * y')). 2: {
-    apply (rngl_add_le_mono_r Hor).
+    apply (rngl_add_le_mono_r Hos Hor).
     now apply (rngl_mul_le_mono_nonneg_r Hop Hor).
   }
   rewrite <- rngl_mul_add_distr_l.
@@ -294,7 +294,7 @@ destruct (rngl_leb_dec 0 y) as [Hzy| Hzy]. {
   rewrite (rngl_squ_opp Hop).
   apply (rngl_sub_move_r Hop) in Hxy'.
   rewrite Hxy'.
-  apply (rngl_le_add_l Hor).
+  apply (rngl_le_add_l Hos Hor).
   apply (rngl_0_le_1 Hos Hor).
 }
 apply rngl_leb_nle in Hzy.
@@ -302,7 +302,7 @@ destruct (rngl_leb_dec 0 y') as [Hzy'| Hzy']. {
   apply rngl_leb_le in Hzy'.
   apply (rngl_nle_gt_iff Hor) in Hzy.
   apply (rngl_le_trans Hor _ (x * y' + y * y')). 2: {
-    apply (rngl_add_le_mono_r Hor).
+    apply (rngl_add_le_mono_r Hos Hor).
     now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
   }
   rewrite <- rngl_mul_add_distr_r.
@@ -317,7 +317,7 @@ destruct (rngl_leb_dec 0 y') as [Hzy'| Hzy']. {
   rewrite (rngl_squ_opp Hop).
   apply (rngl_sub_move_r Hop) in Hxy.
   rewrite Hxy.
-  apply (rngl_le_add_l Hor).
+  apply (rngl_le_add_l Hos Hor).
   apply (rngl_0_le_1 Hos Hor).
 }
 apply rngl_leb_nle in Hzy'.
@@ -1036,7 +1036,7 @@ split. {
   apply (rngl_le_le_squ Hop Hor) in Hcc; [ | apply rngl_cosh_nonneg ].
   apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2 in Hcc.
-  apply (rngl_add_le_mono_l Hor) in Hcc.
+  apply (rngl_add_le_mono_l Hos Hor) in Hcc.
   now apply (rngl_le_squ_le Hop Hiq Hor) in Hcc.
 }
 Qed.
@@ -1540,7 +1540,7 @@ apply eq_hangle_eq.
 apply (eq_rl_sqrt_0 Hos) in H12. 2: {
   apply (rngl_add_squ_nonneg Hos Hor).
 }
-apply (rngl_eq_add_0 Hor) in H12; cycle 1. {
+apply (rngl_eq_add_0 Hos Hor) in H12; cycle 1. {
   apply (rngl_squ_nonneg Hos Hor).
 } {
   apply (rngl_squ_nonneg Hos Hor).
@@ -1608,7 +1608,7 @@ Proof.
 destruct_hc; intros.
 progress unfold hangle_taxi_dist.
 split; intros H12. {
-  apply (rngl_eq_add_0 Hor) in H12; cycle 1.
+  apply (rngl_eq_add_0 Hos Hor) in H12; cycle 1.
   apply (rngl_abs_nonneg Hop Hor).
   apply (rngl_abs_nonneg Hop Hor).
   destruct H12 as (Hcc, Hss).
@@ -1639,7 +1639,7 @@ specialize (rngl_abs_triangle Hop Hor) as H1.
 rewrite rngl_add_assoc.
 rewrite (rngl_add_add_swap (rngl_abs (c2 - c1))).
 rewrite <- rngl_add_assoc.
-apply (rngl_add_le_mono Hor). {
+apply (rngl_add_le_mono Hos Hor). {
   eapply (rngl_le_trans Hor); [ | apply H1 ].
   rewrite rngl_add_comm.
   rewrite (rngl_add_sub_assoc Hop).

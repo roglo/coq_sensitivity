@@ -783,7 +783,7 @@ rewrite rngl_squ_sqrt. 2: {
   apply (rngl_squ_nonneg Hos Hor).
 }
 rewrite (rngl_squ_abs Hop).
-now apply (rngl_le_add_r Hor).
+now apply (rngl_le_add_r Hos Hor).
 Qed.
 
 Theorem rl_sqrt_div_squ_squ :
@@ -953,7 +953,7 @@ assert (Hr : zr = (ρ * rngl_cos (rngl_acos (zr / ρ)))%L). {
     apply (rngl_le_0_add Hos Hor);
     apply (rngl_squ_nonneg Hos Hor).
   }
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_squ_nonneg Hos Hor).
 }
 f_equal; [ now destruct (0 ≤? zi)%L | ].
@@ -985,7 +985,7 @@ assert (Hzρ21 : ((zr / ρ)² ≤ 1)%L). {
     apply (rngl_le_0_add Hos Hor);
     apply (rngl_squ_nonneg Hos Hor).
   }
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_squ_nonneg Hos Hor).
 }
 remember (0 ≤? zi)%L as zzi eqn:Hzzi; symmetry in Hzzi.
@@ -1963,7 +1963,7 @@ induction n; intros. {
     apply (rngl_le_opp_l Hop Hor).
     apply rngl_cos_bound.
   }
-  apply (rngl_add_le_mono_l Hor).
+  apply (rngl_add_le_mono_l Hos Hor).
   apply rngl_cos_bound.
 }
 rewrite rngl_cos_div_pow_2_succ_r. 2: {
