@@ -693,7 +693,7 @@ intros * Hs Hc.
 progress unfold angle_ltb.
 rewrite rngl_sin_5_right_div_2.
 rewrite rngl_cos_5_right_div_2.
-rewrite (rngl_leb_0_opp Hop Hor).
+rewrite (rngl_leb_0_opp Hop Hto).
 generalize Hs; intros H.
 apply (rngl_leb_gt_iff Hor) in H.
 rewrite H; clear H.
@@ -723,7 +723,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hsc Hs Hc.
 progress unfold angle_ltb.
 rewrite rngl_sin_5_right_div_2.
-rewrite (rngl_leb_0_opp Hop Hor).
+rewrite (rngl_leb_0_opp Hop Hto).
 remember (√(1 / 2) ≤? 0)%L as sz eqn:Hsz.
 symmetry in Hsz.
 destruct sz. {
@@ -792,7 +792,7 @@ apply (rngl_leb_gt_iff Hor) in H.
 rewrite H; clear H.
 rewrite rngl_sin_7_right_div_2.
 rewrite rngl_cos_7_right_div_2.
-rewrite (rngl_leb_0_opp Hop Hor).
+rewrite (rngl_leb_0_opp Hop Hto).
 remember (√(1 / 2) ≤? 0)%L as sz eqn:Hsz.
 symmetry in Hsz.
 destruct sz. {
@@ -939,12 +939,12 @@ progress sin_cos_add_sub_straight_hyp T Hc.
 progress sin_cos_add_sub_straight_hyp T Hs.
 progress unfold angle_ltb.
 rewrite rngl_sin_sub_straight_r.
-rewrite (rngl_leb_0_opp Hop Hor).
+rewrite (rngl_leb_0_opp Hop Hto).
 generalize Hs; intros H.
 apply (rngl_leb_gt_iff Hor) in H.
 rewrite H; clear H.
 rewrite rngl_sin_7_right_div_2.
-rewrite (rngl_leb_0_opp Hop Hor).
+rewrite (rngl_leb_0_opp Hop Hto).
 remember (√(1 / 2) ≤? 0)%L as sz eqn:Hsz.
 symmetry in Hsz.
 destruct sz. {
@@ -1070,7 +1070,7 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   apply (rngl_lt_le_incl Hor) in H.
   apply rngl_leb_le in H.
   rewrite H; clear H.
-  rewrite (rngl_leb_0_opp Hop Hor).
+  rewrite (rngl_leb_0_opp Hop Hto).
   remember (rngl_sin (_ * _) ≤? 0)%L as s3 eqn:Hs3.
   symmetry in Hs3.
   destruct s3; [ | easy ].

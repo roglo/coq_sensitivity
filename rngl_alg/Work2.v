@@ -1285,7 +1285,7 @@ rewrite (rngl_sub_sub_swap Hop) in HN.
 rewrite (rngl_sub_sub_distr Hop) in HN.
 rewrite (rngl_sub_diag Hos) in HN.
 rewrite rngl_add_0_l in HN.
-now rewrite (rngl_abs_sub_comm Hop Hor) in HN.
+now rewrite (rngl_abs_sub_comm Hop Hto) in HN.
 Qed.
 
 End a.

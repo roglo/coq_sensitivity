@@ -282,7 +282,7 @@ Proof.
 destruct_ac.
 intros Hc1.
 apply (rl_sqrt_pos Hos Hor).
-apply (rngl_div_pos Hop Hiv Hor). {
+apply (rngl_div_pos Hop Hiv Hto). {
   apply (rngl_0_lt_1 Hos Hc1 Hto).
 }
 apply (rngl_0_lt_2 Hos Hc1 Hor).
@@ -379,7 +379,7 @@ rewrite rngl_sin_right_div_2.
 rewrite rngl_cos_right_div_2.
 rewrite rngl_sin_5_right_div_2.
 rewrite rngl_cos_5_right_div_2.
-rewrite (rngl_leb_0_opp Hop Hor).
+rewrite (rngl_leb_0_opp Hop Hto).
 specialize rl_sqrt_half_nonneg as H.
 apply rngl_leb_le in H.
 rewrite H; clear H.
@@ -524,7 +524,7 @@ rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_0_r Hos).
 do 2 rewrite (rngl_mul_opp_r Hop).
 do 2 rewrite rngl_mul_1_r.
-rewrite (rngl_leb_0_opp Hop Hor).
+rewrite (rngl_leb_0_opp Hop Hto).
 rewrite (rngl_mul_0_r Hos).
 rewrite rngl_add_0_r.
 rewrite (rngl_opp_involutive Hop).
@@ -548,7 +548,7 @@ destruct zs. {
       apply (rngl_2_neq_0 Hos Hc1 Hto).
     }
     symmetry.
-    rewrite (rl_sqrt_0 Hop Hor). 2: {
+    rewrite (rl_sqrt_0 Hop Hto). 2: {
       rewrite Bool.orb_true_iff; right.
       apply (rngl_has_inv_has_inv_or_pdiv Hiv).
     }
@@ -885,7 +885,7 @@ split; intros H12. {
         progress unfold angle_add_overflow2.
         progress unfold angle_ltb.
         progress sin_cos_add_sub_straight_goal T.
-        rewrite (rngl_leb_0_opp Hop Hor).
+        rewrite (rngl_leb_0_opp Hop Hto).
         generalize Hzs2; intros H.
         apply (rngl_lt_le_incl Hor) in H.
         apply rngl_leb_le in H.
@@ -961,7 +961,7 @@ split; intros H12. {
       progress unfold angle_ltb.
       rewrite rngl_sin_5_right_div_2.
       rewrite rngl_cos_5_right_div_2.
-      rewrite (rngl_leb_0_opp Hop Hor).
+      rewrite (rngl_leb_0_opp Hop Hto).
       specialize (rl_sqrt_half_pos Hc1) as H.
       apply (rngl_leb_gt_iff Hor) in H.
       rewrite H; clear H.
@@ -1142,7 +1142,7 @@ split; intros H12. {
         rewrite rngl_sin_add_straight_r.
         rewrite rngl_cos_add_straight_r.
         rewrite rngl_cos_add_right_r.
-        rewrite (rngl_leb_0_opp Hop Hor).
+        rewrite (rngl_leb_0_opp Hop Hto).
         generalize Hzs12; intros H.
         apply (rngl_leb_gt_iff Hor) in H.
         rewrite H; clear H.

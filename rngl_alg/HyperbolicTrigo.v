@@ -1490,7 +1490,7 @@ rewrite (rngl_sub_diag Hos).
 rewrite (rngl_div_0_l Hos Hi1). 2: {
   apply (rngl_2_neq_0 Hos Hc1 Hto).
 }
-apply (rl_sqrt_0 Hop Hor).
+apply (rl_sqrt_0 Hop Hto).
 rewrite Bool.orb_true_iff; right.
 apply (rngl_has_inv_has_inv_or_pdiv Hiv).
 Qed.
@@ -1534,11 +1534,11 @@ split; intros H12. 2: {
   do 2 rewrite (rngl_sub_diag Hos).
   rewrite (rngl_squ_0 Hos).
   rewrite rngl_add_0_r.
-  apply (rl_sqrt_0 Hop Hor Hii).
+  apply (rl_sqrt_0 Hop Hto Hii).
 }
 apply eq_hangle_eq.
 apply (eq_rl_sqrt_0 Hos) in H12. 2: {
-  apply (rngl_add_squ_nonneg Hos Hor).
+  apply (rngl_add_squ_nonneg Hos Hto).
 }
 apply (rngl_eq_add_0 Hor) in H12; cycle 1. {
   apply (rngl_squ_nonneg Hos Hto).
@@ -1571,7 +1571,7 @@ destruct θ2 as (c2, s2, Hcs2).
 destruct θ3 as (c3, s3, Hcs3).
 progress unfold hangle_eucl_dist.
 cbn.
-apply (euclidean_distance_triangular Hic Hop Hiv Hor).
+apply (euclidean_distance_triangular Hic Hop Hiv Hto).
 Qed.
 
 Theorem hangle_eucl_dist_is_dist : is_dist hangle_eucl_dist.
@@ -1597,9 +1597,9 @@ Theorem hangle_taxi_dist_symmetry :
 Proof.
 destruct_hc; intros.
 progress unfold hangle_taxi_dist.
-rewrite (rngl_abs_sub_comm Hop Hor).
+rewrite (rngl_abs_sub_comm Hop Hto).
 f_equal.
-apply (rngl_abs_sub_comm Hop Hor).
+apply (rngl_abs_sub_comm Hop Hto).
 Qed.
 
 Theorem hangle_taxi_dist_separation :
@@ -1635,7 +1635,7 @@ destruct θ2 as (c2, s2, Hcs2).
 destruct θ3 as (c3, s3, Hcs3).
 progress unfold hangle_taxi_dist.
 cbn.
-specialize (rngl_abs_triangle Hop Hor) as H1.
+specialize (rngl_abs_triangle Hop Hto) as H1.
 rewrite rngl_add_assoc.
 rewrite (rngl_add_add_swap (rngl_abs (c2 - c1))).
 rewrite <- rngl_add_assoc.
@@ -1742,7 +1742,7 @@ assert (Hzcr : (0 ≤ rngl_cos θ2 / d)%L). {
     now apply (rl_sqrt_pos Hos Hor).
   } {
     cbn.
-    rewrite (rngl_leb_0_opp Hop Hor).
+    rewrite (rngl_leb_0_opp Hop Hto).
     apply (rngl_leb_gt_iff Hor) in Hzs.
     apply (rngl_lt_le_incl Hor) in Hzs.
     apply rngl_leb_le in Hzs.
@@ -1760,13 +1760,13 @@ apply (rngl_eqb_eq Heo).
 subst d; cbn.
 rewrite (rngl_squ_div Hic Hos Hiv). 2: {
   intros H.
-  apply (eq_rl_sqrt_0 Hos) in H; [ | now apply (rngl_lt_le_incl Hor) ].
+  apply (eq_rl_sqrt_0 Hos) in H; [ | now apply (rngl_lt_le_incl Hto) ].
   rewrite H in Hzc.
   now apply (rngl_lt_irrefl Hor) in Hzc.
 }
 rewrite (rngl_squ_div Hic Hos Hiv). 2: {
   intros H.
-  apply (eq_rl_sqrt_0 Hos) in H; [ | now apply (rngl_lt_le_incl Hor) ].
+  apply (eq_rl_sqrt_0 Hos) in H; [ | now apply (rngl_lt_le_incl Hto) ].
   rewrite H in Hzc.
   now apply (rngl_lt_irrefl Hor) in Hzc.
 }
@@ -1801,7 +1801,7 @@ destruct zs. {
   now apply (rngl_lt_irrefl Hor) in Hzc.
 } {
   cbn.
-  rewrite (rngl_leb_0_opp Hop Hor).
+  rewrite (rngl_leb_0_opp Hop Hto).
   apply (rngl_leb_gt_iff Hor) in Hzs.
   apply (rngl_lt_le_incl Hor) in Hzs.
   apply rngl_leb_le in Hzs.
@@ -1859,7 +1859,7 @@ apply (rngl_eqb_eq Heo).
 rewrite (rngl_squ_div Hic Hos Hiv). 2: {
   intros H; subst d.
   apply (eq_rl_sqrt_0 Hos) in H. 2: {
-    apply (rngl_add_squ_nonneg Hos Hor).
+    apply (rngl_add_squ_nonneg Hos Hto).
   }
   apply (eq_rngl_add_square_0 Hop Hiq Hor) in H.
   destruct H as (Hc, Hs).
@@ -1868,7 +1868,7 @@ rewrite (rngl_squ_div Hic Hos Hiv). 2: {
 rewrite (rngl_squ_div Hic Hos Hiv). 2: {
   intros H; subst d.
   apply (eq_rl_sqrt_0 Hos) in H. 2: {
-    apply (rngl_add_squ_nonneg Hos Hor).
+    apply (rngl_add_squ_nonneg Hos Hto).
   }
   apply (eq_rngl_add_square_0 Hop Hiq Hor) in H.
   destruct H as (Hc, Hs).
@@ -1886,7 +1886,7 @@ specialize (cosh2_sinh2_1 θ) as H1.
 apply (rngl_sub_move_r Hop) in H1.
 progress unfold d.
 rewrite rngl_squ_sqrt. 2: {
-  apply (rngl_add_squ_nonneg Hos Hor).
+  apply (rngl_add_squ_nonneg Hos Hto).
 }
 apply (rngl_div_diag Hiq).
 intros H.

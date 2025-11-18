@@ -841,7 +841,7 @@ split. {
     apply (rngl_squ_nonneg Hos Hto).
   }
 } {
-  apply (rngl_le_div_l Hop Hiv Hor). {
+  apply (rngl_le_div_l Hop Hiv Hto). {
     remember (rngl_squ x + rngl_squ y)%L as a eqn:Ha.
     symmetry in Ha.
     apply (rngl_le_neq Hto).
@@ -899,7 +899,7 @@ destruct (gc_eq_dec Heo z gc_zero) as [Hz| Hz]. {
   progress unfold rngl_squ in Hρ.
   rewrite (rngl_mul_0_l Hos) in Hρ.
   rewrite rngl_add_0_l in Hρ.
-  rewrite (rl_sqrt_0 Hop Hor Hii) in Hρ.
+  rewrite (rl_sqrt_0 Hop Hto Hii) in Hρ.
   rewrite Hρ.
   now do 2 rewrite (rngl_mul_0_l Hos).
 }
@@ -939,7 +939,7 @@ assert (Hr : zr = (ρ * rngl_cos (rngl_acos (zr / ρ)))%L). {
   rewrite (rngl_abs_nonneg_eq Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hor).
   }
-  apply (rngl_le_div_l Hop Hiv Hor); [ easy | ].
+  apply (rngl_le_div_l Hop Hiv Hto); [ easy | ].
   rewrite rngl_mul_1_l.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
     rewrite Hρ.
@@ -976,7 +976,7 @@ assert (Hri : ((zr / ρ)² + (zi / ρ)² = 1)%L). {
 }
 assert (Hzρ21 : ((zr / ρ)² ≤ 1)%L). {
   rewrite (rngl_squ_div Hic Hos Hiv); [ | easy ].
-  apply (rngl_le_div_l Hop Hiv Hor). {
+  apply (rngl_le_div_l Hop Hiv Hto). {
     now apply (rngl_mul_pos_pos Hop Hiq Hto).
   }
   rewrite rngl_mul_1_l.
@@ -1178,7 +1178,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
     rewrite (rngl_mul_mul_swap Hic).
     rewrite <- (rngl_of_nat_pow Hos).
     rewrite (rngl_mul_inv_r Hiv).
-    apply (rngl_le_div_l Hop Hiv Hor). {
+    apply (rngl_le_div_l Hop Hiv Hto). {
       rewrite <- rngl_of_nat_0.
       apply (rngl_of_nat_inj_lt Hos Hc1 Hor).
       apply Nat.neq_0_lt_0.
@@ -1275,7 +1275,7 @@ symmetry.
 now apply (rngl_div_mul Hiv).
 Qed.
 
-Arguments rl_sqrt_0 {T ro rp rl} Hop Hor Hii.
+Arguments rl_sqrt_0 {T ro rp rl} Hop Hto Hii.
 
 Theorem rngl_cos_le_anticompat_when_sin_nonneg :
   ∀ θ1 θ2,
