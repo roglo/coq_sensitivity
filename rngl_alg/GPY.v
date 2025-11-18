@@ -180,7 +180,7 @@ eapply (rngl_le_trans Hor). {
   rewrite Nat.add_sub.
   apply (rngl_le_add_r Hto).
   apply (rngl_div_nonneg Hop Hiv Hto). {
-    apply (rngl_0_le_1 Hos Hor).
+    apply (rngl_0_le_1 Hos Hto).
   }
   apply (rngl_le_neq Hto).
   split; [ apply (rngl_of_nat_nonneg Hos Hor) | ].
