@@ -746,7 +746,7 @@ split; intros H12. {
         }
         apply rngl_nle_gt in Hzc1.
         apply Hzc1; clear Hzc1; cbn.
-        apply (rngl_opp_1_le_0 Hop Hor).
+        apply (rngl_opp_1_le_0 Hop Hto).
       }
       apply rngl_leb_nle in Hzs2.
       apply (rngl_nle_gt_iff Hto) in Hzs2.
@@ -839,7 +839,7 @@ split; intros H12. {
           apply rngl_nle_gt in Hcc.
           apply Hcc; clear Hcc.
           rewrite Hs; cbn.
-          apply (rngl_le_opp_l Hop Hor).
+          apply (rngl_le_opp_l Hop Hto).
           apply rngl_cos_bound.
         }
         rewrite Hs in H12z.
@@ -910,7 +910,7 @@ split; intros H12. {
           rewrite (rngl_leb_refl Hor).
           apply rngl_ltb_lt.
           apply (rngl_le_lt_trans Hto _ 0); [ | easy ].
-          apply (rngl_opp_1_le_0 Hop Hor).
+          apply (rngl_opp_1_le_0 Hop Hto).
         } {
           apply (rngl_lt_le_incl Hor) in Hzc1.
           now apply rngl_sin_nonneg_angle_le_straight.
@@ -922,7 +922,7 @@ split; intros H12. {
       (* lemma *)
       rewrite (rngl_mul_comm Hic).
       apply (rngl_mul_pos_neg Hop Hiq Hto). {
-        apply (rngl_inv_pos Hop Hiv Hor).
+        apply (rngl_inv_pos Hop Hiv Hto).
         apply (rl_sqrt_pos Hos Hto).
         apply (rngl_0_lt_2 Hos Hc1 Hto).
       }

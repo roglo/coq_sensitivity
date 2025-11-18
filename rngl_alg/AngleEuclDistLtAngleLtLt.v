@@ -299,7 +299,7 @@ destruct H23 as [H23| H23]. 2: {
   apply rngl_cos_eq in H23.
   destruct H23; subst θ2; [ apply (rngl_le_refl Hor) | ].
   cbn in Hzs2.
-  apply (rngl_opp_pos_neg Hop Hor) in Hzs2.
+  apply (rngl_opp_pos_neg Hop Hto) in Hzs2.
   apply (rngl_lt_le_incl Hor) in Hzs2.
   now apply rngl_nlt_ge in Hzs2.
 }

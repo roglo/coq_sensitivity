@@ -156,7 +156,7 @@ destruct zs. {
   rewrite <- angle_mul_2_l in Hzsm |-*.
   rewrite rngl_sin_mul_2_l in Hzsm.
   rewrite rngl_cos_mul_2_l'.
-  apply (rngl_le_0_mul Hop Hiq Hor) in Hzsm.
+  apply (rngl_le_0_mul Hop Hiq Hto) in Hzsm.
   remember (rngl_cos (u i)) as x eqn:Hx.
   rewrite Hu in Hx.
   progress unfold seq_angle_to_div_nat in Hx.
@@ -1160,7 +1160,7 @@ apply (eq_rl_sqrt_0 Hos) in H. 2: {
   apply (rngl_div_nonneg Hop Hiv Hto). 2: {
     apply (rngl_0_lt_2 Hos Hc1 Hto).
   }
-  apply (rngl_le_opp_l Hop Hor).
+  apply (rngl_le_opp_l Hop Hto).
   apply rngl_cos_bound.
 }
 (* lemma? *)

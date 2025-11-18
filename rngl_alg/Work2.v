@@ -917,7 +917,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hzs1 Hzs2 Hzs21 Hzs22 H12.
 rewrite rngl_sin_mul_2_l in Hzs21, Hzs22.
 rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
-apply (rngl_le_0_mul Hop Hiq Hor) in Hzs21, Hzs22.
+apply (rngl_le_0_mul Hop Hiq Hto) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
   apply (rngl_0_lt_2 Hos Hc1 Hto).
@@ -926,7 +926,7 @@ destruct Hzs22 as [(_, Hzs22)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
-apply (rngl_le_0_mul Hop Hiq Hor) in Hzs21, Hzs22.
+apply (rngl_le_0_mul Hop Hiq Hto) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
   now apply rngl_nlt_ge in H1.
 }
@@ -970,7 +970,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hzs1 Hzs2 Hzs21 Hzs22 Ht1.
 rewrite rngl_sin_mul_2_l in Hzs21, Hzs22.
 rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
-apply (rngl_le_0_mul Hop Hiq Hor) in Hzs21.
+apply (rngl_le_0_mul Hop Hiq Hto) in Hzs21.
 apply (rngl_lt_mul_0_if Hos Hor) in Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
@@ -980,7 +980,7 @@ destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
   apply (rngl_0_le_2 Hos Hto).
 }
-apply (rngl_le_0_mul Hop Hiq Hor) in Hzs21.
+apply (rngl_le_0_mul Hop Hiq Hto) in Hzs21.
 apply (rngl_lt_mul_0_if Hos Hor) in Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
   apply (rngl_le_antisymm Hor) in H1; [ | easy ].

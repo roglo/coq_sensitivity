@@ -260,11 +260,11 @@ rewrite rngl_mul_1_l.
 split. 2: {
   apply rngl_leb_le.
   apply rl_sqrt_nonneg.
-  apply (rngl_le_div_r Hop Hiv Hor).
+  apply (rngl_le_div_r Hop Hiv Hto).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
   rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_comm.
-  apply (rngl_le_opp_l Hop Hor).
+  apply (rngl_le_opp_l Hop Hto).
   apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
   apply (rngl_opp_1_le_1 Hop Hto).
 }
@@ -286,18 +286,18 @@ rewrite rngl_squ_sqrt. 2: {
    commence mal *)
 Abort. (*
 ...
-  apply (rngl_le_div_r Hop Hiv Hor). {
+  apply (rngl_le_div_r Hop Hiv Hto). {
     apply (rngl_0_lt_2 Hos Hc1 Hto).
   }
   rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_comm.
-  apply (rngl_le_opp_l Hop Hor).
+  apply (rngl_le_opp_l Hop Hto).
 ...
   apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
   apply (rngl_opp_1_le_1 Hop Hto).
 }
 rewrite rngl_squ_sqrt. 2: {
-  apply (rngl_le_div_r Hop Hiv Hor). {
+  apply (rngl_le_div_r Hop Hiv Hto). {
     apply (rngl_0_lt_2 Hos Hc1 Hto).
   }
   rewrite (rngl_mul_0_l Hos).

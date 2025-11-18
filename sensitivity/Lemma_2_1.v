@@ -119,7 +119,7 @@ induction la as [| a]; intros; [ cbn in Hi; flia Hi | ].
 cbn in Hvvz, Hi.
 rewrite rngl_summation_list_cons in Hvvz.
 apply (rngl_eq_add_0 Hos Hor) in Hvvz; cycle 1. {
-  apply (rngl_mul_diag_nonneg Hos Hor).
+  apply (rngl_mul_diag_nonneg Hos Hto).
 } {
   clear a Hvvz Hi IHla.
   induction la as [| a]. {
@@ -129,7 +129,7 @@ apply (rngl_eq_add_0 Hos Hor) in Hvvz; cycle 1. {
   cbn.
   rewrite rngl_summation_list_cons.
   apply (rngl_le_trans Hor _ (a * a)). {
-    apply (rngl_mul_diag_nonneg Hos Hor).
+    apply (rngl_mul_diag_nonneg Hos Hto).
   }
   rewrite <- rngl_add_0_r at 1.
   now apply (rngl_add_le_mono_l Hos Hor).

@@ -56,7 +56,7 @@ apply (rngl_le_trans Hor _ (∑ (i = 1, n), 1 / rngl_of_nat k)). {
     apply Hnk; clear Hnk.
     flia Hi.
   } {
-    apply (rngl_of_nat_inj_le Hop Hc1 Hor).
+    apply (rngl_of_nat_inj_le Hop Hc1 Hto).
     apply Nat.le_add_r.
   }
 }
@@ -73,7 +73,7 @@ apply (rngl_div_le_1 Hop Hiv Hor). {
   now apply Nat.neq_0_lt_0.
 }
 split; [ apply (rngl_of_nat_nonneg Hos Hor) | ].
-now apply (rngl_of_nat_inj_le Hop Hc1 Hor).
+now apply (rngl_of_nat_inj_le Hop Hc1 Hto).
 Qed.
 
 Theorem harmonic_sum_log2_bound_up_to_2_pow :
@@ -114,7 +114,7 @@ rewrite (rngl_summation_shift (2 ^ n + 1)). 2: {
 rewrite Nat.add_comm, Nat.add_sub.
 rewrite <- Nat.add_assoc.
 rewrite Nat.add_sub.
-apply (rngl_le_trans Hor _ 1); [ | apply (rngl_1_le_2 Hos Hiq Hor) ].
+apply (rngl_le_trans Hor _ 1); [ | apply (rngl_1_le_2 Hos Hiq Hto) ].
 apply harmonic_sum_after_2_pow_bound.
 apply Nat.le_add_r.
 Qed.
@@ -204,7 +204,7 @@ rewrite (rngl_summation_shift (2 ^ n)). 2: {
 do 2 rewrite Nat.add_comm, Nat.add_sub.
 apply (rngl_le_trans Hor _ 1). 2: {
   rewrite <- rngl_of_nat_1.
-  apply (rngl_of_nat_inj_le Hop Hc1 Hor).
+  apply (rngl_of_nat_inj_le Hop Hc1 Hto).
   flia H2n.
 }
 apply harmonic_sum_after_2_pow_bound.
