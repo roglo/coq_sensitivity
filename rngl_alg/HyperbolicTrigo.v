@@ -240,7 +240,7 @@ assert (Hyx : (y ≤ x)%L). {
     apply (rngl_le_squ_le Hop Hiq Hor); [ easy | easy | ].
     apply (rngl_sub_move_r Hop) in Hxy.
     rewrite Hxy.
-    apply (rngl_le_add_l Hor).
+    apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_1 Hos Hor).
   }
   apply rngl_leb_nle in Hzy.
@@ -254,7 +254,7 @@ assert (Hyx' : (y' ≤ x')%L). {
     apply (rngl_le_squ_le Hop Hiq Hor); [ easy | easy | ].
     apply (rngl_sub_move_r Hop) in Hxy'.
     rewrite Hxy'.
-    apply (rngl_le_add_l Hor).
+    apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_1 Hos Hor).
   }
   apply rngl_leb_nle in Hzy'.
@@ -267,7 +267,7 @@ destruct (rngl_leb_dec 0 y) as [Hzy| Hzy]. {
   destruct (rngl_leb_dec 0 y') as [Hzy'| Hzy']. {
     apply rngl_leb_le in Hzy'.
     apply (rngl_le_trans Hor _ (y * y' + y * y')). 2: {
-      apply (rngl_add_le_mono_r Hor).
+      apply (rngl_add_le_mono_r Hos Hor).
       now apply (rngl_mul_le_compat_nonneg Hor).
     }
     rewrite <- rngl_mul_2_l.
@@ -294,7 +294,7 @@ destruct (rngl_leb_dec 0 y) as [Hzy| Hzy]. {
   rewrite (rngl_squ_opp Hop).
   apply (rngl_sub_move_r Hop) in Hxy'.
   rewrite Hxy'.
-  apply (rngl_le_add_l Hor).
+  apply (rngl_le_add_l Hos Hor).
   apply (rngl_0_le_1 Hos Hor).
 }
 apply rngl_leb_nle in Hzy.
@@ -317,7 +317,7 @@ destruct (rngl_leb_dec 0 y') as [Hzy'| Hzy']. {
   rewrite (rngl_squ_opp Hop).
   apply (rngl_sub_move_r Hop) in Hxy.
   rewrite Hxy.
-  apply (rngl_le_add_l Hor).
+  apply (rngl_le_add_l Hos Hor).
   apply (rngl_0_le_1 Hos Hor).
 }
 apply rngl_leb_nle in Hzy'.
@@ -1036,7 +1036,7 @@ split. {
   apply (rngl_le_le_squ Hop Hor) in Hcc; [ | apply rngl_cosh_nonneg ].
   apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2 in Hcc.
-  apply (rngl_add_le_mono_l Hor) in Hcc.
+  apply (rngl_add_le_mono_l Hos Hor) in Hcc.
   now apply (rngl_le_squ_le Hop Hiq Hor) in Hcc.
 }
 Qed.
@@ -1639,7 +1639,7 @@ specialize (rngl_abs_triangle Hop Hor) as H1.
 rewrite rngl_add_assoc.
 rewrite (rngl_add_add_swap (rngl_abs (c2 - c1))).
 rewrite <- rngl_add_assoc.
-apply (rngl_add_le_mono Hor). {
+apply (rngl_add_le_mono Hos Hor). {
   eapply (rngl_le_trans Hor); [ | apply H1 ].
   rewrite rngl_add_comm.
   rewrite (rngl_add_sub_assoc Hop).

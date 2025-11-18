@@ -783,7 +783,7 @@ rewrite rngl_squ_sqrt. 2: {
   apply (rngl_squ_nonneg Hos Hto).
 }
 rewrite (rngl_squ_abs Hop).
-now apply (rngl_le_add_r Hor).
+now apply (rngl_le_add_r Hos Hor).
 Qed.
 
 Theorem rl_sqrt_div_squ_squ :
@@ -1963,7 +1963,7 @@ induction n; intros. {
     apply (rngl_le_opp_l Hop Hor).
     apply rngl_cos_bound.
   }
-  apply (rngl_add_le_mono_l Hor).
+  apply (rngl_add_le_mono_l Hos Hor).
   apply rngl_cos_bound.
 }
 rewrite rngl_cos_div_pow_2_succ_r. 2: {

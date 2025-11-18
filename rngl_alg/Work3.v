@@ -530,7 +530,7 @@ cbn.
 eapply (rngl_le_trans Hor). {
   apply (gc_modl_triangular Hic Hop Hiv Hor).
 }
-apply (rngl_add_le_mono_r Hor).
+apply (rngl_add_le_mono_r Hos Hor).
 apply IHl.
 Qed.
 
