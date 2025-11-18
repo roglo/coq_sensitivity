@@ -1636,7 +1636,7 @@ assert (Hr : (0 < R₀)%L). {
     apply (rngl_0_lt_1 Hos Hc1 Hto).
   }
   rewrite <- rngl_add_assoc.
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_le_0_add Hto). {
     now apply (rngl_lt_le_incl Hto) in HM.
   }
@@ -1723,7 +1723,7 @@ assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
   apply (rngl_le_trans Hor _ R₀); [ | now apply (rngl_lt_le_incl Hto) ].
   progress unfold R₀.
   rewrite <- rngl_add_assoc.
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_le_0_add Hto). {
     now apply (rngl_lt_le_incl Hto) in HM.
   }
@@ -1750,7 +1750,7 @@ assert (H2 : (‖ 1 / z ‖ * rngl_of_nat n * m ≤ ‖ z ‖)%L). {
   progress unfold R₀.
   apply (rngl_le_add_l Hor).
   apply (rngl_le_trans Hor _ 1); [ apply (rngl_0_le_1 Hos Hto) | ].
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   now apply (rngl_lt_le_incl Hto) in HM.
 }
 clear H1.
@@ -1773,7 +1773,7 @@ Donc mes angles ne sont pas archimédiens
   progress unfold R₀.
   apply (rngl_le_add_l Hor).
   apply (rngl_le_trans Hor _ 1); [ apply (rngl_0_le_1 Hop Hto) | ].
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   now apply (rngl_lt_le_incl Hto) in HM.
 }
 ...
@@ -1854,7 +1854,7 @@ assert
   }
   progress unfold R₀.
   rewrite <- rngl_add_assoc.
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_le_0_add Hto). {
     now apply (rngl_lt_le_incl Hto) in HM.
   }
@@ -2061,7 +2061,7 @@ assert (H1 : (rngl_of_nat n * m < ‖ z ‖)%L). {
   progress unfold R₀.
   apply (rngl_le_add_l Hor).
   apply (rngl_le_trans Hor _ 1). 2: {
-    apply (rngl_le_add_r Hto).
+    apply (rngl_le_add_r Hor).
     now apply (rngl_lt_le_incl Hto) in HM.
   }
   apply (rngl_0_le_1 Hop Hto).
@@ -2096,7 +2096,7 @@ assert (Hr : (0 < R₀)%L). {
     apply (rngl_0_lt_1 Hop Hc1 Hto).
   }
   rewrite <- rngl_add_assoc.
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_le_0_add Hto). {
     now apply (rngl_lt_le_incl Hto) in HM.
   }

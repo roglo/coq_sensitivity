@@ -120,7 +120,7 @@ rewrite <- rngl_sin_sub in Hc1312.
 apply (rngl_lt_add_lt_sub_l Hop Hto) in Hc1312.
 assert (H2 : (rngl_sin θ3 < rngl_sin θ2)%L). {
   eapply (rngl_le_lt_trans Hto); [ | apply Hc1312 ].
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_mul_nonneg_nonneg Hos Hor).
   now apply (rngl_lt_le_incl Hto).
   apply (rngl_le_0_sub Hop Hto).
@@ -412,7 +412,7 @@ destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     apply (rngl_le_0_sub Hop Hto).
     apply (rngl_le_trans Hor _ 0). {
       apply (rngl_lt_le_incl Hto) in Hc1z.
-      now apply (rngl_mul_nonpos_nonneg Hop Hor).
+      now apply (rngl_mul_nonpos_nonneg Hop Hto).
     }
     now apply (rngl_mul_nonneg_nonneg Hos Hor).
   }

@@ -1056,18 +1056,18 @@ specialize (cosh2_sinh2_1 θ1) as Hcs1.
 specialize (cosh2_sinh2_1 θ2) as Hcs2.
 split. {
   intros Hss.
-  apply (rngl_lt_lt_squ Hop Hiq Hor) in Hss; [ | | easy ]. 2: {
+  apply (rngl_lt_lt_squ Hop Hiq Hto) in Hss; [ | | easy ]. 2: {
     apply (rngl_mul_comm Hic).
   }
   apply (rngl_sub_move_l Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2 in Hss.
-  apply (rngl_sub_lt_mono_r Hop Hor) in Hss.
-  apply (rngl_lt_squ_lt Hop Hiq Hor) in Hss; [ easy | | ].
+  apply (rngl_sub_lt_mono_r Hop Hto) in Hss.
+  apply (rngl_lt_squ_lt Hop Hiq Hto) in Hss; [ easy | | ].
   apply rngl_cosh_nonneg.
   apply rngl_cosh_nonneg.
 } {
   intros Hcc.
-  apply (rngl_lt_lt_squ Hop Hiq Hor) in Hcc; cycle 1. {
+  apply (rngl_lt_lt_squ Hop Hiq Hto) in Hcc; cycle 1. {
     apply (rngl_mul_comm Hic).
   } {
     apply rngl_cosh_nonneg.
@@ -1075,7 +1075,7 @@ split. {
   apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2 in Hcc.
   apply (rngl_add_lt_mono_l Hos Hto) in Hcc.
-  now apply (rngl_lt_squ_lt Hop Hiq Hor) in Hcc.
+  now apply (rngl_lt_squ_lt Hop Hiq Hto) in Hcc.
 }
 Qed.
 
@@ -1541,7 +1541,7 @@ apply eq_hangle_eq.
 apply (eq_rl_sqrt_0 Hos) in H12. 2: {
   apply (rngl_add_squ_nonneg Hos Hto).
 }
-apply (rngl_eq_add_0 Hto) in H12; cycle 1. {
+apply (rngl_eq_add_0 Hos Hor) in H12; cycle 1. {
   apply (rngl_squ_nonneg Hos Hto).
 } {
   apply (rngl_squ_nonneg Hos Hto).
@@ -1609,7 +1609,7 @@ Proof.
 destruct_hc; intros.
 progress unfold hangle_taxi_dist.
 split; intros H12. {
-  apply (rngl_eq_add_0 Hto) in H12; cycle 1.
+  apply (rngl_eq_add_0 Hos Hor) in H12; cycle 1.
   apply (rngl_abs_nonneg Hop Hto).
   apply (rngl_abs_nonneg Hop Hto).
   destruct H12 as (Hcc, Hss).

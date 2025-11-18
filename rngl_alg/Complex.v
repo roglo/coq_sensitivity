@@ -938,7 +938,7 @@ assert (Hr : zr = (ρ * rngl_cos (rngl_acos (zr / ρ)))%L). {
   rewrite <- rngl_squ_1.
   apply (rngl_abs_le_squ_le Hop Hto).
   rewrite (rngl_abs_1 Hos Hto).
-  rewrite (rngl_abs_div Hop Hiv Hor); [ | easy ].
+  rewrite (rngl_abs_div Hop Hiv Hto); [ | easy ].
   rewrite (rngl_abs_nonneg_eq Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hto).
   }
@@ -956,7 +956,7 @@ assert (Hr : zr = (ρ * rngl_cos (rngl_acos (zr / ρ)))%L). {
     apply (rngl_le_0_add Hos Hto);
     apply (rngl_squ_nonneg Hos Hto).
   }
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_squ_nonneg Hos Hto).
 }
 f_equal; [ now destruct (0 ≤? zi)%L | ].
@@ -988,7 +988,7 @@ assert (Hzρ21 : ((zr / ρ)² ≤ 1)%L). {
     apply (rngl_le_0_add Hos Hto);
     apply (rngl_squ_nonneg Hos Hto).
   }
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_squ_nonneg Hos Hto).
 }
 remember (0 ≤? zi)%L as zzi eqn:Hzzi; symmetry in Hzzi.
@@ -1002,7 +1002,7 @@ destruct zzi. {
   apply (rngl_add_sub_eq_l Hos) in Hri.
   rewrite Hri.
   rewrite (rl_sqrt_squ Hop Hto).
-  rewrite (rngl_abs_div Hop Hiv Hor); [ | easy ].
+  rewrite (rngl_abs_div Hop Hiv Hto); [ | easy ].
   rewrite (rngl_abs_nonneg_eq Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hto).
   }
@@ -1025,7 +1025,7 @@ destruct zzi. {
   apply (rngl_add_sub_eq_l Hos) in Hri.
   rewrite Hri.
   rewrite (rl_sqrt_squ Hop Hto).
-  rewrite (rngl_abs_div Hop Hiv Hor); [ | easy ].
+  rewrite (rngl_abs_div Hop Hiv Hto); [ | easy ].
   rewrite (rngl_abs_nonneg_eq Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hto).
   }
@@ -1062,12 +1062,12 @@ Qed.
 Theorem rngl_rat_frac_part_lt_1 :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a b,
   rngl_of_nat b ≠ 0%L
   → (rngl_of_nat a / rngl_of_nat b - rngl_of_nat (a / b) < 1)%L.
 Proof.
-intros Hop Hiv Hor.
+intros Hop Hiv Hto.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hi1.
@@ -1079,7 +1079,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 assert (Hbz : b ≠ 0) by now intros H; subst b.
 assert (Hzb : (0 < rngl_of_nat b)%L). {
   rewrite <- rngl_of_nat_0.
-  apply (rngl_of_nat_inj_lt Hos Hc1 Hor).
+  apply (rngl_of_nat_inj_lt Hos Hc1 Hto).
   apply Nat.neq_0_lt_0.
   now intros H; subst b.
 }
@@ -1101,7 +1101,7 @@ rewrite (rngl_mul_div Hi1); [ | easy ].
 rewrite rngl_add_comm, (rngl_add_sub Hos).
 apply (rngl_lt_div_l Hop Hiv Hto); [ easy | ].
 rewrite rngl_mul_1_l.
-apply (rngl_of_nat_inj_lt Hos Hc1 Hor).
+apply (rngl_of_nat_inj_lt Hos Hc1 Hto).
 now apply Nat.mod_upper_bound.
 Qed.
 
@@ -1113,7 +1113,7 @@ Theorem rat_is_inf_sum_of_inv_rad_pow :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ rad a b,
   2 ≤ rad
@@ -1121,7 +1121,8 @@ Theorem rat_is_inf_sum_of_inv_rad_pow :
   → is_limit_when_seq_tends_to_inf rngl_dist (seq_converging_to_rat rad a b)
        (rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
-intros Hic Hop Hiv Hor Har.
+intros Hic Hop Hiv Hto Har.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * H2r Hbz.
 intros ε Hε.
@@ -1143,7 +1144,7 @@ rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
 assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
   apply (rngl_lt_div_l Hop Hiv Hto). {
     rewrite <- rngl_of_nat_0.
-    apply (rngl_of_nat_inj_lt Hos Hc1 Hor).
+    apply (rngl_of_nat_inj_lt Hos Hc1 Hto).
     now rewrite Nat.add_comm.
   }
   rewrite <- (rngl_mul_comm Hic).
@@ -1151,13 +1152,13 @@ assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
 }
 assert (Hzr : (0 < rngl_of_nat rad)%L). {
   rewrite <- rngl_of_nat_0.
-  apply (rngl_of_nat_inj_lt Hos Hc1 Hor).
+  apply (rngl_of_nat_inj_lt Hos Hc1 Hto).
   apply Nat.neq_0_lt_0.
   now intros H; subst rad.
 }
 assert (Hzb : (0 < rngl_of_nat b)%L). {
   rewrite <- rngl_of_nat_0.
-  apply (rngl_of_nat_inj_lt Hos Hc1 Hor).
+  apply (rngl_of_nat_inj_lt Hos Hc1 Hto).
   apply Nat.neq_0_lt_0.
   now intros H; subst b.
 }
@@ -1183,7 +1184,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
     rewrite (rngl_mul_inv_r Hiv).
     apply (rngl_le_div_l Hop Hiv Hto). {
       rewrite <- rngl_of_nat_0.
-      apply (rngl_of_nat_inj_lt Hos Hc1 Hor).
+      apply (rngl_of_nat_inj_lt Hos Hc1 Hto).
       apply Nat.neq_0_lt_0.
       now apply Nat.pow_nonzero.
     }
@@ -1198,7 +1199,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
   apply (rngl_mul_le_mono_pos_r Hop Hiq Hto) with
     (c := rngl_of_nat (rad ^ m)). {
     rewrite <- rngl_of_nat_0.
-    apply (rngl_of_nat_inj_lt Hos Hc1 Hor).
+    apply (rngl_of_nat_inj_lt Hos Hc1 Hto).
     apply Nat.neq_0_lt_0.
     now apply Nat.pow_nonzero.
   }
@@ -1221,7 +1222,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
   apply (rngl_le_trans Hor _ 1%L). 2: {
     apply (rngl_le_div_r Hop Hiv Hto). {
       rewrite <- rngl_of_nat_0.
-      apply (rngl_of_nat_inj_lt Hos Hc1 Hor).
+      apply (rngl_of_nat_inj_lt Hos Hc1 Hto).
       now rewrite Nat.add_comm.
     }
     rewrite rngl_mul_1_l.
@@ -1257,7 +1258,7 @@ Theorem rat_is_inf_sum_of_inv_rad_pow' :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ rad a i c,
   2 ≤ rad
@@ -1266,11 +1267,11 @@ Theorem rat_is_inf_sum_of_inv_rad_pow' :
       (seq_converging_to_rat rad a i) c
   → rngl_of_nat a = (rngl_of_nat i * c)%L.
 Proof.
-intros Hic Hop Hiv Hor Har.
+intros Hic Hop Hiv Hto Har.
 intros * H2r Hbz Hlim.
-specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hop Hiv Hor Har) as H1.
+specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hop Hiv Hto Har) as H1.
 specialize (H1 _ a i H2r Hbz).
-specialize (limit_unique Hop Hiv Hto (rngl_dist_is_dist Hop Hor)) as H2.
+specialize (limit_unique Hop Hiv Hto (rngl_dist_is_dist Hop Hto)) as H2.
 specialize (H2 _ _ _ Hlim H1).
 subst c.
 rewrite (rngl_mul_comm Hic).
@@ -1563,12 +1564,12 @@ Qed.
 Theorem angle_eucl_dist_sin_cos :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ θ,
   ((angle_eucl_dist θ angle_right)² =
      (1 - rngl_sin θ)² + (rngl_cos θ)²)%L.
 Proof.
-intros Hop Hiq Hor.
+intros Hop Hiq Hto.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros.
 progress unfold angle_eucl_dist.
@@ -1592,7 +1593,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite H1; apply H1.
 }
 intros.
-specialize (angle_eucl_dist_sin_cos Hop Hiq Hor θ) as H1.
+specialize (angle_eucl_dist_sin_cos Hop Hiq Hto θ) as H1.
 rewrite (rngl_squ_sub Hop Hic) in H1.
 rewrite rngl_squ_1 in H1.
 rewrite rngl_mul_1_r in H1.
@@ -1666,7 +1667,7 @@ split; intros Hθθ. {
   apply (rngl_squ_le_abs_le Hop Hiq Hto).
   rewrite rngl_squ_sqrt; [ | easy ].
   rewrite rngl_squ_sqrt; [ | easy ].
-  now apply (rngl_sub_le_mono_l Hop Hor).
+  now apply (rngl_sub_le_mono_l Hop Hto).
 } {
   apply (rngl_mul_le_mono_pos_l Hop Hiq Hto) in Hθθ. 2: {
     rewrite <- (rngl_abs_0 Hop).
@@ -1688,7 +1689,7 @@ split; intros Hθθ. {
   apply (rngl_abs_le_squ_le Hop Hto) in Hθθ.
   rewrite rngl_squ_sqrt in Hθθ; [ | easy ].
   rewrite rngl_squ_sqrt in Hθθ; [ | easy ].
-  now apply (rngl_sub_le_mono_l Hop Hor) in Hθθ.
+  now apply (rngl_sub_le_mono_l Hop Hto) in Hθθ.
 }
 Qed.
 
@@ -1711,10 +1712,11 @@ Theorem rl_sqrt_div_2 :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a, (0 ≤ a → √(a / 2) = √(2 * a) / 2)%L.
 Proof.
-intros Hic Hop Hiv Hor.
+intros Hic Hop Hiv Hto.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hi1.
@@ -1897,7 +1899,7 @@ induction n; intros. {
     apply (rl_sqrt_lt_rl_sqrt Hto). {
       apply rngl_1_add_cos_div_2_nonneg.
     }
-    apply (rngl_div_lt_mono_pos_r Hop Hiv Hor). {
+    apply (rngl_div_lt_mono_pos_r Hop Hiv Hto). {
       apply (rngl_0_lt_2 Hos Hc1 Hto).
     }
     apply (rngl_add_lt_mono_l Hos Hto).
@@ -1959,7 +1961,7 @@ induction n; intros. {
     apply rngl_1_add_cos_div_2_nonneg.
   }
   rewrite rngl_squ_1.
-  apply (rngl_div_le_1 Hop Hiv Hor). {
+  apply (rngl_div_le_1 Hop Hiv Hto). {
     apply (rngl_2_neq_0 Hos Hc1 Hto).
   }
   split. {
@@ -2208,13 +2210,14 @@ Qed.
 Theorem rngl_2_x2_sub_1_le_x :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ x, (0 ≤ x ≤ 1)%L → (2 * x² - 1 ≤ x)%L.
 Proof.
-intros Hop Hiq Hor.
+intros Hop Hiq Hto.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hx.
-apply (rngl_le_sub_le_add_l Hop Hor).
+apply (rngl_le_sub_le_add_l Hop Hto).
 apply (rngl_le_sub_le_add_r Hop Hto).
 progress unfold rngl_squ.
 rewrite rngl_mul_assoc.
@@ -2235,7 +2238,7 @@ apply (rngl_le_trans Hor _ 0)%L. 2: {
   apply (rngl_0_le_1 Hos Hto).
 }
 apply (rngl_lt_le_incl Hto) in H2cz.
-now apply (rngl_mul_nonpos_nonneg Hop Hor).
+now apply (rngl_mul_nonpos_nonneg Hop Hto).
 Qed.
 
 End a.

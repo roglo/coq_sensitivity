@@ -76,11 +76,11 @@ apply (rngl_mul_nonneg_nonneg Hos Hor).
 apply rngl_1_add_cos_div_2_nonneg.
 apply rngl_1_sub_cos_div_2_nonneg.
 do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
-apply (rngl_div_lt_mono_pos_r Hop Hiv Hor). {
+apply (rngl_div_lt_mono_pos_r Hop Hiv Hto). {
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 do 2 rewrite (rngl_mul_div_assoc Hiv).
-apply (rngl_div_lt_mono_pos_r Hop Hiv Hor). {
+apply (rngl_div_lt_mono_pos_r Hop Hiv Hto). {
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 rewrite (rngl_mul_sub_distr_l Hop).
@@ -93,7 +93,7 @@ rewrite (rngl_mul_sub_distr_r Hop).
 rewrite rngl_mul_1_l.
 rewrite (rngl_sub_add_distr Hos).
 rewrite (rngl_add_sub_assoc Hop).
-apply (rngl_sub_lt_mono_r Hop Hor).
+apply (rngl_sub_lt_mono_r Hop Hto).
 rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_sub_sub_distr Hop).
 progress unfold rngl_sub at 2.
@@ -304,11 +304,11 @@ symmetry in Hzc1.
 destruct zc1. {
   apply rngl_ltb_lt in Hzc1.
   apply (rngl_lt_le_incl Hto) in Hzc1.
-  apply (rngl_lt_lt_squ Hop Hiq Hor) in Hc12; [ | | easy ]. 2: {
+  apply (rngl_lt_lt_squ Hop Hiq Hto) in Hc12; [ | | easy ]. 2: {
     apply (rngl_mul_comm Hic).
   }
   apply (rngl_lt_le_incl Hto) in Hzs1, Hzs2.
-  apply (rngl_lt_squ_lt Hop Hiq Hor); [ easy | easy | ].
+  apply (rngl_lt_squ_lt Hop Hiq Hto); [ easy | easy | ].
   specialize (cos2_sin2_1 θ1) as Hcs1.
   specialize (cos2_sin2_1 θ2) as Hcs2.
   apply (rngl_add_sub_eq_r Hos) in Hcs1, Hcs2.
@@ -325,7 +325,7 @@ destruct zc2. {
   rewrite (rngl_add_opp_l Hop).
   apply (rngl_lt_0_sub Hop Hto).
   apply (rngl_le_lt_trans Hto _ 0)%L. {
-    apply (rngl_mul_nonpos_nonneg Hop Hor); [ easy | ].
+    apply (rngl_mul_nonpos_nonneg Hop Hto); [ easy | ].
     now apply (rngl_lt_le_incl Hto).
   } {
     now apply (rngl_mul_pos_pos Hop Hiq Hto).

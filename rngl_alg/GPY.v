@@ -64,7 +64,7 @@ rewrite (rngl_summation_const Hos).
 rewrite Nat_sub_succ_1.
 rewrite (rngl_mul_div_assoc Hiv).
 rewrite rngl_mul_1_r.
-apply (rngl_div_le_1 Hop Hiv Hor). {
+apply (rngl_div_le_1 Hop Hiv Hto). {
   intros H.
   apply eq_rngl_of_nat_0 in H; [ | easy ].
   subst k.
@@ -178,7 +178,7 @@ eapply (rngl_le_trans Hor). {
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   rewrite Nat.add_sub.
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_div_nonneg Hop Hiv Hto). {
     apply (rngl_0_le_1 Hos Hto).
   }

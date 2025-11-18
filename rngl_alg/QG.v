@@ -1404,6 +1404,17 @@ apply QG_le_trans with (y := (c * b)%QG). {
 }
 Qed.
 
+Theorem QG_ord_total_prop :
+  ∀ a b : QG, (a ≤? b)%QG = true ∨ (b ≤? a)%QG = true.
+Proof.
+intros.
+progress unfold QG_leb.
+progress unfold Qle_bool.
+progress unfold Z.leb.
+rewrite Z.compare_antisym.
+now destruct (_ ?= _)%Z; [ left | right | left ].
+Qed.
+
 Theorem QG_not_le : ∀ a b : QG, (¬ (a ≤ b) → a ≠ b ∧ b ≤ a)%QG.
 Proof.
 intros * Hab.
@@ -1848,20 +1859,18 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_inv_or_pdiv := Some (inl QG_inv);
      rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := Some QG_eq_dec;
-     rngl_opt_leb := Some QG_leb |}.
+     rngl_opt_leb := Some (QG_leb, true) |}.
 
 Definition QG_ring_like_ord :=
   let _ := QG_ring_like_op in
-  {| rngl_ord_le_dec := QG_le_dec;
-     rngl_ord_le_refl := QG_le_refl;
+  {| rngl_ord_le_refl := QG_le_refl;
      rngl_ord_le_antisymm := QG_le_antisymm;
      rngl_ord_le_trans := QG_le_trans;
      rngl_ord_add_le_mono_l := QG_add_le_mono_l;
      rngl_ord_mul_le_compat_nonneg := QG_mul_le_compat_nonneg;
      rngl_ord_mul_le_compat_nonpos := QG_mul_le_compat_nonpos;
-     rngl_ord_not_le := QG_not_le |}.
-
-
+     rngl_ord_le_dec := QG_le_dec;
+     rngl_ord_total_prop := QG_ord_total_prop |}.
 
 Theorem QG_integral :
   let roq := QG_ring_like_op in
