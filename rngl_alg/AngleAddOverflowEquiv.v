@@ -71,17 +71,17 @@ apply rngl_1_sub_cos_div_2_nonneg.
 rewrite <- rl_sqrt_mul; cycle 1.
 apply rngl_1_sub_cos_div_2_nonneg.
 apply rngl_1_add_cos_div_2_nonneg.
-apply (rl_sqrt_lt_rl_sqrt Hor).
+apply (rl_sqrt_lt_rl_sqrt Hto).
 apply (rngl_mul_nonneg_nonneg Hos Hor).
 apply rngl_1_add_cos_div_2_nonneg.
 apply rngl_1_sub_cos_div_2_nonneg.
 do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
 apply (rngl_div_lt_mono_pos_r Hop Hiv Hor). {
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 do 2 rewrite (rngl_mul_div_assoc Hiv).
 apply (rngl_div_lt_mono_pos_r Hop Hiv Hor). {
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 rewrite (rngl_mul_sub_distr_l Hop).
 rewrite rngl_mul_1_r.
@@ -98,14 +98,14 @@ rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_sub_sub_distr Hop).
 progress unfold rngl_sub at 2.
 rewrite Hop.
-apply (rngl_add_lt_mono_l Hos Hor).
+apply (rngl_add_lt_mono_l Hos Hto).
 rewrite (rngl_opp_sub_distr Hop).
 apply (rngl_lt_add_lt_sub_r Hop Hor).
 rewrite <- (rngl_add_sub_swap Hop).
 apply (rngl_lt_sub_lt_add_l Hop Hto).
 do 2 rewrite <- (rngl_mul_2_l (rngl_cos _)).
-apply (rngl_mul_lt_mono_pos_l Hop Hiq Hor). {
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+apply (rngl_mul_lt_mono_pos_l Hop Hiq Hto). {
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 easy.
 Qed.
@@ -148,7 +148,7 @@ rewrite Hiv.
 rewrite rngl_mul_1_l.
 f_equal.
 apply rl_nth_root_inv.
-apply (rngl_0_lt_2 Hos Hc1 Hor).
+apply (rngl_0_lt_2 Hos Hc1 Hto).
 Qed.
 
 Theorem rngl_sin_right_div_2 : rngl_sin (angle_right /₂) = √(1 / 2)%L.
@@ -196,7 +196,7 @@ rewrite rngl_squ_sqrt. 2: {
   apply (rngl_div_nonneg Hop Hiv Hto). {
     apply (rngl_0_le_1 Hos Hor).
   }
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 rewrite <- (rngl_div_add_distr_r Hiv).
 rewrite (rngl_div_diag Hiq). 2: {
@@ -231,7 +231,7 @@ rewrite rngl_squ_sqrt. 2: {
   apply (rngl_div_nonneg Hop Hiv Hto). {
     apply (rngl_0_le_1 Hos Hor).
   }
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 rewrite <- (rngl_div_add_distr_r Hiv).
 rewrite (rngl_div_diag Hiq). 2: {
@@ -272,7 +272,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 apply rl_sqrt_nonneg.
 apply (rngl_div_nonneg Hop Hiv Hto).
 apply (rngl_0_le_1 Hos Hor).
-apply (rngl_0_lt_2 Hos Hc1 Hor).
+apply (rngl_0_lt_2 Hos Hc1 Hto).
 Qed.
 
 Theorem rl_sqrt_half_pos :
@@ -281,11 +281,11 @@ Theorem rl_sqrt_half_pos :
 Proof.
 destruct_ac.
 intros Hc1.
-apply (rl_sqrt_pos Hos Hor).
+apply (rl_sqrt_pos Hos Hto).
 apply (rngl_div_pos Hop Hiv Hto). {
   apply (rngl_0_lt_1 Hos Hc1 Hto).
 }
-apply (rngl_0_lt_2 Hos Hc1 Hor).
+apply (rngl_0_lt_2 Hos Hc1 Hto).
 Qed.
 
 Theorem rngl_sin_nonneg_cos_lt_sin_lt :
@@ -332,7 +332,7 @@ destruct zc2. {
   }
 } {
   apply (rngl_ltb_ge_iff Hto) in Hzc2.
-  apply (rngl_opp_lt_compat Hop Hor) in Hc12.
+  apply (rngl_opp_lt_compat Hop Hto) in Hc12.
   rewrite <- (rngl_abs_nonpos_eq Hop Hto) in Hc12; [ | easy ].
   rewrite <- (rngl_abs_nonpos_eq Hop Hto) in Hc12; [ | easy ].
   rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
@@ -340,7 +340,7 @@ destruct zc2. {
   }
   specialize (rngl_lt_le_incl Hor _ _ Hzs1) as H.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
-  apply (rngl_abs_lt_squ_lt Hop Hiq Hor) in Hc12. 2: {
+  apply (rngl_abs_lt_squ_lt Hop Hiq Hto) in Hc12. 2: {
     apply (rngl_mul_comm Hic).
   }
   apply (rngl_squ_lt_abs_lt Hop Hiq Hto).
@@ -923,8 +923,8 @@ split; intros H12. {
       rewrite (rngl_mul_comm Hic).
       apply (rngl_mul_pos_neg Hop Hiq Hto). {
         apply (rngl_inv_pos Hop Hiv Hor).
-        apply (rl_sqrt_pos Hos Hor).
-        apply (rngl_0_lt_2 Hos Hc1 Hor).
+        apply (rl_sqrt_pos Hos Hto).
+        apply (rngl_0_lt_2 Hos Hc1 Hto).
       }
       apply (rngl_lt_sub_0 Hop Hto).
       apply rngl_cos_lt_sin_diag.
@@ -1184,7 +1184,7 @@ split; intros H12. {
     apply rngl_nlt_ge in Hzs12d.
     apply Hzs12d; clear Hzs12d.
     do 2 rewrite angle_sub_straight_eq_add_straight.
-    apply (rngl_opp_lt_compat Hop Hor).
+    apply (rngl_opp_lt_compat Hop Hto).
     rewrite (rngl_opp_0 Hop).
     rewrite <- rngl_sin_add_straight_r.
     rewrite <- angle_div_2_add_overflow. 2: {

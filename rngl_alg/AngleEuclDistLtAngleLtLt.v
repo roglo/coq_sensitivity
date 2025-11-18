@@ -40,14 +40,14 @@ destruct sab. {
   apply rngl_leb_le in Hsab.
   apply (rngl_leb_gt_iff Hor) in Hab.
   apply (rngl_le_antisymm Hor); [ easy | ].
-  apply (rl_sqrt_le_rl_sqrt Hop Hiq Hor); [ easy | ].
+  apply (rl_sqrt_le_rl_sqrt Hop Hiq Hto); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
 }
 destruct ab; [ | easy ].
 apply (rngl_leb_gt_iff Hor) in Hsab.
 apply rngl_leb_le in Hab.
 apply (rngl_le_antisymm Hor); [ now apply (rngl_lt_le_incl Hor) | ].
-now apply (rl_sqrt_le_rl_sqrt Hop Hiq Hor).
+now apply (rl_sqrt_le_rl_sqrt Hop Hiq Hto).
 Qed.
 
 Theorem quadrant_1_rngl_cos_sub_lt :
@@ -95,7 +95,7 @@ rewrite (rngl_add_sub_swap Hop) in Hc1312.
 rewrite <- (rngl_mul_sub_distr_l Hop) in Hc1312.
 apply (rngl_lt_add_lt_sub_r Hop Hor) in Hc1312.
 rewrite <- (rngl_mul_sub_distr_l Hop) in Hc1312.
-apply (rngl_mul_lt_mono_pos_l Hop Hiq Hor (rngl_sin θ1) _ _ Hzs1) in
+apply (rngl_mul_lt_mono_pos_l Hop Hiq Hto (rngl_sin θ1) _ _ Hzs1) in
   Hc1312.
 do 2 rewrite rngl_mul_assoc in Hc1312.
 rewrite fold_rngl_squ in Hc1312.
@@ -202,7 +202,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_le_refl Hor).
 }
 intros * Hzs1 Hzs2 Hzs3 Hzc1 Hzc2 Hzc3 H31.
-assert (Hz2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hos Hor).
+assert (Hz2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hos Hto).
 destruct (rngl_leb_dec (rngl_sin θ2) (rngl_sin θ3)) as [Hs23| Hs23]. {
   rewrite rngl_cos_add.
   rewrite rngl_cos_sub.

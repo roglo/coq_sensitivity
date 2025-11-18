@@ -137,7 +137,7 @@ apply (rngl_div_nonneg Hop Hiv Hto). {
   apply rl_sqrt_nonneg.
   apply (rngl_add_squ_nonneg Hos Hto).
 } {
-  apply (rl_sqrt_pos Hos Hor).
+  apply (rl_sqrt_pos Hos Hto).
   apply (rngl_le_neq Hto).
   split; [ apply (rngl_add_squ_nonneg Hos Hto) | ].
   intros H1; symmetry in H1.
@@ -1051,7 +1051,7 @@ enough (H :
   intros z Hrz.
   destruct H as (Hzr, H).
   specialize (H z Hrz).
-  apply (rngl_lt_div_l Hop Hiv Hor); [ | easy ].
+  apply (rngl_lt_div_l Hop Hiv Hto); [ | easy ].
   apply (rngl_le_neq Hto).
   split; [ apply (gc_modl_nonneg Hos Hor) | ].
   intros H'; symmetry in H'.
@@ -1201,10 +1201,10 @@ rewrite (rngl_summation_const Hos).
 rewrite Nat_sub_succ_1.
 rewrite (rngl_mul_div_assoc Hiv).
 rewrite rngl_mul_1_r.
-apply (rngl_lt_div_l Hop Hiv Hor _ _ _ Hzx).
+apply (rngl_lt_div_l Hop Hiv Hto _ _ _ Hzx).
 rewrite <- (rngl_mul_div_assoc Hiv).
 rewrite (rngl_mul_comm Hic).
-apply (rngl_lt_div_l Hop Hiv Hor). {
+apply (rngl_lt_div_l Hop Hiv Hto). {
   apply (rngl_mul_pos_pos Hop Hiq Hto); [ easy | ].
   apply (rngl_div_pos Hop Hiv Hto); [ | easy ].
   apply (rngl_le_neq Hto).

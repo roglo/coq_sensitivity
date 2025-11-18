@@ -214,7 +214,7 @@ destruct zs. {
     progress unfold seq_angle_to_div_nat in Hxz.
     apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
     apply (rngl_mul_le_mono_pos_l Hop Hiq Hto 2). {
-      apply (rngl_0_lt_2 Hos Hc1 Hor).
+      apply (rngl_0_lt_2 Hos Hc1 Hto).
     }
     now rewrite rngl_mul_0_r.
   }
@@ -1021,7 +1021,7 @@ destruct (rngl_leb_dec 0 (rngl_sin θ)) as [Hs| Hs]. {
   rewrite (rngl_abs_nonpos_eq Hop Hto) in Hcz. 2: {
     now apply (rngl_lt_le_incl Hor) in Hc.
   }
-  apply (rngl_opp_lt_compat Hop Hor) in Hcz.
+  apply (rngl_opp_lt_compat Hop Hto) in Hcz.
   split. {
     now apply quadrant_3_angle_lt_5_angle_right_div_2.
   } {
@@ -1053,7 +1053,7 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
     exfalso.
     apply rngl_nle_gt in H.
     apply H; clear H.
-    apply (rngl_0_le_2 Hos Hor).
+    apply (rngl_0_le_2 Hos Hto).
   }
   right.
   change_angle_opp θ.
@@ -1087,7 +1087,7 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   apply (rngl_le_refl Hor).
 }
 apply (rngl_mul_pos_cancel_l Hop Hiq Hor) in Hz2s. 2: {
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 left.
 change_angle_sub_r θ angle_right.
@@ -1118,7 +1118,7 @@ split. {
   apply rngl_leb_le in H.
   rewrite H; clear H; cbn.
   rewrite (rngl_leb_refl Hor).
-  rewrite (rngl_leb_opp_r Hop Hor).
+  rewrite (rngl_leb_opp_r Hop Hto).
   rewrite (rngl_opp_involutive Hop).
   apply rngl_leb_le.
   apply rngl_sin_bound.
@@ -1158,7 +1158,7 @@ split. {
 intros H; symmetry in H.
 apply (eq_rl_sqrt_0 Hos) in H. 2: {
   apply (rngl_div_nonneg Hop Hiv Hto). 2: {
-    apply (rngl_0_lt_2 Hos Hc1 Hor).
+    apply (rngl_0_lt_2 Hos Hc1 Hto).
   }
   apply (rngl_le_opp_l Hop Hor).
   apply rngl_cos_bound.

@@ -781,7 +781,7 @@ Theorem rngl_squ_lt_squ_nonneg :
 Proof.
 intros Hop Hiq Hor.
 intros * Habc Hza Hab.
-apply (rngl_abs_lt_squ_lt Hop Hiq Hor _ _ Habc).
+apply (rngl_abs_lt_squ_lt Hop Hiq Hto _ _ Habc).
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
 apply (rngl_le_trans Hor _ a); [ easy | ].
@@ -825,8 +825,8 @@ apply (rngl_squ_lt_abs_lt Hop Hiq Hto).
 rewrite rngl_squ_sqrt. 2: {
   apply rngl_1_add_cos_div_2_nonneg.
 }
-apply -> (rngl_lt_div_r Hop Hiv Hor). 2: {
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+apply -> (rngl_lt_div_r Hop Hiv Hto). 2: {
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 rewrite (rngl_mul_comm Hic).
 apply (rngl_lt_sub_lt_add_l Hop Hto).
@@ -873,11 +873,11 @@ rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_lt_mul_0_if Hos Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
-  apply (rngl_0_le_2 Hos Hor).
+  apply (rngl_0_le_2 Hos Hto).
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
-  apply (rngl_0_le_2 Hos Hor).
+  apply (rngl_0_le_2 Hos Hto).
 }
 apply (rngl_lt_mul_0_if Hos Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
@@ -887,9 +887,9 @@ destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   now apply rngl_nle_gt in H.
 }
 do 2 rewrite rngl_cos_mul_2_l' in H12.
-apply (rngl_sub_le_mono_r Hop Hor) in H12.
+apply (rngl_sub_le_mono_r Hop Hto) in H12.
 apply (rngl_mul_le_mono_pos_l Hop Hiq Hto) in H12. 2: {
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 apply (rngl_squ_le_abs_le Hop Hiq Hor) in H12.
 apply (rngl_lt_le_incl Hor) in Hzs21, Hzs22.
@@ -920,11 +920,11 @@ rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_le_0_mul Hop Hiq Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 destruct Hzs22 as [(_, Hzs22)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 apply (rngl_le_0_mul Hop Hiq Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
@@ -941,9 +941,9 @@ destruct Hzs22 as [(_, Hzs22)| (H1, H2)]. 2: {
   apply rngl_cos_bound.
 }
 do 2 rewrite rngl_cos_mul_2_l' in H12.
-apply (rngl_sub_le_mono_r Hop Hor) in H12.
+apply (rngl_sub_le_mono_r Hop Hto) in H12.
 apply (rngl_mul_le_mono_pos_l Hop Hiq Hto) in H12. 2: {
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 apply (rngl_squ_le_abs_le Hop Hiq Hor) in H12.
 rewrite (rngl_abs_nonneg_eq Hop Hor) in H12; [ | easy ].
@@ -974,11 +974,11 @@ apply (rngl_le_0_mul Hop Hiq Hor) in Hzs21.
 apply (rngl_lt_mul_0_if Hos Hor) in Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
   exfalso; apply rngl_nlt_ge in H; apply H.
-  apply (rngl_0_lt_2 Hos Hc1 Hor).
+  apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   exfalso; apply rngl_nle_gt in H; apply H.
-  apply (rngl_0_le_2 Hos Hor).
+  apply (rngl_0_le_2 Hos Hto).
 }
 apply (rngl_le_0_mul Hop Hiq Hor) in Hzs21.
 apply (rngl_lt_mul_0_if Hos Hor) in Hzs22.
