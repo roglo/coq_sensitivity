@@ -318,7 +318,7 @@ intros Hop Hiq Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Haz.
 apply (eq_rl_sqrt_0 Hos) in Haz. {
-  apply (rl_integral_modulus_prop Hop Hiq Hor) in Haz.
+  apply (rl_integral_modulus_prop Hop Hiq Hto) in Haz.
   now apply eq_gc_eq.
 }
 apply (rngl_add_squ_nonneg Hos Hto).
@@ -412,7 +412,7 @@ remember ((gre a)² + (gim a)²)%L as ρ eqn:Hρ.
 assert (Hrz : ρ ≠ 0%L). {
   intros H; apply Haz.
   subst ρ.
-  apply (rl_integral_modulus_prop Hop Hiq Hor) in H.
+  apply (rl_integral_modulus_prop Hop Hiq Hto) in H.
   now apply eq_gc_eq.
 }
 rewrite (rngl_squ_div Hic Hos Hiv); [ | easy ].
@@ -496,7 +496,7 @@ do 2 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_r Hiv).
 rewrite (rngl_div_diag Hiq). 2: {
   intros H; subst ρ.
-  apply (rl_integral_modulus_prop Hop Hiq Hor) in H.
+  apply (rl_integral_modulus_prop Hop Hiq Hto) in H.
   now apply Hbz, eq_gc_eq.
 }
 now do 2 rewrite rngl_mul_1_r.
@@ -630,7 +630,7 @@ do 2 rewrite fold_rngl_squ in Habz.
 injection Habz; clear Habz; intros Habi Habr.
 assert (Hrz : ((gre b)² + (gim b)² ≠ 0)%L). {
   intros H.
-  apply (rl_integral_modulus_prop Hop Hor Hii) in H.
+  apply (rl_integral_modulus_prop Hop Hto Hii) in H.
   now apply Hbz, eq_gc_eq.
 }
 apply (rngl_eq_mul_0_l Hos Hiq) in Habr. 2: {
@@ -723,7 +723,7 @@ assert (Hra : gre a = 0%L). {
   do 2 rewrite fold_rngl_squ in Habr.
   apply (rngl_eq_mul_0_l Hos Hiq) in Habr; [ easy | ].
   intros H; apply Hbz.
-  apply (rl_integral_modulus_prop Hop Hiq Hor) in H.
+  apply (rl_integral_modulus_prop Hop Hiq Hto) in H.
   now apply eq_gc_eq.
 }
 rewrite Hra in Habr, Habi.
@@ -887,12 +887,12 @@ do 2 rewrite <- rngl_mul_add_distr_l.
 rewrite <- Hρ.
 rewrite (rngl_mul_div Hi1). 2: {
   intros H; subst ρ.
-  apply (rl_integral_modulus_prop Hop Hor Hii) in H.
+  apply (rl_integral_modulus_prop Hop Hto Hii) in H.
   now apply Hbz, eq_gc_eq.
 }
 rewrite (rngl_mul_div Hi1). 2: {
   intros H; subst ρ.
-  apply (rl_integral_modulus_prop Hop Hor Hii) in H.
+  apply (rl_integral_modulus_prop Hop Hto Hii) in H.
   now apply Hbz, eq_gc_eq.
 }
 easy.

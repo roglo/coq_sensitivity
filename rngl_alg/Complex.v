@@ -762,10 +762,11 @@ Definition gc_modl (z : GComplex T) := rl_modl (gre z) (gim z).
 Theorem le_rl_sqrt_add :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a b, (0 ≤ b → a ≤ rl_sqrt (rngl_squ a + b))%L.
 Proof.
-intros Hop Hiv Hor.
+intros Hop Hiv Hto.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Hzb.
@@ -784,17 +785,18 @@ rewrite rngl_squ_sqrt. 2: {
   apply (rngl_squ_nonneg Hos Hto).
 }
 rewrite (rngl_squ_abs Hop).
-now apply (rngl_le_add_r Hos Hto).
+now apply (rngl_le_add_r Hos Hor).
 Qed.
 
 Theorem rl_sqrt_div_squ_squ :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ x y, (x ≠ 0 ∨ y ≠ 0)%L →
   (-1 ≤ x / rl_sqrt (rngl_squ x + rngl_squ y) ≤ 1)%L.
 Proof.
-intros Hop Hiv Hor.
+intros Hop Hiv Hto.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_pdiv Hiv) as Hii.
@@ -817,19 +819,19 @@ split. {
       rewrite (rngl_mul_0_l Hos) in H3.
       rewrite rngl_squ_sqrt in H3; [ | easy ].
       move H3 at top; subst a.
-      apply (rl_integral_modulus_prop Hop Hiq Hor) in Ha.
+      apply (rl_integral_modulus_prop Hop Hiq Hto) in Ha.
       now destruct Hxyz.
     }
   }
   rewrite (rngl_mul_opp_l Hop).
   rewrite rngl_mul_1_l.
-  apply (rngl_opp_le_compat Hop Hor).
+  apply (rngl_opp_le_compat Hop Hto).
   rewrite (rngl_opp_involutive Hop).
   destruct (rngl_leb_dec 0 x) as [Hzx| Hzx]. {
     apply rngl_leb_le in Hzx.
     apply (rngl_le_trans Hor _ 0). {
       rewrite <- (rngl_opp_0 Hop).
-      now apply -> (rngl_opp_le_compat Hop Hor).
+      now apply -> (rngl_opp_le_compat Hop Hto).
     }
     now apply rl_sqrt_nonneg.
   } {
@@ -838,7 +840,7 @@ split. {
     apply (rngl_opp_lt_compat Hop Hto) in Hzx.
     rewrite (rngl_opp_0 Hop) in Hzx.
     rewrite <- (rngl_squ_opp Hop).
-    apply (le_rl_sqrt_add Hop Hiv Hor).
+    apply (le_rl_sqrt_add Hop Hiv Hto).
     apply (rngl_squ_nonneg Hos Hto).
   }
 } {
@@ -855,13 +857,13 @@ split. {
       rewrite (rngl_mul_0_l Hos) in H3.
       rewrite rngl_squ_sqrt in H3; [ | easy ].
       move H3 at top; subst a.
-      apply (rl_integral_modulus_prop Hop Hiq Hor) in Ha.
+      apply (rl_integral_modulus_prop Hop Hiq Hto) in Ha.
       now destruct Hxyz.
     }
   }
   rewrite rngl_mul_1_l.
   destruct (rngl_leb_dec 0 x) as [Hzx| Hzx]. {
-    apply (le_rl_sqrt_add Hop Hiv Hor).
+    apply (le_rl_sqrt_add Hop Hiv Hto).
     apply (rngl_squ_nonneg Hos Hto).
   } {
     apply rngl_leb_nle in Hzx.
@@ -914,7 +916,7 @@ assert (Hρz : ρ ≠ 0%L). {
     apply (rngl_le_0_add Hos Hto);
     apply (rngl_squ_nonneg Hos Hto).
   }
-  apply (rl_integral_modulus_prop Hop Hiq Hor) in H.
+  apply (rl_integral_modulus_prop Hop Hiq Hto) in H.
   now destruct H; subst zr zi.
 }
 assert (Hzρ : (0 < ρ)%L). {
@@ -932,9 +934,9 @@ assert (Hzr : zr = (ρ * (zr / ρ))%L). {
 }
 assert (Hr : zr = (ρ * rngl_cos (rngl_acos (zr / ρ)))%L). {
   rewrite rngl_cos_acos; [ easy | ].
-  apply (rngl_between_opp_1_and_1 Hop Hiq Hor).
+  apply (rngl_between_opp_1_and_1 Hop Hiq Hto).
   rewrite <- rngl_squ_1.
-  apply (rngl_abs_le_squ_le Hop Hor).
+  apply (rngl_abs_le_squ_le Hop Hto).
   rewrite (rngl_abs_1 Hos Hto).
   rewrite (rngl_abs_div Hop Hiv Hor); [ | easy ].
   rewrite (rngl_abs_nonneg_eq Hop Hor ρ). 2: {
@@ -972,7 +974,7 @@ assert (Hri : ((zr / ρ)² + (zi / ρ)² = 1)%L). {
   }
   apply (rngl_div_diag Hiq).
   intros H.
-  apply (rl_integral_modulus_prop Hop Hiq Hor) in H.
+  apply (rl_integral_modulus_prop Hop Hiq Hto) in H.
   now move H at top; destruct H; subst zr zi.
 }
 assert (Hzρ21 : ((zr / ρ)² ≤ 1)%L). {
@@ -1683,7 +1685,7 @@ split; intros Hθθ. {
   rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L in Hθθ. 2: {
     now apply rl_sqrt_nonneg.
   }
-  apply (rngl_abs_le_squ_le Hop Hor) in Hθθ.
+  apply (rngl_abs_le_squ_le Hop Hto) in Hθθ.
   rewrite rngl_squ_sqrt in Hθθ; [ | easy ].
   rewrite rngl_squ_sqrt in Hθθ; [ | easy ].
   now apply (rngl_sub_le_mono_l Hop Hor) in Hθθ.

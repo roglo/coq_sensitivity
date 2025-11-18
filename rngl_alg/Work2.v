@@ -895,7 +895,7 @@ apply (rngl_squ_le_abs_le Hop Hiq Hto) in H12.
 apply (rngl_lt_le_incl Hto) in Hzs21, Hzs22.
 rewrite (rngl_abs_nonpos_eq Hop Hto) in H12; [ | easy ].
 rewrite (rngl_abs_nonpos_eq Hop Hto) in H12; [ | easy ].
-now apply (rngl_opp_le_compat Hop Hor) in H12.
+now apply (rngl_opp_le_compat Hop Hto) in H12.
 Qed.
 
 Theorem rngl_cos_sin_twice_lemma_2 :
@@ -1141,10 +1141,10 @@ destruct (rngl_leb_dec a² 1) as [Ha1| H1a]. {
   rewrite rngl_leb_0_sqrt; [ | now apply (rngl_le_0_sub Hop Hor) ].
   split. {
     apply rngl_leb_le.
-    now apply (rngl_between_opp_1_and_1 Hop Hiq Hor) in Ha1.
+    now apply (rngl_between_opp_1_and_1 Hop Hiq Hto) in Ha1.
   } {
     apply rngl_leb_le.
-    now apply (rngl_between_opp_1_and_1 Hop Hiq Hor) in Ha1.
+    now apply (rngl_between_opp_1_and_1 Hop Hiq Hto) in Ha1.
   }
 } {
   split; [ apply angle_le_refl | ].

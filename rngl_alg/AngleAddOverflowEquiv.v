@@ -1126,7 +1126,7 @@ split; intros H12. {
       }
       specialize (angle_div_2_add_not_overflow θ1 θ2 Haov) as H1.
       rewrite angle_sub_straight_eq_add_straight in Hzs12d.
-      apply (rngl_opp_le_compat Hop Hor) in Hzs12d.
+      apply (rngl_opp_le_compat Hop Hto) in Hzs12d.
       rewrite (rngl_opp_0 Hop) in Hzs12d.
       rewrite <- rngl_sin_add_straight_r in Hzs12d.
       rewrite <- rngl_sin_angle_div_2_add_overflow in Hzs12d. 2: {
