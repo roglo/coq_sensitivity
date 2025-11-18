@@ -120,7 +120,7 @@ rewrite <- rngl_sin_sub in Hc1312.
 apply (rngl_lt_add_lt_sub_l Hop Hto) in Hc1312.
 assert (H2 : (rngl_sin θ3 < rngl_sin θ2)%L). {
   eapply (rngl_le_lt_trans Hto); [ | apply Hc1312 ].
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hto).
   apply (rngl_mul_nonneg_nonneg Hos Hor).
   now apply (rngl_lt_le_incl Hor).
   apply (rngl_le_0_sub Hop Hor).

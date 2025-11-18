@@ -178,7 +178,7 @@ eapply (rngl_le_trans Hor). {
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   rewrite Nat.add_sub.
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hto).
   apply (rngl_div_nonneg Hop Hiv Hto). {
     apply (rngl_0_le_1 Hos Hor).
   }

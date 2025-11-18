@@ -23,7 +23,7 @@ Instance Q_ring_like_op : ring_like_op Q :=
      rngl_opt_inv_or_pdiv := Some (inl Q.inv);
      rngl_opt_is_zero_divisor := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := Some Q.eq_dec;
-     rngl_opt_leb := Some Q_leb |}.
+     rngl_opt_leb := Some (Q_leb, true) |}.
 
 (*
 Global Existing Instance Q_ring_like_op.
@@ -105,6 +105,7 @@ exfalso; apply H3.
 now apply Q.mul_le_mono_nonpos.
 Qed.
 
+(*
 Theorem Q_not_le :
   ∀ a b : Q, Q_leb a b ≠ true → a ≠ b ∧ Q_leb b a = true.
 Proof.
@@ -121,6 +122,7 @@ destruct (Q.le_dec b a) as [Hba| Hba]. {
 exfalso; apply Hba.
 now apply Q.lt_le_incl.
 Qed.
+*)
 
 Theorem Q_le_dec :
   ∀ a b : Q, {Q_leb a b = true} + {Q_leb a b ≠ true}.
@@ -184,17 +186,28 @@ split; intros Hbc. {
 }
 Qed.
 
+Theorem Q_ord_total_prop :
+  ∀ a b : Q, Q_leb a b = true ∨ Q_leb b a = true.
+Proof.
+intros.
+progress unfold Q_leb.
+destruct (Q.le_dec a b) as [Hab| Hab]; [ now left | right ].
+destruct (Q.le_dec b a) as [Hba| Hba]; [ easy | exfalso ].
+apply Q.nle_gt in Hab, Hba.
+apply (Q.lt_trans a b a) in Hba; [ | easy ].
+now apply Q.lt_irrefl in Hba.
+Qed.
+
 Definition Q_ring_like_ord :=
   let _ := Q_ring_like_op in
-  {| rngl_ord_le_dec := Q_le_dec;
-     rngl_ord_le_refl := Q_le_refl;
+  {| rngl_ord_le_refl := Q_le_refl;
      rngl_ord_le_antisymm := Q_le_antisymm;
      rngl_ord_le_trans := Q_le_trans;
      rngl_ord_add_le_mono_l := Q_add_le_mono_l;
      rngl_ord_mul_le_compat_nonneg := Q_mul_le_compat_nonneg;
      rngl_ord_mul_le_compat_nonpos := Q_mul_le_compat_nonpos;
-     rngl_ord_not_le := Q_not_le
-   |}.
+     rngl_ord_le_dec := Q_le_dec;
+     rngl_ord_total_prop := Q_ord_total_prop |}.
 
 Definition Q_ring_like_prop :=
   {| rngl_mul_is_comm := true;

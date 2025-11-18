@@ -142,7 +142,7 @@ apply (rngl_div_nonneg Hop Hiv Hto). {
   split; [ apply (rngl_add_squ_nonneg Hos Hto) | ].
   intros H1; symmetry in H1.
   cbn in Hz.
-  apply (rngl_eq_add_0 Hor) in H1; cycle 1. {
+  apply (rngl_eq_add_0 Hto) in H1; cycle 1. {
     apply (rngl_squ_nonneg Hos Hto).
   } {
     apply (rngl_squ_nonneg Hos Hto).
@@ -1636,7 +1636,7 @@ assert (Hr : (0 < R₀)%L). {
     apply (rngl_0_lt_1 Hos Hc1 Hto).
   }
   rewrite <- rngl_add_assoc.
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hto).
   apply (rngl_le_0_add Hto). {
     now apply (rngl_lt_le_incl Hor) in HM.
   }
@@ -1723,7 +1723,7 @@ assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
   apply (rngl_le_trans Hor _ R₀); [ | now apply (rngl_lt_le_incl Hor) ].
   progress unfold R₀.
   rewrite <- rngl_add_assoc.
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hto).
   apply (rngl_le_0_add Hto). {
     now apply (rngl_lt_le_incl Hor) in HM.
   }
@@ -1750,7 +1750,7 @@ assert (H2 : (‖ 1 / z ‖ * rngl_of_nat n * m ≤ ‖ z ‖)%L). {
   progress unfold R₀.
   apply (rngl_le_add_l Hor).
   apply (rngl_le_trans Hor _ 1); [ apply (rngl_0_le_1 Hos Hor) | ].
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hto).
   now apply (rngl_lt_le_incl Hor) in HM.
 }
 clear H1.
@@ -1773,7 +1773,7 @@ Donc mes angles ne sont pas archimédiens
   progress unfold R₀.
   apply (rngl_le_add_l Hor).
   apply (rngl_le_trans Hor _ 1); [ apply (rngl_0_le_1 Hop Hor) | ].
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hto).
   now apply (rngl_lt_le_incl Hor) in HM.
 }
 ...
@@ -1854,7 +1854,7 @@ assert
   }
   progress unfold R₀.
   rewrite <- rngl_add_assoc.
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hto).
   apply (rngl_le_0_add Hto). {
     now apply (rngl_lt_le_incl Hor) in HM.
   }
@@ -2061,7 +2061,7 @@ assert (H1 : (rngl_of_nat n * m < ‖ z ‖)%L). {
   progress unfold R₀.
   apply (rngl_le_add_l Hor).
   apply (rngl_le_trans Hor _ 1). 2: {
-    apply (rngl_le_add_r Hor).
+    apply (rngl_le_add_r Hto).
     now apply (rngl_lt_le_incl Hor) in HM.
   }
   apply (rngl_0_le_1 Hop Hor).
@@ -2096,7 +2096,7 @@ assert (Hr : (0 < R₀)%L). {
     apply (rngl_0_lt_1 Hop Hc1 Hto).
   }
   rewrite <- rngl_add_assoc.
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hto).
   apply (rngl_le_0_add Hto). {
     now apply (rngl_lt_le_incl Hor) in HM.
   }

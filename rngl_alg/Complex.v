@@ -134,11 +134,11 @@ Definition gc_opt_inv_or_pdiv :
 Theorem rl_integral_modulus_prop :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L.
 Proof.
-intros Hop Hiq Hor * Hab.
-now apply (eq_rngl_add_square_0 Hop Hiq Hor) in Hab.
+intros Hop Hiq Hto * Hab.
+now apply (eq_rngl_add_square_0 Hop Hiq Hto) in Hab.
 Qed.
 
 Theorem gc_eq_dec :
@@ -232,8 +232,9 @@ intros Hop Hiq Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Ha.
 rewrite <- rngl_squ_1 in Ha.
+...
 apply (rngl_squ_le_abs_le Hop Hiq Hor) in Ha.
-rewrite (rngl_abs_1 Hos Hor) in Ha.
+rewrite (rngl_abs_1 Hos Hto) in Ha.
 now apply (rngl_abs_le Hop Hor) in Ha.
 Qed.
 
@@ -519,7 +520,7 @@ rewrite (rngl_mul_comm Hic).
 split. {
   rewrite H1; [ easy | ].
   intros H2.
-  apply (eq_rngl_add_square_0 Hop Hiq Hor) in H2.
+  apply (eq_rngl_add_square_0 Hop Hiq Hto) in H2.
   apply Haz.
   apply eq_gc_eq; cbn.
   now f_equal.
@@ -772,7 +773,7 @@ specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hi1.
 apply (rngl_le_trans Hor _ (rngl_abs a)). {
   apply (rngl_le_abs_diag Hop Hor).
 }
-apply (rngl_square_le_simpl_nonneg Hop Hiq Hor). {
+apply (rngl_square_le_simpl_nonneg Hop Hiq Hto). {
   apply rl_sqrt_nonneg.
   apply (rngl_le_0_add Hos Hto); [ | easy ].
   apply (rngl_squ_nonneg Hos Hto).
@@ -783,7 +784,7 @@ rewrite rngl_squ_sqrt. 2: {
   apply (rngl_squ_nonneg Hos Hto).
 }
 rewrite (rngl_squ_abs Hop).
-now apply (rngl_le_add_r Hos Hor).
+now apply (rngl_le_add_r Hos Hto).
 Qed.
 
 Theorem rl_sqrt_div_squ_squ :
@@ -934,7 +935,7 @@ assert (Hr : zr = (ρ * rngl_cos (rngl_acos (zr / ρ)))%L). {
   apply (rngl_between_opp_1_and_1 Hop Hiq Hor).
   rewrite <- rngl_squ_1.
   apply (rngl_abs_le_squ_le Hop Hor).
-  rewrite (rngl_abs_1 Hos Hor).
+  rewrite (rngl_abs_1 Hos Hto).
   rewrite (rngl_abs_div Hop Hiv Hor); [ | easy ].
   rewrite (rngl_abs_nonneg_eq Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hor).
@@ -953,7 +954,7 @@ assert (Hr : zr = (ρ * rngl_cos (rngl_acos (zr / ρ)))%L). {
     apply (rngl_le_0_add Hos Hto);
     apply (rngl_squ_nonneg Hos Hto).
   }
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hto).
   apply (rngl_squ_nonneg Hos Hto).
 }
 f_equal; [ now destruct (0 ≤? zi)%L | ].
@@ -985,7 +986,7 @@ assert (Hzρ21 : ((zr / ρ)² ≤ 1)%L). {
     apply (rngl_le_0_add Hos Hto);
     apply (rngl_squ_nonneg Hos Hto).
   }
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hto).
   apply (rngl_squ_nonneg Hos Hto).
 }
 remember (0 ≤? zi)%L as zzi eqn:Hzzi; symmetry in Hzzi.

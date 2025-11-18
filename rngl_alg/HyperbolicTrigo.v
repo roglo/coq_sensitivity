@@ -32,7 +32,7 @@ Class hangle_ctx :=
     hc_ed : rngl_has_eq_dec T = true;
     hc_iv : rngl_has_inv T = true;
     hc_c2 : rngl_characteristic T ≠ 2;
-    hc_or : rngl_is_ordered T = true }.
+    hc_to : rngl_is_totally_ordered T = true }.
 
 End a.
 
@@ -50,7 +50,8 @@ Ltac destruct_hc :=
   set (Hop := hc_op);
   set (Hiv := hc_iv);
   set (Hed := hc_ed);
-  set (Hor := hc_or);
+  set (Hto := hc_to);
+  set (Hor := rngl_is_totally_ordered_is_ordered Hto);
   specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos;
   specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq;
   specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo;
@@ -103,16 +104,16 @@ destruct Hcs as (Hcs, Hzc).
 assert (H : (1 ≤ c²)%L). {
   apply (rngl_sub_move_r Hop) in Hcs.
   rewrite Hcs.
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_squ_nonneg Hos Hto).
 }
 replace 1%L with 1²%L in H by apply rngl_mul_1_l.
 rewrite <- (rngl_squ_abs Hop c) in H.
 rewrite <- (rngl_squ_abs Hop 1%L) in H.
-apply (rngl_square_le_simpl_nonneg Hop Hiq Hor) in H. 2: {
+apply (rngl_square_le_simpl_nonneg Hop Hiq Hto) in H. 2: {
   apply (rngl_abs_nonneg Hop Hto).
 }
-rewrite (rngl_abs_1 Hos Hor) in H.
+rewrite (rngl_abs_1 Hos Hto) in H.
 now rewrite (rngl_abs_nonneg_eq Hop Hor) in H.
 Qed.
 
@@ -1540,7 +1541,7 @@ apply eq_hangle_eq.
 apply (eq_rl_sqrt_0 Hos) in H12. 2: {
   apply (rngl_add_squ_nonneg Hos Hto).
 }
-apply (rngl_eq_add_0 Hor) in H12; cycle 1. {
+apply (rngl_eq_add_0 Hto) in H12; cycle 1. {
   apply (rngl_squ_nonneg Hos Hto).
 } {
   apply (rngl_squ_nonneg Hos Hto).
@@ -1608,7 +1609,7 @@ Proof.
 destruct_hc; intros.
 progress unfold hangle_taxi_dist.
 split; intros H12. {
-  apply (rngl_eq_add_0 Hor) in H12; cycle 1.
+  apply (rngl_eq_add_0 Hto) in H12; cycle 1.
   apply (rngl_abs_nonneg Hop Hto).
   apply (rngl_abs_nonneg Hop Hto).
   destruct H12 as (Hcc, Hss).
@@ -1861,7 +1862,7 @@ rewrite (rngl_squ_div Hic Hos Hiv). 2: {
   apply (eq_rl_sqrt_0 Hos) in H. 2: {
     apply (rngl_add_squ_nonneg Hos Hto).
   }
-  apply (eq_rngl_add_square_0 Hop Hiq Hor) in H.
+  apply (eq_rngl_add_square_0 Hop Hiq Hto) in H.
   destruct H as (Hc, Hs).
   now apply (eq_rngl_cosh_0 Hc1) in Hc.
 }
@@ -1870,7 +1871,7 @@ rewrite (rngl_squ_div Hic Hos Hiv). 2: {
   apply (eq_rl_sqrt_0 Hos) in H. 2: {
     apply (rngl_add_squ_nonneg Hos Hto).
   }
-  apply (eq_rngl_add_square_0 Hop Hiq Hor) in H.
+  apply (eq_rngl_add_square_0 Hop Hiq Hto) in H.
   destruct H as (Hc, Hs).
   now apply (eq_rngl_cosh_0 Hc1) in Hc.
 }
@@ -1890,7 +1891,7 @@ rewrite rngl_squ_sqrt. 2: {
 }
 apply (rngl_div_diag Hiq).
 intros H.
-apply (eq_rngl_add_square_0 Hop Hiq Hor) in H.
+apply (eq_rngl_add_square_0 Hop Hiq Hto) in H.
 destruct H as (Hc, Hs).
 now apply (eq_rngl_cosh_0 Hc1) in Hc.
 Qed.

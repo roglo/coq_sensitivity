@@ -96,15 +96,16 @@ Definition in_ordered_field :=
   rngl_has_eq_dec T = true ∧
   rngl_has_inv T = true ∧
   rngl_characteristic T = 0 ∧
-  rngl_is_ordered T = true.
+  rngl_is_totally_ordered T = true.
 
 Theorem eq_vect_squ_0 :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.
-intros Hop Hiq Hor * Hvvz.
+intros Hop Hiq Hto * Hvvz.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -212,7 +213,8 @@ Theorem RQ_mul_scal_prop :
   → Rayleigh_quotient M (c × V) = Rayleigh_quotient M V.
 Proof.
 intros Hof * Hsm Hsr Hcz.
-destruct Hof as (Hic & Hop & Heq & Hiv & Hch & Hor).
+destruct Hof as (Hic & Hop & Heq & Hiv & Hch & Hto).
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
@@ -240,7 +242,7 @@ rewrite (rngl_inv_mul_distr Hos Hiv); cycle 1. {
   now apply (rngl_eq_mul_0_l Hos Hiq) in H.
 } {
   intros H.
-  apply (eq_vect_squ_0 Hop Hiq Hor) in H.
+  apply (eq_vect_squ_0 Hop Hiq Hto) in H.
   now rewrite Hsr in H.
 }
 rewrite rngl_mul_assoc.
@@ -256,13 +258,13 @@ Theorem Rayleigh_quotient_of_eigenvector :
   rngl_has_opp T = true →
   (rngl_is_integral_domain T || rngl_has_eq_dec T)%bool = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ (M : matrix T) V μ,
   V ≠ vect_zero (vect_size V)
   → (M • V = μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
-intros Hic Hop Hii Hiv Hor * Hvz Hmv.
+intros Hic Hop Hii Hiv Hto * Hvz Hmv.
 specialize (proj2 rngl_has_opp_or_psub_iff) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (Hos (or_introl Hop)).
@@ -272,7 +274,7 @@ rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
 apply (rngl_mul_div Hiq).
 intros H.
-now apply (eq_vect_squ_0 Hop Hiq Hor) in H.
+now apply (eq_vect_squ_0 Hop Hiq Hto) in H.
 Qed.
 
 Definition is_orthogonal_matrix (M : matrix T) :=
