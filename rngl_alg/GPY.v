@@ -38,16 +38,16 @@ apply (rngl_le_trans Hor _ (∑ (i = 1, n), 1 / rngl_of_nat k)). {
   apply (rngl_summation_le_compat Hor).
   intros i Hi.
   Time apply (rngl_div_le_mono_pos_l Hop Hiv Hor Hii). {
-    apply (rngl_0_lt_1 Hos Hc1 Hor).
+    apply (rngl_0_lt_1 Hos Hc1 Hto).
   }
   apply (rngl_le_inv_inv Hop Hiv Hor). {
-    apply (rngl_le_neq Hor).
+    apply (rngl_le_neq Hto).
     split; [ apply (rngl_of_nat_nonneg Hos Hor) | ].
     intros H; symmetry in H.
     apply eq_rngl_of_nat_0 in H; [ | easy ].
     flia Hi H.
   } {
-    apply (rngl_le_neq Hor).
+    apply (rngl_le_neq Hto).
     split; [ apply (rngl_of_nat_nonneg Hos Hor) | ].
     intros H; symmetry in H.
     apply eq_rngl_of_nat_0 in H; [ | easy ].
@@ -179,10 +179,10 @@ eapply (rngl_le_trans Hor). {
   }
   rewrite Nat.add_sub.
   apply (rngl_le_add_r Hor).
-  apply (rngl_div_nonneg Hop Hiv Hor). {
+  apply (rngl_div_nonneg Hop Hiv Hto). {
     apply (rngl_0_le_1 Hos Hor).
   }
-  apply (rngl_le_neq Hor).
+  apply (rngl_le_neq Hto).
   split; [ apply (rngl_of_nat_nonneg Hos Hor) | ].
   intros H; symmetry in H.
   apply eq_rngl_of_nat_0 in H; [ | easy ].
