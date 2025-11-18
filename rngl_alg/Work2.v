@@ -831,7 +831,7 @@ apply -> (rngl_lt_div_r Hop Hiv Hto). 2: {
 rewrite (rngl_mul_comm Hic).
 apply (rngl_lt_sub_lt_add_l Hop Hto).
 eapply (rngl_le_lt_trans Hto); [ | apply Hc ].
-now apply (rngl_le_sub_le_add_r Hop Hor).
+now apply (rngl_le_sub_le_add_r Hop Hto).
 Qed.
 
 Theorem rngl_lt_add_cos_lt_add_cos_div2 :

@@ -384,7 +384,7 @@ specialize rl_sqrt_half_nonneg as H.
 apply rngl_leb_le in H.
 rewrite H; clear H.
 specialize (rl_sqrt_half_pos Hc1) as H.
-apply (rngl_leb_gt_iff Hor) in H.
+apply (rngl_leb_gt_iff Hto) in H.
 rewrite H; clear H.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
 symmetry in Hzs.
@@ -440,7 +440,7 @@ destruct zs. {
     (* bizarre, comme démonstration *)
   }
 } {
-  apply (rngl_leb_gt_iff Hor) in Hzs.
+  apply (rngl_leb_gt_iff Hto) in Hzs.
   split. {
     intros (_, H1).
     apply rngl_ltb_lt in H1.
@@ -557,12 +557,12 @@ destruct zs. {
   rewrite (rngl_mul_opp_l Hop).
   now rewrite rngl_mul_1_l.
 } {
-  apply (rngl_leb_gt_iff Hor) in Hzs.
+  apply (rngl_leb_gt_iff Hto) in Hzs.
   rewrite (rngl_mul_opp_l Hop).
   rewrite rngl_mul_1_l.
   rewrite (rngl_opp_involutive Hop).
   destruct sz; [ now rewrite rngl_mul_1_l | ].
-  apply (rngl_leb_gt_iff Hor) in Hsz.
+  apply (rngl_leb_gt_iff Hto) in Hsz.
   apply rngl_nle_gt in Hsz.
   exfalso.
   apply Hsz.
@@ -891,7 +891,7 @@ split; intros H12. {
         apply rngl_leb_le in H.
         rewrite H; clear H.
         generalize Hzs2; intros H.
-        apply (rngl_leb_gt_iff Hor) in H.
+        apply (rngl_leb_gt_iff Hto) in H.
         now rewrite H.
       }
       rewrite angle_straight_div_2.
@@ -963,7 +963,7 @@ split; intros H12. {
       rewrite rngl_cos_5_right_div_2.
       rewrite (rngl_leb_0_opp Hop Hto).
       specialize (rl_sqrt_half_pos Hc1) as H.
-      apply (rngl_leb_gt_iff Hor) in H.
+      apply (rngl_leb_gt_iff Hto) in H.
       rewrite H; clear H.
       specialize (rngl_sin_div_2_nonneg (θ1 + θ2)) as H.
       apply rngl_leb_le in H.
@@ -999,7 +999,7 @@ split; intros H12. {
     now apply (angle_div_2_not_straight Hc1) in H.
   }
   destruct zs1; [ easy | ].
-  apply (rngl_leb_gt_iff Hor) in Hzs12, Hzs1.
+  apply (rngl_leb_gt_iff Hto) in Hzs12, Hzs1.
   apply rngl_ltb_ge.
   destruct (rngl_leb_dec 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
     apply rngl_leb_le in Hzc1.
@@ -1043,10 +1043,10 @@ split; intros H12. {
       progress unfold angle_add_overflow2.
       progress unfold angle_ltb.
       generalize Hzs12; intros H.
-      apply (rngl_leb_gt_iff Hor) in H.
+      apply (rngl_leb_gt_iff Hto) in H.
       rewrite H; clear H.
       generalize Hzs1; intros H.
-      apply (rngl_leb_gt_iff Hor) in H.
+      apply (rngl_leb_gt_iff Hto) in H.
       rewrite H; clear H.
       now apply rngl_ltb_lt.
     }
@@ -1144,10 +1144,10 @@ split; intros H12. {
         rewrite rngl_cos_add_right_r.
         rewrite (rngl_leb_0_opp Hop Hto).
         generalize Hzs12; intros H.
-        apply (rngl_leb_gt_iff Hor) in H.
+        apply (rngl_leb_gt_iff Hto) in H.
         rewrite H; clear H.
         generalize Hzs1; intros H.
-        apply (rngl_leb_gt_iff Hor) in H.
+        apply (rngl_leb_gt_iff Hto) in H.
         rewrite H; clear H.
         rewrite (rngl_ltb_opp_r Hop Hor), (rngl_opp_involutive Hop).
         now apply rngl_ltb_lt.

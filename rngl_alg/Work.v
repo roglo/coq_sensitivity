@@ -224,7 +224,7 @@ destruct zs. {
   split; [ easy | ].
   subst x; apply rngl_cos_bound.
 }
-apply (rngl_leb_gt_iff Hor) in Hzs.
+apply (rngl_leb_gt_iff Hto) in Hzs.
 apply rngl_nle_gt in Hzs.
 exfalso.
 apply Hzs; clear Hzs.
@@ -695,7 +695,7 @@ rewrite rngl_sin_5_right_div_2.
 rewrite rngl_cos_5_right_div_2.
 rewrite (rngl_leb_0_opp Hop Hto).
 generalize Hs; intros H.
-apply (rngl_leb_gt_iff Hor) in H.
+apply (rngl_leb_gt_iff Hto) in H.
 rewrite H; clear H.
 remember (√(1 / 2) ≤? 0)%L as sz eqn:Hsz.
 symmetry in Hsz.
@@ -733,9 +733,9 @@ destruct sz. {
   apply Hsz; clear Hsz.
   apply (rl_sqrt_half_pos Hc1).
 }
-apply (rngl_leb_gt_iff Hor) in Hs.
+apply (rngl_leb_gt_iff Hto) in Hs.
 rewrite Hs.
-apply (rngl_leb_gt_iff Hor) in Hs.
+apply (rngl_leb_gt_iff Hto) in Hs.
 apply rngl_ltb_lt.
 rewrite rngl_cos_5_right_div_2.
 change_angle_add_r θ angle_straight.
@@ -788,7 +788,7 @@ specialize rl_sqrt_half_nonneg as Hzs.
 intros * Hcs Hs Hc.
 progress unfold angle_ltb.
 generalize Hs; intros H.
-apply (rngl_leb_gt_iff Hor) in H.
+apply (rngl_leb_gt_iff Hto) in H.
 rewrite H; clear H.
 rewrite rngl_sin_7_right_div_2.
 rewrite rngl_cos_7_right_div_2.
@@ -941,7 +941,7 @@ progress unfold angle_ltb.
 rewrite rngl_sin_sub_straight_r.
 rewrite (rngl_leb_0_opp Hop Hto).
 generalize Hs; intros H.
-apply (rngl_leb_gt_iff Hor) in H.
+apply (rngl_leb_gt_iff Hto) in H.
 rewrite H; clear H.
 rewrite rngl_sin_7_right_div_2.
 rewrite (rngl_leb_0_opp Hop Hto).

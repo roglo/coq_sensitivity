@@ -38,13 +38,13 @@ symmetry in Hsab, Hab.
 destruct sab. {
   destruct ab; [ easy | ].
   apply rngl_leb_le in Hsab.
-  apply (rngl_leb_gt_iff Hor) in Hab.
+  apply (rngl_leb_gt_iff Hto) in Hab.
   apply (rngl_le_antisymm Hor); [ easy | ].
   apply (rl_sqrt_le_rl_sqrt Hop Hiq Hto); [ easy | ].
   now apply (rngl_lt_le_incl Hto).
 }
 destruct ab; [ | easy ].
-apply (rngl_leb_gt_iff Hor) in Hsab.
+apply (rngl_leb_gt_iff Hto) in Hsab.
 apply rngl_leb_le in Hab.
 apply (rngl_le_antisymm Hor); [ now apply (rngl_lt_le_incl Hto) | ].
 now apply (rl_sqrt_le_rl_sqrt Hop Hiq Hto).
@@ -156,7 +156,7 @@ intros H32.
 apply rngl_nle_gt in Hc213.
 apply Hc213; clear Hc213.
 do 2 rewrite rngl_cos_add.
-apply (rngl_le_sub_le_add_r Hop Hor).
+apply (rngl_le_sub_le_add_r Hop Hto).
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).

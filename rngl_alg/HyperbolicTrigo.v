@@ -465,13 +465,13 @@ rewrite (rngl_squ_mul Hic).
 rewrite Hε.
 rewrite rngl_mul_1_l.
 assert (Hz1ac : (0 ≤ rngl_cosh a + 1)%L). {
-  apply (rngl_le_sub_le_add_r Hop Hor).
+  apply (rngl_le_sub_le_add_r Hop Hto).
   rewrite (rngl_sub_0_l Hop).
   apply (rngl_le_trans Hor _ 0); [ | easy ].
   apply (rngl_opp_1_le_0 Hop Hto).
 }
 assert (Hz1sc : (0 ≤ rngl_cosh a - 1)%L). {
-  apply (rngl_le_add_le_sub_r Hop Hor).
+  apply (rngl_le_add_le_sub_r Hop Hto).
   rewrite rngl_add_0_l.
   apply (rngl_cosh_bound a).
 }
@@ -560,7 +560,7 @@ destruct saz. {
   rewrite rngl_mul_1_l.
   now apply (rngl_abs_nonneg_eq Hop Hor).
 } {
-  apply (rngl_leb_gt_iff Hor) in Hsaz.
+  apply (rngl_leb_gt_iff Hto) in Hsaz.
   apply (rngl_lt_le_incl Hto) in Hsaz.
   rewrite (rngl_abs_nonpos_eq Hop Hto); [ | easy ].
   rewrite (rngl_mul_opp_opp Hop).
@@ -684,21 +684,21 @@ destruct (0 ≤? rngl_sinh θ1)%L. {
   destruct (0 ≤? rngl_sinh θ2)%L; [ | easy ].
   split; intros H. {
     apply Bool.not_true_iff_false in H.
-    apply (rngl_leb_gt_iff Hor) in H.
+    apply (rngl_leb_gt_iff Hto) in H.
     now apply rngl_ltb_lt.
   }
   apply Bool.not_true_iff_false.
-  apply (rngl_leb_gt_iff Hor).
+  apply (rngl_leb_gt_iff Hto).
   now apply rngl_ltb_lt.
 }
 destruct (0 ≤? rngl_sinh θ2)%L; [ easy | ].
 split; intros H. {
   apply Bool.not_true_iff_false in H.
-  apply (rngl_leb_gt_iff Hor) in H.
+  apply (rngl_leb_gt_iff Hto) in H.
   now apply rngl_ltb_lt.
 }
 apply Bool.not_true_iff_false.
-apply (rngl_leb_gt_iff Hor).
+apply (rngl_leb_gt_iff Hto).
 now apply rngl_ltb_lt.
 Qed.
 
@@ -1229,20 +1229,20 @@ destruct zs1. {
   destruct zs2; [ | easy ].
   apply rngl_leb_le in Hzs2.
   split; intros H12. {
-    apply (rngl_leb_gt_iff Hor) in H12.
+    apply (rngl_leb_gt_iff Hto) in H12.
     now apply rngl_ltb_lt.
   } {
-    apply (rngl_leb_gt_iff Hor).
+    apply (rngl_leb_gt_iff Hto).
     now apply rngl_ltb_lt in H12.
   }
 } {
-  apply (rngl_leb_gt_iff Hor) in Hzs1.
+  apply (rngl_leb_gt_iff Hto) in Hzs1.
   destruct zs2; [ easy | ].
   split; intros H12. {
-    apply (rngl_leb_gt_iff Hor) in H12.
+    apply (rngl_leb_gt_iff Hto) in H12.
     now apply rngl_ltb_lt.
   } {
-    apply (rngl_leb_gt_iff Hor).
+    apply (rngl_leb_gt_iff Hto).
     now apply rngl_ltb_lt in H12.
   }
 }
@@ -1303,7 +1303,7 @@ apply hangle_leb_gt.
 progress unfold hangle_ltb.
 apply rngl_leb_le in Hzs1.
 rewrite Hzs1.
-apply (rngl_leb_gt_iff Hor) in Hs2z.
+apply (rngl_leb_gt_iff Hto) in Hs2z.
 now rewrite Hs2z.
 Qed.
 
@@ -1744,7 +1744,7 @@ assert (Hzcr : (0 ≤ rngl_cos θ2 / d)%L). {
   } {
     cbn.
     rewrite (rngl_leb_0_opp Hop Hto).
-    apply (rngl_leb_gt_iff Hor) in Hzs.
+    apply (rngl_leb_gt_iff Hto) in Hzs.
     apply (rngl_lt_le_incl Hto) in Hzs.
     apply rngl_leb_le in Hzs.
     rewrite Hzs, rngl_mul_1_l.
@@ -1803,7 +1803,7 @@ destruct zs. {
 } {
   cbn.
   rewrite (rngl_leb_0_opp Hop Hto).
-  apply (rngl_leb_gt_iff Hor) in Hzs.
+  apply (rngl_leb_gt_iff Hto) in Hzs.
   apply (rngl_lt_le_incl Hto) in Hzs.
   apply rngl_leb_le in Hzs.
   rewrite Hzs, rngl_mul_1_l.

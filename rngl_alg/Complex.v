@@ -711,9 +711,10 @@ Qed.
 Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hop : rngl_has_opp T = true}.
 Context {Hiv : rngl_has_inv T = true}.
-Context {Hor : rngl_is_ordered T = true}.
+Context {Hto : rngl_is_totally_ordered T = true}.
 
 Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
+  let Hor := rngl_is_totally_ordered_is_ordered Hto in
   let Hos := rngl_has_opp_has_opp_or_psub Hop in
   let Hsu := rngl_has_opp_has_no_psub Hop in
   let Hio := rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor in
@@ -733,7 +734,7 @@ Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
      rngl_opt_add_opp_diag_l := gc_opt_add_opp_diag_l Hop;
      rngl_opt_add_sub := gc_opt_add_sub Hsu;
      rngl_opt_sub_add_distr := gc_opt_sub_add_distr Hsu;
-     rngl_opt_mul_inv_diag_l := gc_opt_mul_inv_diag_l Hic Hop Hiv Hor;
+     rngl_opt_mul_inv_diag_l := gc_opt_mul_inv_diag_l Hic Hop Hiv Hto;
      rngl_opt_mul_inv_diag_r := gc_opt_mul_inv_diag_r;
      rngl_opt_mul_div := gc_opt_mul_div;
      rngl_opt_integral := gc_integral Hic Hop Hio;
@@ -744,7 +745,7 @@ Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
 
 End a.
 
-Arguments gc_ring_like_prop_not_alg_closed {T ro rp rl} Hic Hop Hiv Hor.
+Arguments gc_ring_like_prop_not_alg_closed {T ro rp rl} Hic Hop Hiv Hto.
 
 (* algebraically closed *)
 
@@ -770,7 +771,7 @@ specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Hzb.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hi1.
 apply (rngl_le_trans Hor _ (rngl_abs a)). {
-  apply (rngl_le_abs_diag Hop Hor).
+  apply (rngl_le_abs_diag Hop Hto).
 }
 apply (rngl_square_le_simpl_nonneg Hop Hiq Hto). {
   apply rl_sqrt_nonneg.
@@ -1012,7 +1013,7 @@ destruct zzi. {
   rewrite (rngl_mul_opp_r Hop).
   apply (rngl_opp_inj Hop).
   rewrite (rngl_opp_involutive Hop).
-  apply (rngl_leb_gt_iff Hor) in Hzzi.
+  apply (rngl_leb_gt_iff Hto) in Hzzi.
   apply (rngl_lt_le_incl Hto) in Hzzi.
   progress unfold rngl_acos.
   destruct (rngl_leb_dec (zr / ρ)² 1)%L as [Hzρ1| Hzρ1]. 2: {
@@ -1624,7 +1625,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 assert (Hz1ss : ∀ θ, (0 ≤ 1 - rngl_sin θ)%L). {
   intros.
-  apply (rngl_le_add_le_sub_r Hop Hor).
+  apply (rngl_le_add_le_sub_r Hop Hto).
   rewrite rngl_add_0_l.
   apply rngl_sin_bound.
 }
@@ -1817,7 +1818,7 @@ destruct zs. {
   apply rl_sqrt_nonneg.
   apply rngl_1_add_cos_div_2_nonneg.
 }
-apply (rngl_leb_gt_iff Hor) in Hzs.
+apply (rngl_leb_gt_iff Hto) in Hzs.
 rewrite (rngl_mul_opp_l Hop) in Hc.
 rewrite rngl_mul_1_l in Hc.
 apply (rngl_opp_inj Hop) in Hc.
@@ -1901,7 +1902,7 @@ induction n; intros. {
     remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
     symmetry in Hzc.
     destruct zc. 2: {
-      apply (rngl_leb_gt_iff Hor) in Hzc.
+      apply (rngl_leb_gt_iff Hto) in Hzc.
       apply (rngl_lt_le_trans Hto _ 0); [ easy | ].
       apply rl_sqrt_nonneg.
       apply (rngl_le_div_r Hop Hiv Hto). {
@@ -1914,7 +1915,7 @@ induction n; intros. {
     apply rngl_leb_le in Hzc.
     now apply (rngl_cos_lt_sqrt_1_add_cos_div_2 Hc1).
   }
-  apply (rngl_leb_gt_iff Hor) in Hzs.
+  apply (rngl_leb_gt_iff Hto) in Hzs.
   rewrite (rngl_mul_opp_l Hop).
   rewrite rngl_mul_1_l.
   rewrite (rngl_add_opp_r Hop).
@@ -2212,7 +2213,7 @@ intros Hop Hiq Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hx.
 apply (rngl_le_sub_le_add_l Hop Hor).
-apply (rngl_le_sub_le_add_r Hop Hor).
+apply (rngl_le_sub_le_add_r Hop Hto).
 progress unfold rngl_squ.
 rewrite rngl_mul_assoc.
 rewrite (rngl_sub_mul_l_diag_r Hop).
@@ -2221,7 +2222,7 @@ destruct (rngl_leb_dec 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
   rewrite <- (rngl_mul_1_r 1%L) at 4.
   apply (rngl_mul_le_compat_nonneg Hor); [ | easy ].
   split; [ easy | ].
-  apply (rngl_le_sub_le_add_r Hop Hor).
+  apply (rngl_le_sub_le_add_r Hop Hto).
   rewrite <- (rngl_mul_1_r 2%L) at 2.
   apply (rngl_mul_le_mono_nonneg_l Hop Hto); [ | easy ].
   apply (rngl_0_le_2 Hos Hto).
