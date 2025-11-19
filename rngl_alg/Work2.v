@@ -786,7 +786,7 @@ apply (rngl_abs_lt_squ_lt Hop Hiq Hto _ _ Habc).
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
 apply (rngl_le_trans Hor _ a); [ easy | ].
-now apply (rngl_lt_le_incl Hto) in Hab.
+now apply rngl_lt_le_incl in Hab.
 Qed.
 
 Theorem rngl_lt_cos_lt_cos_div2 :
@@ -802,7 +802,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * Hba Hzs Hc.
   rewrite (H1 a) in Hc.
   rewrite (H1 (rngl_cos _)) in Hc.
-  now apply (rngl_lt_irrefl Hor) in Hc.
+  now apply rngl_lt_irrefl in Hc.
 }
 intros * Hba Hzs Hc.
 cbn.
@@ -811,7 +811,7 @@ rewrite Hzs.
 rewrite rngl_mul_1_l.
 destruct (rngl_ltb_dec b 0) as [Hblz| Hbgz]. {
   apply rngl_ltb_lt in Hblz.
-  eapply (rngl_lt_le_trans Hto _ 0); [ easy | ].
+  eapply (rngl_lt_le_trans Hor _ 0); [ easy | ].
   apply rl_sqrt_nonneg.
   apply rngl_1_add_cos_div_2_nonneg.
 }
@@ -831,7 +831,7 @@ apply -> (rngl_lt_div_r Hop Hiv Hto). 2: {
 }
 rewrite (rngl_mul_comm Hic).
 apply (rngl_lt_sub_lt_add_l Hop Hto).
-eapply (rngl_le_lt_trans Hto); [ | apply Hc ].
+eapply (rngl_le_lt_trans Hor); [ | apply Hc ].
 now apply (rngl_le_sub_le_add_r Hop Hto).
 Qed.
 
@@ -893,7 +893,7 @@ apply (rngl_mul_le_mono_pos_l Hop Hiq Hto) in H12. 2: {
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 apply (rngl_squ_le_abs_le Hop Hiq Hto) in H12.
-apply (rngl_lt_le_incl Hto) in Hzs21, Hzs22.
+apply rngl_lt_le_incl in Hzs21, Hzs22.
 rewrite (rngl_abs_nonpos_eq Hop Hto) in H12; [ | easy ].
 rewrite (rngl_abs_nonpos_eq Hop Hto) in H12; [ | easy ].
 now apply (rngl_opp_le_compat Hop Hto) in H12.
@@ -994,7 +994,7 @@ destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
 destruct Hzs22 as [(H1, _)| (_, Hzs22)]. {
   now apply rngl_nle_gt in H1.
 }
-apply (rngl_lt_le_incl Hto) in Hzs22.
+apply rngl_lt_le_incl in Hzs22.
 now apply (rngl_le_trans Hor _ 0).
 Qed.
 
@@ -1009,7 +1009,7 @@ destruct_ac.
 intros * Hs1 Hs2 Hs12.
 destruct (rngl_leb_dec 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   apply rngl_leb_le in Hzc1.
-  apply (rngl_lt_le_incl Hto) in Hs1.
+  apply rngl_lt_le_incl in Hs1.
   destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
     apply rngl_leb_le in Hzc2.
     now apply quadrant_1_rngl_cos_add_le_cos_l.
@@ -1021,7 +1021,7 @@ destruct (rngl_leb_dec 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   progress sin_cos_add_sub_right_hyp T Hzc2.
   progress sin_cos_add_sub_right_goal T.
   apply (rngl_le_0_add Hos Hto); [ | easy ].
-  apply (rngl_lt_le_incl Hto) in Hzc2.
+  apply rngl_lt_le_incl in Hzc2.
   apply rngl_sin_add_nonneg; try easy.
 }
 apply rngl_leb_nle in Hzc1.
@@ -1029,14 +1029,14 @@ apply (rngl_nle_gt_iff Hto) in Hzc1.
 destruct (rngl_eqb_dec (rngl_cos θ1) (-1)) as [Hco1| Hco1]. 2: {
   apply (rngl_eqb_neq Heo) in Hco1.
   generalize Hzc1; intros H.
-  apply (rngl_lt_le_incl Hto) in H.
-  apply (rngl_lt_le_incl Hto) in Hs1.
+  apply rngl_lt_le_incl in H.
+  apply rngl_lt_le_incl in Hs1.
   now apply angle_add_overflow_le_lemma_2.
 }
 apply (rngl_eqb_eq Heo) in Hco1.
 apply eq_rngl_cos_opp_1 in Hco1.
 rewrite Hco1 in Hs1.
-now apply (rngl_lt_irrefl Hor) in Hs1.
+now apply rngl_lt_irrefl in Hs1.
 Qed.
 
 Theorem angle_le_0_r : ∀ θ, (θ ≤ 0 ↔ θ = 0)%A.
@@ -1104,12 +1104,12 @@ Proof.
 destruct_ac.
 intros * (H1a & Hab & Hb1).
 assert (H1a1 : (-1 ≤ a ≤ 1)%L). {
-  apply (rngl_lt_le_incl Hto) in Hab.
+  apply rngl_lt_le_incl in Hab.
   split; [ easy | ].
   now apply (rngl_le_trans Hor _ b).
 }
 assert (H1b1 : (-1 ≤ b ≤ 1)%L). {
-  apply (rngl_lt_le_incl Hto) in Hab.
+  apply rngl_lt_le_incl in Hab.
   split; [ | easy ].
   now apply (rngl_le_trans Hor _ a).
 }
@@ -1199,10 +1199,10 @@ apply rngl_leb_le in Hzs.
 apply rngl_ltb_lt in Hzt, Hts.
 apply rngl_sin_nonneg_is_pos; [ | | easy ]. {
   intros H; subst θ.
-  now apply (rngl_lt_irrefl Hor) in Hzt.
+  now apply rngl_lt_irrefl in Hzt.
 } {
   intros H; subst θ.
-  now apply (rngl_lt_irrefl Hor) in Hts.
+  now apply rngl_lt_irrefl in Hts.
 }
 Qed.
 
@@ -1250,7 +1250,7 @@ apply rngl_leb_le in Hzs1, Hzs2, H2s.
 apply rngl_ltb_lt in H12.
 apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
 apply (rngl_le_trans Hor _ (rngl_cos θ2)); [ easy | ].
-now apply (rngl_lt_le_incl Hto).
+now apply rngl_lt_le_incl.
 Qed.
 
 Theorem rngl_squ_le_diag :
