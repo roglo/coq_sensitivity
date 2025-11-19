@@ -154,7 +154,7 @@ destruct_ac.
 intros * Hzs1 Hzs2 Hzs3 Hzc1 Hzc2 Hzc3 Hc213.
 apply (rngl_nle_gt_iff Hto).
 intros H32.
-apply rngl_nle_gt in Hc213.
+apply (rngl_nle_gt Hor) in Hc213.
 apply Hc213; clear Hc213.
 do 2 rewrite rngl_cos_add.
 apply (rngl_le_sub_le_add_r Hop Hto).

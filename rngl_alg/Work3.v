@@ -1118,7 +1118,7 @@ destruct (rngl_eq_dec Heo M 0) as [Hmz| Hmz]. {
   apply (gc_pow_nonzero Hic Hop Hiv Hor).
   intros H''; rewrite H'' in Hx.
   rewrite (gc_modl_0 Hop Hto Hii) in Hx.
-  apply rngl_nle_gt in Hx.
+  apply (rngl_nle_gt Hor) in Hx.
   apply Hx; clear Hx.
   apply (rngl_0_le_1 Hos Hto).
 }
@@ -1179,7 +1179,7 @@ split. {
 }
 intros z Hrz.
 assert (Hzx : (0 < ‖ z ‖)%L). {
-  eapply (rngl_lt_trans Hto); [ | apply Hrz ].
+  eapply (rngl_lt_trans Hor); [ | apply Hrz ].
   apply (rngl_max_lt_iff Hor); left.
   apply (rngl_0_lt_1 Hos Hc1 Hto).
 }

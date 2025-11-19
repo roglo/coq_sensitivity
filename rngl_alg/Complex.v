@@ -1816,7 +1816,7 @@ destruct zs. {
     rewrite Hc.
     apply (rngl_opp_1_lt_0 Hop Hto Hc1).
   }
-  apply rngl_nle_gt in H1.
+  apply (rngl_nle_gt Hor) in H1.
   apply H1; clear H1.
   rewrite Ha.
   apply rl_sqrt_nonneg.
@@ -1902,7 +1902,7 @@ induction n; intros. {
     apply (rngl_div_lt_mono_pos_r Hop Hiv Hto). {
       apply (rngl_0_lt_2 Hos Hc1 Hto).
     }
-    apply (rngl_add_lt_mono_l Hos Hto).
+    apply (rngl_add_lt_mono_l Hos Hor).
     remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
     symmetry in Hzc.
     destruct zc. 2: {
@@ -2004,7 +2004,7 @@ induction n; cbn. {
 apply (rngl_lt_div_l Hop Hiv Hto).
 apply (rngl_0_lt_2 Hos Hc1 Hto).
 rewrite rngl_mul_1_l.
-now apply (rngl_add_lt_mono_l Hos Hto).
+now apply (rngl_add_lt_mono_l Hos Hor).
 Qed.
 
 Theorem squ_rngl_cos_div_pow_2_incr :

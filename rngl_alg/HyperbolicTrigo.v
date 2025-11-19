@@ -660,7 +660,7 @@ destruct (0 ≤? rngl_sinh θ1)%L. {
     now apply rngl_leb_le.
   }
   apply Bool.not_true_iff_false.
-  apply rngl_ltb_ge.
+  apply (rngl_ltb_ge Hor).
   now apply rngl_leb_le.
 }
 destruct (0 ≤? rngl_sinh θ2)%L; [ easy | ].
@@ -670,7 +670,7 @@ split; intros H. {
   now apply rngl_leb_le.
 }
 apply Bool.not_true_iff_false.
-apply rngl_ltb_ge.
+apply (rngl_ltb_ge Hor).
 now apply rngl_leb_le.
 Qed.
 
@@ -1074,7 +1074,7 @@ split. {
   }
   apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2 in Hcc.
-  apply (rngl_add_lt_mono_l Hos Hto) in Hcc.
+  apply (rngl_add_lt_mono_l Hos Hor) in Hcc.
   now apply (rngl_lt_squ_lt Hop Hiq Hto) in Hcc.
 }
 Qed.

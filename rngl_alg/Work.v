@@ -152,7 +152,7 @@ destruct zs. {
   rewrite Hzsm.
   destruct zsm; [ | easy ].
   apply rngl_leb_le in Hzsm.
-  apply rngl_ltb_ge.
+  apply (rngl_ltb_ge Hor).
   rewrite <- angle_mul_2_l in Hzsm |-*.
   rewrite rngl_sin_mul_2_l in Hzsm.
   rewrite rngl_cos_mul_2_l'.
@@ -225,7 +225,7 @@ destruct zs. {
   subst x; apply rngl_cos_bound.
 }
 apply (rngl_leb_gt_iff Hto) in Hzs.
-apply rngl_nle_gt in Hzs.
+apply (rngl_nle_gt Hor) in Hzs.
 exfalso.
 apply Hzs; clear Hzs.
 destruct i; [ cbn in Hni; flia Hni Hmi | ].
@@ -1051,7 +1051,7 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   apply (rngl_lt_mul_0_if Hos Hto) in H2sz.
   destruct H2sz as [(H, _)| (_, Hcz)]. {
     exfalso.
-    apply rngl_nle_gt in H.
+    apply (rngl_nle_gt Hor) in H.
     apply H; clear H.
     apply (rngl_0_le_2 Hos Hto).
   }
