@@ -301,7 +301,7 @@ rewrite rngl_squ_sqrt. 2: {
     apply (rngl_0_lt_2 Hos Hc1 Hto).
   }
   rewrite (rngl_mul_0_l Hos).
-  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_0_sub Hop Hto).
   apply rngl_cosh_bound.
 }
 rewrite <- (rngl_div_sub_distr_r Hop Hiv).

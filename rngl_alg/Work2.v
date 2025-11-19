@@ -776,10 +776,11 @@ Qed.
 Theorem rngl_squ_lt_squ_nonneg :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a b, (a * b = b * a → 0 ≤ a → a < b → a² < b²)%L.
 Proof.
-intros Hop Hiq Hor.
+intros Hop Hiq Hto.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 intros * Habc Hza Hab.
 apply (rngl_abs_lt_squ_lt Hop Hiq Hto _ _ Habc).
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
@@ -1118,11 +1119,11 @@ rewrite rngl_cos_acos; [ | easy ].
 rewrite rngl_sin_acos; [ | easy ].
 rewrite rngl_sin_acos; [ | easy ].
 rewrite rngl_leb_0_sqrt. 2: {
-  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_0_sub Hop Hto).
   now apply (rngl_squ_le_1_iff Hop Hiq Hto).
 }
 rewrite rngl_leb_0_sqrt. 2: {
-  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_0_sub Hop Hto).
   now apply (rngl_squ_le_1_iff Hop Hiq Hto).
 }
 now apply rngl_ltb_lt.
@@ -1138,7 +1139,7 @@ destruct (rngl_leb_dec a² 1) as [Ha1| H1a]. {
   cbn.
   apply rngl_leb_le in Ha1.
   rewrite (rngl_leb_refl Hor).
-  rewrite rngl_leb_0_sqrt; [ | now apply (rngl_le_0_sub Hop Hor) ].
+  rewrite rngl_leb_0_sqrt; [ | now apply (rngl_le_0_sub Hop Hto) ].
   split. {
     apply rngl_leb_le.
     now apply (rngl_between_opp_1_and_1 Hop Hiq Hto) in Ha1.
@@ -1255,22 +1256,22 @@ Qed.
 Theorem rngl_squ_le_diag :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a, (0 ≤ a ≤ 1 → a² ≤ a)%L.
 Proof.
-intros Hop Hiq Hor * Ha.
+intros Hop Hiq Hto * Ha.
 rewrite <- (rngl_mul_1_r a) at 2.
 now apply (rngl_mul_le_mono_nonneg_l Hop Hto).
 Qed.
 
 Theorem rngl_limit_sub_l_limit :
   rngl_has_opp T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a u l,
   is_limit_when_seq_tends_to_inf rngl_dist (λ i, (a - u i)%L) (a - l)%L
   → is_limit_when_seq_tends_to_inf rngl_dist u l.
 Proof.
-intros Hop Hor.
+intros Hop Hto.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hlim.
 intros ε Hε.
