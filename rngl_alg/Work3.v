@@ -82,13 +82,13 @@ Theorem gc_has_nth_root :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
   is_complete T rngl_dist →
   ∀ z : GComplex T, ∀ n, n ≠ 0 → ∃ z', (z' ^ n)%C = z.
 Proof.
-intros Hic Hop Hiq Hor Hcz Har Hco.
+intros Hic Hop Hiq Hto Hcz Har Hco.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hnz.
 specialize (polar z _ _ (eq_refl _) eq_refl) as H1.
@@ -125,10 +125,11 @@ Notation "‖ x ‖" := (gc_modl x) (at level 35, x at level 30).
 Theorem gc_modl_div_nonneg :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ n d, d ≠ 0%C → (0 ≤ ‖ n ‖ / ‖ d ‖)%L.
 Proof.
-intros Hop Hiv Hor * Hz.
+intros Hop Hiv Hto * Hz.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hi1.
@@ -142,7 +143,7 @@ apply (rngl_div_nonneg Hop Hiv Hto). {
   split; [ apply (rngl_add_squ_nonneg Hos Hto) | ].
   intros H1; symmetry in H1.
   cbn in Hz.
-  apply (rngl_eq_add_0 Hto) in H1; cycle 1. {
+  apply (rngl_eq_add_0 Hos Hor) in H1; cycle 1. {
     apply (rngl_squ_nonneg Hos Hto).
   } {
     apply (rngl_squ_nonneg Hos Hto).
@@ -156,11 +157,11 @@ Qed.
 
 Theorem gc_modl_0 :
   rngl_has_opp T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   (rngl_is_integral_domain T || rngl_has_inv_or_pdiv T)%bool = true →
   (‖ 0 ‖ = 0)%L.
 Proof.
-intros Hop Hor Hii.
+intros Hop Hto Hii.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 progress unfold gc_modl.
 progress unfold rl_modl.
@@ -199,10 +200,10 @@ Qed.
 Theorem gc_modl_nonneg :
   rngl_has_opp_or_psub T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ z, (0 ≤ ‖ z ‖)%L.
 Proof.
-intros Hos Hiq Hor *.
+intros Hos Hiq Hto *.
 progress unfold gc_modl.
 progress unfold rl_modl.
 apply rl_sqrt_nonneg.
@@ -263,23 +264,24 @@ Theorem gc_modl_triangular :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a b, (‖ (a + b) ‖ ≤ ‖ a ‖ + ‖ b ‖)%L.
 Proof.
-intros Hic Hop Hiv Hor *.
-apply (rl_modl_add_le Hic Hop Hiv Hor).
+intros Hic Hop Hiv Hto *.
+apply (rl_modl_add_le Hic Hop Hiv Hto).
 Qed.
 
 Theorem gc_modl_triangular_2 :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a b, (‖ a ‖ ≤ ‖ a + b ‖ + ‖ b ‖)%L.
 Proof.
-intros Hic Hop Hiv Hor *.
+intros Hic Hop Hiv Hto *.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
-specialize (gc_modl_triangular Hic Hop Hiv Hor) as H1.
+specialize (gc_modl_triangular Hic Hop Hiv Hto) as H1.
 rewrite <- (gc_modl_opp Hop b).
 eapply (rngl_le_trans Hor); [ | apply H1 ].
 rewrite (gc_add_opp_r Hop).
@@ -294,10 +296,10 @@ Theorem gc_modl_mul :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a b, ‖ (a * b) ‖ = (‖ a ‖ * ‖ b ‖)%L.
 Proof.
-intros Hic Hop Hiq Hor.
+intros Hic Hop Hiq Hto.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros *.
 progress unfold gc_modl.
@@ -311,10 +313,10 @@ Qed.
 Theorem eq_gc_modl_0 :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a, ‖ a ‖ = 0%L → a = 0%C.
 Proof.
-intros Hop Hiq Hor.
+intros Hop Hiq Hto.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Haz.
 apply (eq_rl_sqrt_0 Hos) in Haz. {
@@ -327,10 +329,10 @@ Qed.
 Theorem gc_modl_1 :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ‖ 1 ‖ = 1%L.
 Proof.
-intros Hop Hiq Hor.
+intros Hop Hiq Hto.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 progress unfold gc_modl.
 progress unfold rl_modl.
@@ -378,10 +380,10 @@ Qed.
 Theorem rngl_inv_sqrt :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a, (0 < a)%L → (√a)⁻¹%L = √(a⁻¹)%L.
 Proof.
-intros Hop Hiv Hor.
+intros Hop Hiv Hto.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Haz.
@@ -397,10 +399,10 @@ Theorem gc_modl_inv :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a, a ≠ 0%C → ‖ a ‖⁻¹%L = ‖ a⁻¹ ‖.
 Proof.
-intros Hic Hop Hiv Hor.
+intros Hic Hop Hiv Hto.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Haz.
@@ -420,7 +422,7 @@ rewrite (rngl_squ_div Hic Hos Hiv); [ | easy ].
 rewrite (rngl_squ_opp Hop).
 rewrite <- (rngl_div_add_distr_r Hiv).
 rewrite <- Hρ.
-rewrite (rngl_inv_sqrt Hop Hiv Hor). 2: {
+rewrite (rngl_inv_sqrt Hop Hiv Hto). 2: {
   apply (rngl_le_neq Hto).
   split; [ subst ρ; apply (rngl_add_squ_nonneg Hos Hto) | easy ].
 }
@@ -438,29 +440,29 @@ Theorem gc_modl_div :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a b, b ≠ 0%C → ‖ (a / b) ‖ = (‖ a ‖ / ‖ b ‖)%L.
 Proof.
-intros Hic Hop Hiv Hor.
+intros Hic Hop Hiv Hto.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Hbz.
 progress unfold gc_div.
 progress unfold rngl_div.
 rewrite Hiv.
-rewrite (gc_modl_mul Hic Hop Hiq Hor).
+rewrite (gc_modl_mul Hic Hop Hiq Hto).
 f_equal.
 symmetry.
-now apply (gc_modl_inv Hic Hop Hiv Hor).
+now apply (gc_modl_inv Hic Hop Hiv Hto).
 Qed.
 
 Theorem gc_div_mul :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a b, b ≠ 0%C → (a / b * b)%C = a.
 Proof.
-intros Hic Hop Hiv Hor.
+intros Hic Hop Hiv Hto.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_pdiv Hiv) as Hii.
@@ -506,12 +508,13 @@ Theorem gc_summation_triangular :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   (rngl_is_integral_domain T || rngl_has_inv_or_pdiv T)%bool = true →
   ∀ b e (f : nat → GComplex T),
   (‖ ∑ (i = b, e), f i ‖ ≤ ∑ (i = b, e), ‖ f i ‖)%L.
 Proof.
-intros Hic Hop Hiv Hor Hii.
+intros Hic Hop Hiv Hto Hii.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros.
 progress unfold iter_seq.
@@ -521,14 +524,14 @@ clear n Hl.
 progress unfold iter_list.
 induction l as [| a] using List.rev_ind. {
   cbn.
-  rewrite (gc_modl_0 Hop Hor Hii).
+  rewrite (gc_modl_0 Hop Hto Hii).
   apply (rngl_le_refl Hor).
 }
 cbn.
 do 2 rewrite List.fold_left_app.
 cbn.
 eapply (rngl_le_trans Hor). {
-  apply (gc_modl_triangular Hic Hop Hiv Hor).
+  apply (gc_modl_triangular Hic Hop Hiv Hto).
 }
 apply (rngl_add_le_mono_r Hos Hor).
 apply IHl.
@@ -723,6 +726,7 @@ assert (Hra : gre a = 0%L). {
   do 2 rewrite fold_rngl_squ in Habr.
   apply (rngl_eq_mul_0_l Hos Hiq) in Habr; [ easy | ].
   intros H; apply Hbz.
+...
   apply (rl_integral_modulus_prop Hop Hiq Hto) in H.
   now apply eq_gc_eq.
 }
@@ -783,7 +787,7 @@ Theorem gc_modl_pow :
 Proof.
 intros Hic Hop Hiq Hor *.
 induction n; cbn; [ apply (gc_modl_1 Hop Hiq Hor) | ].
-rewrite (gc_modl_mul Hic Hop Hiq Hor).
+rewrite (gc_modl_mul Hic Hop Hiq Hto).
 rewrite rngl_pow_gc_pow.
 now rewrite IHn.
 Qed.
@@ -1031,12 +1035,12 @@ enough (H :
   apply (rngl_le_neq Hto).
   split; [ easy | ].
   intros H'; symmetry in H'.
-  apply (eq_gc_modl_0 Hos Hiv Hor) in H'.
+  apply (eq_gc_modl_0 Hos Hiv Hto) in H'.
   rewrite (gc_mul_comm Hic) in H'.
   apply (gc_eq_mul_0_l Hic Hop Hiv Hor) in H'; [ | easy ].
   apply (gc_pow_nonzero Hic Hop Hiv Hor) in H'; [ easy | ].
   intros H''; rewrite H'' in Hrz.
-  rewrite (gc_modl_0 Hop Hor Hii) in Hrz.
+  rewrite (gc_modl_0 Hop Hto Hii) in Hrz.
   apply (rngl_lt_le_incl Hto) in Hrz.
   now apply rngl_nlt_ge in Hrz.
 }
@@ -1055,11 +1059,11 @@ enough (H :
   apply (rngl_le_neq Hto).
   split; [ apply (gc_modl_nonneg Hos Hor) | ].
   intros H'; symmetry in H'.
-  apply (eq_gc_modl_0 Hos Hiv Hor) in H'.
+  apply (eq_gc_modl_0 Hos Hiv Hto) in H'.
   apply (gc_eq_mul_0_l Hic Hop Hiv Hor) in H'; [ easy | ].
   apply (gc_pow_nonzero Hic Hop Hiv Hor).
   intros H''; rewrite H'' in Hrz.
-  rewrite (gc_modl_0 Hop Hor Hii) in Hrz.
+  rewrite (gc_modl_0 Hop Hto Hii) in Hrz.
   apply (rngl_lt_le_incl Hto) in Hrz.
   now apply rngl_nlt_ge in Hrz.
 }
@@ -1078,7 +1082,7 @@ enough (H :
   eapply (rngl_le_lt_trans Hto); [ | apply H ].
   apply (rngl_summation_le_compat Hor).
   intros i Hi.
-  rewrite (gc_modl_mul Hic Hop Hor).
+  rewrite (gc_modl_mul Hic Hop Hto).
   apply (rngl_mul_le_mono_nonneg_r Hop Hto). {
     apply (gc_modl_nonneg Hos Hor).
   }
@@ -1108,11 +1112,11 @@ destruct (rngl_eq_dec Heo M 0) as [Hmz| Hmz]. {
   apply (rngl_le_neq Hto).
   split ; [ easy | ].
   intros H; symmetry in H.
-  apply (eq_gc_modl_0 Hos Hiv Hor) in H.
+  apply (eq_gc_modl_0 Hos Hiv Hto) in H.
   apply (gc_eq_mul_0_l Hic Hop Hiv Hor) in H; [ easy | ].
   apply (gc_pow_nonzero Hic Hop Hiv Hor).
   intros H''; rewrite H'' in Hx.
-  rewrite (gc_modl_0 Hop Hor Hii) in Hx.
+  rewrite (gc_modl_0 Hop Hto Hii) in Hx.
   apply rngl_nle_gt in Hx.
   apply Hx; clear Hx.
   apply (rngl_0_le_1 Hos Hto).
@@ -1210,7 +1214,7 @@ apply (rngl_lt_div_l Hop Hiv Hto). {
   apply (rngl_le_neq Hto).
   split; [ apply (gc_modl_nonneg Hos Hor) | ].
   intros H; symmetry in H.
-  now apply (eq_gc_modl_0 Hos Hiv Hor) in H.
+  now apply (eq_gc_modl_0 Hos Hiv Hto) in H.
 }
 rewrite (rngl_mul_div_assoc Hiv).
 eapply (rngl_le_lt_trans Hto); [ | apply Hrz ].
@@ -1303,11 +1307,11 @@ rewrite (rngl_abs_nonneg_eq Hop Hor) in Hr. 2: {
   apply (rngl_le_neq Hto).
   split; [ apply (gc_modl_nonneg Hos Hor) | ].
   intros H; symmetry in H.
-  apply (eq_gc_modl_0 Hos Hiv Hor) in H.
+  apply (eq_gc_modl_0 Hos Hiv Hto) in H.
   apply (rngl_eq_mul_0_r Hosc Hi1c) in H; [ | easy ].
   apply (rngl_pow_nonzero Honc Hc1c Hosc Hi1c) in H; [ easy | ].
   intros H'; rewrite H' in Hrz; cbn in Hrz.
-  rewrite (gc_modl_0 Hop Hor Hii) in Hrz.
+  rewrite (gc_modl_0 Hop Hto Hii) in Hrz.
   apply (rngl_lt_le_incl Hto) in Hrz.
   now apply rngl_nlt_ge in Hrz.
 }
@@ -1670,20 +1674,20 @@ assert (Hr : (0 < R₀)%L). {
     apply (rngl_le_neq Hto).
     split; [ apply (gc_modl_nonneg Hos Hor) | ].
     intros H; symmetry in H.
-    now apply (eq_gc_modl_0 Hos Hiv Hor) in H.
+    now apply (eq_gc_modl_0 Hos Hiv Hto) in H.
   }
   apply (rngl_div_nonneg Hop Hiv Hto).
   apply (gc_modl_nonneg Hos Hor).
   apply (rngl_le_neq Hto).
   split; [ apply (gc_modl_nonneg Hos Hor) | ].
   intros H; symmetry in H.
-  now apply (eq_gc_modl_0 Hos Hiv Hor) in H.
+  now apply (eq_gc_modl_0 Hos Hiv Hto) in H.
 }
 split; [ easy | ].
 intros z Hrz.
 assert (Hzz : z ≠ 0%C). {
   intros H; subst z.
-  rewrite (gc_modl_0 Hop Hor Hii) in Hrz.
+  rewrite (gc_modl_0 Hop Hto Hii) in Hrz.
   now apply (rngl_lt_asymm Hto) in Hr.
 }
 remember (Max (i = _, _), _) as m eqn:Hm.
@@ -1691,7 +1695,7 @@ assert (Hz1z : (0 < ‖ (1 / z) ‖)%L). {
   apply (rngl_le_neq Hto).
   split; [ apply (gc_modl_nonneg Hos Hor) | ].
   intros H; symmetry in H.
-  apply (eq_gc_modl_0 Hos Hiv Hor) in H.
+  apply (eq_gc_modl_0 Hos Hiv Hto) in H.
   apply (f_equal (rngl_mul z)) in H.
   cbn in H.
   rewrite (gc_mul_0_r Hos) in H.
@@ -1717,7 +1721,7 @@ assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
     apply (rngl_le_neq Hto).
     split; [ apply (gc_modl_nonneg Hos Hor) | ].
     intros H; symmetry in H.
-    now apply (eq_gc_modl_0 Hos Hiv Hor) in H.
+    now apply (eq_gc_modl_0 Hos Hiv Hto) in H.
   }
   rewrite rngl_mul_1_l.
   apply (rngl_le_trans Hor _ R₀); [ | now apply (rngl_lt_le_incl Hto) ].
@@ -1815,7 +1819,7 @@ assert
   remember (P.[i] / P.[n])%L as x eqn:Hx.
   rewrite (rngl_div_gc_div Hic Hiv) in Hx.
   rewrite <- Hx; cbn.
-  rewrite (gc_modl_mul Hic Hop Hor).
+  rewrite (gc_modl_mul Hic Hop Hto).
   rewrite (rngl_mul_comm Hic).
   destruct (rngl_eq_dec Heo (‖ x ‖) 0) as [Hxz| Hxz]. {
     rewrite Hxz.
@@ -1841,7 +1845,7 @@ assert
     apply (rngl_le_neq Hto).
     split; [ apply (gc_modl_nonneg Hop Hor) | ].
     intros H; symmetry in H.
-    apply (eq_gc_modl_0 Hop Hiv Hor) in H.
+    apply (eq_gc_modl_0 Hop Hiv Hto) in H.
     rewrite <- rngl_0_gc_0 in H.
     now apply (rngl_pow_nonzero Honc Hc1c Hosc Hi1c) in H.
   }
@@ -1872,7 +1876,7 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hto (‖ z ^ (n - 1) ‖))%L in H1. 2: {
   apply (gc_modl_nonneg Hop Hor).
 }
 rewrite (rngl_mul_comm Hic) in H1.
-do 3 rewrite <- (gc_modl_mul Hic Hop Hor) in H1.
+do 3 rewrite <- (gc_modl_mul Hic Hop Hto) in H1.
 (**)
 do 3 rewrite <- rngl_mul_gc_mul in H1.
 rewrite <- rngl_pow_gc_pow in H1.
@@ -1927,11 +1931,11 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
     apply (rngl_le_neq Hto).
     split; [ apply (gc_modl_nonneg Hop Hor) | ].
     symmetry; intros H.
-    now apply (eq_gc_modl_0 Hop Hiv Hor) in H.
+    now apply (eq_gc_modl_0 Hop Hiv Hto) in H.
   }
   cbn in Hm.
   rewrite <- (gc_modl_div Hic Hop Hiv Hor) in Hm; [ | easy ].
-  rewrite (gc_modl_mul Hic Hop Hor) in H1.
+  rewrite (gc_modl_mul Hic Hop Hto) in H1.
   rewrite <- Hm in H1.
 (**)
   subst R₀.
@@ -1949,7 +1953,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   rewrite <- rngl_add_gc_add.
   rewrite <- (rngl_div_gc_div Hic Hiv).
   rewrite <- (gc_mul_add_distr_l Hop); cbn.
-  rewrite (gc_modl_mul Hic Hop Hor).
+  rewrite (gc_modl_mul Hic Hop Hto).
   subst R₀.
   rewrite rngl_of_nat_1 in Hrz.
   rewrite rngl_mul_1_l in Hrz.
@@ -1997,7 +2001,7 @@ assert (Hzm : (0 < m)%L). {
     apply (rngl_le_neq Hto).
     split; [ apply (gc_modl_nonneg Hop Hor) | ].
     intros H; symmetry in H.
-    now apply (eq_gc_modl_0 Hop Hiv Hor) in H.
+    now apply (eq_gc_modl_0 Hop Hiv Hto) in H.
   }
   specialize (H2 H); clear H.
   specialize (H2 0).
@@ -2009,7 +2013,7 @@ assert (Hzm : (0 < m)%L). {
   rewrite (rngl_mul_comm Hic) in H2.
   rewrite (rngl_div_mul Hiv) in H2. 2: {
     intros H.
-    now apply (eq_gc_modl_0 Hop Hiv Hor) in H.
+    now apply (eq_gc_modl_0 Hop Hiv Hto) in H.
   }
 (* ouais bon, y a aucune raison que P.[0] vaille 0 *)
 ...
@@ -2194,7 +2198,7 @@ assert (H1 :
   rewrite gc_pow_succ_r.
   rewrite (gc_mul_comm Hic z).
   rewrite (gc_mul_assoc Hop).
-  rewrite (gc_modl_mul Hic Hop Hor).
+  rewrite (gc_modl_mul Hic Hop Hto).
   eapply (rngl_le_trans Hor). {
     apply (rngl_mul_le_mono_nonneg_r Hop Hto _ _ (‖ z ‖)) in IHm. 2: {
       apply (gc_modl_nonneg Hop Hor).
@@ -2221,14 +2225,14 @@ assert (H1 :
   rewrite (fold_left_rngl_add_fun_from_0 _ (‖ a ‖)%L).
   rewrite rngl_add_assoc.
   apply (rngl_add_le_compat Hor). {
-    rewrite <- (gc_modl_mul Hic Hop Hor).
+    rewrite <- (gc_modl_mul Hic Hop Hto).
     apply (gc_modl_triangular_2 Hic Hop Hiv Hor).
   }
   do 2 rewrite fold_iter_list.
   rewrite (rngl_mul_summation_list_distr_r Hos).
   apply (rngl_summation_list_le_compat Hor).
   intros i Hi.
-  rewrite <- (gc_modl_mul Hic Hop Hor).
+  rewrite <- (gc_modl_mul Hic Hop Hto).
   rewrite <- (gc_mul_assoc Hop).
   rewrite (gc_mul_comm Hic _ z).
   rewrite <- gc_pow_succ_r.
