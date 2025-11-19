@@ -100,7 +100,7 @@ progress unfold rngl_sub at 2.
 rewrite Hop.
 apply (rngl_add_lt_mono_l Hos Hto).
 rewrite (rngl_opp_sub_distr Hop).
-apply (rngl_lt_add_lt_sub_r Hop Hor).
+apply (rngl_lt_add_lt_sub_r Hop Hto).
 rewrite <- (rngl_add_sub_swap Hop).
 apply (rngl_lt_sub_lt_add_l Hop Hto).
 do 2 rewrite <- (rngl_mul_2_l (rngl_cos _)).
@@ -313,7 +313,7 @@ destruct zc1. {
   specialize (cos2_sin2_1 θ2) as Hcs2.
   apply (rngl_add_sub_eq_r Hos) in Hcs1, Hcs2.
   rewrite <- Hcs1, <- Hcs2 in Hc12.
-  now apply (rngl_sub_lt_mono_l Hop Hor) in Hc12.
+  now apply (rngl_sub_lt_mono_l Hop Hto) in Hc12.
 }
 apply (rngl_ltb_ge_iff Hto) in Hzc1.
 remember (0 <? rngl_cos θ2)%L as zc2 eqn:Hzc2.
@@ -348,7 +348,7 @@ destruct zc2. {
   specialize (cos2_sin2_1 θ2) as Hcs2.
   apply (rngl_add_sub_eq_r Hos) in Hcs1, Hcs2.
   rewrite <- Hcs1, <- Hcs2 in Hc12.
-  now apply (rngl_sub_lt_mono_l Hop Hor) in Hc12.
+  now apply (rngl_sub_lt_mono_l Hop Hto) in Hc12.
 }
 Qed.
 
@@ -1149,7 +1149,7 @@ split; intros H12. {
         generalize Hzs1; intros H.
         apply (rngl_leb_gt_iff Hto) in H.
         rewrite H; clear H.
-        rewrite (rngl_ltb_opp_r Hop Hor), (rngl_opp_involutive Hop).
+        rewrite (rngl_ltb_opp_r Hop Hto), (rngl_opp_involutive Hop).
         now apply rngl_ltb_lt.
       }
       apply rngl_nlt_ge in Hzs12d.

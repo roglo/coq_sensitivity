@@ -219,7 +219,7 @@ destruct zs. {
     now rewrite rngl_mul_0_r.
   }
   (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
-  apply (rngl_2_x2_sub_1_le_x Hop Hiq Hor).
+  apply (rngl_2_x2_sub_1_le_x Hop Hiq Hto).
   rewrite <- Hx in Hzsm.
   split; [ easy | ].
   subst x; apply rngl_cos_bound.
@@ -448,7 +448,7 @@ destruct_ac.
 intros.
 specialize (@newton_binomial) as H1.
 set (gro := gc_ring_like_op T).
-set (grp := gc_ring_like_prop_not_alg_closed Hic Hop Hiv Hor).
+set (grp := gc_ring_like_prop_not_alg_closed Hic Hop Hiv Hto).
 specialize (H1 (GComplex T)).
 specialize (H1 gro grp).
 assert (Hosc : rngl_has_opp_or_psub (GComplex T) = true). {
@@ -1046,9 +1046,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize rl_sqrt_half_nonneg as Hzs.
 intros * Hsz.
 rewrite rngl_sin_mul_2_l in Hsz.
-apply (rngl_lt_mul_0_if Hos Hor) in Hsz.
+apply (rngl_lt_mul_0_if Hos Hto) in Hsz.
 destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
-  apply (rngl_lt_mul_0_if Hos Hor) in H2sz.
+  apply (rngl_lt_mul_0_if Hos Hto) in H2sz.
   destruct H2sz as [(H, _)| (_, Hcz)]. {
     exfalso.
     apply rngl_nle_gt in H.
@@ -1086,7 +1086,7 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   rewrite (rngl_opp_0 Hop).
   apply (rngl_le_refl Hor).
 }
-apply (rngl_mul_pos_cancel_l Hop Hiq Hor) in Hz2s. 2: {
+apply (rngl_mul_pos_cancel_l Hop Hiq Hto) in Hz2s. 2: {
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 left.

@@ -1239,7 +1239,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 set (roc := gc_ring_like_op T).
-set (rpc := gc_ring_like_prop_not_alg_closed Hic Hop Hiv Hor).
+set (rpc := gc_ring_like_prop_not_alg_closed Hic Hop Hiv Hto).
 assert (Hc1c : rngl_characteristic (GComplex T) ≠ 1) by easy.
 assert (Hosc : rngl_has_opp_or_psub (GComplex T) = true). {
   progress unfold rngl_has_opp_or_psub.
@@ -1531,7 +1531,7 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
     ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
 Proof.
 intros Hic Hop Hiv Hor.
-set (rpc := gc_ring_like_prop_not_alg_closed Hic Hop Hiv Hor).
+set (rpc := gc_ring_like_prop_not_alg_closed Hic Hop Hiv Hto).
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_pdiv Hiv) as Hii.
@@ -2235,7 +2235,7 @@ assert (H1 :
   apply (rngl_le_refl Hor).
 }
 eapply (rngl_lt_le_trans Hto); [ | apply H1 ].
-apply (rngl_lt_add_lt_sub_r Hop Hor).
+apply (rngl_lt_add_lt_sub_r Hop Hto).
 ...
 *)
 

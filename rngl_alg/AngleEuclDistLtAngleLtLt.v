@@ -27,10 +27,11 @@ Context {ac : angle_ctx T}.
 Theorem rngl_sqrt_min_distr :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a b, (0 ≤ a)%L → (0 ≤ b)%L → rngl_min √a √b = √(rngl_min a b)%L.
 Proof.
-intros Hop Hiq Hor * Hza Hzb.
+intros Hop Hiq Hto * Hza Hzb.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 progress unfold rngl_min.
 remember (√a ≤? √b)%L as sab eqn:Hsab.
 remember (a ≤? b)%L as ab eqn:Hab.
@@ -93,7 +94,7 @@ do 2 rewrite rngl_cos_sub in Hc1312.
 apply (rngl_lt_sub_lt_add_l Hop Hto) in Hc1312.
 rewrite (rngl_add_sub_swap Hop) in Hc1312.
 rewrite <- (rngl_mul_sub_distr_l Hop) in Hc1312.
-apply (rngl_lt_add_lt_sub_r Hop Hor) in Hc1312.
+apply (rngl_lt_add_lt_sub_r Hop Hto) in Hc1312.
 rewrite <- (rngl_mul_sub_distr_l Hop) in Hc1312.
 apply (rngl_mul_lt_mono_pos_l Hop Hiq Hto (rngl_sin θ1) _ _ Hzs1) in
   Hc1312.
@@ -104,7 +105,7 @@ apply (rngl_add_move_l Hop) in H2.
 rewrite H2 in Hc1312; clear H2.
 rewrite (rngl_mul_sub_distr_r Hop) in Hc1312.
 rewrite rngl_mul_1_l in Hc1312.
-apply (rngl_lt_add_lt_sub_r Hop Hor) in Hc1312.
+apply (rngl_lt_add_lt_sub_r Hop Hto) in Hc1312.
 progress unfold rngl_squ in Hc1312.
 rewrite (rngl_mul_comm Hic (rngl_sin θ1)) in Hc1312.
 do 2 rewrite <- rngl_mul_assoc in Hc1312.
@@ -120,7 +121,7 @@ rewrite <- rngl_sin_sub in Hc1312.
 apply (rngl_lt_add_lt_sub_l Hop Hto) in Hc1312.
 assert (H2 : (rngl_sin θ3 < rngl_sin θ2)%L). {
   eapply (rngl_le_lt_trans Hto); [ | apply Hc1312 ].
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_mul_nonneg_nonneg Hos Hor).
   now apply (rngl_lt_le_incl Hto).
   apply (rngl_le_0_sub Hop Hto).
