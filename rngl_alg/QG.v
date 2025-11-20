@@ -1690,12 +1690,67 @@ apply QG_mul_nonneg_nonneg; [ now apply QG_lt_le_incl | ].
 now apply QG_le_0_sub.
 Qed.
 
+Theorem QG_lt_le_neq : ∀ a b, (a < b ↔ a ≤ b ∧ a ≠ b)%QG.
+Proof.
+intros.
+split; intros Hab. {
+  split; [ now apply QG_lt_le_incl | ].
+  intros H; subst b.
+  now apply QG_lt_irrefl in Hab.
+}
+destruct Hab as (Hab, Hnab).
+apply QG_nle_gt.
+intros Hba.
+apply Hnab; clear Hnab.
+now apply QG_le_antisymm.
+Qed.
+
+(* *)
+
+Require Import RingLike.Core.
+
+Definition QG_ring_like_op : ring_like_op QG :=
+  {| rngl_zero := 0%QG;
+     rngl_one := 1%QG;
+     rngl_add := QG_add;
+     rngl_mul := QG_mul;
+     rngl_opt_opp_or_psub := Some (inl QG_opp);
+     rngl_opt_inv_or_pdiv := Some (inl QG_inv);
+     rngl_opt_is_zero_divisor := Some (λ _, True);
+     rngl_opt_eq_dec := Some QG_eq_dec;
+     rngl_opt_leb := Some (QG_leb, true) |}.
+
+Definition QG_ring_like_ord :=
+  let _ := QG_ring_like_op in
+  {| rngl_ord_le_refl := QG_le_refl;
+     rngl_ord_le_antisymm := QG_le_antisymm;
+     rngl_ord_le_trans := QG_le_trans;
+     rngl_ord_add_le_mono_l := QG_add_le_mono_l;
+     rngl_ord_mul_le_compat_nonneg := QG_mul_le_compat_nonneg;
+     rngl_ord_mul_le_compat_nonpos := QG_mul_le_compat_nonpos;
+     rngl_ord_le_dec := QG_le_dec;
+     rngl_ord_total_prop := QG_ord_total_prop |}.
+
+Theorem QG_integral :
+  let roq := QG_ring_like_op in
+  ∀ a b : QG,
+  (a * b)%QG = 0%QG
+  → a = 0%QG ∨ b = 0%QG ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
+Proof.
+intros * Hab.
+now right; right; left.
+Qed.
+
 Theorem QG_archimedean :
-  ∀ a b : QG, (0 < a)%QG →
-  {n : nat | (b < List.fold_right QG_add 0 (List.repeat a n))%QG}.
+  ∀ a b : QG,
+  (0 ≤? a)%QG = true ∧ 0%QG ≠ a
+  → ∃ₜ n : nat,
+    (b ≤? List.fold_right QG_add 0 (ListDef.repeat a n))%QG = true ∧
+    b ≠ List.fold_right QG_add 0%QG (ListDef.repeat a n).
 Proof.
 intros * Ha *.
 exists (Z.to_nat (Z_of_QG (b / a)) + 1)%nat.
+apply QG_lt_le_neq.
 rewrite List_fold_right_QG_add.
 rewrite List.map_repeat.
 rewrite Q_mul_nat.
@@ -1713,6 +1768,7 @@ destruct (Qlt_le_dec 0 (qg_q b)) as [Hbz| Hbz]. 2: {
     apply Z.div_pos; [ | easy ].
     apply Z.mul_nonneg_nonneg. {
       apply QG_lt_iff in Ha.
+      apply QG_lt_le_neq in Ha.
       destruct Ha as (Ha, Haz).
       apply Qle_bool_iff in Ha; cbn in Ha.
       progress unfold Qle in Ha.
@@ -1740,6 +1796,7 @@ destruct (Qlt_le_dec 0 (qg_q b)) as [Hbz| Hbz]. 2: {
         destruct a as ((an, ad), Hap).
         cbn in Ha |-*.
         apply QG_lt_iff in Ha.
+        apply QG_lt_le_neq in Ha.
         destruct Ha as (Ha1, Ha2).
         apply Qle_bool_iff in Ha1.
         cbn in Ha1.
@@ -1775,6 +1832,7 @@ destruct (Qlt_le_dec 0 (qg_q b)) as [Hbz| Hbz]. 2: {
         apply QG_lt_iff in Ha.
         destruct a as ((an, ad), Hap).
         cbn in H3; subst an.
+        apply QG_lt_le_neq in Ha.
         destruct Ha as (Ha1, Ha2).
         apply Ha2; symmetry.
         now apply qeq_QG_eq.
@@ -1822,6 +1880,7 @@ rewrite Z2Nat.id. 2: {
     cbn in Ha, Hx.
     subst an.
     apply QG_lt_iff in Ha.
+    apply QG_lt_le_neq in Ha.
     destruct Ha as (Ha, Ha').
     apply Qle_bool_iff in Ha.
     cbn in Ha.
@@ -1836,6 +1895,7 @@ rewrite QG_of_Z_add.
 progress unfold QG_of_Z at 2; fold QG_1.
 specialize (QG_of_Z_Z_of_QG_interv (b / a)%QG) as H1.
 destruct H1 as (H1, H2).
+...
 apply (@QG_mul_lt_mono_pos_l a) in H2; [ | easy ].
 progress unfold QG_div in H2 at 1.
 rewrite (QG_mul_comm a) in H2.
@@ -1845,42 +1905,7 @@ rewrite QG_mul_inv_diag_l in H2. 2: {
 }
 now rewrite QG_mul_1_r in H2.
 Qed.
-
-(* *)
-
-Require Import RingLike.Core.
-
-Definition QG_ring_like_op : ring_like_op QG :=
-  {| rngl_zero := 0%QG;
-     rngl_one := 1%QG;
-     rngl_add := QG_add;
-     rngl_mul := QG_mul;
-     rngl_opt_opp_or_psub := Some (inl QG_opp);
-     rngl_opt_inv_or_pdiv := Some (inl QG_inv);
-     rngl_opt_is_zero_divisor := Some (λ _, True);
-     rngl_opt_eq_dec := Some QG_eq_dec;
-     rngl_opt_leb := Some (QG_leb, true) |}.
-
-Definition QG_ring_like_ord :=
-  let _ := QG_ring_like_op in
-  {| rngl_ord_le_refl := QG_le_refl;
-     rngl_ord_le_antisymm := QG_le_antisymm;
-     rngl_ord_le_trans := QG_le_trans;
-     rngl_ord_add_le_mono_l := QG_add_le_mono_l;
-     rngl_ord_mul_le_compat_nonneg := QG_mul_le_compat_nonneg;
-     rngl_ord_mul_le_compat_nonpos := QG_mul_le_compat_nonpos;
-     rngl_ord_le_dec := QG_le_dec;
-     rngl_ord_total_prop := QG_ord_total_prop |}.
-
-Theorem QG_integral :
-  let roq := QG_ring_like_op in
-  ∀ a b : QG,
-  (a * b)%QG = 0%QG
-  → a = 0%QG ∨ b = 0%QG ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
-Proof.
-intros * Hab.
-now right; right; left.
-Qed.
+*)
 
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;

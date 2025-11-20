@@ -338,7 +338,7 @@ destruct zc2. {
   rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
     now apply rngl_lt_le_incl.
   }
-  specialize (rngl_lt_le_incl Hto _ _ Hzs1) as H.
+  specialize (rngl_lt_le_incl _ _ Hzs1) as H.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
   apply (rngl_abs_lt_squ_lt Hop Hiq Hto) in Hc12. 2: {
     apply (rngl_mul_comm Hic).
@@ -397,7 +397,7 @@ destruct zs. {
       apply (rngl_ltb_lt Heo) in Hzc.
       now apply (rngl_lt_le_trans Hor _ 0).
     }
-    apply rngl_ltb_nlt in Hcz.
+    apply (rngl_ltb_nlt Heo) in Hcz.
     apply (rngl_nlt_ge_iff Hto) in Hcz.
     apply (rngl_lt_le_trans Hor _ √(1/2))%L; [ easy | ].
     specialize rngl_sin_nonneg_cos_le_sin_le as H2.
@@ -421,7 +421,7 @@ destruct zs. {
       apply (rngl_ltb_lt Heo) in Hzc.
       now apply (rngl_lt_le_trans Hor _ 0).
     }
-    apply rngl_ltb_nlt in Hcz.
+    apply (rngl_ltb_nlt Heo) in Hcz.
     apply (rngl_nlt_ge_iff Hto) in Hcz.
     apply (rngl_nle_gt_iff Hto).
     intros Hcc.

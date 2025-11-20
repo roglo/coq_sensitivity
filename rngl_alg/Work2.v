@@ -815,7 +815,7 @@ destruct (rngl_ltb_dec b 0) as [Hblz| Hbgz]. {
   apply rl_sqrt_nonneg.
   apply rngl_1_add_cos_div_2_nonneg.
 }
-apply rngl_ltb_nlt in Hbgz.
+apply (rngl_ltb_nlt Heo) in Hbgz.
 apply (rngl_nlt_ge_iff Hto) in Hbgz.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor b); [ | easy ].
 rewrite <- (rngl_abs_nonneg_eq Hop Hor √_). 2: {
