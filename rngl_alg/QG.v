@@ -1895,7 +1895,7 @@ rewrite QG_of_Z_add.
 progress unfold QG_of_Z at 2; fold QG_1.
 specialize (QG_of_Z_Z_of_QG_interv (b / a)%QG) as H1.
 destruct H1 as (H1, H2).
-...
+apply QG_lt_le_neq in Ha.
 apply (@QG_mul_lt_mono_pos_l a) in H2; [ | easy ].
 progress unfold QG_div in H2 at 1.
 rewrite (QG_mul_comm a) in H2.
@@ -1905,7 +1905,6 @@ rewrite QG_mul_inv_diag_l in H2. 2: {
 }
 now rewrite QG_mul_1_r in H2.
 Qed.
-*)
 
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
