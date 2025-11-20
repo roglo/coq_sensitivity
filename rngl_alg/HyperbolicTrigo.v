@@ -150,7 +150,7 @@ rewrite (rngl_squ_0 Hos) in H1.
 apply (rngl_sub_move_l Hop) in H1.
 rewrite (rngl_sub_0_l Hop) in H1.
 specialize (rngl_squ_nonneg Hos Hto (rngl_sinh θ))%L as H2.
-apply rngl_nlt_ge in H2.
+apply (rngl_nlt_ge Hor) in H2.
 apply H2; clear H2.
 rewrite H1.
 apply (rngl_opp_1_lt_0 Hop Hto Hc1).
@@ -685,21 +685,21 @@ destruct (0 ≤? rngl_sinh θ1)%L. {
   split; intros H. {
     apply Bool.not_true_iff_false in H.
     apply (rngl_leb_gt_iff Hto) in H.
-    now apply rngl_ltb_lt.
+    now apply (rngl_ltb_lt Heo).
   }
   apply Bool.not_true_iff_false.
   apply (rngl_leb_gt_iff Hto).
-  now apply rngl_ltb_lt.
+  now apply (rngl_ltb_lt Heo).
 }
 destruct (0 ≤? rngl_sinh θ2)%L; [ easy | ].
 split; intros H. {
   apply Bool.not_true_iff_false in H.
   apply (rngl_leb_gt_iff Hto) in H.
-  now apply rngl_ltb_lt.
+  now apply (rngl_ltb_lt Heo).
 }
 apply Bool.not_true_iff_false.
 apply (rngl_leb_gt_iff Hto).
-now apply rngl_ltb_lt.
+now apply (rngl_ltb_lt Heo).
 Qed.
 
 Theorem rngl_cosh_add :
@@ -759,7 +759,7 @@ apply (rngl_squ_eq_cases Hop Hiv Heo) in H1. 2: {
 apply eq_hangle_eq; cbn.
 destruct H1; subst c; [ easy | ].
 exfalso.
-apply rngl_nlt_ge in H2.
+apply (rngl_nlt_ge Hor) in H2.
 apply H2; clear H2.
 apply (rngl_opp_1_lt_0 Hop Hto Hc1).
 Qed.
@@ -1170,14 +1170,14 @@ destruct c1z. 2: {
   destruct c2z; [ | easy ].
   exfalso.
   apply rngl_leb_le in Hc2z.
-  apply rngl_nlt_ge in Hc2z.
+  apply (rngl_nlt_ge Hor) in Hc2z.
   apply Hc2z; clear Hc2z.
   apply (rngl_cosh_pos Hc1).
 }
 destruct c2z; [ now apply (rngl_opp_inj Hop) in H1 | ].
 exfalso.
 apply rngl_leb_le in Hc1z.
-apply rngl_nlt_ge in Hc1z.
+apply (rngl_nlt_ge Hor) in Hc1z.
 apply Hc1z; clear Hc1z.
 apply (rngl_cosh_pos Hc1).
 Qed.
@@ -1230,20 +1230,20 @@ destruct zs1. {
   apply rngl_leb_le in Hzs2.
   split; intros H12. {
     apply (rngl_leb_gt_iff Hto) in H12.
-    now apply rngl_ltb_lt.
+    now apply (rngl_ltb_lt Heo).
   } {
     apply (rngl_leb_gt_iff Hto).
-    now apply rngl_ltb_lt in H12.
+    now apply (rngl_ltb_lt Heo) in H12.
   }
 } {
   apply (rngl_leb_gt_iff Hto) in Hzs1.
   destruct zs2; [ easy | ].
   split; intros H12. {
     apply (rngl_leb_gt_iff Hto) in H12.
-    now apply rngl_ltb_lt.
+    now apply (rngl_ltb_lt Heo).
   } {
     apply (rngl_leb_gt_iff Hto).
-    now apply rngl_ltb_lt in H12.
+    now apply (rngl_ltb_lt Heo) in H12.
   }
 }
 Qed.
@@ -1268,10 +1268,10 @@ progress unfold hangle_ltb in H.
 remember (0 ≤? rngl_sinh θ)%L as zs eqn:Hzs.
 symmetry in Hzs.
 destruct zs. {
-  apply rngl_ltb_lt in H.
+  apply (rngl_ltb_lt Heo) in H.
   now apply rngl_lt_irrefl in H.
 } {
-  apply rngl_ltb_lt in H.
+  apply (rngl_ltb_lt Heo) in H.
   now apply rngl_lt_irrefl in H.
 }
 Qed.
@@ -1720,12 +1720,12 @@ destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hos Hc1) as H1.
   intros * Hzc *.
-  apply rngl_ltb_lt in Hzc.
+  apply (rngl_ltb_lt Heo) in Hzc.
   rewrite H1 in Hzc.
   now apply rngl_lt_irrefl in Hzc.
 }
 intros * Hzc.
-apply rngl_ltb_lt in Hzc.
+apply (rngl_ltb_lt Heo) in Hzc.
 progress unfold cosh2_sinh2_prop.
 apply Bool.andb_true_iff.
 set (d := √(rngl_cos θ)).

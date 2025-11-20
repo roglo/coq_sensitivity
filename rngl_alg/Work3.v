@@ -1043,7 +1043,7 @@ enough (H :
   intros H''; rewrite H'' in Hrz.
   rewrite (gc_modl_0 Hop Hto Hii) in Hrz.
   apply rngl_lt_le_incl in Hrz.
-  now apply rngl_nlt_ge in Hrz.
+  now apply (rngl_nlt_ge Hor) in Hrz.
 }
 enough (H :
   ∃ R,
@@ -1066,7 +1066,7 @@ enough (H :
   intros H''; rewrite H'' in Hrz.
   rewrite (gc_modl_0 Hop Hto Hii) in Hrz.
   apply rngl_lt_le_incl in Hrz.
-  now apply rngl_nlt_ge in Hrz.
+  now apply (rngl_nlt_ge Hor) in Hrz.
 }
 set (M := Max (k = 0, n - 1), ‖ a.[k] ‖).
 enough (H :
@@ -1314,7 +1314,7 @@ rewrite (rngl_abs_nonneg_eq Hop Hor) in Hr. 2: {
   intros H'; rewrite H' in Hrz; cbn in Hrz.
   rewrite (gc_modl_0 Hop Hto Hii) in Hrz.
   apply rngl_lt_le_incl in Hrz.
-  now apply rngl_nlt_ge in Hrz.
+  now apply (rngl_nlt_ge Hor) in Hrz.
 }
 ...
   apply (rngl_pow_nonzero Hc1 Hos) in H.
@@ -1465,7 +1465,7 @@ assert
   destruct (is_lower_bound Im (m + ε)) as [Hme| Hme]; [ exfalso | easy ].
   specialize (Hm (m + ε)%L) as H1.
   destruct (is_bound _ _) as [Hbme| Hbme]. {
-    apply rngl_nlt_ge in H1.
+    apply (rngl_nlt_ge Hor) in H1.
     now apply H1, (rngl_lt_add_r Hos Hto).
   }
   clear H1.
