@@ -172,7 +172,7 @@ Theorem rngl_cosh_pos :
 Proof.
 destruct_hc.
 intros Hc1 *.
-apply (rngl_le_neq Hto).
+apply rngl_le_neq.
 split; [ apply rngl_cosh_nonneg | ].
 symmetry.
 apply (eq_rngl_cosh_0 Hc1).

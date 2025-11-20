@@ -245,7 +245,7 @@ apply (rngl_mul_nonneg_nonneg Hos Hor). {
     rewrite Hzs3; cbn.
     rewrite (rngl_leb_refl Hor).
     apply (rngl_ltb_lt Heo).
-    apply (rngl_le_neq Hto).
+    apply rngl_le_neq.
     split; [ apply rngl_cos_bound | ].
     intros H1.
     symmetry in H1.
@@ -304,7 +304,7 @@ destruct H23 as [H23| H23]. 2: {
   apply rngl_lt_le_incl in Hzs2.
   now apply (rngl_nlt_ge Hor) in Hzs2.
 }
-apply (rngl_le_neq Hto).
+apply rngl_le_neq.
 apply rngl_lt_le_incl in Hzs2, Hzs3.
 apply (quadrant_1_rngl_cos_add_lt θ1).
 easy.
@@ -346,7 +346,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hz21 Hzs21 Hzs1 Hzs2 Hzc1 Hzc2.
 apply quadrant_1_sin_sub_pos_cos_lt; try easy.
-apply (rngl_le_neq Hto).
+apply rngl_le_neq.
 split; [ easy | ].
 intros H; symmetry in H.
 apply eq_rngl_sin_0 in H.
@@ -407,7 +407,7 @@ destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
   apply (rngl_opp_nonneg_nonpos Hop Hto) in Hzs21.
   apply (rngl_nlt_ge Hor) in Hzs21.
   apply Hzs21; clear Hzs21.
-  apply (rngl_le_neq Hto).
+  apply rngl_le_neq.
   split. {
     rewrite rngl_sin_sub.
     apply (rngl_le_0_sub Hop Hto).

@@ -809,7 +809,7 @@ split. {
   apply (rngl_le_div_r Hop Hiv Hto). {
     remember (rngl_squ x + rngl_squ y)%L as a eqn:Ha.
     symmetry in Ha.
-    apply (rngl_le_neq Hto).
+    apply rngl_le_neq.
     split. {
       now apply rl_sqrt_nonneg.
     } {
@@ -847,7 +847,7 @@ split. {
   apply (rngl_le_div_l Hop Hiv Hto). {
     remember (rngl_squ x + rngl_squ y)%L as a eqn:Ha.
     symmetry in Ha.
-    apply (rngl_le_neq Hto).
+    apply rngl_le_neq.
     split. {
       now apply rl_sqrt_nonneg.
     } {
@@ -921,7 +921,7 @@ assert (Hρz : ρ ≠ 0%L). {
 }
 assert (Hzρ : (0 < ρ)%L). {
   apply not_eq_sym in Hρz.
-  apply (rngl_le_neq Hto).
+  apply rngl_le_neq.
   split; [ | easy ].
   rewrite Hρ.
   apply rl_sqrt_nonneg.
@@ -1926,7 +1926,7 @@ induction n; intros. {
   apply (rngl_lt_le_trans Hor _ 0). {
     apply (rngl_opp_neg_pos Hop Hto).
     apply (rl_sqrt_pos Hos Hto).
-    apply (rngl_le_neq Hto).
+    apply rngl_le_neq.
     split; [ apply rngl_1_add_cos_div_2_nonneg | ].
     intros H; symmetry in H.
     progress unfold rngl_div in H.
@@ -1996,7 +1996,7 @@ destruct_ac.
 intros Hc1.
 intros * Htz.
 induction n; cbn. {
-  apply (rngl_le_neq Hto).
+  apply rngl_le_neq.
   split; [ apply rngl_cos_bound | ].
   intros H.
   now apply eq_rngl_cos_1 in H.
