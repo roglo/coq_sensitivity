@@ -2021,7 +2021,7 @@ apply (rngl_lt_div_r Hop Hiv Hto).
 apply (rngl_0_lt_2 Hos Hc1 Hto).
 rewrite (rngl_mul_comm Hic).
 rewrite rngl_mul_2_l.
-apply (rngl_add_lt_mono_r Hos Hto).
+apply (rngl_add_lt_mono_r Hos Hor).
 subst a.
 now apply (squ_rngl_cos_non_0_div_pow_2_bound Hc1).
 Qed.

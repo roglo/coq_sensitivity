@@ -1944,7 +1944,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   rewrite rngl_mul_1_l in Hrz.
   rewrite (rngl_add_comm 1) in Hrz.
   rewrite <- rngl_add_assoc in Hrz.
-  apply (rngl_add_lt_mono_r Hop Hto _ _ (1 + m))%L.
+  apply (rngl_add_lt_mono_r Hop Hor _ _ (1 + m))%L.
   eapply (rngl_lt_le_trans Hor); [ apply Hrz | ].
 ...
   rewrite <- (gc_div_mul Hic Hop Hiv Hor a b); [ | easy ].
@@ -1960,7 +1960,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   rewrite rngl_mul_1_l in Hrz.
   rewrite (rngl_add_comm 1) in Hrz.
   rewrite <- rngl_add_assoc in Hrz.
-  apply (rngl_add_lt_mono_r Hop Hto _ _ (1 + m))%L.
+  apply (rngl_add_lt_mono_r Hop Hor _ _ (1 + m))%L.
   eapply (rngl_lt_le_trans Hor); [ apply Hrz | ].
 ...
   eapply (rngl_lt_le_trans Hor). 2: {
