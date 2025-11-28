@@ -1466,7 +1466,7 @@ assert
   specialize (Hm (m + ε)%L) as H1.
   destruct (is_bound _ _) as [Hbme| Hbme]. {
     apply (rngl_nlt_ge Hor) in H1.
-    now apply H1, (rngl_lt_add_r Hos Hto).
+    now apply H1, (rngl_lt_add_r Hos Hor).
   }
   clear H1.
   destruct Hbme as (x, Hx).
