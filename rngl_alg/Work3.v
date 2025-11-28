@@ -1109,7 +1109,7 @@ destruct (rngl_eq_dec Heo M 0) as [Hmz| Hmz]. {
     intros i Hi.
     apply (rngl_mul_0_l Hos).
   }
-  apply (rngl_mul_pos_pos Hop Hiq Hto); [ easy | ].
+  apply (rngl_mul_pos_pos Hop Hiq Hor); [ easy | ].
   apply rngl_le_neq.
   split ; [ easy | ].
   intros H; symmetry in H.
@@ -1210,7 +1210,7 @@ apply (rngl_lt_div_l Hop Hiv Hto _ _ _ Hzx).
 rewrite <- (rngl_mul_div_assoc Hiv).
 rewrite (rngl_mul_comm Hic).
 apply (rngl_lt_div_l Hop Hiv Hto). {
-  apply (rngl_mul_pos_pos Hop Hiq Hto); [ easy | ].
+  apply (rngl_mul_pos_pos Hop Hiq Hor); [ easy | ].
   apply (rngl_div_pos Hop Hiv Hto); [ | easy ].
   apply rngl_le_neq.
   split; [ apply (gc_modl_nonneg Hos Hor) | ].
@@ -2076,7 +2076,7 @@ assert (H2 : (‖ 1 / z ‖ * rngl_of_nat n * m < ‖ z ‖)%L). {
   rewrite <- rngl_mul_assoc.
   rewrite <- rngl_mul_1_l.
   apply (rngl_mul_le_mono_pos_r Hop Hiq Hto). {
-    apply (rngl_mul_pos_pos Hop Hto Hii). 2: {
+    apply (rngl_mul_pos_pos Hop Hor Hii). 2: {
 ...
     rewrite <- rngl_of_nat_0.
 ...

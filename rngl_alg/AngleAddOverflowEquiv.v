@@ -328,7 +328,7 @@ destruct zc2. {
     apply (rngl_mul_nonpos_nonneg Hop Hor); [ easy | ].
     now apply rngl_lt_le_incl.
   } {
-    now apply (rngl_mul_pos_pos Hop Hiq Hto).
+    now apply (rngl_mul_pos_pos Hop Hiq Hor).
   }
 } {
   apply (rngl_ltb_ge_iff Hto) in Hzc2.
@@ -489,7 +489,7 @@ destruct zs. {
     rewrite (rngl_mul_opp_r Hop).
     rewrite (rngl_add_opp_r Hop).
     rewrite <- (rngl_mul_sub_distr_l Hop).
-    apply (rngl_mul_pos_pos Hop Hiq Hto). {
+    apply (rngl_mul_pos_pos Hop Hiq Hor). {
       apply (rl_sqrt_half_pos Hc1).
     }
     now apply (rngl_lt_0_sub Hop Hor).
@@ -921,7 +921,7 @@ split; intros H12. {
       rewrite Hiv.
       (* lemma *)
       rewrite (rngl_mul_comm Hic).
-      apply (rngl_mul_pos_neg Hop Hiq Hto). {
+      apply (rngl_mul_pos_neg Hop Hiq Hor). {
         apply (rngl_inv_pos Hop Hiv Hto).
         apply (rl_sqrt_pos Hos Hto).
         apply (rngl_0_lt_2 Hos Hc1 Hto).

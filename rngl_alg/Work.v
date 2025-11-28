@@ -621,7 +621,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
-  apply (rngl_mul_pos_pos Hop Hiq Hto). {
+  apply (rngl_mul_pos_pos Hop Hiq Hor). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
@@ -763,7 +763,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
-  apply (rngl_mul_pos_pos Hop Hiq Hto). {
+  apply (rngl_mul_pos_pos Hop Hiq Hor). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
@@ -826,7 +826,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
-  apply (rngl_mul_pos_pos Hop Hiq Hto). {
+  apply (rngl_mul_pos_pos Hop Hiq Hor). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
@@ -912,7 +912,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
-  apply (rngl_mul_pos_pos Hop Hiq Hto). {
+  apply (rngl_mul_pos_pos Hop Hiq Hor). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).

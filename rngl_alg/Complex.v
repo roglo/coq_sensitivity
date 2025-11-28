@@ -980,7 +980,7 @@ assert (Hri : ((zr / ρ)² + (zi / ρ)² = 1)%L). {
 assert (Hzρ21 : ((zr / ρ)² ≤ 1)%L). {
   rewrite (rngl_squ_div Hic Hos Hiv); [ | easy ].
   apply (rngl_le_div_l Hop Hiv Hto). {
-    now apply (rngl_mul_pos_pos Hop Hiq Hto).
+    now apply (rngl_mul_pos_pos Hop Hiq Hor).
   }
   rewrite rngl_mul_1_l.
   rewrite Hρ.
