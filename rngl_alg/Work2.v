@@ -1256,10 +1256,10 @@ Qed.
 Theorem rngl_squ_le_diag :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_totally_ordered T = true →
+  rngl_is_ordered T = true →
   ∀ a, (0 ≤ a ≤ 1 → a² ≤ a)%L.
 Proof.
-intros Hop Hiq Hto * Ha.
+intros Hop Hiq Hor * Ha.
 rewrite <- (rngl_mul_1_r a) at 2.
 now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
 Qed.

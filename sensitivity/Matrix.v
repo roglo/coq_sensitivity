@@ -506,7 +506,8 @@ destruct (lt_dec j k) as [Hljk| Hljk]. {
   rewrite Nat.min_l; [ | flia Hkc ].
   rewrite Nat_succ_sub_succ_r; [ | flia Hkc Hjk Hljk ].
   cbn - [ List.skipn ].
-  rewrite List_nth_skipn.
+  rewrite List.nth_skipn.
+  rewrite Nat.add_comm.
   rewrite Nat.sub_add; [ easy | flia Hkc Hjk Hljk ].
 }
 Qed.

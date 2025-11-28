@@ -224,8 +224,8 @@ split. {
       destruct Hini as (j & Hjl & Hjn).
       rewrite List.length_skipn in Hjl.
       rewrite List.nth_skipn in Hjn.
-      specialize (NoDup_nat _ Hpi i (j + S i) Hil) as H2.
-      assert (H : j + S i < List.length l) by flia Hjl.
+      specialize (NoDup_nat _ Hpi i (S i + j) Hil) as H2.
+      assert (H : S i + j < List.length l) by flia Hjl.
       specialize (H2 H); clear H.
       rewrite <- Hni in H2.
       rewrite Hjn in H2.
