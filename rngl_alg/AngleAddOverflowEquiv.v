@@ -684,7 +684,7 @@ split; intros H12. {
           apply (rngl_le_add_le_sub_l Hop Hto).
           rewrite (rngl_sub_mul_r_diag_l Hop).
           apply (rngl_le_trans Hor _ 0). {
-            apply (rngl_opp_nonpos_nonneg Hop Hto).
+            apply (rngl_opp_nonpos_nonneg Hop Hor).
             now apply (rngl_mul_nonneg_nonneg Hos Hor).
           }
           apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
@@ -876,7 +876,7 @@ split; intros H12. {
         rewrite H; clear H.
         apply (rngl_ltb_ge Hor).
         apply (rngl_le_trans Hor _ 0); [ | easy ].
-        apply (rngl_opp_nonpos_nonneg Hop Hto).
+        apply (rngl_opp_nonpos_nonneg Hop Hor).
         now apply rngl_lt_le_incl in Hzc1.
       }
       rewrite angle_sub_straight_eq_add_straight.

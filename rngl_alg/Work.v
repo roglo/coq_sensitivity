@@ -672,7 +672,7 @@ apply rngl_leb_le in H.
 rewrite H; clear H.
 apply (rngl_ltb_lt Heo).
 apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
-apply (rngl_opp_neg_pos Hop Hto).
+apply (rngl_opp_neg_pos Hop Hor).
 apply (rl_sqrt_half_pos Hc1).
 Qed.
 
@@ -702,7 +702,7 @@ symmetry in Hsz.
 destruct sz; [ easy | ].
 apply (rngl_ltb_lt Heo).
 apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
-apply (rngl_opp_neg_pos Hop Hto).
+apply (rngl_opp_neg_pos Hop Hor).
 apply (rl_sqrt_half_pos Hc1).
 Qed.
 
@@ -958,7 +958,7 @@ apply (rngl_ltb_lt Heo).
 rewrite rngl_cos_sub_straight_r.
 rewrite rngl_cos_7_right_div_2.
 apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
-now apply (rngl_opp_neg_pos Hop Hto).
+now apply (rngl_opp_neg_pos Hop Hor).
 Qed.
 
 Theorem rngl_cos_mul_2_neg_if :
@@ -1106,7 +1106,7 @@ split. {
   apply rngl_leb_le in H.
   rewrite H; clear H.
   apply (rngl_ltb_lt Heo).
-  now apply (rngl_opp_neg_pos Hop Hto).
+  now apply (rngl_opp_neg_pos Hop Hor).
 }
 apply angle_lt_iff.
 split. {
