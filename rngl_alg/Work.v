@@ -1160,7 +1160,7 @@ apply (eq_rl_sqrt_0 Hos) in H. 2: {
   apply (rngl_div_nonneg Hop Hiv Hto). 2: {
     apply (rngl_0_lt_2 Hos Hc1 Hto).
   }
-  apply (rngl_le_opp_l Hop Hto).
+  apply (rngl_le_opp_l Hop Hor).
   apply rngl_cos_bound.
 }
 (* lemma? *)

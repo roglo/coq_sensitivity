@@ -839,7 +839,7 @@ split; intros H12. {
           apply (rngl_nle_gt Hor) in Hcc.
           apply Hcc; clear Hcc.
           rewrite Hs; cbn.
-          apply (rngl_le_opp_l Hop Hto).
+          apply (rngl_le_opp_l Hop Hor).
           apply rngl_cos_bound.
         }
         rewrite Hs in H12z.
@@ -1090,7 +1090,7 @@ split; intros H12. {
     progress sin_cos_add_sub_right_hyp T Hzs12.
     progress sin_cos_add_sub_right_goal T.
     apply rngl_lt_le_incl in Hzc1.
-    apply (rngl_le_0_add Hos Hto); [ | easy ].
+    apply (rngl_le_0_add Hos Hor); [ | easy ].
     apply rngl_lt_le_incl in Hzs1, Hc2z.
     now apply rngl_sin_add_nonneg.
   } {

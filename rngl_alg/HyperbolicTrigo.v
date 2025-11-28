@@ -286,7 +286,7 @@ destruct (rngl_leb_dec 0 y) as [Hzy| Hzy]. {
   rewrite <- rngl_mul_add_distr_l.
   apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
   rewrite rngl_add_comm.
-  apply (rngl_le_opp_l Hop Hto).
+  apply (rngl_le_opp_l Hop Hor).
   apply (rngl_le_squ_le Hop Hiq Hto); [ | easy | ]. {
     apply rngl_lt_le_incl in Hzy'.
     (* todo: rename rngl_opp_nonneg_nonpos into rngl_le_0_opp, perhaps? *)
@@ -309,7 +309,7 @@ destruct (rngl_leb_dec 0 y') as [Hzy'| Hzy']. {
   rewrite <- rngl_mul_add_distr_r.
   apply (rngl_mul_nonneg_nonneg Hos Hor); [ | easy ].
   rewrite rngl_add_comm.
-  apply (rngl_le_opp_l Hop Hto).
+  apply (rngl_le_opp_l Hop Hor).
   apply (rngl_le_squ_le Hop Hiq Hto); [ | easy | ]. {
     apply rngl_lt_le_incl in Hzy.
     (* todo: rename rngl_opp_nonneg_nonpos into rngl_le_0_opp, perhaps? *)
@@ -323,7 +323,7 @@ destruct (rngl_leb_dec 0 y') as [Hzy'| Hzy']. {
 }
 apply rngl_leb_nle in Hzy'.
 apply (rngl_nle_gt_iff Hto) in Hzy, Hzy'.
-apply (rngl_le_0_add Hos Hto).
+apply (rngl_le_0_add Hos Hor).
 now apply (rngl_mul_nonneg_nonneg Hos Hor).
 apply rngl_lt_le_incl in Hzy, Hzy'.
 now apply (rngl_mul_nonpos_nonpos Hos Hor).
@@ -370,7 +370,7 @@ split. 2: {
   apply (rngl_0_lt_2 Hos Hc1 Hto).
   rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_comm.
-  apply (rngl_le_opp_l Hop Hto).
+  apply (rngl_le_opp_l Hop Hor).
   apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
   apply (rngl_opp_1_le_1 Hop Hto).
 }
@@ -381,7 +381,7 @@ rewrite rngl_squ_sqrt. 2: {
   }
   rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_comm.
-  apply (rngl_le_opp_l Hop Hto).
+  apply (rngl_le_opp_l Hop Hor).
   apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
   apply (rngl_opp_1_le_1 Hop Hto).
 }
@@ -1187,7 +1187,7 @@ Theorem rngl_add_cosh_nonneg :
 Proof.
 destruct_hc.
 intros.
-apply (rngl_le_0_add Hos Hto); apply rngl_cosh_nonneg.
+apply (rngl_le_0_add Hos Hor); apply rngl_cosh_nonneg.
 Qed.
 
 Theorem rngl_sinh_sub_anticomm :
@@ -1789,7 +1789,7 @@ destruct zs. {
       apply (rngl_0_lt_2 Hos Hc1 Hto).
     }
     rewrite (rngl_mul_0_l Hos).
-    apply (rngl_le_opp_l Hop Hto).
+    apply (rngl_le_opp_l Hop Hor).
     apply rngl_cos_bound.
   }
   rewrite (rngl_div_mul Hiv). 2: {
@@ -1812,7 +1812,7 @@ destruct zs. {
       apply (rngl_0_lt_2 Hos Hc1 Hto).
     }
     rewrite (rngl_mul_0_l Hos).
-    apply (rngl_le_opp_l Hop Hto).
+    apply (rngl_le_opp_l Hop Hor).
     apply rngl_cos_bound.
   }
   rewrite (rngl_div_mul Hiv). 2: {

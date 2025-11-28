@@ -1642,7 +1642,7 @@ assert (Hr : (0 < R₀)%L). {
   }
   rewrite <- rngl_add_assoc.
   apply (rngl_le_add_r Hor).
-  apply (rngl_le_0_add Hto). {
+  apply (rngl_le_0_add Hor). {
     now apply rngl_lt_le_incl in HM.
   }
   progress unfold iter_seq.
@@ -1729,7 +1729,7 @@ assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
   progress unfold R₀.
   rewrite <- rngl_add_assoc.
   apply (rngl_le_add_r Hor).
-  apply (rngl_le_0_add Hto). {
+  apply (rngl_le_0_add Hor). {
     now apply rngl_lt_le_incl in HM.
   }
   apply (rngl_mul_nonneg_nonneg Hos Hor). {
@@ -1860,7 +1860,7 @@ assert
   progress unfold R₀.
   rewrite <- rngl_add_assoc.
   apply (rngl_le_add_r Hor).
-  apply (rngl_le_0_add Hto). {
+  apply (rngl_le_0_add Hor). {
     now apply rngl_lt_le_incl in HM.
   }
   apply (rngl_mul_nonneg_nonneg Hop Hor).
@@ -2102,7 +2102,7 @@ assert (Hr : (0 < R₀)%L). {
   }
   rewrite <- rngl_add_assoc.
   apply (rngl_le_add_r Hor).
-  apply (rngl_le_0_add Hto). {
+  apply (rngl_le_0_add Hor). {
     now apply rngl_lt_le_incl in HM.
   }
   progress unfold iter_seq.
