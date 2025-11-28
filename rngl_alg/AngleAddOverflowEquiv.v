@@ -926,7 +926,7 @@ split; intros H12. {
         apply (rl_sqrt_pos Hos Hto).
         apply (rngl_0_lt_2 Hos Hc1 Hto).
       }
-      apply (rngl_lt_sub_0 Hop Hto).
+      apply (rngl_lt_sub_0 Hop Hor).
       apply rngl_cos_lt_sin_diag.
       split. {
         apply angle_div_2_lt_compat.

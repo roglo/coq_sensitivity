@@ -977,7 +977,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize rl_sqrt_half_nonneg as Hzs.
 intros * Hcz.
 rewrite rngl_cos_mul_2_l in Hcz.
-apply -> (rngl_lt_sub_0 Hop Hto) in Hcz.
+apply -> (rngl_lt_sub_0 Hop Hor) in Hcz.
 apply (rngl_squ_lt_abs_lt Hop Hiq Hto) in Hcz.
 destruct (rngl_leb_dec 0 (rngl_sin θ)) as [Hs| Hs]. {
   apply rngl_leb_le in Hs.

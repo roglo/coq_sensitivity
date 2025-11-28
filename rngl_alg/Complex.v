@@ -1174,7 +1174,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
   cbn.
   progress unfold rngl_dist.
   rewrite (rngl_abs_nonpos_eq Hop Hto). 2: {
-    apply (rngl_le_sub_0 Hop Hto).
+    apply (rngl_le_sub_0 Hop Hor).
     clear Hm.
     apply (rngl_le_div_r Hop Hiv Hto); [ easy | ].
     progress unfold rngl_div.
