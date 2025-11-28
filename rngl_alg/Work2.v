@@ -888,7 +888,7 @@ destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
   now apply (rngl_nle_gt Hor) in H.
 }
 do 2 rewrite rngl_cos_mul_2_l' in H12.
-apply (rngl_sub_le_mono_r Hop Hto) in H12.
+apply (rngl_sub_le_mono_r Hop Hor) in H12.
 apply (rngl_mul_le_mono_pos_l Hop Hiq Hto) in H12. 2: {
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
@@ -942,7 +942,7 @@ destruct Hzs22 as [(_, Hzs22)| (H1, H2)]. 2: {
   apply rngl_cos_bound.
 }
 do 2 rewrite rngl_cos_mul_2_l' in H12.
-apply (rngl_sub_le_mono_r Hop Hto) in H12.
+apply (rngl_sub_le_mono_r Hop Hor) in H12.
 apply (rngl_mul_le_mono_pos_l Hop Hiq Hto) in H12. 2: {
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }

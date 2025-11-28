@@ -1028,7 +1028,7 @@ split. {
   apply (rngl_le_le_squ Hop Hto) in Hss; [ | easy ].
   apply (rngl_sub_move_l Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2 in Hss.
-  apply (rngl_sub_le_mono_r Hop Hto) in Hss.
+  apply (rngl_sub_le_mono_r Hop Hor) in Hss.
   apply (rngl_le_squ_le Hop Hiq Hto) in Hss; [ easy | | ].
   apply rngl_cosh_nonneg.
   apply rngl_cosh_nonneg.
@@ -1061,7 +1061,7 @@ split. {
   }
   apply (rngl_sub_move_l Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2 in Hss.
-  apply (rngl_sub_lt_mono_r Hop Hto) in Hss.
+  apply (rngl_sub_lt_mono_r Hop Hor) in Hss.
   apply (rngl_lt_squ_lt Hop Hiq Hto) in Hss; [ easy | | ].
   apply rngl_cosh_nonneg.
   apply rngl_cosh_nonneg.

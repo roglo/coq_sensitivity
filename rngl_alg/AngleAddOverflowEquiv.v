@@ -93,7 +93,7 @@ rewrite (rngl_mul_sub_distr_r Hop).
 rewrite rngl_mul_1_l.
 rewrite (rngl_sub_add_distr Hos).
 rewrite (rngl_add_sub_assoc Hop).
-apply (rngl_sub_lt_mono_r Hop Hto).
+apply (rngl_sub_lt_mono_r Hop Hor).
 rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_sub_sub_distr Hop).
 progress unfold rngl_sub at 2.
