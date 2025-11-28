@@ -124,7 +124,7 @@ assert (H2 : (rngl_sin θ3 < rngl_sin θ2)%L). {
   apply (rngl_le_add_r Hos Hor).
   apply (rngl_mul_nonneg_nonneg Hos Hor).
   now apply rngl_lt_le_incl.
-  apply (rngl_le_0_sub Hop Hto).
+  apply (rngl_le_0_sub Hop Hor).
   now apply rngl_lt_le_incl.
 }
 apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff.
@@ -161,14 +161,14 @@ apply (rngl_le_sub_le_add_r Hop Hto).
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
-apply (rngl_le_0_sub Hop Hto).
+apply (rngl_le_0_sub Hop Hor).
 rewrite (rngl_add_sub_swap Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 apply (rngl_le_0_add Hos Hto).
 apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
-now apply (rngl_le_0_sub Hop Hto).
+now apply (rngl_le_0_sub Hop Hor).
 apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
-apply (rngl_le_0_sub Hop Hto).
+apply (rngl_le_0_sub Hop Hor).
 now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
 Qed.
 
@@ -220,7 +220,7 @@ destruct (rngl_leb_dec (rngl_sin θ2) (rngl_sin θ3)) as [Hs23| Hs23]. {
   }
   apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
   apply rngl_leb_le in Hs23.
-  now apply (rngl_le_0_sub Hop Hto).
+  now apply (rngl_le_0_sub Hop Hor).
 }
 apply rngl_leb_nle in Hs23.
 apply (rngl_nle_gt_iff Hto) in Hs23.
@@ -410,7 +410,7 @@ destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
   apply rngl_le_neq.
   split. {
     rewrite rngl_sin_sub.
-    apply (rngl_le_0_sub Hop Hto).
+    apply (rngl_le_0_sub Hop Hor).
     apply (rngl_le_trans Hor _ 0). {
       apply rngl_lt_le_incl in Hc1z.
       now apply (rngl_mul_nonpos_nonneg Hop Hto).
@@ -447,7 +447,7 @@ progress sin_cos_add_sub_straight_hyp T Hc1z.
 progress sin_cos_add_sub_straight_hyp T Hc2z.
 progress sin_cos_add_sub_straight_goal T.
 rewrite (rngl_add_opp_r Hop).
-apply (rngl_lt_0_sub Hop Hto).
+apply (rngl_lt_0_sub Hop Hor).
 apply rngl_lt_le_incl in Hc2z, Hc1z.
 apply quadrant_1_sin_sub_nonneg_cos_lt; try easy.
 now intros H; subst θ2.

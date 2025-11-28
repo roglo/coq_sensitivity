@@ -622,7 +622,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
   apply (rngl_mul_pos_pos Hop Hiq Hto). {
-    now apply (rngl_lt_0_sub Hop Hto).
+    now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
 }
@@ -744,7 +744,7 @@ progress sin_cos_add_sub_straight_hyp T Hs.
 progress sin_cos_add_sub_straight_hyp T Hsc.
 progress sin_cos_add_sub_straight_goal T.
 rewrite (rngl_add_opp_r Hop).
-apply (rngl_lt_0_sub Hop Hto).
+apply (rngl_lt_0_sub Hop Hor).
 rewrite <- rngl_cos_right_div_2.
 apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   now apply rngl_lt_le_incl in Hs.
@@ -764,7 +764,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
   apply (rngl_mul_pos_pos Hop Hiq Hto). {
-    now apply (rngl_lt_0_sub Hop Hto).
+    now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
 }
@@ -827,7 +827,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
   apply (rngl_mul_pos_pos Hop Hiq Hto). {
-    now apply (rngl_lt_0_sub Hop Hto).
+    now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
 }
@@ -890,7 +890,7 @@ progress sin_cos_add_sub_straight_hyp T Hs.
 progress sin_cos_add_sub_straight_hyp T Hcs.
 progress sin_cos_add_sub_straight_goal T.
 rewrite (rngl_add_opp_r Hop).
-apply (rngl_lt_0_sub Hop Hto).
+apply (rngl_lt_0_sub Hop Hor).
 specialize (rngl_cos_div_2 angle_right) as H1.
 cbn - [ rngl_cos ] in H1.
 specialize (rngl_0_le_1 Hos Hto) as H2.
@@ -913,7 +913,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_sub_distr_r Hop).
   apply (rngl_mul_pos_pos Hop Hiq Hto). {
-    now apply (rngl_lt_0_sub Hop Hto).
+    now apply (rngl_lt_0_sub Hop Hor).
   }
   apply (rl_sqrt_half_pos Hc1).
 }

@@ -281,7 +281,7 @@ destruct (rngl_leb_dec 0 y) as [Hzy| Hzy]. {
   clear - Hzx' Hyx Hzy Hzy' Hxy' hc Hor Hop Hos Hiq.
   apply (rngl_le_trans Hor _ (y * x' + y * y')). 2: {
     apply (rngl_add_le_mono_r Hos Hor).
-    now apply (rngl_mul_le_mono_nonneg_r Hop Hto).
+    now apply (rngl_mul_le_mono_nonneg_r Hop Hor).
   }
   rewrite <- rngl_mul_add_distr_l.
   apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
@@ -304,7 +304,7 @@ destruct (rngl_leb_dec 0 y') as [Hzy'| Hzy']. {
   apply (rngl_nle_gt_iff Hto) in Hzy.
   apply (rngl_le_trans Hor _ (x * y' + y * y')). 2: {
     apply (rngl_add_le_mono_r Hos Hor).
-    now apply (rngl_mul_le_mono_nonneg_l Hop Hto).
+    now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
   }
   rewrite <- rngl_mul_add_distr_r.
   apply (rngl_mul_nonneg_nonneg Hos Hor); [ | easy ].
@@ -390,7 +390,7 @@ rewrite rngl_squ_sqrt. 2: {
     apply (rngl_0_lt_2 Hos Hc1 Hto).
   }
   rewrite (rngl_mul_0_l Hos).
-  apply (rngl_le_0_sub Hop Hto).
+  apply (rngl_le_0_sub Hop Hor).
   apply rngl_cosh_bound.
 }
 rewrite <- (rngl_div_sub_distr_r Hop Hiv).

@@ -1654,7 +1654,7 @@ rewrite rl_sqrt_mul; [ | | easy ]. 2: {
   now apply rngl_lt_le_incl.
 }
 split; intros Hθθ. {
-  apply (rngl_mul_le_mono_nonneg_l Hop Hto). {
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
     apply rl_sqrt_nonneg.
     now apply rngl_lt_le_incl.
   }
@@ -1943,7 +1943,7 @@ induction n; intros. {
     apply (rngl_0_lt_2 Hos Hc1 Hto).
   }
   rewrite (rngl_mul_0_l Hos).
-  apply (rngl_le_0_sub Hop Hto).
+  apply (rngl_le_0_sub Hop Hor).
   rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
     apply (rngl_0_le_1 Hos Hto).
   }
@@ -2229,7 +2229,7 @@ destruct (rngl_leb_dec 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
   split; [ easy | ].
   apply (rngl_le_sub_le_add_r Hop Hto).
   rewrite <- (rngl_mul_1_r 2%L) at 2.
-  apply (rngl_mul_le_mono_nonneg_l Hop Hto); [ | easy ].
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | easy ].
   apply (rngl_0_le_2 Hos Hto).
 }
 apply rngl_leb_nle in H2cz.

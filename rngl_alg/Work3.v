@@ -1084,7 +1084,7 @@ enough (H :
   apply (rngl_summation_le_compat Hor).
   intros i Hi.
   rewrite (gc_modl_mul Hic Hop Hto).
-  apply (rngl_mul_le_mono_nonneg_r Hop Hto). {
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor). {
     apply (gc_modl_nonneg Hos Hor).
   }
   progress unfold M.
@@ -1873,7 +1873,7 @@ assert
   now apply (gc_modl_div_nonneg Hop Hiv Hor).
 }
 clear H2.
-apply (rngl_mul_le_mono_nonneg_l Hop Hto (‖ z ^ (n - 1) ‖))%L in H1. 2: {
+apply (rngl_mul_le_mono_nonneg_l Hop Hor (‖ z ^ (n - 1) ‖))%L in H1. 2: {
   apply (gc_modl_nonneg Hop Hor).
 }
 rewrite (rngl_mul_comm Hic) in H1.
@@ -1964,7 +1964,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   eapply (rngl_lt_le_trans Hor); [ apply Hrz | ].
 ...
   eapply (rngl_lt_le_trans Hor). 2: {
-    apply (rngl_mul_le_mono_nonneg_l Hop Hto).
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor).
     apply (gc_modl_nonneg Hop Hor).
   }
 ...
@@ -2201,7 +2201,7 @@ assert (H1 :
   rewrite (gc_mul_assoc Hop).
   rewrite (gc_modl_mul Hic Hop Hto).
   eapply (rngl_le_trans Hor). {
-    apply (rngl_mul_le_mono_nonneg_r Hop Hto _ _ (‖ z ‖)) in IHm. 2: {
+    apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (‖ z ‖)) in IHm. 2: {
       apply (gc_modl_nonneg Hop Hor).
     }
     apply IHm.

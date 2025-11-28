@@ -1119,11 +1119,11 @@ rewrite rngl_cos_acos; [ | easy ].
 rewrite rngl_sin_acos; [ | easy ].
 rewrite rngl_sin_acos; [ | easy ].
 rewrite rngl_leb_0_sqrt. 2: {
-  apply (rngl_le_0_sub Hop Hto).
+  apply (rngl_le_0_sub Hop Hor).
   now apply (rngl_squ_le_1_iff Hop Hiq Hto).
 }
 rewrite rngl_leb_0_sqrt. 2: {
-  apply (rngl_le_0_sub Hop Hto).
+  apply (rngl_le_0_sub Hop Hor).
   now apply (rngl_squ_le_1_iff Hop Hiq Hto).
 }
 now apply (rngl_ltb_lt Heo).
@@ -1139,7 +1139,7 @@ destruct (rngl_leb_dec a² 1) as [Ha1| H1a]. {
   cbn.
   apply rngl_leb_le in Ha1.
   rewrite (rngl_leb_refl Hor).
-  rewrite rngl_leb_0_sqrt; [ | now apply (rngl_le_0_sub Hop Hto) ].
+  rewrite rngl_leb_0_sqrt; [ | now apply (rngl_le_0_sub Hop Hor) ].
   split. {
     apply rngl_leb_le.
     now apply (rngl_between_opp_1_and_1 Hop Hiq Hto) in Ha1.
@@ -1261,7 +1261,7 @@ Theorem rngl_squ_le_diag :
 Proof.
 intros Hop Hiq Hto * Ha.
 rewrite <- (rngl_mul_1_r a) at 2.
-now apply (rngl_mul_le_mono_nonneg_l Hop Hto).
+now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
 Qed.
 
 Theorem rngl_limit_sub_l_limit :

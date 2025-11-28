@@ -223,7 +223,7 @@ split. {
       apply (List.In_nth _ _ 0) in Hini.
       destruct Hini as (j & Hjl & Hjn).
       rewrite List.length_skipn in Hjl.
-      rewrite List_nth_skipn in Hjn.
+      rewrite List.nth_skipn in Hjn.
       specialize (NoDup_nat _ Hpi i (j + S i) Hil) as H2.
       assert (H : j + S i < List.length l) by flia Hjl.
       specialize (H2 H); clear H.

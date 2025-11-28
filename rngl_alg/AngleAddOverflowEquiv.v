@@ -64,7 +64,7 @@ rewrite H; clear H.
 rewrite rngl_mul_1_l.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_add_opp_r Hop).
-apply (rngl_lt_0_sub Hop Hto).
+apply (rngl_lt_0_sub Hop Hor).
 rewrite <- rl_sqrt_mul; cycle 1.
 apply rngl_1_add_cos_div_2_nonneg.
 apply rngl_1_sub_cos_div_2_nonneg.
@@ -323,7 +323,7 @@ destruct zc2. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite rngl_add_comm.
   rewrite (rngl_add_opp_l Hop).
-  apply (rngl_lt_0_sub Hop Hto).
+  apply (rngl_lt_0_sub Hop Hor).
   apply (rngl_le_lt_trans Hor _ 0)%L. {
     apply (rngl_mul_nonpos_nonneg Hop Hto); [ easy | ].
     now apply rngl_lt_le_incl.
@@ -449,7 +449,7 @@ destruct zs. {
     progress sin_cos_add_sub_straight_hyp T Hzs.
     progress sin_cos_add_sub_straight_goal T.
     rewrite (rngl_add_opp_r Hop).
-    apply (rngl_lt_0_sub Hop Hto).
+    apply (rngl_lt_0_sub Hop Hor).
     apply (rngl_le_lt_trans Hor _ √(1/2))%L; [ | easy ].
     specialize rngl_sin_nonneg_cos_lt_sin_lt as H2.
     specialize (H2 (angle_right /₂) θ)%A.
@@ -469,7 +469,7 @@ destruct zs. {
     progress sin_cos_add_sub_straight_hyp T Hzs.
     progress sin_cos_add_sub_straight_goal T.
     rewrite (rngl_add_opp_r Hop).
-    apply (rngl_lt_0_sub Hop Hto).
+    apply (rngl_lt_0_sub Hop Hor).
     rewrite <- rngl_cos_right_div_2.
     apply quadrant_1_sin_sub_pos_cos_lt. {
       rewrite rngl_sin_right_div_2.
@@ -492,7 +492,7 @@ destruct zs. {
     apply (rngl_mul_pos_pos Hop Hiq Hto). {
       apply (rl_sqrt_half_pos Hc1).
     }
-    now apply (rngl_lt_0_sub Hop Hto).
+    now apply (rngl_lt_0_sub Hop Hor).
   }
 }
 Qed.
@@ -688,7 +688,7 @@ split; intros H12. {
             now apply (rngl_mul_nonneg_nonneg Hos Hor).
           }
           apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
-          apply (rngl_le_0_sub Hop Hto).
+          apply (rngl_le_0_sub Hop Hor).
           apply rngl_cos_bound.
         }
         apply rngl_leb_nle in Hzc1.
