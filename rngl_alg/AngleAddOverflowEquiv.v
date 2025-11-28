@@ -325,7 +325,7 @@ destruct zc2. {
   rewrite (rngl_add_opp_l Hop).
   apply (rngl_lt_0_sub Hop Hor).
   apply (rngl_le_lt_trans Hor _ 0)%L. {
-    apply (rngl_mul_nonpos_nonneg Hop Hto); [ easy | ].
+    apply (rngl_mul_nonpos_nonneg Hop Hor); [ easy | ].
     now apply rngl_lt_le_incl.
   } {
     now apply (rngl_mul_pos_pos Hop Hiq Hto).

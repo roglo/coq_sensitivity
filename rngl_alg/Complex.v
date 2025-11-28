@@ -2239,7 +2239,7 @@ apply (rngl_le_trans Hor _ 0)%L. 2: {
   apply (rngl_0_le_1 Hos Hto).
 }
 apply rngl_lt_le_incl in H2cz.
-now apply (rngl_mul_nonpos_nonneg Hop Hto).
+now apply (rngl_mul_nonpos_nonneg Hop Hor).
 Qed.
 
 End a.

@@ -413,7 +413,7 @@ destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     apply (rngl_le_0_sub Hop Hor).
     apply (rngl_le_trans Hor _ 0). {
       apply rngl_lt_le_incl in Hc1z.
-      now apply (rngl_mul_nonpos_nonneg Hop Hto).
+      now apply (rngl_mul_nonpos_nonneg Hop Hor).
     }
     now apply (rngl_mul_nonneg_nonneg Hos Hor).
   }
