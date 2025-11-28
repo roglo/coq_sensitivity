@@ -772,7 +772,7 @@ specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Hzb.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hi1.
 apply (rngl_le_trans Hor _ (rngl_abs a)). {
-  apply (rngl_le_abs_diag Hop Hto).
+  apply (rngl_le_abs_diag Hop Hor).
 }
 apply (rngl_square_le_simpl_nonneg Hop Hiq Hto). {
   apply rl_sqrt_nonneg.
