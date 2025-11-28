@@ -1021,7 +1021,7 @@ destruct (rngl_leb_dec 0 (rngl_sin θ)) as [Hs| Hs]. {
   rewrite (rngl_abs_nonpos_eq Hop Hto) in Hcz. 2: {
     now apply rngl_lt_le_incl in Hc.
   }
-  apply (rngl_opp_lt_compat Hop Hto) in Hcz.
+  apply (rngl_opp_lt_compat Hop Hor) in Hcz.
   split. {
     now apply quadrant_3_angle_lt_5_angle_right_div_2.
   } {

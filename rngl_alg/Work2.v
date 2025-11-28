@@ -896,7 +896,7 @@ apply (rngl_squ_le_abs_le Hop Hiq Hto) in H12.
 apply rngl_lt_le_incl in Hzs21, Hzs22.
 rewrite (rngl_abs_nonpos_eq Hop Hto) in H12; [ | easy ].
 rewrite (rngl_abs_nonpos_eq Hop Hto) in H12; [ | easy ].
-now apply (rngl_opp_le_compat Hop Hto) in H12.
+now apply (rngl_opp_le_compat Hop Hor) in H12.
 Qed.
 
 Theorem rngl_cos_sin_twice_lemma_2 :

@@ -825,19 +825,19 @@ split. {
   }
   rewrite (rngl_mul_opp_l Hop).
   rewrite rngl_mul_1_l.
-  apply (rngl_opp_le_compat Hop Hto).
+  apply (rngl_opp_le_compat Hop Hor).
   rewrite (rngl_opp_involutive Hop).
   destruct (rngl_leb_dec 0 x) as [Hzx| Hzx]. {
     apply rngl_leb_le in Hzx.
     apply (rngl_le_trans Hor _ 0). {
       rewrite <- (rngl_opp_0 Hop).
-      now apply -> (rngl_opp_le_compat Hop Hto).
+      now apply -> (rngl_opp_le_compat Hop Hor).
     }
     now apply rl_sqrt_nonneg.
   } {
     apply rngl_leb_nle in Hzx.
     apply (rngl_nle_gt_iff Hto) in Hzx.
-    apply (rngl_opp_lt_compat Hop Hto) in Hzx.
+    apply (rngl_opp_lt_compat Hop Hor) in Hzx.
     rewrite (rngl_opp_0 Hop) in Hzx.
     rewrite <- (rngl_squ_opp Hop).
     apply (le_rl_sqrt_add Hop Hiv Hto).

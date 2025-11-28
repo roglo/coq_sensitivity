@@ -332,7 +332,7 @@ destruct zc2. {
   }
 } {
   apply (rngl_ltb_ge_iff Hto) in Hzc2.
-  apply (rngl_opp_lt_compat Hop Hto) in Hc12.
+  apply (rngl_opp_lt_compat Hop Hor) in Hc12.
   rewrite <- (rngl_abs_nonpos_eq Hop Hto) in Hc12; [ | easy ].
   rewrite <- (rngl_abs_nonpos_eq Hop Hto) in Hc12; [ | easy ].
   rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
@@ -1126,7 +1126,7 @@ split; intros H12. {
       }
       specialize (angle_div_2_add_not_overflow θ1 θ2 Haov) as H1.
       rewrite angle_sub_straight_eq_add_straight in Hzs12d.
-      apply (rngl_opp_le_compat Hop Hto) in Hzs12d.
+      apply (rngl_opp_le_compat Hop Hor) in Hzs12d.
       rewrite (rngl_opp_0 Hop) in Hzs12d.
       rewrite <- rngl_sin_add_straight_r in Hzs12d.
       rewrite <- rngl_sin_angle_div_2_add_overflow in Hzs12d. 2: {
@@ -1184,7 +1184,7 @@ split; intros H12. {
     apply (rngl_nlt_ge Hor) in Hzs12d.
     apply Hzs12d; clear Hzs12d.
     do 2 rewrite angle_sub_straight_eq_add_straight.
-    apply (rngl_opp_lt_compat Hop Hto).
+    apply (rngl_opp_lt_compat Hop Hor).
     rewrite (rngl_opp_0 Hop).
     rewrite <- rngl_sin_add_straight_r.
     rewrite <- angle_div_2_add_overflow. 2: {
