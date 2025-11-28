@@ -2153,7 +2153,7 @@ progress replace (m - 2) with (n - 1) in Hr by flia Hn.
 assert (H1 :
   (‖ P.[n] * z ^ n ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
    ‖ rngl_eval_polyn P z ‖)%L). {
-  apply (rngl_le_sub_le_add_r Hop Hto).
+  apply (rngl_le_sub_le_add_r Hop Hor).
   progress unfold rngl_eval_polyn.
   progress unfold iter_seq.
   progress unfold iter_list.
@@ -2240,7 +2240,7 @@ assert (H1 :
   apply (rngl_le_refl Hor).
 }
 eapply (rngl_lt_le_trans Hor); [ | apply H1 ].
-apply (rngl_lt_add_lt_sub_r Hop Hto).
+apply (rngl_lt_add_lt_sub_r Hop Hor).
 ...
 *)
 

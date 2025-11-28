@@ -830,9 +830,9 @@ apply -> (rngl_lt_div_r Hop Hiv Hto). 2: {
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 rewrite (rngl_mul_comm Hic).
-apply (rngl_lt_sub_lt_add_l Hop Hto).
+apply (rngl_lt_sub_lt_add_l Hop Hor).
 eapply (rngl_le_lt_trans Hor); [ | apply Hc ].
-now apply (rngl_le_sub_le_add_r Hop Hto).
+now apply (rngl_le_sub_le_add_r Hop Hor).
 Qed.
 
 Theorem rngl_lt_add_cos_lt_add_cos_div2 :
@@ -844,11 +844,11 @@ Theorem rngl_lt_add_cos_lt_add_cos_div2 :
 Proof.
 destruct_ac.
 intros * Hba Hzs Ha.
-apply (rngl_lt_sub_lt_add_l Hop Hto).
+apply (rngl_lt_sub_lt_add_l Hop Hor).
 apply (rngl_lt_cos_lt_cos_div2 (1 - a)%L); [ | easy | ]. {
   now rewrite <- (rngl_add_sub_swap Hop).
 } {
-  now apply (rngl_lt_sub_lt_add_l Hop Hto).
+  now apply (rngl_lt_sub_lt_add_l Hop Hor).
 }
 Qed.
 

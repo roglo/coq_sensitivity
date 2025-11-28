@@ -465,13 +465,13 @@ rewrite (rngl_squ_mul Hic).
 rewrite Hε.
 rewrite rngl_mul_1_l.
 assert (Hz1ac : (0 ≤ rngl_cosh a + 1)%L). {
-  apply (rngl_le_sub_le_add_r Hop Hto).
+  apply (rngl_le_sub_le_add_r Hop Hor).
   rewrite (rngl_sub_0_l Hop).
   apply (rngl_le_trans Hor _ 0); [ | easy ].
   apply (rngl_opp_1_le_0 Hop Hto).
 }
 assert (Hz1sc : (0 ≤ rngl_cosh a - 1)%L). {
-  apply (rngl_le_add_le_sub_r Hop Hto).
+  apply (rngl_le_add_le_sub_r Hop Hor).
   rewrite rngl_add_0_l.
   apply (rngl_cosh_bound a).
 }

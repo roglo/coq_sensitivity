@@ -100,9 +100,9 @@ progress unfold rngl_sub at 2.
 rewrite Hop.
 apply (rngl_add_lt_mono_l Hos Hor).
 rewrite (rngl_opp_sub_distr Hop).
-apply (rngl_lt_add_lt_sub_r Hop Hto).
+apply (rngl_lt_add_lt_sub_r Hop Hor).
 rewrite <- (rngl_add_sub_swap Hop).
-apply (rngl_lt_sub_lt_add_l Hop Hto).
+apply (rngl_lt_sub_lt_add_l Hop Hor).
 do 2 rewrite <- (rngl_mul_2_l (rngl_cos _)).
 apply (rngl_mul_lt_mono_pos_l Hop Hiq Hto). {
   apply (rngl_0_lt_2 Hos Hc1 Hto).
@@ -681,7 +681,7 @@ split; intros H12. {
           cbn.
           progress unfold rngl_sub.
           rewrite Hop.
-          apply (rngl_le_add_le_sub_l Hop Hto).
+          apply (rngl_le_add_le_sub_l Hop Hor).
           rewrite (rngl_sub_mul_r_diag_l Hop).
           apply (rngl_le_trans Hor _ 0). {
             apply (rngl_opp_nonpos_nonneg Hop Hor).

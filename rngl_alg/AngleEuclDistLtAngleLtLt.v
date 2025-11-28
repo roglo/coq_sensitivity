@@ -91,10 +91,10 @@ assert (H1 : (rngl_sin (θ1 - θ2) < rngl_sin (θ1 - θ3))%L). {
   easy.
 }
 do 2 rewrite rngl_cos_sub in Hc1312.
-apply (rngl_lt_sub_lt_add_l Hop Hto) in Hc1312.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in Hc1312.
 rewrite (rngl_add_sub_swap Hop) in Hc1312.
 rewrite <- (rngl_mul_sub_distr_l Hop) in Hc1312.
-apply (rngl_lt_add_lt_sub_r Hop Hto) in Hc1312.
+apply (rngl_lt_add_lt_sub_r Hop Hor) in Hc1312.
 rewrite <- (rngl_mul_sub_distr_l Hop) in Hc1312.
 apply (rngl_mul_lt_mono_pos_l Hop Hiq Hto (rngl_sin θ1) _ _ Hzs1) in
   Hc1312.
@@ -105,7 +105,7 @@ apply (rngl_add_move_l Hop) in H2.
 rewrite H2 in Hc1312; clear H2.
 rewrite (rngl_mul_sub_distr_r Hop) in Hc1312.
 rewrite rngl_mul_1_l in Hc1312.
-apply (rngl_lt_add_lt_sub_r Hop Hto) in Hc1312.
+apply (rngl_lt_add_lt_sub_r Hop Hor) in Hc1312.
 progress unfold rngl_squ in Hc1312.
 rewrite (rngl_mul_comm Hic (rngl_sin θ1)) in Hc1312.
 do 2 rewrite <- rngl_mul_assoc in Hc1312.
@@ -118,7 +118,7 @@ rewrite <- rngl_sin_sub in Hc1312.
 rewrite (rngl_add_sub_swap Hop) in Hc1312.
 rewrite <- (rngl_sub_sub_distr Hop) in Hc1312.
 rewrite <- rngl_sin_sub in Hc1312.
-apply (rngl_lt_add_lt_sub_l Hop Hto) in Hc1312.
+apply (rngl_lt_add_lt_sub_l Hop Hor) in Hc1312.
 assert (H2 : (rngl_sin θ3 < rngl_sin θ2)%L). {
   eapply (rngl_le_lt_trans Hor); [ | apply Hc1312 ].
   apply (rngl_le_add_r Hos Hor).
@@ -157,7 +157,7 @@ intros H32.
 apply (rngl_nle_gt Hor) in Hc213.
 apply Hc213; clear Hc213.
 do 2 rewrite rngl_cos_add.
-apply (rngl_le_sub_le_add_r Hop Hto).
+apply (rngl_le_sub_le_add_r Hop Hor).
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).

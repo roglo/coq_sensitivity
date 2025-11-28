@@ -1628,7 +1628,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 assert (Hz1ss : ∀ θ, (0 ≤ 1 - rngl_sin θ)%L). {
   intros.
-  apply (rngl_le_add_le_sub_r Hop Hto).
+  apply (rngl_le_add_le_sub_r Hop Hor).
   rewrite rngl_add_0_l.
   apply rngl_sin_bound.
 }
@@ -2217,8 +2217,8 @@ intros Hop Hiq Hto.
 specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hx.
-apply (rngl_le_sub_le_add_l Hop Hto).
-apply (rngl_le_sub_le_add_r Hop Hto).
+apply (rngl_le_sub_le_add_l Hop Hor).
+apply (rngl_le_sub_le_add_r Hop Hor).
 progress unfold rngl_squ.
 rewrite rngl_mul_assoc.
 rewrite (rngl_sub_mul_l_diag_r Hop).
@@ -2227,7 +2227,7 @@ destruct (rngl_leb_dec 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
   rewrite <- (rngl_mul_1_r 1%L) at 4.
   apply (rngl_mul_le_compat_nonneg Hor); [ | easy ].
   split; [ easy | ].
-  apply (rngl_le_sub_le_add_r Hop Hto).
+  apply (rngl_le_sub_le_add_r Hop Hor).
   rewrite <- (rngl_mul_1_r 2%L) at 2.
   apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | easy ].
   apply (rngl_0_le_2 Hos Hto).
