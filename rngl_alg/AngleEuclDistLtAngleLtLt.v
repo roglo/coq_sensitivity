@@ -300,7 +300,7 @@ destruct H23 as [H23| H23]. 2: {
   apply rngl_cos_eq in H23.
   destruct H23; subst θ2; [ apply (rngl_le_refl Hor) | ].
   cbn in Hzs2.
-  apply (rngl_opp_pos_neg Hop Hto) in Hzs2.
+  apply (rngl_opp_pos_neg Hop Hor) in Hzs2.
   apply rngl_lt_le_incl in Hzs2.
   now apply (rngl_nlt_ge Hor) in Hzs2.
 }
@@ -359,7 +359,7 @@ apply angle_sub_move_l in H.
 subst θ1.
 rewrite rngl_sin_sub_straight_r in Hzs1.
 rewrite rngl_cos_sub_straight_r in Hzc1.
-apply (rngl_opp_nonneg_nonpos Hop Hto) in Hzs1, Hzc1.
+apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs1, Hzc1.
 apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
 apply eq_rngl_sin_0 in Hzs2.
 destruct Hzs2; subst θ2. {
@@ -404,7 +404,7 @@ destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
   apply rngl_leb_le in Hzc2.
   exfalso.
   rewrite rngl_sin_sub_anticomm in Hzs21.
-  apply (rngl_opp_nonneg_nonpos Hop Hto) in Hzs21.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs21.
   apply (rngl_nlt_ge Hor) in Hzs21.
   apply Hzs21; clear Hzs21.
   apply rngl_le_neq.
@@ -426,7 +426,7 @@ destruct (rngl_leb_dec 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
   subst θ2.
   rewrite rngl_sin_sub_straight_r in Hzs2.
   rewrite rngl_cos_sub_straight_r in Hzc2.
-  apply (rngl_opp_nonneg_nonpos Hop Hto) in Hzs2, Hzc2.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2, Hzc2.
   apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
   apply eq_rngl_sin_0 in Hzs1.
   destruct Hzs1; subst θ1; [ | easy ].

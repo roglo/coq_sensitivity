@@ -290,7 +290,7 @@ destruct (rngl_leb_dec 0 y) as [Hzy| Hzy]. {
   apply (rngl_le_squ_le Hop Hiq Hto); [ | easy | ]. {
     apply rngl_lt_le_incl in Hzy'.
     (* todo: rename rngl_opp_nonneg_nonpos into rngl_le_0_opp, perhaps? *)
-    now apply (rngl_opp_nonneg_nonpos Hop Hto).
+    now apply (rngl_opp_nonneg_nonpos Hop Hor).
   }
   rewrite (rngl_squ_opp Hop).
   apply (rngl_sub_move_r Hop) in Hxy'.
@@ -313,7 +313,7 @@ destruct (rngl_leb_dec 0 y') as [Hzy'| Hzy']. {
   apply (rngl_le_squ_le Hop Hiq Hto); [ | easy | ]. {
     apply rngl_lt_le_incl in Hzy.
     (* todo: rename rngl_opp_nonneg_nonpos into rngl_le_0_opp, perhaps? *)
-    now apply (rngl_opp_nonneg_nonpos Hop Hto).
+    now apply (rngl_opp_nonneg_nonpos Hop Hor).
   }
   rewrite (rngl_squ_opp Hop).
   apply (rngl_sub_move_r Hop) in Hxy.
