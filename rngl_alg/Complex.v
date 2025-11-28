@@ -1667,7 +1667,7 @@ split; intros Hθθ. {
   apply (rngl_squ_le_abs_le Hop Hiq Hto).
   rewrite rngl_squ_sqrt; [ | easy ].
   rewrite rngl_squ_sqrt; [ | easy ].
-  now apply (rngl_sub_le_mono_l Hop Hto).
+  now apply (rngl_sub_le_mono_l Hop Hor).
 } {
   apply (rngl_mul_le_mono_pos_l Hop Hiq Hto) in Hθθ. 2: {
     rewrite <- (rngl_abs_0 Hop).
@@ -1689,7 +1689,7 @@ split; intros Hθθ. {
   apply (rngl_abs_le_squ_le Hop Hto) in Hθθ.
   rewrite rngl_squ_sqrt in Hθθ; [ | easy ].
   rewrite rngl_squ_sqrt in Hθθ; [ | easy ].
-  now apply (rngl_sub_le_mono_l Hop Hto) in Hθθ.
+  now apply (rngl_sub_le_mono_l Hop Hor) in Hθθ.
 }
 Qed.
 
