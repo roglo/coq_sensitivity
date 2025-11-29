@@ -1740,7 +1740,7 @@ assert (Hzcr : (0 ≤ rngl_cos θ2 / d)%L). {
       apply rngl_1_add_cos_div_2_nonneg.
     }
     subst d.
-    now apply (rl_sqrt_pos Hos Hto).
+    now apply (rl_sqrt_pos Hos Hor).
   } {
     cbn.
     rewrite (rngl_leb_0_opp Hop Hto).
@@ -1753,7 +1753,7 @@ assert (Hzcr : (0 ≤ rngl_cos θ2 / d)%L). {
       apply rngl_1_add_cos_div_2_nonneg.
     }
     subst d.
-    now apply (rl_sqrt_pos Hos Hto).
+    now apply (rl_sqrt_pos Hos Hor).
   }
 }
 split; [ | now apply rngl_leb_le ].

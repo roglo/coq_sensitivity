@@ -138,7 +138,7 @@ apply (rngl_div_nonneg Hop Hiv Hto). {
   apply rl_sqrt_nonneg.
   apply (rngl_add_squ_nonneg Hos Hto).
 } {
-  apply (rl_sqrt_pos Hos Hto).
+  apply (rl_sqrt_pos Hos Hor).
   apply rngl_le_neq.
   split; [ apply (rngl_add_squ_nonneg Hos Hto) | ].
   intros H1; symmetry in H1.

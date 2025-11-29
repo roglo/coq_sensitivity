@@ -281,7 +281,7 @@ Theorem rl_sqrt_half_pos :
 Proof.
 destruct_ac.
 intros Hc1.
-apply (rl_sqrt_pos Hos Hto).
+apply (rl_sqrt_pos Hos Hor).
 apply (rngl_div_pos Hop Hiv Hto). {
   apply (rngl_0_lt_1 Hos Hc1 Hto).
 }
@@ -923,7 +923,7 @@ split; intros H12. {
       rewrite (rngl_mul_comm Hic).
       apply (rngl_mul_pos_neg Hop Hiq Hor). {
         apply (rngl_inv_pos Hop Hiv Hto).
-        apply (rl_sqrt_pos Hos Hto).
+        apply (rl_sqrt_pos Hos Hor).
         apply (rngl_0_lt_2 Hos Hc1 Hto).
       }
       apply (rngl_lt_sub_0 Hop Hor).

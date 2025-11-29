@@ -1926,7 +1926,7 @@ induction n; intros. {
   rewrite (rngl_add_opp_r Hop).
   apply (rngl_lt_le_trans Hor _ 0). {
     apply (rngl_opp_neg_pos Hop Hor).
-    apply (rl_sqrt_pos Hos Hto).
+    apply (rl_sqrt_pos Hos Hor).
     apply rngl_le_neq.
     split; [ apply rngl_1_add_cos_div_2_nonneg | ].
     intros H; symmetry in H.
