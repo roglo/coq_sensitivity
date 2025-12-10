@@ -956,7 +956,7 @@ split; intros H12. {
         apply (rngl_nlt_ge Hor) in Hzs12.
         apply Hzs12; clear Hzs12.
         rewrite H12; cbn.
-        apply (rngl_opp_1_lt_0 Hop Hto Hc1).
+        apply (rngl_opp_1_lt_0 Hop Hc1 Hto).
       }
       progress unfold angle_ltb.
       rewrite rngl_sin_5_right_div_2.
@@ -1168,7 +1168,7 @@ split; intros H12. {
         apply (rngl_nlt_ge Hor) in Hss.
         apply Hss; clear Hss.
         rewrite H; cbn.
-        apply (rngl_opp_1_lt_0 Hop Hto Hc1).
+        apply (rngl_opp_1_lt_0 Hop Hc1 Hto).
       }
       now apply (angle_div_2_not_straight Hc1) in H.
     }

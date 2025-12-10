@@ -1815,7 +1815,7 @@ destruct zs. {
   remember √((1 + rngl_cos θ) / 2)%L as a eqn:Ha.
   assert (H1 : (a < 0)%L). {
     rewrite Hc.
-    apply (rngl_opp_1_lt_0 Hop Hto Hc1).
+    apply (rngl_opp_1_lt_0 Hop Hc1 Hto).
   }
   apply (rngl_nle_gt Hor) in H1.
   apply H1; clear H1.

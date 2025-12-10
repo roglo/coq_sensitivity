@@ -153,7 +153,7 @@ specialize (rngl_squ_nonneg Hos Hto (rngl_sinh θ))%L as H2.
 apply (rngl_nlt_ge Hor) in H2.
 apply H2; clear H2.
 rewrite H1.
-apply (rngl_opp_1_lt_0 Hop Hto Hc1).
+apply (rngl_opp_1_lt_0 Hop Hc1 Hto).
 Qed.
 
 Theorem rngl_cosh_nonneg :
@@ -761,7 +761,7 @@ destruct H1; subst c; [ easy | ].
 exfalso.
 apply (rngl_nlt_ge Hor) in H2.
 apply H2; clear H2.
-apply (rngl_opp_1_lt_0 Hop Hto Hc1).
+apply (rngl_opp_1_lt_0 Hop Hc1 Hto).
 Qed.
 
 Theorem hangle_add_comm :
