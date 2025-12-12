@@ -2060,7 +2060,7 @@ Qed.
 Theorem angle_all_add_not_overflow :
   ∀ n θ,
   (∀ m, m < n → angle_add_overflow θ (m * θ) = false)
-  ↔ angle_mul_nat_overflow n θ = false.
+  ↔ angle_mul_nat_overflow n θ = 0.
 Proof.
 destruct_ac.
 intros.

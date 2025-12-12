@@ -751,7 +751,7 @@ Qed.
 
 Theorem seq_angle_mul_nat_not_overflow :
   ∀ n θ i,
-  angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false.
+  angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = 0.
 Proof.
 intros.
 apply angle_all_add_not_overflow.
@@ -1057,7 +1057,7 @@ Qed.
 
 Theorem eq_angle_mul_0_iff :
   ∀ n θ,
-  angle_mul_nat_overflow n θ = false
+  angle_mul_nat_overflow n θ = 0
   → (n * θ = 0)%A
   ↔ n = 0 ∨ θ = 0%A.
 Proof.
