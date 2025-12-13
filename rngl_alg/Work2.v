@@ -460,7 +460,7 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. {
     eapply angle_mul_nat_not_overflow_le_l. 2: {
-      apply angle_mul_nat_overflow_pow_div.
+      apply angle_mul_nat_div_2π_pow_div.
     }
     progress unfold inv_ub_num.
     progress unfold inv_ub_den_pow2.
@@ -501,7 +501,7 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. {
     eapply angle_mul_nat_not_overflow_le_l. 2: {
-      apply angle_mul_nat_overflow_pow_div.
+      apply angle_mul_nat_div_2π_pow_div.
     }
     progress unfold inv_ub_num.
     progress unfold inv_ub_den_pow2.
@@ -656,7 +656,7 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
   rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. {
     apply (angle_mul_nat_not_overflow_le_l _ (2 ^ inv_ub_den_pow2 n)). 2: {
-      apply angle_mul_nat_overflow_pow_div.
+      apply angle_mul_nat_div_2π_pow_div.
     }
     rewrite Nat.pow_sub_r; [ | easy | easy ].
     eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le | ].
@@ -706,7 +706,7 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
   rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. {
     apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
-      apply angle_mul_nat_overflow_pow_div.
+      apply angle_mul_nat_div_2π_pow_div.
     }
     eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le; flia Hm | ].
     apply Nat.Div0.div_le_upper_bound.
@@ -751,7 +751,7 @@ Qed.
 
 Theorem seq_angle_mul_nat_not_overflow :
   ∀ n θ i,
-  angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = 0.
+  angle_mul_nat_div_2π n (seq_angle_to_div_nat θ n i) = 0.
 Proof.
 intros.
 apply angle_all_add_not_overflow.
@@ -1057,7 +1057,7 @@ Qed.
 
 Theorem eq_angle_mul_0_iff :
   ∀ n θ,
-  angle_mul_nat_overflow n θ = 0
+  angle_mul_nat_div_2π n θ = 0
   → (n * θ = 0)%A
   ↔ n = 0 ∨ θ = 0%A.
 Proof.
