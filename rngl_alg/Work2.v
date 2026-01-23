@@ -807,6 +807,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hba Hzs Hc.
 cbn.
 apply rngl_leb_le in Hzs.
+progress unfold rngl_signp.
 rewrite Hzs.
 rewrite rngl_mul_1_l.
 destruct (rngl_ltb_dec b 0) as [Hblz| Hbgz]. {

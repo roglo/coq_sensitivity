@@ -594,6 +594,7 @@ apply rngl_leb_le in Hs; rewrite Hs.
 apply rngl_leb_le in Hs.
 specialize (rngl_0_le_1 Hos Hto) as H1.
 apply rngl_leb_le in H1.
+progress unfold rngl_signp.
 rewrite H1; clear H1.
 rewrite rngl_mul_1_l.
 specialize rl_sqrt_half_nonneg as Hzs.
@@ -757,6 +758,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   cbn.
   specialize (rngl_0_le_1 Hos Hto) as H2.
   apply rngl_leb_le in H2.
+  progress unfold rngl_signp.
   rewrite H2; clear H2.
   rewrite rngl_mul_1_l.
   rewrite rngl_add_0_r, (rngl_sub_0_r Hos).
@@ -820,6 +822,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   cbn.
   specialize (rngl_0_le_1 Hos Hto) as H2.
   apply rngl_leb_le in H2.
+  progress unfold rngl_signp.
   rewrite H2; clear H2.
   rewrite rngl_mul_1_l.
   rewrite rngl_add_0_r, (rngl_sub_0_r Hos).
@@ -852,6 +855,7 @@ apply rngl_leb_le in Hs.
 apply (rngl_ltb_lt Heo); cbn.
 specialize (rngl_0_le_1 Hos Hto) as H1.
 apply rngl_leb_le in H1.
+progress unfold rngl_signp.
 rewrite H1; clear H1.
 rewrite rngl_mul_1_l.
 rewrite rngl_add_0_r.
@@ -1138,6 +1142,7 @@ destruct_ac.
 intros Hc1 *.
 rewrite angle_div_2_pow_succ_r_1.
 cbn - [ angle_div_2_pow ].
+progress unfold rngl_signp.
 remember (0 ≤? _)%L as zs eqn:Hzs.
 symmetry in Hzs.
 destruct zs. 2: {
@@ -1184,6 +1189,7 @@ destruct_ac.
 intros.
 rewrite angle_div_2_pow_succ_r_1.
 cbn - [ angle_div_2_pow ].
+progress unfold rngl_signp.
 remember (0 ≤? _)%L as zs eqn:Hzs.
 symmetry in Hzs.
 destruct zs. 2: {

@@ -1772,6 +1772,7 @@ cbn.
 induction n. {
   cbn.
   apply rngl_leb_le in Hzs.
+  progress unfold rngl_signp.
   rewrite Hzs; symmetry.
   apply rngl_mul_1_l.
 }
@@ -1808,6 +1809,7 @@ intros Hc1.
 intros * H.
 apply eq_angle_eq in H.
 injection H; clear H; intros Hs Hc.
+progress unfold rngl_signp in Hc.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
 symmetry in Hzs.
 destruct zs. {
@@ -1892,6 +1894,7 @@ apply (rngl_eqb_neq Heo) in Ht1.
 revert θ Htz Ht1.
 induction n; intros. {
   cbn.
+  progress unfold rngl_signp.
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
   symmetry in Hzs.
   destruct zs. {
@@ -2092,6 +2095,7 @@ destruct_ac.
 intros * Hzs.
 cbn.
 apply rngl_leb_le in Hzs.
+progress unfold rngl_signp.
 rewrite Hzs.
 rewrite rngl_mul_1_l.
 apply rl_sqrt_nonneg.

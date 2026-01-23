@@ -56,6 +56,7 @@ intros * Hzs1 Hzs2 Hcc.
 cbn.
 generalize Hzs2; intros H.
 apply rngl_leb_le in H.
+progress unfold rngl_signp.
 rewrite H; clear H.
 rewrite rngl_mul_1_l.
 generalize Hzs1; intros H.
@@ -138,6 +139,7 @@ intros.
 cbn.
 specialize (rngl_0_le_1 Hos Hto) as H.
 apply rngl_leb_le in H.
+progress unfold rngl_signp.
 rewrite H; clear H.
 rewrite rngl_mul_1_l.
 rewrite rngl_add_0_r.
@@ -164,6 +166,7 @@ destruct_ac.
 cbn.
 specialize (rngl_0_le_1 Hos Hto) as H1.
 apply rngl_leb_le in H1.
+progress unfold rngl_signp.
 rewrite H1; clear H1.
 rewrite rngl_mul_1_l.
 now rewrite rngl_add_0_r.
@@ -181,6 +184,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 cbn.
 specialize (rngl_0_le_1 Hos Hto) as H1.
 apply rngl_leb_le in H1.
+progress unfold rngl_signp.
 rewrite H1; clear H1.
 do 2 rewrite (rngl_mul_0_r Hos).
 do 2 rewrite (rngl_sub_0_r Hos).
@@ -217,6 +221,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 cbn.
 specialize (rngl_0_le_1 Hos Hto) as H1.
 apply rngl_leb_le in H1.
+progress unfold rngl_signp.
 rewrite H1; clear H1.
 do 2 rewrite (rngl_mul_0_r Hos).
 do 2 rewrite (rngl_sub_0_r Hos).
@@ -483,6 +488,7 @@ destruct zs. {
     cbn.
     specialize (rngl_0_le_1 Hos Hto) as H2.
     apply rngl_leb_le in H2.
+    progress unfold rngl_signp.
     rewrite H2; clear H2.
     rewrite rngl_mul_1_l.
     rewrite rngl_add_0_r, (rngl_sub_0_r Hos).
@@ -524,6 +530,7 @@ rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_0_r Hos).
 do 2 rewrite (rngl_mul_opp_r Hop).
 do 2 rewrite rngl_mul_1_r.
+progress unfold rngl_signp.
 rewrite (rngl_leb_0_opp Hop Hto).
 rewrite (rngl_mul_0_r Hos).
 rewrite rngl_add_0_r.

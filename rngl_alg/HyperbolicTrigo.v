@@ -1734,7 +1734,8 @@ assert (Hzcr : (0 ≤ rngl_cos θ2 / d)%L). {
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
   symmetry in Hzs.
   destruct zs. {
-    cbn; rewrite Hzs, rngl_mul_1_l.
+    cbn; progress unfold rngl_signp.
+    rewrite Hzs, rngl_mul_1_l.
     apply (rngl_div_nonneg Hop Hiv Hto). {
       apply rl_sqrt_nonneg.
       apply rngl_1_add_cos_div_2_nonneg.
@@ -1742,7 +1743,7 @@ assert (Hzcr : (0 ≤ rngl_cos θ2 / d)%L). {
     subst d.
     now apply (rl_sqrt_pos Hos Hor).
   } {
-    cbn.
+    cbn; progress unfold rngl_signp.
     rewrite (rngl_leb_0_opp Hop Hto).
     apply (rngl_leb_gt_iff Hto) in Hzs.
     apply rngl_lt_le_incl in Hzs.
@@ -1783,7 +1784,8 @@ unfold θ2.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
 symmetry in Hzs.
 destruct zs. {
-  cbn; rewrite Hzs, rngl_mul_1_l.
+  cbn; progress unfold rngl_signp.
+  rewrite Hzs, rngl_mul_1_l.
   rewrite rngl_squ_sqrt. 2: {
     apply (rngl_le_div_r Hop Hiv Hto). {
       apply (rngl_0_lt_2 Hos Hc1 Hto).
@@ -1801,7 +1803,7 @@ destruct zs. {
   intros H; rewrite H in Hzc.
   now apply rngl_lt_irrefl in Hzc.
 } {
-  cbn.
+  cbn; progress unfold rngl_signp.
   rewrite (rngl_leb_0_opp Hop Hto).
   apply (rngl_leb_gt_iff Hto) in Hzs.
   apply rngl_lt_le_incl in Hzs.
