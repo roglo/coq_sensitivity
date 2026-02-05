@@ -81,11 +81,7 @@ Definition gc_pow_nat {T}
     (z : GComplex T) n :=
   @rngl_power (GComplex T) (gc_ring_like_op T) z n.
 
-Notation "0" := gc_zero : gc_scope.
-Notation "1" := gc_one : gc_scope.
-Notation "x + y" := (gc_add x y) : gc_scope.
 Notation "x - y" := (gc_sub x y) : gc_scope.
-Notation "x * y" := (gc_mul x y) : gc_scope.
 Notation " x / y" := (gc_div x y) : gc_scope.
 Notation "- x" := (gc_opp x) : gc_scope.
 Notation "x ⁻¹" := (gc_inv x) : gc_scope.
@@ -145,8 +141,6 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
-
-Definition gc_modl (z : GComplex T) := rl_modl (gre z) (gim z).
 
 Theorem le_rl_sqrt_add :
   rngl_has_opp T = true →
@@ -1081,12 +1075,6 @@ split; intros Hθθ. {
   rewrite rngl_squ_sqrt in Hθθ; [ | easy ].
   now apply (rngl_sub_le_mono_l Hop Hor) in Hθθ.
 }
-Qed.
-
-Theorem rl_sqrt_nonneg : ∀ a, (0 ≤ a → 0 ≤ √ a)%L.
-Proof.
-intros * Ha.
-now apply rl_sqrt_nonneg.
 Qed.
 
 Theorem rngl_sin_div_2_pow_nat_nonneg :
