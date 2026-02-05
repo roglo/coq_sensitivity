@@ -12,6 +12,7 @@ Require Import RingLike.RealLike.
 Require Import RingLike.IterAdd.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
+Require Import RingLike.C_algebra.
 
 Require Import TrigoWithoutPi.Core.
 Require Import TrigoWithoutPi.AngleDiv2Add.

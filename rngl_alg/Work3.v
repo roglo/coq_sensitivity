@@ -13,6 +13,7 @@ Require Import RingLike.IterMax.
 Require Import RingLike.Misc.
 Require Import RingLike.Utils.
 Require Import RingLike.IntermVal.
+Require Import RingLike.C_algebra.
 
 Require Import TrigoWithoutPi.Core.
 Require Import TrigoWithoutPi.AngleDivNat.
