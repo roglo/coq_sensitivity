@@ -42,9 +42,6 @@ destruct (rngl_eqb_dec ra rb) as [Hrab| Hrab]. {
 }
 Qed.
 
-Definition gc_sub (ca cb : GComplex T) :=
-  {| gre := gre ca - gre cb; gim := gim ca - gim cb |}.
-
 Definition gc_opp (c : GComplex T) :=
   {| gre := - gre c; gim := - gim c |}.
 
@@ -76,12 +73,6 @@ Qed.
 
 End a.
 
-Definition gc_pow_nat {T}
-    {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T}
-    (z : GComplex T) n :=
-  @rngl_power (GComplex T) (gc_ring_like_op T) z n.
-
-Notation "x - y" := (gc_sub x y) : gc_scope.
 Notation " x / y" := (gc_div x y) : gc_scope.
 Notation "- x" := (gc_opp x) : gc_scope.
 Notation "x ⁻¹" := (gc_inv x) : gc_scope.
