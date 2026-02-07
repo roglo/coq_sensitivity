@@ -121,8 +121,6 @@ rewrite rngl_add_0_l.
 easy.
 Qed.
 
-Notation "‖ x ‖" := (gc_modl x) (at level 35, x at level 30).
-
 Theorem gc_modl_div_nonneg :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
