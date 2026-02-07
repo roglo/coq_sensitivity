@@ -49,9 +49,6 @@ Definition gc_inv c :=
   let d := (gre c * gre c + gim c * gim c)%L in
   mk_gc (gre c / d) (- gim c / d)%L.
 
-Definition gc_div (ca cb : GComplex T) :=
-  gc_mul ca (gc_inv cb).
-
 End a.
 
 Section a.
@@ -73,7 +70,6 @@ Qed.
 
 End a.
 
-Notation " x / y" := (gc_div x y) : gc_scope.
 Notation "- x" := (gc_opp x) : gc_scope.
 Notation "x ⁻¹" := (gc_inv x) : gc_scope.
 Notation "x +ℹ y" := (mk_gc x y) (at level 50) : gc_scope.
