@@ -394,36 +394,12 @@ f_equal; symmetry.
 apply (rl_sqrt_1 Hop Hiq Hto).
 Qed.
 
-(*******)
-
-(* y a comme un truc qui déconne... *)
-Theorem glop :
-  rngl_mul_is_comm T = true →
-  ∀ a, gc_inv a = rngl_inv a.
-Proof.
-intros Hic *.
-progress unfold rngl_inv.
-cbn.
-progress unfold gc_opt_inv_or_pdiv.
-rewrite Hic.
-cbn.
-remember (rngl_opt_inv_or_pdiv T) as ip eqn:Hip.
-symmetry in Hip.
-destruct ip as [inv| ]. {
-  destruct inv; [ easy | ].
-...
-}
-...
-
 Theorem gc_modulus_inv :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_totally_ordered T = true →
-(*
   ∀ a, a ≠ 0%C → ‖ a ‖⁻¹%L = ‖ a⁻¹ ‖.
-*)
-  ∀ a, a ≠ 0%C → ‖ a ‖⁻¹%L = ‖ rngl_inv a ‖.
 Proof.
 intros Hic Hop Hiv Hto.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
@@ -431,21 +407,6 @@ specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Haz.
 progress unfold gc_modulus.
 cbn.
-(**)
-progress unfold rngl_inv.
-cbn.
-progress unfold gc_opt_inv_or_pdiv.
-cbn.
-destruct (rngl_opt_inv_or_pdiv T) as [s| ]; cbn. {
-  destruct s. {
-    rewrite Hic.
-    cbn.
-...
-  cbn.
-  admit.
-  admit.
-}
-...
 do 2 rewrite fold_rngl_squ.
 progress unfold rl_modl.
 remember ((gre a)² + (gim a)²)%L as ρ eqn:Hρ.
@@ -473,8 +434,6 @@ rewrite rngl_mul_assoc.
 rewrite (rngl_mul_inv_diag_r Hiv); [ | easy ].
 symmetry; apply rngl_mul_1_l.
 Qed.
-
-...
 
 Theorem gc_modulus_div :
   rngl_mul_is_comm T = true →
