@@ -285,23 +285,6 @@ apply (eq_rl_sqrt_0 Hos) in Haz. {
 apply (rngl_add_squ_nonneg Hos Hto).
 Qed.
 
-Theorem gc_modulus_1 :
-  rngl_has_opp T = true →
-  rngl_has_inv_or_pdiv T = true →
-  rngl_is_totally_ordered T = true →
-  ‖ 1 ‖ = 1%L.
-Proof.
-intros Hop Hiq Hto.
-specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
-progress unfold gc_modulus.
-progress unfold rl_modl.
-cbn.
-rewrite rngl_squ_1.
-rewrite (rngl_squ_0 Hos).
-rewrite rngl_add_0_r.
-apply (rl_sqrt_1 Hop Hiq Hto).
-Qed.
-
 Theorem gc_div_1_r :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -2307,5 +2290,3 @@ Search (_ + (_ - _))%L.
 ...
 *)
 
-About gc_mul_0_l.
-Search gc_mul.
