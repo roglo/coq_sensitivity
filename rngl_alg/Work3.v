@@ -31,30 +31,6 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Theorem gc_mul_0_l :
-  rngl_has_opp_or_psub T = true →
-  ∀ z : GComplex T, (0 * z = 0)%C.
-Proof.
-intros Hos *.
-apply eq_gc_eq; cbn.
-do 2 rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_0_r Hos).
-rewrite rngl_add_0_l.
-easy.
-Qed.
-
-Theorem gc_mul_0_r :
-  rngl_has_opp_or_psub T = true →
-  ∀ z : GComplex T, (z * 0 = 0)%C.
-Proof.
-intros Hos *.
-apply eq_gc_eq; cbn.
-do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos).
-rewrite rngl_add_0_l.
-easy.
-Qed.
-
 Theorem gc_pow_mul_l :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
@@ -2330,3 +2306,6 @@ apply (f_equal (λ c, b + c)%L) in Hab.
 Search (_ + (_ - _))%L.
 ...
 *)
+
+About gc_mul_0_l.
+Search gc_mul.
