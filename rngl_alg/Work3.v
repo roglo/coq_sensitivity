@@ -154,22 +154,6 @@ apply (rngl_div_nonneg Hop Hiv Hto). {
 }
 Qed.
 
-Theorem gc_modl_0 :
-  rngl_has_opp T = true →
-  rngl_is_totally_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_or_pdiv T)%bool = true →
-  (‖ 0 ‖ = 0)%L.
-Proof.
-intros Hop Hto Hii.
-specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
-progress unfold gc_modulus.
-progress unfold rl_modl.
-cbn.
-rewrite (rngl_squ_0 Hos).
-rewrite rngl_add_0_l.
-apply (rl_sqrt_0 Hop Hto Hii).
-Qed.
-
 Theorem gc_mul_1_l :
   rngl_has_opp_or_psub T = true →
   ∀ z, (1 * z)%C = z.
@@ -523,7 +507,7 @@ clear n Hl.
 progress unfold iter_list.
 induction l as [| a] using List.rev_ind. {
   cbn.
-  rewrite (gc_modl_0 Hop Hto Hii).
+  rewrite (gc_modulus_0 Hop Hiv Hto).
   apply (rngl_le_refl Hor).
 }
 cbn.
