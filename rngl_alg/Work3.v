@@ -729,7 +729,7 @@ Theorem gc_modulus_pow :
   ∀ z n, (‖ z ^ n ‖ = ‖ z ‖ ^ n)%L.
 Proof.
 intros Hic Hop Hiq Hto *.
-induction n; cbn; [ apply (gc_modulus_1 Hop Hiq Hto) | ].
+induction n; cbn; [ apply (gc_modulus_1 Hop Hto Hiq) | ].
 rewrite (gc_modulus_mul Hic Hop Hiq Hto).
 rewrite rngl_pow_gc_pow.
 now rewrite IHn.
