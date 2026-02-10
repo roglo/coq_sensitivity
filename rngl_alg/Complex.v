@@ -66,7 +66,6 @@ Qed.
 
 End a.
 
-Notation "- x" := (gc_opp x) : gc_scope.
 Notation "z ^ n" := (gc_pow_nat z n) : gc_scope.
 
 Section a.

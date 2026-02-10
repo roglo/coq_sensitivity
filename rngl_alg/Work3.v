@@ -208,8 +208,7 @@ Theorem gc_add_sub :
   ∀ a b, (a + b - b)%C = a.
 Proof.
 intros Hos *.
-apply eq_gc_eq.
-cbn.
+apply eq_gc_eq; cbn.
 now do 2 rewrite (rngl_add_sub Hos).
 Qed.
 
