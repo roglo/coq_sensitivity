@@ -134,13 +134,7 @@ Theorem gc_mul_1_l :
   rngl_has_opp_or_psub T = true →
   ∀ z, (1 * z)%C = z.
 Proof.
-intros Hos.
-intros.
-apply eq_gc_eq; cbn.
-do 2 rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_0_r Hos).
-rewrite rngl_add_0_l.
-split; apply rngl_mul_1_l.
+apply gc_opt_mul_1_l.
 Qed.
 
 Theorem gc_mul_1_r :
