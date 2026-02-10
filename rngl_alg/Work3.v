@@ -2283,4 +2283,3 @@ apply (f_equal (λ c, b + c)%L) in Hab.
 Search (_ + (_ - _))%L.
 ...
 *)
-
