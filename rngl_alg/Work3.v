@@ -451,11 +451,11 @@ Theorem gc_summation_triangular :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_totally_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_or_pdiv T)%bool = true →
   ∀ b e (f : nat → GComplex T),
   (‖ ∑ (i = b, e), f i ‖ ≤ ∑ (i = b, e), ‖ f i ‖)%L.
 Proof.
-intros Hic Hop Hiv Hto Hii.
+intros Hic Hop Hiv Hto.
+specialize (rngl_int_dom_or_inv_pdiv Hiv) as Hii.
 specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros.
@@ -466,7 +466,7 @@ clear n Hl.
 progress unfold iter_list.
 induction l as [| a] using List.rev_ind. {
   cbn.
-  rewrite (gc_modulus_0 Hop Hiv Hto).
+  rewrite (gc_modulus_0 Hop Hii Hto).
   apply (rngl_le_refl Hor).
 }
 cbn.
@@ -729,7 +729,7 @@ Theorem gc_modulus_pow :
   ∀ z n, (‖ z ^ n ‖ = ‖ z ‖ ^ n)%L.
 Proof.
 intros Hic Hop Hiq Hto *.
-induction n; cbn; [ apply (gc_modulus_1 Hop Hto Hiq) | ].
+induction n; cbn; [ apply (gc_modulus_1 Hop Hiq Hto) | ].
 rewrite (gc_modulus_mul Hic Hop Hiq Hto).
 rewrite rngl_pow_gc_pow.
 now rewrite IHn.
