@@ -69,11 +69,11 @@ intros Hic Hop Hiq Hto Hcz Har Hco.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * Hnz.
 specialize (polar z _ _ (eq_refl _) eq_refl) as H1.
-set (ρ := √((gre z)² + (gim z)²)%L) in H1.
+set (ρ := √((Re z)² + (Im z)²)%L) in H1.
 set
   (θ :=
-     (if (0 ≤? gim z)%L then rngl_acos (gre z / ρ)
-      else (- rngl_acos (gre z / ρ))%A)) in H1.
+     (if (0 ≤? Im z)%L then rngl_acos (Re z / ρ)
+      else (- rngl_acos (Re z / ρ))%A)) in H1.
 rewrite H1.
 specialize (exists_angle_div_nat Hcz Har Hco) as H2.
 specialize (H2 θ n Hnz).
@@ -257,7 +257,7 @@ intros *.
 progress unfold gc_modulus.
 cbn.
 progress unfold rl_modl.
-rewrite (rngl_add_comm (gim a * gre b)).
+rewrite (rngl_add_comm (Im a * Re b)).
 rewrite <- (Brahmagupta_Fibonacci_identity Hic Hop).
 apply rl_sqrt_mul; apply (rngl_add_squ_nonneg Hos Hto).
 Qed.
@@ -291,7 +291,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hos Hc1) as H1.
   intros.
   apply eq_gc_eq.
-  do 2 rewrite (H1 (gre _)), (H1 (gim _)).
+  do 2 rewrite (H1 (Re _)), (H1 (Im _)).
   easy.
 }
 intros.
@@ -345,7 +345,7 @@ progress unfold gc_modulus.
 cbn.
 do 2 rewrite fold_rngl_squ.
 progress unfold rl_modl.
-remember ((gre a)² + (gim a)²)%L as ρ eqn:Hρ.
+remember ((Re a)² + (Im a)²)%L as ρ eqn:Hρ.
 assert (Hrz : ρ ≠ 0%L). {
   intros H; apply Haz.
   subst ρ.
@@ -405,7 +405,7 @@ intros * Hbz.
 apply eq_gc_eq.
 cbn.
 do 2 rewrite fold_rngl_squ.
-remember ((gre b)² + (gim b)²)%L as ρ eqn:Hρ.
+remember ((Re b)² + (Im b)²)%L as ρ eqn:Hρ.
 progress unfold rngl_div.
 rewrite Hiv.
 rewrite (rngl_mul_opp_l Hop).
@@ -421,9 +421,9 @@ do 8 rewrite rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_r.
 do 2 rewrite <- (rngl_mul_sub_distr_r Hop).
 do 3 rewrite <- rngl_mul_add_distr_r.
-rewrite (rngl_mul_mul_swap Hic _ (gim b)).
+rewrite (rngl_mul_mul_swap Hic _ (Im b)).
 rewrite (rngl_add_sub Hos).
-rewrite (rngl_mul_mul_swap Hic _ (gim b) (gre b)).
+rewrite (rngl_mul_mul_swap Hic _ (Im b) (Re b)).
 rewrite (rngl_sub_add Hop).
 do 4 rewrite <- rngl_mul_assoc.
 do 2 rewrite fold_rngl_squ.
@@ -566,7 +566,7 @@ progress unfold rngl_div in Habz.
 rewrite Hiv in Habz.
 do 2 rewrite fold_rngl_squ in Habz.
 injection Habz; clear Habz; intros Habi Habr.
-assert (Hrz : ((gre b)² + (gim b)² ≠ 0)%L). {
+assert (Hrz : ((Re b)² + (Im b)² ≠ 0)%L). {
   intros H.
   apply (rl_integral_modulus_prop Hop Hto Hii) in H.
   now apply Hbz, eq_gc_eq.
@@ -579,21 +579,21 @@ apply (rngl_eq_mul_0_l Hos Hiq) in Habi. 2: {
   intros H.
   now apply (rngl_inv_neq_0 Hos Hiv) in H.
 }
-assert (Hia : gim a = 0%L). {
+assert (Hia : Im a = 0%L). {
   rewrite rngl_add_comm in Habr.
-  apply (f_equal (rngl_mul (gim b))) in Habr.
-  apply (f_equal (rngl_mul (gre b))) in Habi.
+  apply (f_equal (rngl_mul (Im b))) in Habr.
+  apply (f_equal (rngl_mul (Re b))) in Habi.
   rewrite (rngl_mul_0_r Hos) in Habr, Habi.
   rewrite rngl_mul_add_distr_l in Habr.
   rewrite (rngl_mul_sub_distr_l Hop) in Habi.
-  rewrite (rngl_mul_comm Hic _ (gre a * _))%L in Habr.
-  rewrite (rngl_mul_assoc _ (gre a)) in Habi.
-  rewrite (rngl_mul_comm Hic _ (gre a)) in Habi.
+  rewrite (rngl_mul_comm Hic _ (Re a * _))%L in Habr.
+  rewrite (rngl_mul_assoc _ (Re a)) in Habi.
+  rewrite (rngl_mul_comm Hic _ (Re a)) in Habi.
   apply (rngl_add_move_0_r Hop) in Habr.
   apply -> (rngl_sub_move_0_r Hop) in Habi.
   rewrite <- Habi in Habr.
   apply (rngl_add_move_0_r Hop) in Habr.
-  do 2 rewrite (rngl_mul_comm Hic _ (gim a * _))%L in Habr.
+  do 2 rewrite (rngl_mul_comm Hic _ (Im a * _))%L in Habr.
   do 2 rewrite <- rngl_mul_assoc in Habr.
   do 2 rewrite fold_rngl_squ in Habr.
   rewrite <- rngl_mul_add_distr_l in Habr.
@@ -641,22 +641,22 @@ apply eq_gc_eq in Hab.
 cbn in Hab.
 destruct Hab as (Habr, Habi).
 rewrite rngl_add_comm in Habi.
-assert (Hra : gre a = 0%L). {
-  apply (f_equal (rngl_mul (gre b))) in Habr.
-  apply (f_equal (rngl_mul (gim b))) in Habi.
+assert (Hra : Re a = 0%L). {
+  apply (f_equal (rngl_mul (Re b))) in Habr.
+  apply (f_equal (rngl_mul (Im b))) in Habi.
   rewrite (rngl_mul_0_r Hos) in Habr, Habi.
   rewrite (rngl_mul_sub_distr_l Hop) in Habr.
   rewrite rngl_mul_add_distr_l in Habi.
-  rewrite (rngl_mul_assoc _ (gim a)) in Habr.
-  rewrite (rngl_mul_comm Hic _ (gim a)) in Habr.
-  rewrite (rngl_mul_comm Hic _ (gim a * _))%L in Habi.
+  rewrite (rngl_mul_assoc _ (Im a)) in Habr.
+  rewrite (rngl_mul_comm Hic _ (Im a)) in Habr.
+  rewrite (rngl_mul_comm Hic _ (Im a * _))%L in Habi.
   apply -> (rngl_sub_move_0_r Hop) in Habr.
   rewrite rngl_add_comm in Habi.
   apply (rngl_add_move_0_r Hop) in Habi.
   rewrite Habi in Habr.
   apply (rngl_add_move_0_r Hop) in Habr.
-  rewrite (rngl_mul_comm Hic (gre b)) in Habr.
-  rewrite (rngl_mul_comm Hic (gim b)) in Habr.
+  rewrite (rngl_mul_comm Hic (Re b)) in Habr.
+  rewrite (rngl_mul_comm Hic (Im b)) in Habr.
   do 2 rewrite <- rngl_mul_assoc in Habr.
   rewrite <- rngl_mul_add_distr_l in Habr.
   do 2 rewrite fold_rngl_squ in Habr.
@@ -742,7 +742,7 @@ do 4 rewrite (rngl_mul_opp_r Hop).
 do 2 rewrite (rngl_sub_opp_r Hop).
 do 2 rewrite (rngl_add_opp_r Hop).
 do 2 rewrite fold_rngl_squ.
-remember ((gre c)² + (gim c)²)%L as ρ eqn:Hρ.
+remember ((Re c)² + (Im c)²)%L as ρ eqn:Hρ.
 do 2 rewrite rngl_mul_add_distr_l.
 do 2 rewrite rngl_mul_add_distr_r.
 do 2 rewrite (rngl_mul_sub_distr_l Hop).
@@ -807,7 +807,7 @@ specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hi1.
 intros * Hbz.
 apply eq_gc_eq; cbn.
 do 2 rewrite fold_rngl_squ.
-remember ((gre b)² + (gim b)²)%L as ρ eqn:Hρ.
+remember ((Re b)² + (Im b)²)%L as ρ eqn:Hρ.
 rewrite (rngl_div_opp_l Hop Hiv).
 do 2 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_sub_opp_r Hop).
@@ -817,7 +817,7 @@ do 2 rewrite (rngl_mul_sub_distr_r Hop).
 do 8 rewrite (rngl_mul_div_assoc Hiv).
 rewrite rngl_add_assoc.
 rewrite (rngl_sub_sub_distr Hop).
-do 2 rewrite (rngl_mul_mul_swap Hic _ (gim b) (gre b)).
+do 2 rewrite (rngl_mul_mul_swap Hic _ (Im b) (Re b)).
 rewrite (rngl_sub_add Hop).
 rewrite (rngl_add_sub Hos).
 do 2 rewrite <- (rngl_div_add_distr_r Hiv).
@@ -1363,7 +1363,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros em * H1len * Hz *.
   apply (neq_neq_GComplex Hed) in Hz.
   cbn - [ rngl_zero ] in Hz.
-  rewrite (H1 (gre _)), (H1 (gim _)) in Hz.
+  rewrite (H1 (Re _)), (H1 (Im _)) in Hz.
   now destruct Hz.
 }
 intros em * H1len * Hz *.

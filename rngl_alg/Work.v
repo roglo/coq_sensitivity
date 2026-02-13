@@ -261,7 +261,7 @@ Theorem gre_summation :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   ∀ b e (f : nat → GComplex T),
-  gre (∑ (i = b, e), f i)%L = (∑ (i = b, e), gre (f i))%L.
+  Re (∑ (i = b, e), f i)%L = (∑ (i = b, e), Re (f i))%L.
 Proof.
 intros Hic Hop.
 intros.
@@ -291,7 +291,7 @@ Theorem gim_summation :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   ∀ b e (f : nat → GComplex T),
-  gim (∑ (i = b, e), f i)%L = (∑ (i = b, e), gim (f i))%L.
+  Im (∑ (i = b, e), f i)%L = (∑ (i = b, e), Im (f i))%L.
 Proof.
 intros Hic Hop.
 intros.
@@ -317,10 +317,10 @@ f_equal.
 apply rngl_add_0_l.
 Qed.
 
-Theorem gre_1 : (gre 1 = 1%L).
+Theorem gre_1 : (Re 1 = 1%L).
 Proof. easy. Qed.
 
-Theorem gim_1 : (gim 1 = 0%L).
+Theorem gim_1 : (Im 1 = 0%L).
 Proof. easy. Qed.
 
 Theorem gc_pow_re_0 :
@@ -413,7 +413,7 @@ destruct b. {
 }
 Qed.
 
-Theorem gre_rngl_of_nat : ∀ n, gre (rngl_of_nat n) = rngl_of_nat n.
+Theorem gre_rngl_of_nat : ∀ n, Re (rngl_of_nat n) = rngl_of_nat n.
 Proof.
 intros.
 induction n; [ easy | ].
@@ -421,7 +421,7 @@ do 2 rewrite rngl_of_nat_succ.
 now cbn; rewrite IHn.
 Qed.
 
-Theorem gim_rngl_of_nat : ∀ n, gim (rngl_of_nat n) = 0%L.
+Theorem gim_rngl_of_nat : ∀ n, Im (rngl_of_nat n) = 0%L.
 Proof.
 intros.
 induction n; [ easy | ].

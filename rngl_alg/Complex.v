@@ -25,7 +25,7 @@ Context {rp : ring_like_prop T}.
 
 Theorem neq_neq_GComplex :
   rngl_has_eq_dec T = true →
-  ∀ a b : GComplex T, a ≠ b → gre a ≠ gre b ∨ gim a ≠ gim b.
+  ∀ a b : GComplex T, a ≠ b → Re a ≠ Re b ∨ Im a ≠ Im b.
 Proof.
 intros Hed.
 specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
@@ -43,7 +43,7 @@ destruct (rngl_eqb_dec ra rb) as [Hrab| Hrab]. {
 Qed.
 
 Definition gc_opp (c : GComplex T) :=
-  {| gre := - gre c; gim := - gim c |}.
+  {| Re := - Re c; Im := - Im c |}.
 
 End a.
 
@@ -99,15 +99,6 @@ intros; cbn.
 progress unfold gc_add; cbn.
 do 2 rewrite rngl_add_0_r.
 now apply eq_gc_eq.
-Qed.
-
-Theorem gc_mul_comm :
-  rngl_mul_is_comm T = true →
-  ∀ a b, (a * b = b * a)%C.
-Proof.
-intros Hic.
-specialize gc_opt_mul_comm as H1.
-now rewrite Hic in H1.
 Qed.
 
 End a.
@@ -243,10 +234,10 @@ Arguments rl_sqrt_squ {T ro rp rl} Hto Hop a%_L.
 
 Theorem polar :
   ∀ (z : GComplex T) ρ θ,
-  ρ = √((gre z)² + (gim z)²)%L
+  ρ = √((Re z)² + (Im z)²)%L
   → θ =
-       (if (0 ≤? gim z)%L then rngl_acos (gre z / ρ)%L
-        else angle_opp (rngl_acos (gre z / ρ)%L))
+       (if (0 ≤? Im z)%L then rngl_acos (Re z / ρ)%L
+        else angle_opp (rngl_acos (Re z / ρ)%L))
   → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
 destruct_ac.
