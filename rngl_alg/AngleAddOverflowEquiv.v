@@ -1097,7 +1097,7 @@ split; intros H12. {
     progress sin_cos_add_sub_right_hyp T Hzs12.
     progress sin_cos_add_sub_right_goal T.
     apply rngl_lt_le_incl in Hzc1.
-    apply (rngl_le_0_add Hos Hor); [ | easy ].
+    apply (rngl_add_nonneg_nonneg Hos Hor); [ | easy ].
     apply rngl_lt_le_incl in Hzs1, Hc2z.
     now apply rngl_sin_add_nonneg.
   } {
