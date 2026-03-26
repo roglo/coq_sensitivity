@@ -25,7 +25,7 @@ Context {rp : ring_like_prop T}.
 
 Theorem neq_neq_GComplex :
   rngl_has_eq_dec T = true →
-  ∀ a b : GComplex T, a ≠ b → Re a ≠ Re b ∨ Im a ≠ Im b.
+  ∀ a b : Complex T, a ≠ b → Re a ≠ Re b ∨ Im a ≠ Im b.
 Proof.
 intros Hed.
 specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
@@ -42,7 +42,7 @@ destruct (rngl_eqb_dec ra rb) as [Hrab| Hrab]. {
 }
 Qed.
 
-Definition gc_opp (c : GComplex T) :=
+Definition gc_opp (c : Complex T) :=
   {| Re := - Re c; Im := - Im c |}.
 
 End a.
@@ -66,7 +66,7 @@ Qed.
 
 End a.
 
-Notation "z ^ n" := (gc_pow_nat z n) : gc_scope.
+Notation "z ^ n" := (c_pow_nat z n) : c_scope.
 
 Section a.
 
@@ -92,13 +92,13 @@ rewrite (rngl_abs_1 Hos Hto) in Ha.
 now apply (rngl_abs_le Hop Hto) in Ha.
 Qed.
 
-Theorem gc_add_0_r :
-  ∀ a : GComplex T, (a + 0)%C = a.
+Theorem c_add_0_r :
+  ∀ a : Complex T, (a + 0)%C = a.
 Proof.
 intros; cbn.
-progress unfold gc_add; cbn.
+progress unfold c_add; cbn.
 do 2 rewrite rngl_add_0_r.
-now apply eq_gc_eq.
+now apply eq_c_eq.
 Qed.
 
 End a.
@@ -233,12 +233,12 @@ Qed.
 Arguments rl_sqrt_squ {T ro rp rl} Hto Hop a%_L.
 
 Theorem polar :
-  ∀ (z : GComplex T) ρ θ,
+  ∀ (z : Complex T) ρ θ,
   ρ = √((Re z)² + (Im z)²)%L
   → θ =
        (if (0 ≤? Im z)%L then rngl_acos (Re z / ρ)%L
         else angle_opp (rngl_acos (Re z / ρ)%L))
-  → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
+  → z = mk_c (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -248,9 +248,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   f_equal; rewrite H1; apply H1.
 }
 intros * Hρ Hθ.
-destruct (gc_eq_dec Heo z gc_zero) as [Hz| Hz]. {
+destruct (c_eq_dec Heo z c_zero) as [Hz| Hz]. {
   destruct z as (zr, zi).
-  progress unfold gc_zero in Hz.
+  progress unfold c_zero in Hz.
   injection Hz; clear Hz; intros; subst zr zi.
   cbn in Hρ.
   progress unfold rngl_squ in Hρ.
@@ -393,24 +393,24 @@ Qed.
 Definition seq_converging_to_rat (rad a b n : nat) :=
   (rngl_of_nat (a * rad ^ n / b) / rngl_of_nat rad ^ n)%L.
 
-Theorem gc_cos_add_sin_add_is_mul :
+Theorem c_cos_add_sin_add_is_mul :
   ∀ a b,
   (rngl_cos (a + b) +ℹ rngl_sin (a + b))%C =
   ((rngl_cos a +ℹ rngl_sin a) * (rngl_cos b +ℹ rngl_sin b))%C.
 Proof. easy. Qed.
 
 (* Moivre formula *)
-Theorem gc_cos_sin_pow :
+Theorem c_cos_sin_pow :
   ∀ a n,
   ((rngl_cos a +ℹ rngl_sin a) ^ n)%C =
   (rngl_cos (n * a) +ℹ rngl_sin (n * a))%C.
 Proof.
 intros.
-progress unfold gc_pow_nat.
+progress unfold c_pow_nat.
 induction n; [ easy | ].
 rewrite rngl_pow_succ_r.
 rewrite IHn.
-now apply eq_gc_eq.
+now apply eq_c_eq.
 Qed.
 
 Theorem rngl_rat_frac_part_lt_1 :

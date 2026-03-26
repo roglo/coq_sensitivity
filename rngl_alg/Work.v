@@ -32,16 +32,16 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
-Theorem gc_pow_im_0 :
+Theorem c_pow_im_0 :
   rngl_has_opp_or_psub T = true →
-  ∀ n x, (mk_gc x 0%L ^ n)%C = (mk_gc (x ^ n) 0)%C.
+  ∀ n x, (mk_c x 0%L ^ n)%C = (mk_c (x ^ n) 0)%C.
 Proof.
 intros Hos *.
-progress unfold gc_pow_nat.
+progress unfold c_pow_nat.
 induction n; [ easy | ].
 rewrite rngl_pow_succ_r; cbn.
 rewrite IHn.
-apply eq_gc_eq; cbn.
+apply eq_c_eq; cbn.
 do 2 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
 now rewrite (rngl_mul_0_l Hos).
@@ -260,7 +260,7 @@ Qed.
 Theorem gre_summation :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
-  ∀ b e (f : nat → GComplex T),
+  ∀ b e (f : nat → Complex T),
   Re (∑ (i = b, e), f i)%L = (∑ (i = b, e), Re (f i))%L.
 Proof.
 intros Hic Hop.
@@ -276,12 +276,12 @@ rewrite fold_left_rngl_add_fun_from_0.
 rewrite rngl_add_0_l.
 rewrite <- IHlen.
 rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1.
-apply gc_add_0_l.
+apply c_add_0_l.
 intros; cbn.
-specialize gc_add_comm as H1; cbn in H1.
+specialize c_add_comm as H1; cbn in H1.
 rewrite H1; clear H1.
-apply gc_add_0_l.
-apply gc_add_assoc.
+apply c_add_0_l.
+apply c_add_assoc.
 cbn.
 f_equal.
 apply rngl_add_0_l.
@@ -290,7 +290,7 @@ Qed.
 Theorem gim_summation :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
-  ∀ b e (f : nat → GComplex T),
+  ∀ b e (f : nat → Complex T),
   Im (∑ (i = b, e), f i)%L = (∑ (i = b, e), Im (f i))%L.
 Proof.
 intros Hic Hop.
@@ -306,12 +306,12 @@ rewrite fold_left_rngl_add_fun_from_0.
 rewrite rngl_add_0_l.
 rewrite <- IHlen.
 rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1.
-apply gc_add_0_l.
+apply c_add_0_l.
 intros; cbn.
-specialize gc_add_comm as H1; cbn in H1.
+specialize c_add_comm as H1; cbn in H1.
 rewrite H1; clear H1.
-apply gc_add_0_l.
-apply gc_add_assoc.
+apply c_add_0_l.
+apply c_add_assoc.
 cbn.
 f_equal.
 apply rngl_add_0_l.
@@ -323,15 +323,15 @@ Proof. easy. Qed.
 Theorem gim_1 : (Im 1 = 0%L).
 Proof. easy. Qed.
 
-Theorem gc_pow_re_0 :
+Theorem c_pow_re_0 :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   ∀ n y,
-  (mk_gc 0 y ^ n =
+  (mk_c 0 y ^ n =
      if Nat.even n then
-       mk_gc ((minus_one_pow (n / 2)) * (y ^ n))%L 0
+       mk_c ((minus_one_pow (n / 2)) * (y ^ n))%L 0
      else
-       mk_gc 0 ((minus_one_pow (n / 2)) * (y ^ n))%L)%C.
+       mk_c 0 ((minus_one_pow (n / 2)) * (y ^ n))%L)%C.
 Proof.
 intros Hic Hop.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
@@ -342,13 +342,13 @@ destruct b. {
   destruct Hb as (m, Hm).
   subst n.
   rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
-  progress unfold gc_pow_nat.
+  progress unfold c_pow_nat.
   induction m; cbn. {
     rewrite rngl_mul_1_l.
-    now apply eq_gc_eq.
+    now apply eq_c_eq.
   }
   rewrite IHm.
-  progress unfold gc_mul.
+  progress unfold c_mul.
   cbn.
   do 4 rewrite (rngl_mul_0_l Hos).
   do 2 rewrite (rngl_sub_0_l Hop).
@@ -379,11 +379,11 @@ destruct b. {
   rewrite Nat.mul_comm, Nat.div_add_l; [ | easy ].
   rewrite Nat.div_small; [ | easy ].
   rewrite Nat.add_0_r.
-  progress unfold gc_pow_nat.
+  progress unfold c_pow_nat.
   induction m; cbn. {
     rewrite rngl_mul_1_l.
     rewrite rngl_mul_1_r.
-    apply eq_gc_eq; cbn.
+    apply eq_c_eq; cbn.
     do 2 rewrite (rngl_mul_0_l Hos).
     rewrite (rngl_mul_0_r Hos).
     rewrite (rngl_sub_0_r Hos).
@@ -392,7 +392,7 @@ destruct b. {
     easy.
   }
   rewrite IHm.
-  progress unfold gc_mul.
+  progress unfold c_mul.
   cbn.
   do 4 rewrite (rngl_mul_0_l Hos).
   do 2 rewrite (rngl_sub_0_l Hop).
@@ -448,34 +448,34 @@ Proof.
 destruct_ac.
 intros.
 specialize (@newton_binomial) as H1.
-set (gro := gc_ring_like_op T).
-set (grp := gc_ring_like_prop_not_alg_closed Hic Hop Hiv Hto).
-specialize (H1 (GComplex T)).
+set (gro := c_ring_like_op T).
+set (grp := c_ring_like_prop_not_alg_closed Hic Hop Hiv Hto).
+specialize (H1 (Complex T)).
 specialize (H1 gro grp).
-assert (Hosc : rngl_has_opp_or_psub (GComplex T) = true). {
+assert (Hosc : rngl_has_opp_or_psub (Complex T) = true). {
   progress unfold rngl_has_opp_or_psub in Hos.
   progress unfold rngl_has_opp_or_psub.
   cbn.
-  progress unfold gc_opt_opp_or_psub.
+  progress unfold c_opt_opp_or_psub.
   generalize Hos; intros Hos'; clear Hos.
   destruct (rngl_opt_opp_or_psub T) as [s| ]; [ | easy ].
   now destruct s.
 }
 specialize (H1 Hic Hosc n).
-specialize (H1 (mk_gc (rngl_cos α) 0)).
-specialize (H1 (mk_gc 0 (rngl_sin α))).
+specialize (H1 (mk_c (rngl_cos α) 0)).
+specialize (H1 (mk_c 0 (rngl_sin α))).
 cbn - [ rngl_add rngl_zero ] in H1.
 remember (∑ (k = _, _), _) as x in H1.
 cbn in H1; subst x.
-progress unfold gc_add in H1.
+progress unfold c_add in H1.
 cbn - [ rngl_add rngl_zero ] in H1.
 rewrite rngl_add_0_r in H1.
 rewrite rngl_add_0_l in H1.
 progress unfold gro in H1.
-specialize (gc_cos_sin_pow α n) as H2.
-progress unfold gc_pow_nat in H2.
+specialize (c_cos_sin_pow α n) as H2.
+progress unfold c_pow_nat in H2.
 rewrite H2 in H1; clear H2.
-apply eq_gc_eq in H1.
+apply eq_c_eq in H1.
 cbn - [ rngl_add rngl_zero ] in H1.
 rewrite (gre_summation Hic Hop) in H1.
 rewrite (gim_summation Hic Hop) in H1.
@@ -484,11 +484,11 @@ split. {
   rewrite Hc.
   apply rngl_summation_eq_compat.
   intros * (_, Hi).
-  specialize (gc_pow_im_0 Hos) as H1.
-  progress unfold gc_pow_nat in H1.
+  specialize (c_pow_im_0 Hos) as H1.
+  progress unfold c_pow_nat in H1.
   rewrite H1.
-  specialize (gc_pow_re_0 Hic Hop) as H2.
-  progress unfold gc_pow_nat in H2.
+  specialize (c_pow_re_0 Hic Hop) as H2.
+  progress unfold c_pow_nat in H2.
   rewrite H2.
   cbn - [ "/" ].
   do 2 rewrite (rngl_mul_0_r Hos).
@@ -520,11 +520,11 @@ split. {
   do 2 rewrite (rngl_mul_0_l Hos).
   rewrite (rngl_sub_0_r Hos).
   rewrite rngl_add_0_l.
-  specialize (gc_pow_im_0 Hos) as H1.
-  progress unfold gc_pow_nat in H1.
+  specialize (c_pow_im_0 Hos) as H1.
+  progress unfold c_pow_nat in H1.
   rewrite H1.
-  specialize (gc_pow_re_0 Hic Hop) as H2.
-  progress unfold gc_pow_nat in H2.
+  specialize (c_pow_re_0 Hic Hop) as H2.
+  progress unfold c_pow_nat in H2.
   rewrite H2.
   cbn - [ "/" ].
   rewrite (rngl_mul_0_r Hos).
