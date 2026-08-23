@@ -282,7 +282,7 @@ Fixpoint sqrt_mod_loop a p i :=
   match i with
   | 0 => None
   | S i' =>
-      if i * i mod p =? a mod p then Some i
+      if i * i mod p =? a mod p then Some (p - i)
       else sqrt_mod_loop a p i'
   end.
 
@@ -295,6 +295,13 @@ Definition legendre_symbol a p :=
     | Some _ => 1
     | None => p - 1
     end.
+
+(*
+Definition is_quadratic_residue a p := legendre_symbol a p =? 1.
+
+Compute (let p := 17 in List.map (λ a, (sqrt_mod a p, a)) (List.seq 0 p)).
+Compute (let p := 17 in List.filter (λ a, is_quadratic_residue a p) (List.seq 0 p)).
+*)
 
 (* to be completed
 Theorem euler_criterion : ∀ p,
