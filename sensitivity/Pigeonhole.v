@@ -671,8 +671,10 @@ do 2 rewrite Hfg in Hx'.
 now injection Hx'; intros H; symmetry in H.
 Qed.
 
-Theorem bijective_fin_t : ∀ m n (f : fin_t m → fin_t n),
-  FinFun.Bijective f → m = n.
+Definition Bijective {A B} (f : A → B) :=
+  ∃ g : B → A, (∀ x : A, g (f x) = x) ∧ ∀ y : B, f (g y) = y.
+
+Theorem bijective_fin_t : ∀ m n (f : fin_t m → fin_t n), Bijective f → m = n.
 Proof.
 intros * Hf.
 destruct Hf as (g & Hgf & Hfg).
