@@ -277,3 +277,38 @@ apply Nat_mul_mod_cancel_l in Hx1. 2: {
 }
 rewrite (Nat.mod_small 1) in Hx1; [ easy | flia Hap ].
 Qed.
+
+Fixpoint sqrt_mod_loop a p i :=
+  match i with
+  | 0 => None
+  | S i' =>
+      if i * i mod p =? a mod p then Some i
+      else sqrt_mod_loop a p i'
+  end.
+
+Definition sqrt_mod a p := sqrt_mod_loop a p (p - 1).
+
+Definition legendre_symbol a p :=
+  if a =? 0 then 0
+  else
+    match sqrt_mod a p with
+    | Some _ => 1
+    | None => p - 1
+    end.
+
+(* to be completed
+Theorem euler_criterion : ∀ p,
+  prime p
+  → ∀ a, 1 ≤ a < p
+  → a ^ ((p - 1) / 2) ≡ legendre_symbol a p mod p.
+Proof.
+intros * Hp * Hap.
+progress unfold legendre_symbol.
+remember (a =? 0) as az eqn:Haz.
+symmetry in Haz.
+destruct az. {
+  now apply Nat.eqb_eq in Haz; subst a.
+}
+apply Nat.eqb_neq in Haz.
+...
+*)
