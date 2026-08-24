@@ -325,20 +325,28 @@ Theorem eq_sqrt_mod_Some : ∀ a b p, sqrt_mod a p = Some b → b * b ≡ a mod 
 Proof.
 intros * Hsm.
 Theorem eq_sqrt_mod_loop_Some :
-  ∀ a b p i, sqrt_mod_loop a p i = Some b → b * b ≡ a mod p.
+  ∀ a b p i,
+  i < p
+  → sqrt_mod_loop a p i = Some b
+  → b * b ≡ a mod p.
 Proof.
-intros * Hsm.
+intros * Hip Hsm.
 induction i; [ easy | ].
 cbn - [ "*" ] in Hsm.
 remember ((S i * S i) mod p =? a mod p) as e eqn:He.
 symmetry in He.
-destruct e. {
-  injection Hsm; clear Hsm; intros; subst b.
-  apply Nat.eqb_eq in He.
-  rewrite Nat.mul_sub_distr_l.
-  do 2 rewrite Nat.mul_sub_distr_r.
-  rewrite Nat.sub_sub_distr; cycle 1. {
-    apply Nat.mul_le_mono_r.
+destruct e; cycle 1. {
+  apply IHi; [ flia Hip | easy ].
+}
+injection Hsm; clear Hsm; intros; subst b.
+apply Nat.eqb_eq in He.
+rewrite Nat.mul_sub_distr_l.
+do 2 rewrite Nat.mul_sub_distr_r.
+rewrite Nat.sub_sub_distr; cycle 1. {
+  apply Nat.mul_le_mono_r.
+  now apply Nat.lt_le_incl.
+} {
+(* S i ≤ p - S i → ah merde, ça marche pas *)
 ...
 now apply eq_sqrt_mod_loop_Some in Hsm.
 ...
