@@ -317,5 +317,6 @@ destruct az. {
   now apply Nat.eqb_eq in Haz; subst a.
 }
 apply Nat.eqb_neq in Haz.
+specialize (fermat_little p Hp a Hap) as H1.
 ...
 *)
