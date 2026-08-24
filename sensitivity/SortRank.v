@@ -167,6 +167,29 @@ subst ib; apply Hia.
 now left.
 Qed.
 
+Definition Injective {A B : Type} (f : A → B) :=
+  ∀ x y : A, f x = f y → x = y.
+
+Theorem Injective_map_NoDup A B (f:A->B) (l:list A) :
+  Injective f -> List.NoDup l -> List.NoDup (List.map f l).
+Proof.
+intros * Hinj Hnd.
+progress unfold Injective in Hinj.
+induction l as [| a]; [ constructor | ].
+cbn in Hnd |-*.
+apply List.NoDup_cons_iff in Hnd.
+apply List.NoDup_cons_iff.
+destruct Hnd as (Hal, Hnd).
+split; [ | now apply IHl ].
+intros H1; apply Hal; clear Hal.
+clear Hnd IHl.
+induction l as [| b]; [ easy | ].
+cbn in H1.
+destruct H1 as [H1| H1].
+now left; apply Hinj.
+now right; apply IHl.
+Qed.
+
 Theorem NoDup_isort_rank :
   ∀ {A} rel (l : list A), List.NoDup (isort_rank rel l).
 Proof.
@@ -178,7 +201,7 @@ constructor. {
   intros H; apply List.in_map_iff in H.
   now destruct H as (i & Hi & H).
 }
-apply FinFun.Injective_map_NoDup; [ | easy ].
+apply Injective_map_NoDup; [ | easy ].
 intros i j Hij.
 now apply Nat.succ_inj in Hij.
 Qed.
