@@ -343,6 +343,14 @@ apply Nat.eqb_eq in He.
 rewrite Nat.mul_sub_distr_l.
 do 2 rewrite Nat.mul_sub_distr_r.
 rewrite Nat_sub_sub_swap.
+Theorem glop : ∀ a b c, b * c ≤  a → a - b * c ≡ a mod c.
+Proof.
+intros * Hbca.
+rewrite <- (Nat.Div0.mod_add _ b).
+now rewrite Nat.sub_add.
+Qed.
+rewrite glop.
+....
 rewrite Nat.sub_sub_distr; cycle 1. {
   apply Nat.mul_le_mono_r.
   now apply Nat.lt_le_incl.
