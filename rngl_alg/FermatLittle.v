@@ -350,6 +350,38 @@ rewrite <- (Nat.Div0.mod_add _ b).
 now rewrite Nat.sub_add.
 Qed.
 rewrite glop.
+Theorem Nat_neg_neg_mod :
+  ∀ a b n, a ≤ n → b ≤ n → (n - a) * (n - b) ≡ (a * b) mod n.
+Proof.
+intros * Han Hbn.
+rewrite Nat.mul_sub_distr_l.
+do 2 rewrite Nat.mul_sub_distr_r.
+rewrite Nat_sub_sub_swap.
+rewrite glop; cycle 1. {
+  rewrite Nat.sub_sub_distr.
+  rewrite <- Nat.mul_sub_distr_l.
+  apply Nat.le_sub_le_add_r.
+  rewrite <- Nat.mul_sub_distr_l.
+  apply Nat.mul_le_mono_nonneg_r; [ | easy ].
+  apply Nat.le_add_le_sub_l.
+  now rewrite Nat.add_0_r.
+  now apply Nat.mul_le_mono_nonneg_r.
+  now apply Nat.mul_le_mono_nonneg_l.
+}
+rewrite Nat.sub_sub_distr; cycle 1. {
+  now apply Nat.mul_le_mono_nonneg_r.
+} {
+  now apply Nat.mul_le_mono_nonneg_l.
+}
+rewrite <- Nat.mul_sub_distr_l.
+rewrite Nat.mul_comm.
+rewrite Nat.add_comm.
+rewrite Nat.Div0.mod_add.
+easy.
+Qed.
+...
+rewrite Nat.mul_sub_distr_r.
+do 2 rewrite Nat.mul_sub_distr_l.
 ....
 rewrite Nat.sub_sub_distr; cycle 1. {
   apply Nat.mul_le_mono_r.
