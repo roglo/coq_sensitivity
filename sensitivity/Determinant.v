@@ -328,7 +328,7 @@ apply NoDup_concat_if. {
   intros l Hl.
   apply List.in_map_iff in Hl.
   destruct Hl as (i & Hl & Hi); subst l.
-  apply FinFun.Injective_map_NoDup; [ | easy ].
+  apply Injective_map_NoDup; [ | easy ].
   intros j k Hjk.
   now injection Hjk.
 }
