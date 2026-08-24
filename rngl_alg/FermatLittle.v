@@ -278,6 +278,38 @@ apply Nat_mul_mod_cancel_l in Hx1. 2: {
 rewrite (Nat.mod_small 1) in Hx1; [ easy | flia Hap ].
 Qed.
 
+Theorem Nat_neg_neg_mod :
+  ∀ a b n, a ≤ n → b ≤ n → (n - a) * (n - b) ≡ (a * b) mod n.
+Proof.
+intros * Han Hbn.
+rewrite Nat.mul_sub_distr_l.
+do 2 rewrite Nat.mul_sub_distr_r.
+rewrite Nat_sub_sub_swap.
+rewrite <- (Nat.Div0.mod_add _ a).
+rewrite Nat.sub_add; cycle 1. {
+  rewrite Nat.sub_sub_distr; cycle 1. {
+    now apply Nat.mul_le_mono_nonneg_r.
+  } {
+    now apply Nat.mul_le_mono_nonneg_l.
+  }
+  rewrite <- Nat.mul_sub_distr_l.
+  apply Nat.le_sub_le_add_r.
+  rewrite <- Nat.mul_sub_distr_l.
+  apply Nat.mul_le_mono_nonneg_r; [ | easy ].
+  apply Nat.le_add_le_sub_l.
+  now rewrite Nat.add_0_r.
+}
+rewrite Nat.sub_sub_distr; cycle 1. {
+  now apply Nat.mul_le_mono_nonneg_r.
+} {
+  now apply Nat.mul_le_mono_nonneg_l.
+}
+rewrite <- Nat.mul_sub_distr_l.
+rewrite Nat.mul_comm.
+rewrite Nat.add_comm.
+now rewrite Nat.Div0.mod_add.
+Qed.
+
 Fixpoint sqrt_mod_loop a p i :=
   match i with
   | 0 => None
@@ -303,6 +335,38 @@ Compute (let p := 17 in List.map (λ a, (sqrt_mod a p, a)) (List.seq 0 p)).
 Compute (let p := 17 in List.filter (λ a, is_quadratic_residue a p) (List.seq 0 p)).
 *)
 
+Theorem eq_sqrt_mod_loop_Some :
+  ∀ a b p i,
+  i < p
+  → sqrt_mod_loop a p i = Some b
+  → b * b ≡ a mod p.
+Proof.
+intros * Hip Hsm.
+induction i; [ easy | ].
+cbn - [ "*" ] in Hsm.
+remember ((S i * S i) mod p =? a mod p) as e eqn:He.
+symmetry in He.
+destruct e; cycle 1. {
+  apply IHi; [ flia Hip | easy ].
+}
+injection Hsm; clear Hsm; intros; subst b.
+apply Nat.eqb_eq in He.
+apply Nat.lt_le_incl in Hip.
+now rewrite Nat_neg_neg_mod.
+Qed.
+
+Theorem eq_sqrt_mod_Some :
+  ∀ a b p,
+  p ≠ 0
+  → sqrt_mod a p = Some b
+  → b * b ≡ a mod p.
+Proof.
+intros * Hp Hsm.
+apply eq_sqrt_mod_loop_Some in Hsm; [ easy | ].
+apply Nat.sub_lt; [ | easy ].
+now apply Nat.neq_0_lt_0.
+Qed.
+
 (* to be completed
 Theorem euler_criterion : ∀ p,
   prime p
@@ -321,25 +385,8 @@ specialize (fermat_little p Hp a Hap) as H1.
 remember (sqrt_mod a p) as sm eqn:Hsm.
 symmetry in Hsm.
 destruct sm as [b| ]. {
-Theorem eq_sqrt_mod_Some : ∀ a b p, sqrt_mod a p = Some b → b * b ≡ a mod p.
-Proof.
-intros * Hsm.
-Theorem eq_sqrt_mod_loop_Some :
-  ∀ a b p i,
-  i < p
-  → sqrt_mod_loop a p i = Some b
-  → b * b ≡ a mod p.
-Proof.
-intros * Hip Hsm.
-induction i; [ easy | ].
-cbn - [ "*" ] in Hsm.
-remember ((S i * S i) mod p =? a mod p) as e eqn:He.
-symmetry in He.
-destruct e; cycle 1. {
-  apply IHi; [ flia Hip | easy ].
-}
-injection Hsm; clear Hsm; intros; subst b.
-apply Nat.eqb_eq in He.
+  apply eq_sqrt_mod_Some in Hsm; [ | flia Hap ].
+....
 rewrite Nat.mul_sub_distr_l.
 do 2 rewrite Nat.mul_sub_distr_r.
 rewrite Nat_sub_sub_swap.
@@ -350,35 +397,6 @@ rewrite <- (Nat.Div0.mod_add _ b).
 now rewrite Nat.sub_add.
 Qed.
 rewrite glop.
-Theorem Nat_neg_neg_mod :
-  ∀ a b n, a ≤ n → b ≤ n → (n - a) * (n - b) ≡ (a * b) mod n.
-Proof.
-intros * Han Hbn.
-rewrite Nat.mul_sub_distr_l.
-do 2 rewrite Nat.mul_sub_distr_r.
-rewrite Nat_sub_sub_swap.
-rewrite glop; cycle 1. {
-  rewrite Nat.sub_sub_distr.
-  rewrite <- Nat.mul_sub_distr_l.
-  apply Nat.le_sub_le_add_r.
-  rewrite <- Nat.mul_sub_distr_l.
-  apply Nat.mul_le_mono_nonneg_r; [ | easy ].
-  apply Nat.le_add_le_sub_l.
-  now rewrite Nat.add_0_r.
-  now apply Nat.mul_le_mono_nonneg_r.
-  now apply Nat.mul_le_mono_nonneg_l.
-}
-rewrite Nat.sub_sub_distr; cycle 1. {
-  now apply Nat.mul_le_mono_nonneg_r.
-} {
-  now apply Nat.mul_le_mono_nonneg_l.
-}
-rewrite <- Nat.mul_sub_distr_l.
-rewrite Nat.mul_comm.
-rewrite Nat.add_comm.
-rewrite Nat.Div0.mod_add.
-easy.
-Qed.
 ...
 rewrite Nat.mul_sub_distr_r.
 do 2 rewrite Nat.mul_sub_distr_l.
