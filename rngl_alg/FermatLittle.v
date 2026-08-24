@@ -342,11 +342,29 @@ injection Hsm; clear Hsm; intros; subst b.
 apply Nat.eqb_eq in He.
 rewrite Nat.mul_sub_distr_l.
 do 2 rewrite Nat.mul_sub_distr_r.
+rewrite Nat_sub_sub_swap.
 rewrite Nat.sub_sub_distr; cycle 1. {
   apply Nat.mul_le_mono_r.
   now apply Nat.lt_le_incl.
 } {
-(* S i ≤ p - S i → ah merde, ça marche pas *)
+  apply Nat.mul_le_mono_l.
+  now apply Nat.lt_le_incl.
+}
+rewrite Nat.add_sub_swap.
+...
+rewrite <- Nat.add_sub_swap; cycle 1. {
+  apply Nat.mul_le_mono_l.
+  now apply Nat.lt_le_incl.
+}
+rewrite (Nat.mul_comm p (S i)).
+rewrite <- Nat.sub_add_distr.
+rewrite <- Nat.mul_add_distr_l.
+Search ((_ - _) mod _).
+
+do 2 rewrite <- (Nat.Div0.mod_add _ (S i)).
+rewrite <- Nat.add_assoc.
+rewrite <- Nat.mul_add_distr_l.
+rewrite Nat.sub_add.
 ...
 now apply eq_sqrt_mod_loop_Some in Hsm.
 ...
