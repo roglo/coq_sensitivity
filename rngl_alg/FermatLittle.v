@@ -318,5 +318,19 @@ destruct az. {
 }
 apply Nat.eqb_neq in Haz.
 specialize (fermat_little p Hp a Hap) as H1.
+remember (sqrt_mod a p) as sm eqn:Hsm.
+symmetry in Hsm.
+destruct sm as [b| ]. {
+Theorem eq_sqrt_mod_Some : ∀ a b p, sqrt_mod a p = Some b → b * b = a.
+Proof.
+intros * Hsm.
+Theorem eq_sqrt_mod_loop_Some :
+  ∀ a b p i, sqrt_mod_loop a p i = Some b → b * b = a.
+Proof.
+intros * Hsm.
+induction i; [ easy | ].
+cbn in Hsm.
+...
+now apply eq_sqrt_mod_loop_Some in Hsm.
 ...
 *)
