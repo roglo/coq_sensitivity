@@ -339,7 +339,7 @@ Theorem eq_sqrt_mod_loop_Some :
   ∀ a b p i,
   i < p
   → sqrt_mod_loop a p i = Some b
-  → b * b ≡ a mod p.
+  → 1 ≤ b < p ∧ b * b ≡ a mod p.
 Proof.
 intros * Hip Hsm.
 induction i; [ easy | ].
@@ -351,15 +351,16 @@ destruct e; cycle 1. {
 }
 injection Hsm; clear Hsm; intros; subst b.
 apply Nat.eqb_eq in He.
-apply Nat.lt_le_incl in Hip.
-now rewrite Nat_neg_neg_mod.
+split; [ | now apply Nat.lt_le_incl in Hip; rewrite Nat_neg_neg_mod ].
+split; [ | now apply Nat.lt_le_incl in Hip; apply Nat.sub_lt ].
+flia Hip.
 Qed.
 
 Theorem eq_sqrt_mod_Some :
   ∀ a b p,
   p ≠ 0
   → sqrt_mod a p = Some b
-  → b * b ≡ a mod p.
+  → 1 ≤ b < p ∧ b * b ≡ a mod p.
 Proof.
 intros * Hp Hsm.
 apply eq_sqrt_mod_loop_Some in Hsm; [ easy | ].
@@ -381,11 +382,22 @@ destruct az. {
   now apply Nat.eqb_eq in Haz; subst a.
 }
 apply Nat.eqb_neq in Haz.
-specialize (fermat_little p Hp a Hap) as H1.
 remember (sqrt_mod a p) as sm eqn:Hsm.
 symmetry in Hsm.
 destruct sm as [b| ]. {
   apply eq_sqrt_mod_Some in Hsm; [ | flia Hap ].
+  destruct Hsm as (Hbp, Hsm).
+  rewrite <- Nat_mod_pow_mod.
+  rewrite <- Hsm.
+  rewrite Nat_mod_pow_mod.
+  rewrite <- Nat.pow_2_r.
+  rewrite <- Nat.pow_mul_r.
+  rewrite <- (proj2 (Nat.Div0.div_exact _ _)). {
+    rewrite fermat_little; [ | easy | easy ].
+    symmetry.
+    apply Nat.mod_1_l.
+    now apply (Nat.le_lt_trans _ a).
+  }
 ....
 rewrite Nat.mul_sub_distr_l.
 do 2 rewrite Nat.mul_sub_distr_r.
