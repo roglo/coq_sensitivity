@@ -51,7 +51,7 @@ Proof.
 intros.
 specialize (Pos.gcd_divide_l a b) as H1.
 apply Z.divide_Zpos in H1.
-apply Znumtheory.Zdivide_mod in H1.
+apply Z.mod0_divide in H1.
 apply Zdiv.Zmod_divides in H1; [ | easy ].
 destruct H1 as (c & Hc).
 destruct c as [| c| c]; [ easy | | easy ].
@@ -136,7 +136,7 @@ destruct qn as [| qn| qn]. {
       rewrite Pos2Z.inj_gcd.
       rewrite <- Z.gcd_opp_l.
       rewrite Pos2Z.opp_pos.
-      apply Znumtheory.Zdivide_mod.
+      apply Z.mod0_divide.
       apply Z.gcd_divide_l.
     }
     cbn in Hz.
@@ -147,12 +147,12 @@ destruct qn as [| qn| qn]. {
     rewrite <- Z2Pos.inj_gcd; cycle 1. {
       apply Z.div_str_pos.
       split; [ easy | ].
-      apply Znumtheory.Zdivide_le; [ easy | easy | ].
+      apply Z.divide_pos_le; [ easy | ].
       apply Z.gcd_divide_l.
     } {
       apply Z.div_str_pos.
       split; [ easy | ].
-      apply Znumtheory.Zdivide_le; [ easy | easy | ].
+      apply Z.divide_pos_le; [ easy | ].
       apply Z.gcd_divide_r.
     }
     rewrite Z.gcd_div_factor; [ | easy | | ]; cycle 1. {
