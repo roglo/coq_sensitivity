@@ -403,6 +403,22 @@ Theorem prime_2_or_odd : ∀ p, prime p → p = 2 ∨ Nat.Odd p.
 Proof.
 intros * Hp.
 destruct (Nat.eq_dec p 2) as [Hp2| Hp2]; [ now left | right ].
+apply Nat.div2_Odd.
+Search Nat.div2.
+cbn.
+destruct p; [ easy | ].
+f_equal.
+cbn.
+apply Nat.odd_spec.
+Search Nat.Odd.
+Search (Nat.odd).
+Search Nat.Odd.
+(*
+...
+prime_only_divisors:
+  ∀ p : nat, prime p → ∀ a : nat, Nat.divide a p → a = 1 ∨ a = p
+...
+*)
 destruct p; [ easy | ].
 apply Nat.Odd_succ.
 progress unfold prime in Hp.
