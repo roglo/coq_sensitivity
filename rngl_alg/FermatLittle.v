@@ -405,6 +405,19 @@ intros * Hp.
 destruct (Nat.eq_dec p 2) as [Hp2| Hp2]; [ now left | right ].
 apply Nat.div2_Odd.
 Search Nat.div2.
+do 2 rewrite Nat.div2_div.
+Axiom odd_prime: ∀ p : nat, prime p → p ≠ 2 → p mod 2 = 1.
+apply odd_prime in Hp; [ | easy ].
+destruct p; [ easy | ].
+Search (S _ mod _).
+...
+remember (p mod 2) as q eqn:Hq.
+symmetry in Hq.
+destruct q; [ easy | ].
+Search (_ mod _ = _ ↔ _).
+Search (_ ↔ _ mod _ = _).
+apply Nat.Div0
+Search Nat.Odd.
 cbn.
 destruct p; [ easy | ].
 f_equal.
@@ -415,6 +428,7 @@ Search (Nat.odd).
 Search Nat.Odd.
 (*
 ...
+odd_prime: ∀ p : nat, prime p → p ≠ 2 → p mod 2 = 1
 prime_only_divisors:
   ∀ p : nat, prime p → ∀ a : nat, Nat.divide a p → a = 1 ∨ a = p
 ...
