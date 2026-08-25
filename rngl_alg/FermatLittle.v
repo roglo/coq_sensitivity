@@ -399,6 +399,10 @@ destruct sm as [b| ]. {
     apply Nat.mod_1_l.
     now apply (Nat.le_lt_trans _ a).
   }
+Axiom odd_prime: ∀ p : nat, prime p → p ≠ 2 → p mod 2 = 1.
+Show.
+specialize (odd_prime _ Hp Hp2) as H1.
+...
 Theorem prime_2_or_odd : ∀ p, prime p → p = 2 ∨ Nat.Odd p.
 Proof.
 intros * Hp.
@@ -406,7 +410,6 @@ destruct (Nat.eq_dec p 2) as [Hp2| Hp2]; [ now left | right ].
 apply Nat.div2_Odd.
 Search Nat.div2.
 do 2 rewrite Nat.div2_div.
-Axiom odd_prime: ∀ p : nat, prime p → p ≠ 2 → p mod 2 = 1.
 apply odd_prime in Hp; [ | easy ].
 destruct p; [ easy | ].
 Search (S _ mod _).
