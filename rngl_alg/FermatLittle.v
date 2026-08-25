@@ -392,12 +392,49 @@ destruct sm as [b| ]. {
   rewrite Nat_mod_pow_mod.
   rewrite <- Nat.pow_2_r.
   rewrite <- Nat.pow_mul_r.
+  destruct (Nat.eq_dec p 2) as [Hp2| Hp2]; [ now subst p | ].
   rewrite <- (proj2 (Nat.Div0.div_exact _ _)). {
     rewrite fermat_little; [ | easy | easy ].
     symmetry.
     apply Nat.mod_1_l.
     now apply (Nat.le_lt_trans _ a).
   }
+Theorem prime_2_or_odd : ∀ p, prime p → p = 2 ∨ Nat.Odd p.
+Proof.
+intros * Hp.
+destruct (Nat.eq_dec p 2) as [Hp2| Hp2]; [ now left | right ].
+destruct p; [ easy | ].
+apply Nat.Odd_succ.
+progress unfold prime in Hp.
+cbn in Hp.
+destruct p; [ easy | ].
+destruct p; [ easy | clear Hp2 ].
+apply Nat.Even_succ_succ.
+cbn - [ "mod" ] in Hp.
+replace (S (S (S p))) with (S p + 1 * 2) in Hp at 1 by flia.
+rewrite Nat.Div0.mod_add in Hp.
+Print prime_test.
+(* ouais, chais pas *)
+...
+apply Nat.odd_spec.
+apply Bool.not_false_iff_true.
+intros He.
+
+remember (Nat.even p) as ep eqn:Hep.
+symmetry in Hep.
+destruct ep; cycle 1. {
+Search (Nat.odd _ = false).
+Search (Nat.even _ = false).
+Search Nat.Even.
+Print Nat.even.
+apply Bool.not_true_iff_false in He.
+Search Nat.Odd.
+
+apply Nat.Even_succ.
+cbn.
+progress unfold Nat.Even.
+
+Print Nat.OddT.
 ....
 rewrite Nat.mul_sub_distr_l.
 do 2 rewrite Nat.mul_sub_distr_r.
